@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-
 Vue.use(Router)
 
 export default new Router({
@@ -10,7 +9,7 @@ export default new Router({
       path: '/',
       name: '',
       meta: {
-        title: ''
+        title: '工作台'
       },
       component: resolve => require(['@/views/index.vue'], resolve),
       children:[
@@ -18,7 +17,7 @@ export default new Router({
           path: '/',
           name: 'index',
           meta: {
-            title: '首页'
+            title: '工作台'
           },
           component: resolve => require(['@/views/welcome.vue'], resolve),
         },
@@ -47,20 +46,20 @@ export default new Router({
           component: resolve => require(['@/views/basics/index.vue'], resolve),
         },
         {
-          path: '/send-letter',
-          name: 'send-letter',
+          path: '/sendLetter',
+          name: 'sendLetter',
           meta: {
             title: '发函'
           },
-          component: resolve => require(['@/views/send-letter/index.vue'], resolve),
+          component: resolve => require(['@/views/sendLetter/index.vue'], resolve),
         },
         {
-          path: '/circular-notice',
-          name: 'circular-notice',
+          path: '/circularNotice',
+          name: 'circularNotice',
           meta: {
             title: '交房通知'
           },
-          component: resolve => require(['@/views/circular-notice/index.vue'], resolve),
+          component: resolve => require(['@/views/circularNotice/index.vue'], resolve),
         },
         {
           path: '/hydropower',
@@ -71,20 +70,20 @@ export default new Router({
           component: resolve => require(['@/views/hydropower/index.vue'], resolve),
         },
         {
-          path: '/two-books',
-          name: 'two-books',
+          path: '/twoBooks',
+          name: 'twoBooks',
           meta: {
             title: '两书'
           },
-          component: resolve => require(['@/views/two-books/index.vue'], resolve),
+          component: resolve => require(['@/views/twoBooks/index.vue'], resolve),
     },
         {
-          path: '/property-right',
-          name: 'property-right',
+          path: '/propertyRight',
+          name: 'propertyRight',
           meta: {
             title: '产权办理'
           },
-          component: resolve => require(['@/views/property-right/index.vue'], resolve),
+          component: resolve => require(['@/views/propertyRight/index.vue'], resolve),
         },
         {
           path: '/agreement',

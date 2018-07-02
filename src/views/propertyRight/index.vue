@@ -12,14 +12,14 @@
           <Form :model="formItem" :label-width="100" class="search-form">
             <Row>
               <Col span="24">
+              <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="12">
                   <FormItem label="状态">
                     <Select v-model="formItem.select" placeholder="全部">
                       <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
+                      <Option value="shanghai">进行中</Option>
+                      <Option value="shenzhen">已归档</Option>
                     </Select>
                   </FormItem>
                   </Col>
@@ -29,36 +29,13 @@
                   </FormItem>
                   </Col>
                   <Col span="12">
-                  <FormItem label="联系电话">
-                    <Input v-model="formItem.tel"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
                   <FormItem label="楼栋">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
+                    <Input v-model="formItem.input"></Input>
                   </FormItem>
                   </Col>
                   <Col span="12">
                   <FormItem label="房间号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="门牌号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
+                    <Input v-model="formItem.home"></Input>
                   </FormItem>
                   </Col>
                   <Col span="12">
@@ -72,6 +49,7 @@
                   </FormItem>
                   </Col>
                 </Row>
+              </Form>
               </Col>
             </Row>
           </Form>
@@ -90,11 +68,12 @@
 
     <Card>
       <Row style="margin:0 5px 5px 20px;font-size: 20px">
-        <Col span="1">
+        <Col span="4">
         <Button type="primary" @click="modal1 = true" icon="plus-round">新增</Button>
+        <Button type="primary" @click="modal1 = true" icon="plus-round">批量发起</Button>
         <Modal
           v-model="modal1"
-          title="新增水电过户"
+          title="新增合同备案"
           width="800"
           @on-ok="ok"
           @on-cancel="cancel">
@@ -131,7 +110,12 @@
               </FormItem>
               </Col>
 
-              <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
+              <Col span="8">
+              <FormItem label="业主">
+                <Input v-model="modelFormitem.name"></Input>
+              </FormItem>
+              </Col>
+              <Col span="24">
               资料
               </Col>
               <Col span="24">
@@ -167,7 +151,6 @@
           input: '',
           home:'',
           name:'',
-          tel:'',
           select: '',
           radio: 'male',
           checkbox: [],
@@ -240,11 +223,6 @@
             align: 'center'
           },
           {
-            title: '联系电话',
-            key: 'tel',
-            align: 'center'
-          },
-          {
             title: '楼栋',
             key: 'building',
             align: 'center'
@@ -252,16 +230,6 @@
           {
             title: '房间号',
             key: 'home',
-            align: 'center'
-          },
-          {
-            title: '门牌号',
-            key: 'doorNumber',
-            align: 'center'
-          },
-          {
-            title: '房源用途',
-            key: 'housingUse',
             align: 'center'
           },
           {
@@ -275,11 +243,8 @@
             operation: 'John Brown',
             state: 18,
             name: 'New York No. 1 Lake Park',
-            tel:'16461611',
             building: '2016-10-03',
             home:'',
-            doorNumber:'51',
-            housingUse:'',
             time:'2016-10-03'
           },
           {
@@ -326,27 +291,32 @@
             }
           },
           {
+            title: '序号',
+            key: 'serialNumber',
+            align: 'center'
+          },
+          {
             title: '状态',
             key: 'state',
             align: 'center'
           },
           {
-            title: '业主姓名',
+            title: '资料名称',
             key: 'name',
             align: 'center'
           },
           {
-            title: '楼栋',
+            title: '资料数量',
             key: 'building',
             align: 'center'
           },
           {
-            title: '房间号',
+            title: '存档',
             key: 'home',
             align: 'center'
           },
           {
-            title: '更新时间',
+            title: '存档份数',
             key: 'time',
             align: 'center'
           }
@@ -354,19 +324,12 @@
         data2: [
           {
             operation: 'John Brown',
-            state: 18,
+            serialNumber:'1',
+            state: '必填',
             name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'',
-            time:'2016-10-03'
-          },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'dsfvx',
-            time:'2016-10-03'
+            building: '203',
+            home:'222',
+            time:'333'
           }
         ],
       }
@@ -390,3 +353,4 @@
     }
   }
 </script>
+

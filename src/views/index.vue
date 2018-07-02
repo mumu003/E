@@ -160,13 +160,13 @@
             {
               "id": 5,
               "name": "发函",
-              "url": "/send-letter",
+              "url": "/sendLetter",
               "icon": "paper-airplane"
             },
             {
               "id": 6,
               "name": "交房通知",
-              "url": "/circular-notice",
+              "url": "/circularNotice",
               "icon": "unlocked"
             },
             {
@@ -178,13 +178,13 @@
             {
               "id": 8,
               "name": "两书",
-              "url": "/two-books",
+              "url": "/twoBooks",
               "icon": "ios-book"
             },
             {
               "id": 9,
               "name": "产权办理",
-              "url": "/property-right",
+              "url": "/propertyRight",
               "icon": "cube"
             },
             {

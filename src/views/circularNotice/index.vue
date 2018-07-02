@@ -12,6 +12,7 @@
           <Form :model="formItem" :label-width="100" class="search-form">
             <Row>
               <Col span="24">
+              <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="12">
                   <FormItem label="状态">
@@ -24,13 +25,12 @@
                   </FormItem>
                   </Col>
                   <Col span="12">
-                  <FormItem label="业主姓名">
-                    <Input v-model="formItem.name"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="联系电话">
-                    <Input v-model="formItem.tel"></Input>
+                  <FormItem label="地块">
+                    <Select v-model="formItem.select" placeholder="全部">
+                      <Option value="beijing">全部</Option>
+                      <Option value="shanghai">进行中</Option>
+                      <Option value="shenzhen">已归档</Option>
+                    </Select>
                   </FormItem>
                   </Col>
                   <Col span="12">
@@ -52,15 +52,7 @@
                     </Select>
                   </FormItem>
                   </Col>
-                  <Col span="12">
-                  <FormItem label="门牌号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
+
                   <Col span="12">
                   <FormItem label="时间">
                     <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
@@ -72,6 +64,7 @@
                   </FormItem>
                   </Col>
                 </Row>
+              </Form>
               </Col>
             </Row>
           </Form>
@@ -235,13 +228,8 @@
             align: 'center'
           },
           {
-            title: '业主姓名',
-            key: 'name',
-            align: 'center'
-          },
-          {
-            title: '联系电话',
-            key: 'tel',
+            title: '地块',
+            key: 'massif',
             align: 'center'
           },
           {
@@ -260,8 +248,13 @@
             align: 'center'
           },
           {
-            title: '房源用途',
-            key: 'housingUse',
+            title: '面积',
+            key: 'acreage',
+            align: 'center'
+          },
+          {
+            title: '创建人',
+            key: 'founder',
             align: 'center'
           },
           {
@@ -274,36 +267,13 @@
           {
             operation: 'John Brown',
             state: 18,
-            name: 'New York No. 1 Lake Park',
+            massif: 'New York No. 1 Lake Park',
             tel:'16461611',
             building: '2016-10-03',
-            home:'',
+            home:'545',
             doorNumber:'51',
-            housingUse:'',
-            time:'2016-10-03'
-          },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'',
-            time:'2016-10-03'
-          },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'',
-            time:'2016-10-03'
-          },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'dsfvx',
+            acreage:'46465',
+            founder:'hfjk',
             time:'2016-10-03'
           }
         ],

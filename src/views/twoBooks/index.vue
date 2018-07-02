@@ -12,6 +12,7 @@
           <Form :model="formItem" :label-width="100" class="search-form">
             <Row>
               <Col span="24">
+              <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="12">
                   <FormItem label="状态">
@@ -72,6 +73,7 @@
                   </FormItem>
                   </Col>
                 </Row>
+              </Form>
               </Col>
             </Row>
           </Form>
@@ -229,6 +231,7 @@
               },'')
             }
           },
+
           {
             title: '状态',
             key: 'state',
@@ -245,6 +248,11 @@
             align: 'center'
           },
           {
+            title: '业主身份证',
+            key: 'id',
+            align: 'center'
+          },
+          {
             title: '楼栋',
             key: 'building',
             align: 'center'
@@ -255,13 +263,23 @@
             align: 'center'
           },
           {
-            title: '门牌号',
-            key: 'doorNumber',
+            title: '用途',
+            key: 'purpose',
             align: 'center'
           },
           {
-            title: '房源用途',
-            key: 'housingUse',
+            title: '建筑面积',
+            key: 'coveredArea',
+            align: 'center'
+          },
+          {
+            title: '合同交互期限',
+            key: 'contractDurationa',
+            align: 'center'
+          },
+          {
+            title: '房屋实际交互日期',
+            key: 'houseDate',
             align: 'center'
           },
           {
@@ -273,39 +291,47 @@
         data1: [
           {
             operation: 'John Brown',
-            state: 18,
+            state: '通过',
             name: 'New York No. 1 Lake Park',
             tel:'16461611',
+            id:'5446546646464646',
             building: '2016-10-03',
-            home:'',
-            doorNumber:'51',
-            housingUse:'',
+            home:'464',
+            purpose:'555',
+            coveredArea:'64654',
+            contractDurationa:'56546',
+            houseDate:'44',
             time:'2016-10-03'
           },
           {
             operation: 'John Brown',
-            state: 18,
+            state: '驳回',
             name: 'New York No. 1 Lake Park',
+            tel:'16461611',
+            id:'5446546646464646',
             building: '2016-10-03',
-            home:'',
+            home:'464',
+            purpose:'555',
+            coveredArea:'64654',
+            contractDurationa:'56546',
+            houseDate:'44',
             time:'2016-10-03'
           },
           {
             operation: 'John Brown',
-            state: 18,
+            state: '不通过',
             name: 'New York No. 1 Lake Park',
+            tel:'16461611',
+            id:'5446546646464646',
             building: '2016-10-03',
-            home:'',
+            home:'464',
+            purpose:'555',
+            coveredArea:'64654',
+            contractDurationa:'56546',
+            houseDate:'44',
             time:'2016-10-03'
           },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'dsfvx',
-            time:'2016-10-03'
-          }
+
         ],
         modal1: false,
         modelFormitem:{

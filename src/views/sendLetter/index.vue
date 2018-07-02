@@ -9,69 +9,42 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form :model="formItem" :label-width="100" class="search-form">
+          <Form  :model="formItem" :label-width="80">
             <Row>
-              <Col span="24">
-                <Row>
-                  <Col span="12">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="业主姓名">
-                    <Input v-model="formItem.name"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="联系电话">
-                    <Input v-model="formItem.tel"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="楼栋">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="房间号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="门牌号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="时间">
-                    <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem>
-                    <TimePicker type="time" placeholder="Select time" v-model="formItem.time" style="width: 100%;"></TimePicker>
-                  </FormItem>
-                  </Col>
-                </Row>
+              <Col span="12">
+              <FormItem label="状态">
+                <Select v-model="formItem.select" placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="shanghai">通过</Option>
+                  <Option value="shenzhen">驳回</Option>
+                  <Option value="shenzhen">审核中</Option>
+                </Select>
+              </FormItem>
+              </Col>
+              <Col span="12">
+              <FormItem label="业主姓名">
+                <Input v-model="formItem.name"></Input>
+              </FormItem>
+              </Col>
+              <Col span="12">
+              <FormItem label="楼栋">
+                <Input v-model="formItem.input"></Input>
+              </FormItem>
+              </Col>
+              <Col span="12">
+              <FormItem label="房间号">
+                <Input v-model="formItem.home"></Input>
+              </FormItem>
+              </Col>
+              <Col span="12">
+              <FormItem label="时间">
+                <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
+              </FormItem>
+              </Col>
+              <Col span="12">
+              <FormItem>
+                <TimePicker type="time" placeholder="Select time" v-model="formItem.time" style="width: 100%;"></TimePicker>
+              </FormItem>
               </Col>
             </Row>
           </Form>
@@ -79,8 +52,8 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>  重置</Button>
+            <Button type="primary" ><Icon type="search"></Icon> 搜索</Button>
+            <Button  type="ghost" ><Icon type="refresh"></Icon>  重置</Button>
             </Col>
           </div>
         </div>
@@ -88,13 +61,13 @@
       </Col>
     </Row>
 
-    <Card>
+    <Card style="margin-top: 10px;">
       <Row style="margin:0 5px 5px 20px;font-size: 20px">
         <Col span="1">
-        <Button type="primary" @click="modal1 = true" icon="plus-round">新增</Button>
+        <Button type="primary" @click="modal1 = true">新增</Button>
         <Modal
           v-model="modal1"
-          title="新增水电过户"
+          title="新增发函流程"
           width="800"
           @on-ok="ok"
           @on-cancel="cancel">
@@ -102,36 +75,29 @@
           <Form  :model="modelFormitem" :label-width="80">
             <Row>
               <Col span="8">
-              <FormItem label="楼栋">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
-                </Select>
-              </FormItem>
+                <FormItem label="楼栋">
+                  <Input v-model="modelFormitem.name"></Input>
+                </FormItem>
               </Col>
 
               <Col span="8">
-              <FormItem label="单元">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
-                </Select>
-              </FormItem>
+                <FormItem label="单元">
+                  <Input v-model="modelFormitem.name"></Input>
+                </FormItem>
               </Col>
 
               <Col span="8">
-              <FormItem label="房间号">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
-                </Select>
-              </FormItem>
+                <FormItem label="房间号">
+                  <Input v-model="modelFormitem.home"></Input>
+                </FormItem>
               </Col>
 
-              <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
+              <Col span="8">
+              <FormItem label="业主">
+                <Input v-model="modelFormitem.name"></Input>
+              </FormItem>
+              </Col>
+              <Col span="24">
               资料
               </Col>
               <Col span="24">
@@ -143,8 +109,6 @@
         </Modal>
         </Col>
       </Row>
-
-
       <Table border :columns="columns1" :data="data1"></Table>
 
       <Row style="margin-top: 20px;">
@@ -167,7 +131,6 @@
           input: '',
           home:'',
           name:'',
-          tel:'',
           select: '',
           radio: 'male',
           checkbox: [],
@@ -197,18 +160,13 @@
 
                 },'状态详情'),
                 h('Button', {
-                  /* props:{
-                     type:'success'//组件自带样式
-                   },*/
                   style:{
                     width:'100px',
                     margin:'10px 0px'//自己编写样式
                   }
                 },'编辑'),
                 h('Button', {
-                  /* props:{
-                     type:'success'
-                   },*/
+
                   style:{
                     width:'100px',
                     marginBottom:'5px'
@@ -240,11 +198,6 @@
             align: 'center'
           },
           {
-            title: '联系电话',
-            key: 'tel',
-            align: 'center'
-          },
-          {
             title: '楼栋',
             key: 'building',
             align: 'center'
@@ -252,16 +205,6 @@
           {
             title: '房间号',
             key: 'home',
-            align: 'center'
-          },
-          {
-            title: '门牌号',
-            key: 'doorNumber',
-            align: 'center'
-          },
-          {
-            title: '房源用途',
-            key: 'housingUse',
             align: 'center'
           },
           {
@@ -273,44 +216,34 @@
         data1: [
           {
             operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            tel:'16461611',
+            state: '通过',
+            name: '王五',
             building: '2016-10-03',
-            home:'',
-            doorNumber:'51',
-            housingUse:'',
+            home:'656',
             time:'2016-10-03'
           },
           {
             operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
+            state: '驳回',
+            name: '李四',
             building: '2016-10-03',
-            home:'',
+            home:'560',
             time:'2016-10-03'
           },
           {
             operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
+            state: '不通过',
+            name: '张三',
             building: '2016-10-03',
-            home:'',
-            time:'2016-10-03'
-          },
-          {
-            operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'dsfvx',
+            home:'894',
             time:'2016-10-03'
           }
         ],
         modal1: false,
         modelFormitem:{
           select: '',
-          name:''
+          name:'',
+          home:''
         },
         columns2: [
           {
@@ -390,3 +323,4 @@
     }
   }
 </script>
+
