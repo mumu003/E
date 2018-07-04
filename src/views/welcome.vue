@@ -9,12 +9,12 @@
                     <Col span="2">
                     共1000条
                     </Col>
-                    <Col span="8" offset="14" >
+                    <Col span="10" offset="12" >
                     <Page :total="100"></Page>
                     </Col>
                   </Row>
                 </TabPane>
-                <TabPane label="发函">标签二gf的内容</TabPane>
+                <TabPane label="发函">标签二的内容</TabPane>
                 <TabPane label="交房通知">标签三的内容</TabPane>
                 <TabPane label="水电过户">标签二的内容</TabPane>
                 <TabPane label="两书">标签三的内容</TabPane>
@@ -104,6 +104,11 @@ export default {
                 return h('Button', {
                   props:{
                     size:'small'
+                  },
+                  style:{
+                    margin:'10px 0px',//自己编写样式
+                    backgroundColor:'rgb(187, 190, 196)',
+                    color:'#fff'
                   }
                 },'编辑')
               }

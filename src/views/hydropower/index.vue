@@ -10,77 +10,73 @@
         </p>
         <div id="search-body">
           <Form :model="formItem" :label-width="100" class="search-form">
-            <Row>
-              <Col span="24">
-                <Row>
-                  <Col span="12">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="业主姓名">
-                    <Input v-model="formItem.name"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="联系电话">
-                    <Input v-model="formItem.tel"></Input>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="楼栋">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="房间号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">通过</Option>
-                      <Option value="shenzhen">驳回</Option>
-                      <Option value="shenzhen">审核中</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="门牌号">
-                    <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
-                    </Select>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem label="时间">
-                    <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
-                  </FormItem>
-                  </Col>
-                  <Col span="12">
-                  <FormItem>
-                    <TimePicker type="time" placeholder="Select time" v-model="formItem.time" style="width: 100%;"></TimePicker>
-                  </FormItem>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
+              <Row>
+                <Col span="12">
+                <FormItem label="状态">
+                  <Select v-model="formItem.select" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="adopt">通过</Option>
+                    <Option value="reject">驳回</Option>
+                    <Option value="audit">审核中</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="业主姓名">
+                  <Input v-model="formItem.name"></Input>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="联系电话">
+                  <Input v-model="formItem.tel"></Input>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="楼栋">
+                  <Select v-model="formItem.building" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="having">进行中</Option>
+                    <Option value="file">已归档</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="房间号">
+                  <Select v-model="formItem.home" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="adopt">通过</Option>
+                    <Option value="reject">驳回</Option>
+                    <Option value="audit">审核中</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="门牌号">
+                  <Select v-model="formItem.doorplate" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="having">进行中</Option>
+                    <Option value="file">已归档</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="时间">
+                  <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem>
+                  <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                </FormItem>
+                </Col>
+              </Row>
           </Form>
           <div class="search-row">
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>  重置</Button>
+            <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
+            <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
             </Col>
           </div>
         </div>
@@ -88,14 +84,15 @@
       </Col>
     </Row>
 
-    <Card>
-      <Row style="margin:0 5px 5px 20px;font-size: 20px">
+    <Card style="margin-top: 10px;">
+      <Row style="margin:0 0 10px 0px;font-size: 20px">
         <Col span="1">
-        <Button type="primary" @click="modal1 = true" icon="plus-round">新增</Button>
+        <Button type="primary" @click="newHydropowertmodal = true" icon="plus-round">新增</Button>
         <Modal
-          v-model="modal1"
+          v-model="newHydropowertmodal"
           title="新增水电过户"
           width="800"
+          :loading="loading"
           @on-ok="ok"
           @on-cancel="cancel">
 
@@ -103,30 +100,30 @@
             <Row>
               <Col span="8">
               <FormItem label="楼栋">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
 
               <Col span="8">
               <FormItem label="单元">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
 
               <Col span="8">
               <FormItem label="房间号">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
@@ -135,7 +132,7 @@
               资料
               </Col>
               <Col span="24">
-              <Table border :columns="columns2" :data="data2"></Table>
+              <Table border :columns="newHydropowert" :data="newHydropowertdata"></Table>
               </Col>
             </Row>
           </Form>
@@ -168,6 +165,8 @@
           home:'',
           name:'',
           tel:'',
+          building:'',
+          doorplate:'',
           select: '',
           radio: 'male',
           checkbox: [],
@@ -202,13 +201,15 @@
                    },*/
                   style:{
                     width:'100px',
-                    margin:'10px 0px'//自己编写样式
+                    margin:'10px 0px',//自己编写样式
+                    backgroundColor:'rgb(187, 190, 196)',
+                    color:'#fff'
                   }
                 },'编辑'),
                 h('Button', {
-                  /* props:{
-                     type:'success'
-                   },*/
+                  props:{
+                    type:'error'//组件自带样式
+                  },
                   style:{
                     width:'100px',
                     marginBottom:'5px'
@@ -307,12 +308,13 @@
             time:'2016-10-03'
           }
         ],
-        modal1: false,
+        newHydropowertmodal: false,
+        loading: true,
         modelFormitem:{
           select: '',
           name:''
         },
-        columns2: [
+        newHydropowert: [
           {
             title: '选项',
             key: 'option',
@@ -351,7 +353,7 @@
             align: 'center'
           }
         ],
-        data2: [
+        newHydropowertdata: [
           {
             operation: 'John Brown',
             state: 18,
@@ -382,10 +384,26 @@
       },
       //模态框
       ok () {
-        this.$Message.info('你点击了确定');
+        setTimeout(() => {
+          this.newHydropowertmodal = false;
+        }, 2000);
       },
       cancel () {
         this.$Message.info('你取消了操作');
+      },
+      searchSubmit(){
+        this.$refs.table.init();
+      },
+      searchCancel(){
+        this.formItem.select="";
+        this.formItem.name="";
+        this.formItem.tel="";
+        this.formItem.building="";
+        this.formItem.home="";
+        this.formItem.doorplate="";
+        this.formItem.date="";
+        this.formItem.time="";
+        this.$refs.table.init();
       }
     }
   }

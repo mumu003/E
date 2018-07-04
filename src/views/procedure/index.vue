@@ -11,7 +11,7 @@
         <div id="search-body">
           <Form :model="formItem" :label-width="100" class="search-form">
             <Row>
-              <Col span="6">
+              <Col span="12">
               <FormItem label="流程名称" prop="status">
                 <Select v-model="formItem.status" placeholder="全部">
                   <Option value="all">全部</Option>
@@ -20,15 +20,15 @@
               </Col>
             </Row>
             <Row>
-              <Col span="6">
+              <Col span="12">
               <FormItem label="时间" prop="date">
                 <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
               </FormItem>
               </Col>
-              <Col span="2"></Col>
-              <Col span="6">
-              <FormItem prop="date1" label="--">
-                <DatePicker type="date" placeholder="" v-model="formItem.date1" style="width: 100%"></DatePicker>
+
+              <Col span="12">
+              <FormItem>
+                <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
               </FormItem>
               </Col>
             </Row>
@@ -67,7 +67,13 @@
       </Col>
     </Row>
 
-    <Modal title="新增流程设置" v-model="addModal" :closable="false" width="800px">
+    <Modal
+      title="新增流程设置"
+      v-model="addModal"
+      width="800"
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
       <Form :label-width="100" class="modal-form" :model="addForm">
         <Row>
           <Col span="12">
@@ -95,7 +101,7 @@
           </Col>
           <Col span="24">
           <FormItem label="">
-            <Table border :columns="columns2" :data="data2"></Table>
+            <Table border :columns="newProcess" :data="newProcessdata"></Table>
           </FormItem>
           </Col>
           <Col span="12">
@@ -116,7 +122,7 @@
           </Col>
           <Col span="12">
           <FormItem label="存档资料" prop="name">
-            <Input v-model="addForm.name" placeholder="" id="name" @click="selectMaterialModal = true"></Input>
+            <Input v-model="addForm.name" placeholder=""  @click="selectMaterialModal = true"></Input>
           </FormItem>
           </Col>
           <Col span="12">
@@ -128,7 +134,7 @@
           </Col>
           <Col span="12">
           <FormItem label="存档资料" prop="name">
-            <Input v-model="addForm.name" placeholder="" id="name"></Input>
+            <Input v-model="addForm.name" placeholder="" ></Input>
           </FormItem>
           </Col>
         </Row>
@@ -239,13 +245,15 @@
     data () {
       return {
         addModal: false,
+        loading: true,
         selectMaterialModal:false,
         addMaterialModal:false,
         editMaterialModal:false,
         formItem: {
           select: '',
           date: '',
-          date1:''
+          time:'',
+          status:''
         },
         addForm:{
           name:'',
@@ -287,7 +295,9 @@
                 },"详情"),
                 h("Button",{
                   style:{
-                    margin:'5px 0'
+                    margin:'5px 0',
+                    backgroundColor:'rgb(187, 190, 196)',
+                    color:'#fff'
                   }
                 },"编辑")
               ])
@@ -334,7 +344,7 @@
             date: '2016-10-02 12:00:00'
           }
         ],
-        columns2: [
+        newProcess: [
           {
             title: '选项',
             key: 'name',
@@ -378,7 +388,7 @@
             align:"center",
           }
         ],
-        data2: [
+        newProcessdata: [
           {
             num: '1',
             status: '必填',
@@ -399,17 +409,24 @@
       }
     },
     methods:{
+      ok () {
+        setTimeout(() => {
+          this.addModal = false;
+        }, 2000);
+      },
+      cancel () {
+        this.$Message.info('你取消了操作');
+      },
       searchSubmit(){
         this.$refs.table.init();
       },
       searchCancel(){
-        this.formItem.name="";
+        this.formItem.time="";
+        this.formItem.status="";
+        this.formItem.date="";
         this.$refs.table.init();
       },
     }
   }
 </script>
 
-<style>
-
-</style>

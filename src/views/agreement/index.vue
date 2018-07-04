@@ -9,17 +9,14 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form :model="formItem" :label-width="100" class="search-form">
-            <Row>
-              <Col span="24">
               <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="12">
                   <FormItem label="状态">
                     <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="beijing">全部</Option>
-                      <Option value="shanghai">进行中</Option>
-                      <Option value="shenzhen">已归档</Option>
+                      <Option value="all">全部</Option>
+                      <Option value="having">进行中</Option>
+                      <Option value="file">已归档</Option>
                     </Select>
                   </FormItem>
                   </Col>
@@ -27,20 +24,17 @@
                 <Row>
                   <Col span="12">
                   <FormItem label="时间">
-                    <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                    <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
                   </FormItem>
                   </Col>
                   <Col span="12">
                   <FormItem>
-                    <TimePicker type="time" placeholder="Select time" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                    <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
                   </FormItem>
                   </Col>
                 </Row>
               </Form>
-              </Col>
-            </Row>
-          </Form>
-          <div class="search-row">
+            <div class="search-row">
             <Col>
             </Col>
             <Col>
@@ -53,14 +47,15 @@
       </Col>
     </Row>
 
-    <Card>
-      <Row style="margin:0 5px 5px 20px;font-size: 20px">
+    <Card style="margin-top: 10px;">
+      <Row style="margin:0 0 10px 0px;font-size: 20px">
         <Col span="1">
-        <Button type="primary" @click="modal1 = true" icon="plus-round">新增</Button>
+        <Button type="primary" @click="newAgreementmodal = true" icon="plus-round">新增</Button>
         <Modal
-          v-model="modal1"
-          title="新增合同备案"
+          v-model="newAgreementmodal"
+          title="新增协议书申请"
           width="800"
+          :loading="loading"
           @on-ok="ok"
           @on-cancel="cancel">
 
@@ -68,30 +63,30 @@
             <Row>
               <Col span="8">
               <FormItem label="楼栋">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
 
               <Col span="8">
               <FormItem label="单元">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
 
               <Col span="8">
               <FormItem label="房间号">
-                <Select placeholder="">
-                  <Option value="beijing">全部</Option>
-                  <Option value="shanghai">进行中</Option>
-                  <Option value="shenzhen">已归档</Option>
+                <Select placeholder="全部">
+                  <Option value="all">全部</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
@@ -105,7 +100,7 @@
               资料
               </Col>
               <Col span="24">
-              <Table border :columns="columns2" :data="data2"></Table>
+              <Table border :columns="newAgreement" :data="newAgreementdata"></Table>
               </Col>
             </Row>
           </Form>
@@ -168,10 +163,15 @@
                    },*/
                   style:{
                     width:'100px',
-                    margin:'10px 0px'//自己编写样式
+                    margin:'10px 0px',//自己编写样式
+                    backgroundColor:'rgb(187, 190, 196)',
+                    color:'#fff'
                   }
                 },'编辑'),
                 h('Button', {
+                  props:{
+                    type:'error'//组件自带样式
+                  },
                   style:{
                     width:'100px',
                     marginBottom:'5px'
@@ -228,12 +228,13 @@
             time:'2016-10-03'
           }
         ],
-        modal1: false,
+        newAgreementmodal: false,
+        loading: true,
         modelFormitem:{
           select: '',
           name:''
         },
-        columns2: [
+        newAgreement: [
           {
             title: '选项',
             key: 'option',
@@ -277,7 +278,7 @@
             align: 'center'
           }
         ],
-        data2: [
+        newAgreementdata: [
           {
             operation: 'John Brown',
             serialNumber:'1',
@@ -301,10 +302,21 @@
       },
       //模态框
       ok () {
-        this.$Message.info('你点击了确定');
+        setTimeout(() => {
+          this.newAgreementmodal = false;
+        }, 2000);
       },
       cancel () {
         this.$Message.info('你取消了操作');
+      },
+      searchSubmit(){
+        this.$refs.table.init();
+      },
+      searchCancel(){
+        this.formItem.select="";
+        this.formItem.date="";
+        this.formItem.time="";
+        this.$refs.table.init();
       }
     }
   }

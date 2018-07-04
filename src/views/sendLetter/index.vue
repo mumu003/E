@@ -15,9 +15,8 @@
               <FormItem label="状态">
                 <Select v-model="formItem.select" placeholder="全部">
                   <Option value="all">全部</Option>
-                  <Option value="shanghai">通过</Option>
-                  <Option value="shenzhen">驳回</Option>
-                  <Option value="shenzhen">审核中</Option>
+                  <Option value="having">进行中</Option>
+                  <Option value="file">已归档</Option>
                 </Select>
               </FormItem>
               </Col>
@@ -28,7 +27,7 @@
               </Col>
               <Col span="12">
               <FormItem label="楼栋">
-                <Input v-model="formItem.input"></Input>
+                <Input v-model="formItem.building"></Input>
               </FormItem>
               </Col>
               <Col span="12">
@@ -38,12 +37,12 @@
               </Col>
               <Col span="12">
               <FormItem label="时间">
-                <DatePicker type="date" placeholder="Select date" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
               </FormItem>
               </Col>
               <Col span="12">
               <FormItem>
-                <TimePicker type="time" placeholder="Select time" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
               </FormItem>
               </Col>
             </Row>
@@ -52,8 +51,8 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary" ><Icon type="search"></Icon> 搜索</Button>
-            <Button  type="ghost" ><Icon type="refresh"></Icon>  重置</Button>
+            <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
+            <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
             </Col>
           </div>
         </div>
@@ -62,13 +61,14 @@
     </Row>
 
     <Card style="margin-top: 10px;">
-      <Row style="margin:0 5px 5px 20px;font-size: 20px">
+      <Row style="margin:0 0 10px 0px;font-size: 20px">
         <Col span="1">
-        <Button type="primary" @click="modal1 = true">新增</Button>
+        <Button type="primary" @click="newLettermodal = true" icon="plus-round">新增</Button>
         <Modal
-          v-model="modal1"
+          v-model="newLettermodal"
           title="新增发函流程"
           width="800"
+          :loading="loading"
           @on-ok="ok"
           @on-cancel="cancel">
 
@@ -101,7 +101,7 @@
               资料
               </Col>
               <Col span="24">
-              <Table border :columns="columns2" :data="data2"></Table>
+              <Table border :columns="newLetter" :data="newLetterdata"></Table>
               </Col>
             </Row>
           </Form>
@@ -162,11 +162,15 @@
                 h('Button', {
                   style:{
                     width:'100px',
-                    margin:'10px 0px'//自己编写样式
+                    margin:'10px 0px',//自己编写样式
+                    backgroundColor:'rgb(187, 190, 196)',
+                    color:'#fff'
                   }
                 },'编辑'),
                 h('Button', {
-
+                  props:{
+                    type:'error'//组件自带样式
+                  },
                   style:{
                     width:'100px',
                     marginBottom:'5px'
@@ -239,13 +243,14 @@
             time:'2016-10-03'
           }
         ],
-        modal1: false,
+        newLettermodal: false,
+        loading: true,
         modelFormitem:{
           select: '',
           name:'',
           home:''
         },
-        columns2: [
+        newLetter: [
           {
             title: '选项',
             key: 'option',
@@ -259,49 +264,56 @@
             }
           },
           {
+            title: '序号',
+            key: 'serialNumber',
+            align: 'center'
+          },
+          {
             title: '状态',
             key: 'state',
             align: 'center'
           },
           {
-            title: '业主姓名',
+            title: '资料名称',
             key: 'name',
             align: 'center'
           },
           {
-            title: '楼栋',
+            title: '资料数量',
             key: 'building',
             align: 'center'
           },
           {
-            title: '房间号',
+            title: '存档',
             key: 'home',
             align: 'center'
           },
           {
-            title: '更新时间',
+            title: '存档份数',
             key: 'time',
             align: 'center'
           }
         ],
-        data2: [
+        newLetterdata: [
           {
             operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'',
-            time:'2016-10-03'
+            serialNumber:'1',
+            state: '必填',
+            name: '业主身份证',
+            building: '203',
+            home:'222',
+            time:'333'
           },
           {
             operation: 'John Brown',
-            state: 18,
-            name: 'New York No. 1 Lake Park',
-            building: '2016-10-03',
-            home:'dsfvx',
-            time:'2016-10-03'
+            serialNumber:'1',
+            state: '必填',
+            name: '业主身份证',
+            building: '203',
+            home:'222',
+            time:'333'
           }
-        ],
+        ]
       }
     },
     methods: {
@@ -315,10 +327,24 @@
       },
       //模态框
       ok () {
-        this.$Message.info('你点击了确定');
+        setTimeout(() => {
+          this.newLettermodal = false;
+        }, 2000);
       },
       cancel () {
         this.$Message.info('你取消了操作');
+      },
+      searchSubmit(){
+        this.$refs.table.init();
+      },
+      searchCancel(){
+        this.formItem.select="";
+        this.formItem.name="";
+        this.formItem.building="";
+        this.formItem.home="";
+        this.formItem.date="";
+        this.formItem.time="";
+        this.$refs.table.init();
       }
     }
   }
