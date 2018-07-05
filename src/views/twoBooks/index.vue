@@ -2,157 +2,155 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title">
-          <Icon type="levels"></Icon>
-          检索
-          <collapse-icon foldPart="search-body"></collapse-icon>
-        </p>
-        <div id="search-body">
-          <Form :model="formItem" :label-width="100" class="search-form">
-            <Row>
-              <Col span="12">
-              <FormItem label="状态">
-                <Select v-model="formItem.select" placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="adopt">通过</Option>
-                  <Option value="reject">驳回</Option>
-                  <Option value="audit">审核中</Option>
-                </Select>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="业主姓名">
-                <Input v-model="formItem.name"></Input>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="联系电话">
-                <Input v-model="formItem.tel"></Input>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="楼栋">
-                <Select v-model="formItem.building" placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="房间号">
-                <Select v-model="formItem.home" placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="adopt">通过</Option>
-                  <Option value="reject">驳回</Option>
-                  <Option value="audit">审核中</Option>
-                </Select>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="门牌号">
-                <Select v-model="formItem.doorplate" placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem label="时间">
-                <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
-              </FormItem>
-              </Col>
-              <Col span="12">
-              <FormItem>
-                <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
-              </FormItem>
-              </Col>
-            </Row>
+        <Card class="search-card">
+          <p slot="title">
+            <Icon type="levels"></Icon>
+              检索
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form :model="formItem" :label-width="100" class="search-form">
+              <Row>
+                <Col span="12">
+                  <FormItem label="状态">
+                  <Select v-model="formItem.select" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="adopt">通过</Option>
+                    <Option value="reject">驳回</Option>
+                    <Option value="audit">审核中</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="业主姓名">
+                  <Input v-model="formItem.name"></Input>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="联系电话">
+                  <Input v-model="formItem.tel"></Input>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="楼栋">
+                  <Select v-model="formItem.building" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="having">进行中</Option>
+                    <Option value="file">已归档</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="房间号">
+                  <Select v-model="formItem.home" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="adopt">通过</Option>
+                    <Option value="reject">驳回</Option>
+                    <Option value="audit">审核中</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                 <FormItem label="门牌号">
+                  <Select v-model="formItem.doorplate" placeholder="全部">
+                    <Option value="all">全部</Option>
+                    <Option value="having">进行中</Option>
+                    <Option value="file">已归档</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="时间">
+                  <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem>
+                  <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                </FormItem>
+                </Col>
+              </Row>
           </Form>
-          <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-            <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
-            </Col>
-          </div>
+            <div class="search-row">
+              <Col>
+              </Col>
+              <Col>
+                <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
+                <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
+              </Col>
+            </div>
         </div>
-      </Card>
+        </Card>
       </Col>
     </Row>
+    <Row :gutter="10">
+      <Col span="24">
+        <Card style="margin-top: 10px;">
+          <Row style="margin:0 0 10px 0px;font-size: 20px">
+            <Col span="1">
+              <Button type="primary" @click="twoNewbooksmodal = true" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+          <Table border :columns="columns1" :data="data1"></Table>
+          <Row style="margin-top: 20px;">
+            <Col span="2">
+              共1000条
+            </Col>
+            <Col span="10" offset="12" >
+              <Page :total="100"></Page>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+    </Row>
+    <Modal v-model="twoNewbooksmodal" title="新增两书"
+      width="800"
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
 
-    <Card style="margin-top: 10px;">
-      <Row style="margin:0 0 10px 0px;font-size: 20px">
-        <Col span="1">
-        <Button type="primary" @click="twoNewbooksmodal = true" icon="plus-round">新增</Button>
-        <Modal
-          v-model="twoNewbooksmodal"
-          title="新增两书"
-          width="800"
-          :loading="loading"
-          @on-ok="ok"
-          @on-cancel="cancel">
+      <Form  :model="modelFormitem" :label-width="80">
+        <Row>
+          <Col span="8">
+          <FormItem label="楼栋">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-          <Form  :model="modelFormitem" :label-width="80">
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+          <Col span="8">
+          <FormItem label="单元">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-              <Col span="8">
-              <FormItem label="单元">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+          <Col span="8">
+          <FormItem label="房间号">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-              <Col span="8">
-              <FormItem label="房间号">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+          <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
+          资料
+          </Col>
+          <Col span="24">
+          <Table border :columns="twoNewbooks" :data="twoNewbooksdata"></Table>
+          </Col>
+        </Row>
+      </Form>
 
-              <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
-              资料
-              </Col>
-              <Col span="24">
-              <Table border :columns="twoNewbooks" :data="twoNewbooksdata"></Table>
-              </Col>
-            </Row>
-          </Form>
-
-        </Modal>
-        </Col>
-      </Row>
-
-
-      <Table border :columns="columns1" :data="data1"></Table>
-
-      <Row style="margin-top: 20px;">
-        <Col span="2">
-        共1000条
-        </Col>
-        <Col span="10" offset="12" >
-        <Page :total="100"></Page>
-        </Col>
-      </Row>
-    </Card>
+    </Modal>
   </div>
 </template>
 <script type="text/ecmascript-6">
@@ -185,9 +183,6 @@
             render:function(h,params){
               return h('div',[
                 h('Button', {
-                  /* props:{
-                     type:'success'
-                   },*/
                   style:{
                     width:'100px',
                     marginTop:'5px'

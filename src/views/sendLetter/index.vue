@@ -2,14 +2,14 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title">
-          <Icon type="levels"></Icon>
-          检索
-          <collapse-icon foldPart="search-body"></collapse-icon>
-        </p>
-        <div id="search-body">
-          <Form  :model="formItem" :label-width="80">
+        <Card class="search-card">
+          <p slot="title">
+            <Icon type="levels"></Icon>
+              检索
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form  :model="formItem" :label-width="80">
             <Row>
               <Col span="12">
               <FormItem label="状态">
@@ -51,75 +51,76 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
+              <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
+              <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
             </Col>
           </div>
         </div>
-      </Card>
+        </Card>
       </Col>
     </Row>
+    <Row :gutter="10">
+      <Col span="24">
+        <Card style="margin-top: 10px;">
+          <Row style="margin:0 0 10px 0px;font-size: 20px">
+            <Col span="1">
+              <Button type="primary" @click="newLettermodal = true" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+          <Table border :columns="columns1" :data="data1"></Table>
 
-    <Card style="margin-top: 10px;">
-      <Row style="margin:0 0 10px 0px;font-size: 20px">
-        <Col span="1">
-        <Button type="primary" @click="newLettermodal = true" icon="plus-round">新增</Button>
-        <Modal
-          v-model="newLettermodal"
-          title="新增发函流程"
-          width="800"
-          :loading="loading"
-          @on-ok="ok"
-          @on-cancel="cancel">
-
-          <Form  :model="modelFormitem" :label-width="80">
-            <Row>
-              <Col span="8">
-                <FormItem label="楼栋">
-                  <Input v-model="modelFormitem.name"></Input>
-                </FormItem>
-              </Col>
-
-              <Col span="8">
-                <FormItem label="单元">
-                  <Input v-model="modelFormitem.name"></Input>
-                </FormItem>
-              </Col>
-
-              <Col span="8">
-                <FormItem label="房间号">
-                  <Input v-model="modelFormitem.home"></Input>
-                </FormItem>
-              </Col>
-
-              <Col span="8">
-              <FormItem label="业主">
-                <Input v-model="modelFormitem.name"></Input>
-              </FormItem>
-              </Col>
-              <Col span="24">
-              资料
-              </Col>
-              <Col span="24">
-              <Table border :columns="newLetter" :data="newLetterdata"></Table>
-              </Col>
-            </Row>
-          </Form>
-
-        </Modal>
-        </Col>
+          <Row style="margin-top: 20px;">
+            <Col span="2">
+              共1000条
+            </Col>
+            <Col span="10" offset="12" >
+              <Page :total="100"></Page>
+            </Col>
       </Row>
-      <Table border :columns="columns1" :data="data1"></Table>
+        </Card>
+      </Col>
+    </Row>
+    <Modal v-model="newLettermodal" title="新增发函流程"
+      width="800"
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
 
-      <Row style="margin-top: 20px;">
-        <Col span="2">
-        共1000条
-        </Col>
-        <Col span="10" offset="12" >
-        <Page :total="100"></Page>
-        </Col>
-      </Row>
-    </Card>
+      <Form  :model="modelFormitem" :label-width="80">
+        <Row>
+          <Col span="8">
+          <FormItem label="楼栋">
+            <Input v-model="modelFormitem.name"></Input>
+          </FormItem>
+          </Col>
+
+          <Col span="8">
+          <FormItem label="单元">
+            <Input v-model="modelFormitem.name"></Input>
+          </FormItem>
+          </Col>
+
+          <Col span="8">
+          <FormItem label="房间号">
+            <Input v-model="modelFormitem.home"></Input>
+          </FormItem>
+          </Col>
+
+          <Col span="8">
+          <FormItem label="业主">
+            <Input v-model="modelFormitem.name"></Input>
+          </FormItem>
+          </Col>
+          <Col span="24">
+          资料
+          </Col>
+          <Col span="24">
+          <Table border :columns="newLetter" :data="newLetterdata"></Table>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
+
   </div>
 </template>
 <script type="text/ecmascript-6">
@@ -149,9 +150,6 @@
             render:function(h,params){
               return h('div',[
                 h('Button', {
-                  /* props:{
-                     type:'success'
-                   },*/
                   style:{
                     width:'100px',
                     marginTop:'5px'

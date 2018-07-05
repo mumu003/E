@@ -12,7 +12,7 @@
               <FormItem prop="userName">
                 <Input v-model="form.userName" placeholder="请输入用户名">
                 <span slot="prepend">
-                    <Icon :size="16" type="person"></Icon>
+                  <Icon :size="16" type="person"></Icon>
                 </span>
                 </Input>
               </FormItem>
@@ -78,7 +78,8 @@
                 .then(res => {
                   console.log(res.data)
                   if (res.data.code === 200) {
-                    sessionStorage.setItem("token", res.data.data.token)
+                    sessionStorage.setItem("token", res.data.data.token);
+                    sessionStorage.setItem("name",res.data.data.username);
                     this.$router.push("/")
                     this.$Message.success("登录成功！")
                   } else {

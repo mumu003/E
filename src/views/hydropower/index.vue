@@ -2,14 +2,14 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title">
-          <Icon type="levels"></Icon>
-          检索
-          <collapse-icon foldPart="search-body"></collapse-icon>
-        </p>
-        <div id="search-body">
-          <Form :model="formItem" :label-width="100" class="search-form">
+        <Card class="search-card">
+          <p slot="title">
+            <Icon type="levels"></Icon>
+              检索
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
                 <Col span="12">
                 <FormItem label="状态">
@@ -80,79 +80,80 @@
             </Col>
           </div>
         </div>
-      </Card>
+        </Card>
       </Col>
     </Row>
 
-    <Card style="margin-top: 10px;">
-      <Row style="margin:0 0 10px 0px;font-size: 20px">
-        <Col span="1">
-        <Button type="primary" @click="newHydropowertmodal = true" icon="plus-round">新增</Button>
-        <Modal
-          v-model="newHydropowertmodal"
-          title="新增水电过户"
-          width="800"
-          :loading="loading"
-          @on-ok="ok"
-          @on-cancel="cancel">
+    <Row :gutter="10">
+      <Col span="24">
+        <Card style="margin-top: 10px;">
+          <Row style="margin:0 0 10px 0px;font-size: 20px">
+            <Col span="1">
+              <Button type="primary" @click="newHydropowertmodal = true" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+          <Table border :columns="columns1" :data="data1"></Table>
+          <Row style="margin-top: 20px;">
+            <Col span="2">
+              共1000条
+            </Col>
+            <Col span="10" offset="12" >
+              <Page :total="100"></Page>
+            </Col>
+        </Row>
+        </Card>
+      </Col>
+    </Row>
 
-          <Form  :model="modelFormitem" :label-width="80">
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+    <Modal v-model="newHydropowertmodal" title="新增水电过户"
+      width="800"
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
 
-              <Col span="8">
-              <FormItem label="单元">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+      <Form  :model="modelFormitem" :label-width="80">
+        <Row>
+          <Col span="8">
+          <FormItem label="楼栋">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-              <Col span="8">
-              <FormItem label="房间号">
-                <Select placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
-                </Select>
-              </FormItem>
-              </Col>
+          <Col span="8">
+          <FormItem label="单元">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-              <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
-              资料
-              </Col>
-              <Col span="24">
-              <Table border :columns="newHydropowert" :data="newHydropowertdata"></Table>
-              </Col>
-            </Row>
-          </Form>
+          <Col span="8">
+          <FormItem label="房间号">
+            <Select placeholder="全部">
+              <Option value="all">全部</Option>
+              <Option value="having">进行中</Option>
+              <Option value="file">已归档</Option>
+            </Select>
+          </FormItem>
+          </Col>
 
-        </Modal>
-        </Col>
-      </Row>
+          <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
+          资料
+          </Col>
+          <Col span="24">
+          <Table border :columns="newHydropowert" :data="newHydropowertdata"></Table>
+          </Col>
+        </Row>
+      </Form>
 
+    </Modal>
 
-      <Table border :columns="columns1" :data="data1"></Table>
-
-      <Row style="margin-top: 20px;">
-        <Col span="2">
-        共1000条
-        </Col>
-        <Col span="10" offset="12" >
-        <Page :total="100"></Page>
-        </Col>
-      </Row>
-    </Card>
   </div>
 </template>
 <script type="text/ecmascript-6">

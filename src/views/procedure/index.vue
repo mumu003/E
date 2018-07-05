@@ -2,62 +2,62 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title">
-          <Icon type="levels"></Icon>
-          检索
-          <collapse-icon foldPart="search-body"></collapse-icon>
-        </p>
-        <div id="search-body">
-          <Form :model="formItem" :label-width="100" class="search-form">
-            <Row>
-              <Col span="12">
-              <FormItem label="流程名称" prop="status">
-                <Select v-model="formItem.status" placeholder="全部">
-                  <Option value="all">全部</Option>
-                </Select>
-              </FormItem>
-              </Col>
-            </Row>
-            <Row>
-              <Col span="12">
-              <FormItem label="时间" prop="date">
-                <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
-              </FormItem>
-              </Col>
+        <Card class="search-card">
+          <p slot="title">
+            <Icon type="levels"></Icon>
+            检索
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form :model="formItem" :label-width="100" class="search-form">
+              <Row>
+                <Col span="12">
+                  <FormItem label="流程名称" prop="status">
+                    <Select v-model="formItem.status" placeholder="全部">
+                      <Option value="all">全部</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem label="时间" prop="date">
+                    <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
+                  </FormItem>
+                </Col>
 
-              <Col span="12">
-              <FormItem>
-                <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
-              </FormItem>
-              </Col>
-            </Row>
+                <Col span="12">
+                  <FormItem>
+                    <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                  </FormItem>
+                </Col>
+              </Row>
           </Form>
           <div class="search-row">
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon>检索</Button>
-            <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>重置</Button>
+              <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon>检索</Button>
+              <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>重置</Button>
             </Col>
           </div>
         </div>
-      </Card>
+        </Card>
       </Col>
     </Row>
 
     <Row :gutter="10" class="mt10">
       <Col span="24">
-      <Card>
-        <div class="search-row">
-          <Col>
-          <Button type="primary" @click="addModal = true"><Icon type="plus-round"></Icon> 新增</Button>
-          </Col>
-          <Col>
-          </Col>
-        </div>
-        <Row class="searchable-table-con">
-          <Table border :columns="columns1" :data="data1"></Table>
+        <Card>
+          <div class="search-row">
+            <Col>
+              <Button type="primary" @click="addModal = true"><Icon type="plus-round"></Icon> 新增</Button>
+            </Col>
+            <Col>
+            </Col>
+          </div>
+          <Row class="searchable-table-con">
+            <Table border :columns="columns1" :data="data1"></Table>
           <Row style="margin: 10px">
             <Col span="2" style="font-size: 14px">共1000条</Col>
             <Col span="7" offset="15"><Page :total="100"></Page></Col>
@@ -67,9 +67,7 @@
       </Col>
     </Row>
 
-    <Modal
-      title="新增流程设置"
-      v-model="addModal"
+    <Modal title="新增流程设置" v-model="addModal"
       width="800"
       :loading="loading"
       @on-ok="ok"

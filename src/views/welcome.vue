@@ -22,10 +22,7 @@
                 <TabPane label="协议书申请">标签三的内容</TabPane>
               </Tabs>
             </Col>
-
-
         </Row>
-
         <Row :gutter="10" style="margin-top:10px;" v-if="urlShow">
             <Col span="24">
                 <Card>
@@ -53,20 +50,19 @@
         <Modal v-model="editModal" title="修改项目地址" :closable="false"  :mask-closable="false">
           <div>
             <Form :model="editForm" :label-width="100" class="search-form">
-            <Row>
-              <Col span="20" offset="1">
-                  <FormItem label="项目地址">
-                      <Input v-model="editForm.projectUrl" placeholder=""></Input>
-                 </FormItem>
-              </Col>
+              <Row>
+                <Col span="20" offset="1">
+                    <FormItem label="项目地址">
+                        <Input v-model="editForm.projectUrl" placeholder=""></Input>
+                   </FormItem>
+                </Col>
             </Row>
-          </Form>
-        </div>
-        <div slot="footer">
+            </Form>
+          </div>
+          <div slot="footer">
               <Button type="primary" @click="editSubmit">确定</Button>
           </div>
         </Modal>
-
     </div>
 </template>
 

@@ -2,15 +2,15 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title">
-          <Icon type="levels"></Icon>
-            检索
-          <collapse-icon foldPart="search-body"></collapse-icon>
-        </p>
-        <div id="search-body">
-          <Form  :model="formItem" :label-width="80">
-            <Row>
+        <Card class="search-card">
+          <p slot="title">
+            <Icon type="levels"></Icon>
+              检索
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form  :model="formItem" :label-width="80">
+              <Row>
               <Col span="12">
               <FormItem label="状态">
                 <Select v-model="formItem.select" placeholder="全部">
@@ -46,78 +46,29 @@
               </FormItem>
               </Col>
             </Row>
-          </Form>
-          <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-            <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
-            </Col>
+            </Form>
+            <div class="search-row">
+              <Col>
+              </Col>
+              <Col>
+                <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
+                <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
+              </Col>
           </div>
         </div>
       </Card>
       </Col>
     </Row>
 
-    <Card style="margin-top: 10px;">
+    <Row :gutter="10">
+      <Col span="24">
+        <Card style="margin-top: 10px;">
         <Row style="margin:0 0 10px 0px;font-size: 20px">
           <Col span="1">
           <Button type="primary" @click="addContractmodal = true" icon="plus-round">新增</Button>
-          <Modal
-          v-model="addContractmodal"
-          title="新增合同备案"
-          width="800"
-          :loading="loading"
-          @on-ok="ok"
-          @on-cancel="cancel">
-
-          <Form  :model="modelFormitem" :label-width="100">
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Select v-model="formItem.buildingsLierId">
-                  <Option :value="item.id" v-for="item in buildingsLierList" :key="item.id">{{item.name}}</Option>
-                </Select>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="单元">
-                <Select v-model="formItem.unitLierId">
-                  <Option :value="item.id" v-for="item in unitLierList" :key="item.id">{{item.name}}</Option>
-                </Select>
-                <!--{{id}}-->
-              </FormItem>
-              </Col>
-
-              <Col span="8">
-                <FormItem label="房间号">
-                    <Select v-model="formItem.roomsLierId">
-                      <Option :value="item.id" v-for="item in roomsLierList" :key="item.id">{{item.num}}</Option>
-                    </Select>
-                </FormItem>
-              </Col>
-              <Col span="8">
-                <FormItem label="业主">
-                  <Input v-model="modelFormitem.name"></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                资料
-              </Col>
-              <Col span="24">
-                <Table border :columns="addContract" :data="addContractdata"></Table>
-              </Col>
-            </Row>
-          </Form>
-
-        </Modal>
           </Col>
-
         </Row>
-
         <Table border :columns="columns1" :data="data1"></Table>
-
         <Row style="margin-top: 20px;">
           <Col span="2">
             共1000条
@@ -127,6 +78,51 @@
           </Col>
         </Row>
     </Card>
+      </Col>
+    </Row>
+
+    <Modal v-model="addContractmodal" title="新增合同备案"
+      width="800"
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
+      <Form  :model="modelFormitem" :label-width="100">
+        <Row>
+          <Col span="8">
+          <FormItem label="楼栋">
+            <Select v-model="formItem.buildingsLierId" @on-change="change">
+              <Option :value="item.id" v-for="item in buildingsLierList" :key="item.id" >{{item.name}}</Option>
+            </Select>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="单元">
+            <Select v-model="formItem.unitLierId">
+              <Option :value="item.id" v-for="item in unitLierList" :key="item.id" >{{item.name}}</Option>
+            </Select>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="房间号">
+            <Select v-model="formItem.roomsLierId">
+              <Option :value="item.id" v-for="item in roomsLierList" :key="item.id">{{item.num}}</Option>
+            </Select>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="业主">
+            <Input v-model="modelFormitem.name"></Input>
+          </FormItem>
+          </Col>
+          <Col span="24">
+          资料
+          </Col>
+          <Col span="24">
+          <Table border :columns="addContract" :data="addContractdata"></Table>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
   </div>
 </template>
 <script>
@@ -142,13 +138,13 @@
         value1: '1',
         //表单
         formItem: {
+          buildingsLierId:'',
           home:'',
           name:'',
           select: '',
           building: '',
           date: '',
           time: '',
-          buildingsLierId:'',
           unitLierId:'',
           roomsLierId:''
         },
@@ -343,10 +339,11 @@
       this.getBuildingslier(),
       this.getUnitLier(),
       this.getRoomsLier()
-
     },
     methods: {//对象
-
+      change(){
+        console.log(this.formItem.buildingsLierId)
+      },
       //获取楼栋列表
       getBuildingslier(){
         this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingList", '', res => {
