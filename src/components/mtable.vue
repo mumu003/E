@@ -6,7 +6,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   props: ['config', 'searchParams', 'isFirst'],
@@ -27,7 +26,7 @@ export default {
   computed: {
     selected_count () {
       let count = 0
-      this.tableData.forEach(function (item) {
+      this.tableData.forEach(function (item) {//调用数组的每个元素，并将元素传递给回调函数
         if (item._checked) {
           count++
         }

@@ -85,6 +85,7 @@
         <Col span="24">
             <Card>
                 <div class="search-row">
+                  <Row>
                     <Col>
                         <Button type="primary" @click="addProject"><Icon type="plus-round"></Icon> 新增</Button>
                         <Button type="info" @click="addProject"><Icon type="edit"></Icon> 编辑</Button>
@@ -93,6 +94,7 @@
                     </Col>
                     <Col>
                     </Col>
+                  </Row>
                 </div>
                 <Row class="searchable-table-con">
                     <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
@@ -273,7 +275,7 @@
                         }, '查看详情'),
                       ])
                     }
-                    
+
                   }
                 },
                 {

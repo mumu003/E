@@ -12,8 +12,8 @@
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
                 <Col span="9">
-                  <FormItem label="流程名称" prop="name">
-                    <Select v-model="formItem.name" placeholder="全部">
+                  <FormItem label="流程名称" prop="status">
+                    <Select v-model="formItem.status" placeholder="全部">
                       <Option value="all">全部</Option>
                       <Option value="1">合同备案</Option>
                       <Option value="2">发函</Option>
@@ -32,7 +32,6 @@
                     <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
                   </FormItem>
                 </Col>
-
                 <Col span="9">
                   <FormItem>
                     <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
