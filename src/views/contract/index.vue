@@ -60,24 +60,24 @@
       </Col>
     </Row>
 
-    <Row :gutter="10">
+
+    <Row :gutter="10" class="mt10">
       <Col span="24">
-        <Card style="margin-top: 10px;">
-        <Row style="margin:0 0 10px 0px;font-size: 20px">
-          <Col span="1">
-          <Button type="primary" @click="addContractmodal = true" icon="plus-round">新增</Button>
-          </Col>
+        <Card>
+          <div class="search-row">
+            <Col>
+              <Button type="primary" @click="addContractmodal = true" ><Icon type="plus-round"></Icon> 新增</Button>
+              <Button type="info" @click="addContractmodal = true" ><Icon type="edit"></Icon> 编辑</Button>
+              <Button type="ghost" @click="addContractmodal = true" ><Icon type="navicon"></Icon> 详情</Button>
+              <Button type="error" @click="addContractmodal = true" ><Icon type="close"></Icon> 删除</Button>
+            </Col>
+            <Col>
+            </Col>
+          </div>
+          <Row class="searchable-table-con">
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
         </Row>
-        <Table border :columns="columns1" :data="data1"></Table>
-        <Row style="margin-top: 20px;">
-          <Col span="2">
-            共1000条
-          </Col>
-          <Col span="10" offset="12" >
-            <Page :total="100"></Page>
-          </Col>
-        </Row>
-    </Card>
+      </Card>
       </Col>
     </Row>
 
@@ -123,6 +123,7 @@
         </Row>
       </Form>
     </Modal>
+    
   </div>
 </template>
 <script>
@@ -149,6 +150,68 @@
           roomsLierId:''
         },
         //表格
+        tableConfig:{
+            url:"https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/contractBill/list",
+              columns:[
+                {
+                  title:"选项",
+                  width:100,
+                  align:'center',
+                  render: (h, params) => {
+                    return h('div', [
+                      h('Button', {
+                          props: {
+                              size: 'small'
+                          },
+                          style: {
+                              marginRight: '5px',
+                              background:"#bbbec4",
+                              color:"white"
+                          },
+                          on: {
+                              click: () => {
+                                  this.editId=params.row.id;
+                                  this.editList();
+                              }
+                          }
+                      }, '修改'),
+                      // h('Button', {
+                      //     props: {
+                      //         type: 'error',
+                      //         size: 'small'
+                      //     },
+                      //     on: {
+                      //         click: () => {
+                      //             this.$Modal.confirm({
+                      //                   title:"操作提示",
+                      //                   content:"确认删除该网点",
+                      //                   onOk:()=>{
+                      //                     this.$request.post('https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/contractBill/list',{id:params.row.id},res=>{
+                      //                          this.$Message.success(res.message);
+                      //                          this.$refs.table.init();
+                      //                     },res=>{
+                      //                          this.$Message.error({content:res.message,duration:2});
+                      //                     });
+                      //                   }
+                      //             });
+                      //         }
+                      //     }
+                      // }, '删除'),
+                    ])
+                  }
+                },
+                {
+                  title: '名称',
+                  key: 'buildingName',
+                  align:'center'
+                },
+                {
+                  title: '更新时间',
+                  key: 'updatedAt',
+                  align:'center'
+                }
+              ],
+        },
         columns1: [
           {
             title: '操作',
@@ -337,8 +400,7 @@
     },
     mounted(){//方法
       this.getBuildingslier(),
-      this.getUnitLier(),
-      this.getRoomsLier()
+      this.getUnitLier()
     },
     methods: {//对象
       change(){
@@ -364,15 +426,7 @@
           this.unitLierList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName
-          }))
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //获取房间列表
-      getRoomsLier(){
-        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
-          console.log(res)
+          })),
           this.roomsLierList = res.data.units[0].rooms.map(item => ({
             id: item.roomId,
             num: item.roomNum
@@ -381,6 +435,18 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //获取房间列表
+      // getRoomsLier(){
+      //   this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
+      //     console.log(res)
+      //     this.roomsLierList = res.data.units[0].rooms.map(item => ({
+      //       id: item.roomId,
+      //       num: item.roomNum
+      //     }))
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
 
       //按钮
       btn:function(){

@@ -11,153 +11,145 @@
           <div id="search-body">
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="状态">
-                  <Select v-model="formItem.select" placeholder="全部">
-                    <Option value="all">全部</Option>
-                    <Option value="adopt">通过</Option>
-                    <Option value="reject">驳回</Option>
-                    <Option value="audit">审核中</Option>
-                  </Select>
-                </FormItem>
+                    <Select v-model="formItem.select" placeholder="全部">
+                      <Option value="all">全部</Option>
+                      <Option value="adopt">通过</Option>
+                      <Option value="reject">驳回</Option>
+                      <Option value="audit">审核中</Option>
+                    </Select>
+                  </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="业主姓名">
-                  <Input v-model="formItem.name"></Input>
-                </FormItem>
+                    <Input v-model="formItem.name"></Input>
+                  </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="联系电话">
-                  <Input v-model="formItem.tel"></Input>
-                </FormItem>
+                    <Input v-model="formItem.tel"></Input>
+                  </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="楼栋">
-                  <Select v-model="formItem.building" placeholder="全部">
-                    <Option value="all">全部</Option>
-                    <Option value="having">进行中</Option>
-                    <Option value="file">已归档</Option>
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                  <FormItem label="房间号">
-                  <Select v-model="formItem.home" placeholder="全部">
-                    <Option value="all">全部</Option>
-                    <Option value="adopt">通过</Option>
-                    <Option value="reject">驳回</Option>
-                    <Option value="audit">审核中</Option>
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                 <FormItem label="门牌号">
-                  <Select v-model="formItem.doorplate" placeholder="全部">
-                    <Option value="all">全部</Option>
-                    <Option value="having">进行中</Option>
-                    <Option value="file">已归档</Option>
-                  </Select>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                  <FormItem label="时间">
-                  <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                  <FormItem>
-                  <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
-                </FormItem>
+                    <Select v-model="formItem.building" @on-change="change" placeholder="全部">
+                      <Option value="all">全部</Option>
+                      <Option :value="item.id" v-for="item in buildingsList" :key="item.id" >{{item.name}}</Option>
+                    </Select>
+                  </FormItem>
                 </Col>
               </Row>
-          </Form>
+              <Row>
+                <Col span="9">
+                  <FormItem label="房间号">
+                    <Select v-model="formItem.home" @on-change="change" placeholder="全部">
+                      <Option value="all">全部</Option>
+                      <Option :value="item.id" v-for="item in roomsList" :key="item.id" >{{item.num}}</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="9">
+                  <FormItem label="门牌号">
+                    <Select v-model="formItem.doorplate" placeholder="全部">
+                      <Option value="all">全部</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="9">
+                  <FormItem label="时间">
+                    <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                  </FormItem>
+                </Col>
+                <Col span="9">
+                  <FormItem>
+                    <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                  </FormItem>
+                </Col>
+              </Row>
+            </Form>
             <div class="search-row">
               <Col>
               </Col>
               <Col>
                 <Button type="primary"  @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-                <Button  type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon>  重置</Button>
+                <Button type="ghost" @click="searchCancel" ><Icon type="refresh"></Icon> 重置</Button>
               </Col>
             </div>
-        </div>
+          </div>
         </Card>
       </Col>
     </Row>
-    <Row :gutter="10">
-      <Col span="24">
-        <Card style="margin-top: 10px;">
-          <Row style="margin:0 0 10px 0px;font-size: 20px">
-            <Col span="1">
-              <Button type="primary" @click="twoNewbooksmodal = true" icon="plus-round">新增</Button>
-            </Col>
-          </Row>
-          <Table border :columns="columns1" :data="data1"></Table>
-          <Row style="margin-top: 20px;">
-            <Col span="2">
-              共1000条
-            </Col>
-            <Col span="10" offset="12" >
-              <Page :total="100"></Page>
-            </Col>
-          </Row>
-        </Card>
-      </Col>
+
+    <Row :gutter="10" class="mt10">
+        <Col span="24">
+            <Card>
+                <div class="search-row">
+                    <Col>
+                        <Button type="primary" @click="addProject"><Icon type="plus-round"></Icon> 新增</Button>
+                        <Button type="info" @click="addProject"><Icon type="edit"></Icon> 编辑</Button>
+                        <Button @click="addProject"><Icon type="navicon"></Icon> 状态详情</Button>
+                        <Button type="error" @click="addProject"><Icon type="close"></Icon> 终止</Button>
+                    </Col>
+                    <Col>
+                    </Col>
+                </div>
+                <Row class="searchable-table-con">
+                    <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
+                </Row>
+            </Card>
+        </Col>
     </Row>
-    <Modal v-model="twoNewbooksmodal" title="新增两书"
+
+    <Modal v-model="addTwoBooksModal" title="新增两书"
       width="800"
       :loading="loading"
       @on-ok="ok"
       @on-cancel="cancel">
-
       <Form  :model="modelFormitem" :label-width="80">
         <Row>
           <Col span="8">
-          <FormItem label="楼栋">
-            <Select placeholder="全部">
-              <Option value="all">全部</Option>
-              <Option value="having">进行中</Option>
-              <Option value="file">已归档</Option>
+            <FormItem label="楼栋">
+              <Select placeholder="全部">
+                <Option value="all">全部</Option>
             </Select>
-          </FormItem>
+            </FormItem>
           </Col>
-
           <Col span="8">
-          <FormItem label="单元">
-            <Select placeholder="全部">
-              <Option value="all">全部</Option>
-              <Option value="having">进行中</Option>
-              <Option value="file">已归档</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="单元">
+              <Select placeholder="全部">
+                <Option value="all">全部</Option>
+              </Select>
+            </FormItem>
           </Col>
-
           <Col span="8">
-          <FormItem label="房间号">
-            <Select placeholder="全部">
-              <Option value="all">全部</Option>
-              <Option value="having">进行中</Option>
-              <Option value="file">已归档</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="房间号">
+              <Select placeholder="全部">
+                <Option value="all">全部</Option>
+              </Select>
+            </FormItem>
           </Col>
-
-          <Col span="24" style="font-size: 20px;margin-bottom: 10px;">
-          资料
+          <Col span="8">
+            <FormItem label="资料">
+            </FormItem>
           </Col>
           <Col span="24">
-          <Table border :columns="twoNewbooks" :data="twoNewbooksdata"></Table>
+            <FormItem label="">
+              <Table border :columns="twoNewbooks" :data="twoNewbooksdata"></Table>
+            </FormItem>
           </Col>
         </Row>
       </Form>
-
     </Modal>
+
   </div>
 </template>
 <script type="text/ecmascript-6">
   export default {
     data () {
       return {
-        value1: '1',
+        buildingsList:[],
+        roomsList:[],
         formItem: {
           input: '',
           home:'',
@@ -166,14 +158,136 @@
           building:'',
           doorplate:'',
           select: '',
-          radio: 'male',
-          checkbox: [],
-          switch: true,
           date: '',
           time: '',
-          slider: [20, 50],
-          textarea: ''
         },
+        tableConfig:{
+              url:"https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/processSetting/list",
+              columns:[
+                {
+                  title:"操作",
+                  width:150,
+                  render: (h, params) => {
+                    if (params.row.status==1) {
+                      return h('div', [
+                      h('Button', {
+                          props: {
+                              type: 'error',
+                              size: 'small'
+                          },
+                          style: {
+                              marginRight: '5px'
+                          },
+                          on: {
+                              click: () => {
+                                  this.$Modal.confirm({
+                                        title:"操作提示",
+                                        content:"确认禁用该用户",
+                                        onOk:()=>{
+                                          this.$request.post('/apiHost/api/branch-user/set-status',{id:params.row.id,status:0},res=>{
+                                              this.$Message.success(res.message);
+                                               this.$refs.table.init();
+                                          },res=>{
+                                               this.$Modal.error({ title: '提示信息',content: res.message});
+                                          });
+                                        }
+                                  });
+                              }
+                          }
+                      }, '禁用'),
+                      h('Button', {
+                            props: {
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.editId=params.row.id;
+                                    this.getDetail();
+                                    this.viewModal=true;
+                                }
+                            }
+                        }, '查看详情'),
+                      h('Button', {
+                          props: {
+                              size: 'small'
+                          },
+                          style:{
+                            background:"#bbbec4",
+                              color:"white"
+                          },
+                          on: {
+                              click: () => {
+                                  this.editId=params.row.id;
+                                  this.getDetail();
+                                  console.log(this.addForm);
+                                  this.editModal=true;
+                              }
+                          }
+                      }, '修改'),
+                      ])
+                    }
+                    if (params.row.status==0) {
+                      return h('div', [
+                      h('Button', {
+                          props: {
+                              type: 'primary',
+                              size: 'small'
+                          },
+                          style: {
+                                marginRight: '5px'
+                          },
+                          on: {
+                              click: () => {
+                                  this.$Modal.confirm({
+                                        title:"操作提示",
+                                        content:"确认启用该用户",
+                                        onOk:()=>{
+                                          this.$request.post('/apiHost/api/branch-user/set-status',{id:params.row.id,status:1},res=>{
+                                               this.$Message.success(res.message);
+                                               this.$refs.table.init();
+                                          },res=>{
+                                               this.$Modal.error({ title: '提示信息',content: res.message});
+                                          });
+                                        }
+                                  });
+                              }
+                          }
+                      }, '启用'),
+                      h('Button', {
+                            props: {
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.editId=params.row.id;
+                                    this.getDetail();
+                                    this.viewModal=true;
+                                }
+                            }
+                        }, '查看详情'),
+                      ])
+                    }
+                    
+                  }
+                },
+                {
+                  title: '用户名',
+                  key: 'name',
+                  width:150
+                },
+                {
+                  title: '姓名',
+                  key: 'createdAt',
+                  width:150
+                }
+              ],
+            },
         columns1: [
           {
             title: '操作',
@@ -327,7 +441,7 @@
           },
 
         ],
-        twoNewbooksmodal: false,
+        addTwoBooksModal: false,
         loading: true,
         modelFormitem:{
           select: '',
@@ -392,7 +506,51 @@
         ],
       }
     },
+    mounted(){
+      this.getBuildingsList(),
+      this.getRoomsList(),
+      this.getTwoBooksList()
+    },
     methods: {
+      //获取楼栋
+      getBuildingsList(){
+        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingList", '', res => {
+          this.buildingsList = res.data.buildings.map(item => ({
+            id: item.buildingId,
+            name: item.buildingName
+          }))
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //获取门牌号
+      getRoomsList(){
+        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
+          this.roomsList = res.data.units[0].rooms.map(item => ({
+            id: item.roomId,
+            num: item.roomNum
+          }))
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //获取门牌号
+      getTwoBooksList(){
+        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/contractBill/list", '', res => {
+          console.log(res)
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //搜索
+
+      //重置
+
+      //新增
+      addProject(){
+        this.addTwoBooksModal=true;
+      },
+
       //按钮
       btn:function(){
         console.log(this.formItem)
@@ -423,7 +581,10 @@
         this.formItem.date="";
         this.formItem.time="";
         this.$refs.table.init();
-      }
+      },
+      change(){
+
+    }
     }
   }
 </script>

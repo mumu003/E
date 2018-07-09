@@ -11,22 +11,29 @@
           <div id="search-body">
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
-                <Col span="12">
-                  <FormItem label="流程名称" prop="status">
-                    <Select v-model="formItem.status" placeholder="全部">
+                <Col span="9">
+                  <FormItem label="流程名称" prop="name">
+                    <Select v-model="formItem.name" placeholder="全部">
                       <Option value="all">全部</Option>
+                      <Option value="1">合同备案</Option>
+                      <Option value="2">发函</Option>
+                      <Option value="3">交房通知</Option>
+                      <Option value="4">水电过户</Option>
+                      <Option value="5">两书</Option>
+                      <Option value="6">产权办理</Option>
+                      <Option value="7">协议书申请</Option>
                     </Select>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="时间" prop="date">
                     <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
                   </FormItem>
                 </Col>
 
-                <Col span="12">
+                <Col span="9">
                   <FormItem>
                     <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
                   </FormItem>
@@ -37,8 +44,8 @@
             <Col>
             </Col>
             <Col>
-              <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon>检索</Button>
-              <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>重置</Button>
+              <Button type="primary" @click="searchSubmit" ><Icon type="search"></Icon>检索</Button>
+              <Button type="ghost" @click="searchReset" ><Icon type="refresh"></Icon>重置</Button>
             </Col>
           </div>
         </div>
@@ -51,88 +58,84 @@
         <Card>
           <div class="search-row">
             <Col>
-              <Button type="primary" @click="addModal = true"><Icon type="plus-round"></Icon> 新增</Button>
+              <Button type="primary" @click="addProject" ><Icon type="plus-round"></Icon> 新增</Button>
+              <Button type="info" @click="addProject" ><Icon type="edit"></Icon> 编辑</Button>
+              <Button type="ghost" @click="addProject" ><Icon type="navicon"></Icon> 详情</Button>
+              <Button type="error" @click="addProject" ><Icon type="close"></Icon> 删除</Button>
+              <Button type="primary" @click="addProject" ><Icon type="plus-round"></Icon> 新增资料</Button>
             </Col>
             <Col>
             </Col>
           </div>
           <Row class="searchable-table-con">
-            <Table border :columns="columns1" :data="data1"></Table>
-          <Row style="margin: 10px">
-            <Col span="2" style="font-size: 14px">共1000条</Col>
-            <Col span="7" offset="15"><Page :total="100"></Page></Col>
-          </Row>
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
         </Row>
       </Card>
       </Col>
     </Row>
 
-    <Modal title="新增流程设置" v-model="addModal"
-      width="800"
-      :loading="loading"
+    <Modal title="新增流程设置" v-model="addProcedureModal" width="800" :loading="loading"
       @on-ok="ok"
       @on-cancel="cancel">
-      <Form :label-width="100" class="modal-form" :model="addForm">
+      <Form :label-width="100" class="modal-form" :model="addProcedureForm">
         <Row>
           <Col span="12">
           <FormItem label="流程名称" prop="name">
-            <Select v-model="addForm.name" placeholder="" style="width: 100%">
-              <Option value="all">合同备案</Option>
-              <Option value="ing">进行中</Option>
-              <Option value="right">已归档</Option>
+            <Select v-model="addProcedureForm.name" placeholder="" style="width: 100%" @on-change="selectChange">
+              <Option value="1">合同备案</Option>
+              <Option value="2">发函</Option>
+              <Option value="3">交房通知</Option>
+              <Option value="4">水电过户</Option>
+              <Option value="5">两书</Option>
+              <Option value="6">产权办理</Option>
+              <Option value="7">协议书申请</Option>
             </Select>
           </FormItem>
           </Col>
-          <Col span="12">
-          <FormItem label="房款交齐">
-            <CheckboxGroup v-model="addForm.right">
-              <Checkbox value="yes">是</Checkbox>
-            </CheckboxGroup>
-          </FormItem>
+          <Col span="12" v-if="addProcedureForm.name === '3'">
+            <FormItem label="房款交齐">
+              <CheckboxGroup v-model="addProcedureForm.right">
+                <Checkbox label="是"></Checkbox>
+              </CheckboxGroup>
+            </FormItem>
           </Col>
-          <Col span="24">
-          <FormItem label="资料">
-            <Button @click="addMaterialModal = true">新增</Button>
-            <Button type="primary" @click="editMaterialModal = true">编辑</Button>
-            <Button type="ghost">删除</Button>
-          </FormItem>
-          </Col>
-          <Col span="24">
-          <FormItem label="">
-            <Table border :columns="newProcess" :data="newProcessdata"></Table>
-          </FormItem>
-          </Col>
+          <div v-if="addProcedureForm.name === '3'">
+            <Col span="24">
+              <FormItem label="资料">
+                <Button type="primary" ><Icon type="plus-round"></Icon> 新增</Button>
+                <Button type="info" ><Icon type="edit"></Icon> 编辑</Button>
+                <Button type="error" ><Icon type="close"></Icon> 删除</Button>
+              </FormItem>
+            </Col>
+            <Col span="24">
+              <FormItem label="">
+                <Table border :columns="newProcess" :data="newProcessdata"></Table>
+              </FormItem>
+            </Col>
+          </div>
+        </Row>
+        <Row>
           <Col span="12">
           <FormItem label="流程参与角色">
           </FormItem>
           </Col>
           <Col span="24">
           <FormItem label="">
-            <Button>新建角色</Button>
+            <Button type="primary" ><Icon type="plus-round"></Icon>新建角色</Button>
           </FormItem>
           </Col>
           <Col span="12">
-          <FormItem label="发起人" prop="name">
-            <Select v-model="addForm.name" placeholder="" style="width: 100%">
+          <FormItem label="发起人" prop="initiator">
+            <Select v-model="addProcedureForm.initiator" placeholder="" style="width: 100%">
               <Option value="all">客服经理</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="12">
-          <FormItem label="存档资料" prop="name">
-            <Input v-model="addForm.name" placeholder=""  @click="selectMaterialModal = true"></Input>
-          </FormItem>
-          </Col>
-          <Col span="12">
-          <FormItem label="关闭节点" prop="name">
-            <Select v-model="addForm.name" placeholder="" style="width: 100%">
+          <FormItem label="关闭节点" prop="closedNode">
+            <Select v-model="addProcedureForm.closedNode" placeholder="" style="width: 100%">
               <Option value="all">客服经理</Option>
             </Select>
-          </FormItem>
-          </Col>
-          <Col span="12">
-          <FormItem label="存档资料" prop="name">
-            <Input v-model="addForm.name" placeholder="" ></Input>
           </FormItem>
           </Col>
         </Row>
@@ -242,20 +245,23 @@
     name: 'processConfiguration',
     data () {
       return {
-        addModal: false,
         loading: true,
+        addProcedureModal: false,
         selectMaterialModal:false,
         addMaterialModal:false,
         editMaterialModal:false,
         formItem: {
-          select: '',
+          name: '',
           date: '',
-          time:'',
-          status:''
+          time:''
         },
-        addForm:{
+        addProcedureForm:{
           name:'',
-          right:''
+          right:[],
+          initiator:'',
+          initiatorData:'',
+          closedNode:'',
+          closedNodeData:''
         },
         addMaterialForm:{
           name:'',
@@ -277,51 +283,68 @@
           censusRegister:'',
           censusRegisterNumber:''
         },
-        columns1: [
-          {
-            title: '操作',
-            key: 'name',
-            align:"center",
-            width:100,
-            render:function(h,params){
-              return h("div",[
-                h("Button",{
-                  style:{
-                    align:'center',
-                    margin:'5px 0 0'
+        tableConfig:{
+            url:"http://rap2api.taobao.org/app/mock/17251/api/goods/list",
+              columns:[
+                {
+                  title:"选项",
+                  width:100,
+                  align:'center',
+                  render: (h, params) => {
+                    return h('div', [
+                      h('Button', {
+                          props: {
+                              size: 'small'
+                          },
+                          style: {
+                              marginRight: '5px',
+                              background:"#bbbec4",
+                              color:"white"
+                          },
+                          on: {
+                              click: () => {
+                                  this.editId=params.row.id;
+                                  this.editList();
+                              }
+                          }
+                      }, '修改'),
+                      h('Button', {
+                          props: {
+                              type: 'error',
+                              size: 'small'
+                          },
+                          on: {
+                              click: () => {
+                                  this.$Modal.confirm({
+                                        title:"操作提示",
+                                        content:"确认删除该网点",
+                                        onOk:()=>{
+                                          this.$request.post('https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/contractBill/list',{id:params.row.id},res=>{
+                                               this.$Message.success(res.message);
+                                               this.$refs.table.init();
+                                          },res=>{
+                                               this.$Message.error({content:res.message,duration:2});
+                                          });
+                                        }
+                                  });
+                              }
+                          }
+                      }, '删除'),
+                    ])
                   }
-                },"详情"),
-                h("Button",{
-                  style:{
-                    margin:'5px 0',
-                    backgroundColor:'rgb(187, 190, 196)',
-                    color:'#fff'
-                  }
-                },"编辑")
-              ])
-            }
-          },
-          {
-            title: '选项',
-            key: 'age',
-            align:"center",
-            render : function ( h , param ){
-              return h("div",[
-                h("Checkbox","")
-              ])
-            }
-          },
-          {
-            title: '名称',
-            key: 'address',
-            align:"center"
-          },
-          {
-            title: '更新时间',
-            key: 'date',
-            align:"center",
-          }
-        ],
+                },
+                {
+                  title: '名称',
+                  key: 'goodsCode',
+                  align:'center'
+                },
+                {
+                  title: '更新时间',
+                  key: 'unit',
+                  align:'center'
+                }
+              ],
+        },
         data1: [
           {
             name: 'John Brown',
@@ -406,6 +429,9 @@
         ]
       }
     },
+    mounted(){
+      // this.getcontractBillList()
+    },
     methods:{
       ok () {
         setTimeout(() => {
@@ -416,14 +442,44 @@
         this.$Message.info('你取消了操作');
       },
       searchSubmit(){
-        this.$refs.table.init();
+        console.log(this.formItem)
+        this.searchReset()
       },
-      searchCancel(){
-        this.formItem.time="";
-        this.formItem.status="";
+      searchReset(){
+        this.formItem.name="";
         this.formItem.date="";
-        this.$refs.table.init();
+        this.formItem.time="";
       },
+      addProject(){
+        this.addProcedureModal=true;
+      },
+      //获取列表
+      // getcontractBillList(){
+      //   this.$request.post("http://rap2api.taobao.org/app/mock/17251/api/goods/list", '', res => {
+      //     console.log(res);
+      //     return;
+      //     this.contractBillList = res.data.buildings.map(item => ({
+      //       id: item.buildingId,
+      //       name: item.buildingName
+      //     }))
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
+      selectChange(){
+        console.log(this.addProcedureForm.name)
+      }
+      //获取门牌号
+      // getRoomsList(){
+      //   this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
+      //     this.roomsList = res.data.units[0].rooms.map(item => ({
+      //       id: item.roomId,
+      //       num: item.roomNum
+      //     }))
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
     }
   }
 </script>
