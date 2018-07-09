@@ -154,8 +154,6 @@
           tStartTime:"",
           tEndTime:"",
         },
-
-        /*id:'',*/
         value1: '1',
         //表单
         formItem: {
@@ -271,15 +269,14 @@
               align: 'center'
             }
           ],
-        },
         //模态框延迟
-        addContractmodal: false,
-        editContractmodal:false,
+        addContractmodal:false,
+        /*editContractmodal:false,*/
         viewContractmodal:false,
-        loading: true,
+        loading:true,
         //模态框表单,表格数据
         modelFormitem:{
-          select: '',
+          select:'',
           name:''
         },
         addContract: [
@@ -345,10 +342,9 @@
             file:'是',
             archivalPortion: '2'
           },
-
         ],
       }
-    },
+      },
     mounted(){//方法
       this.getBuildingslier(),
       this.getUnitLier()
