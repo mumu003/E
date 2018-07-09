@@ -1,12 +1,12 @@
 <template>
-  <div style="height: 100%;padding: 15px;border: 1px solid #dddee1;box-shadow: 0 2px 3px 2px rgba(0,0,0,.03);">
+  <!--<div style="height: 100%;padding: 15px;border: 1px solid #dddee1;box-shadow: 0 2px 3px 2px rgba(0,0,0,.03);">-->
+  <div>
     <Table border stripe :loading="loading" :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
     <div class="page-tool">
       <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
     </div>
   </div>
 </template>
-
 <script>
 export default {
   props: ['config', 'searchParams', 'isFirst'],
@@ -27,7 +27,7 @@ export default {
   computed: {
     selected_count () {
       let count = 0
-      this.tableData.forEach(function (item) {
+      this.tableData.forEach(function (item) {//调用数组的每个元素，并将元素传递给回调函数
         if (item._checked) {
           count++
         }
@@ -60,6 +60,7 @@ export default {
           list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
         })
         this.tableData = list
+        console.log(this.tableData)
         this.total = data.total
         this.currentPage = data.pageNum === 0 ? 1 : data.pageNum
       })

@@ -11,7 +11,7 @@
           <div id="search-body">
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="状态">
                   <Select v-model="formItem.select" placeholder="全部">
                     <Option value="all">全部</Option>
@@ -21,17 +21,17 @@
                   </Select>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="业主姓名">
                   <Input v-model="formItem.name"></Input>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="联系电话">
                   <Input v-model="formItem.tel"></Input>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="楼栋">
                   <Select v-model="formItem.building" placeholder="全部">
                     <Option value="all">全部</Option>
@@ -40,7 +40,7 @@
                   </Select>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="房间号">
                   <Select v-model="formItem.home" placeholder="全部">
                     <Option value="all">全部</Option>
@@ -50,7 +50,7 @@
                   </Select>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="门牌号">
                   <Select v-model="formItem.doorplate" placeholder="全部">
                     <Option value="all">全部</Option>
@@ -59,12 +59,12 @@
                   </Select>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem label="时间">
                   <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
                 </FormItem>
                 </Col>
-                <Col span="12">
+                <Col span="9">
                 <FormItem>
                   <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
                 </FormItem>

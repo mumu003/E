@@ -11,7 +11,7 @@
           <div id="search-body">
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="流程名称" prop="status">
                     <Select v-model="formItem.status" placeholder="全部">
                       <Option value="all">全部</Option>
@@ -20,13 +20,12 @@
                 </Col>
               </Row>
               <Row>
-                <Col span="12">
+                <Col span="9">
                   <FormItem label="时间" prop="date">
                     <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
                   </FormItem>
                 </Col>
-
-                <Col span="12">
+                <Col span="9">
                   <FormItem>
                     <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
                   </FormItem>
