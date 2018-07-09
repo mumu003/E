@@ -5,44 +5,56 @@
         <Card class="search-card">
           <p slot="title">
             <Icon type="levels"></Icon>
-              检索
+              {{$route.meta.title}}
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
             <Form  :model="formItem" :label-width="80">
-              <Row>
-              <Col span="9">
+              <Row type="flex" justify="start">
+              <Col span="6">
               <FormItem label="状态">
-                <Select v-model="formItem.select" placeholder="全部">
-                  <Option value="all">全部</Option>
-                  <Option value="having">进行中</Option>
-                  <Option value="file">已归档</Option>
+                <Select v-model="formItem.status" placeholder="全部">
+                  <Option value="">全部</Option>
+                  <Option value="1">进行中</Option>
+                  <Option value="2">已归档</Option>
+                  <Option value="0">终止</Option>
                 </Select>
               </FormItem>
               </Col>
-              <Col span="9">
-              <FormItem label="业主姓名">
-                <Input v-model="formItem.name"></Input>
-              </FormItem>
-              </Col>
-              <Col span="9">
+              <Col span="6">
               <FormItem label="楼栋">
-                <Input v-model="formItem.building"></Input>
+                <Select v-model="formItem.buildingId" placeholder="请选择楼栋" @on-change="getUnits(formItem.buildingId)">
+                  <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+                </Select>
               </FormItem>
               </Col>
-              <Col span="9">
+                <Col span="6">
+                <FormItem label="单元">
+                  <Select v-model="formItem.unitId" placeholder="请选择单元" @on-change="getRooms(formItem.unitId)">
+                    <Option :value="item.id" v-for="(item,index) in unitList" :key="index">{{item.name}}</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+              <Col span="6">
               <FormItem label="房间号">
-                <Input v-model="formItem.home"></Input>
+                <Select v-model="formItem.roomId" placeholder="请选择房间" @on-change="getCustomer(formItem.roomId)">
+                  <Option :value="item.id" v-for="(item,index) in roomList" :key="index">{{item.name}}</Option>
+                </Select>
               </FormItem>
               </Col>
-              <Col span="9">
+                <Col span="6">
+                <FormItem label="业主姓名">
+                  <Input v-model="formItem.customerName" disabled></Input>
+                </FormItem>
+                </Col>
+              <Col span="6">
               <FormItem label="时间">
-                <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
+                <DatePicker type="datetime" @on-change="getStartDate" placeholder="请输入开始时间" v-model="formItem.startUpdateTime" class="widthp100" transfer></DatePicker>
               </FormItem>
               </Col>
-              <Col span="9">
+              <Col span="6">
               <FormItem>
-                <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
+                <DatePicker type="datetime" @on-change="getEndDate" placeholder="请输入结束时间" v-model="formItem.endUpdateTime" class="widthp100" transfer></DatePicker>
               </FormItem>
               </Col>
             </Row>
@@ -51,8 +63,8 @@
               <Col>
               </Col>
               <Col>
-                <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon>搜索</Button>
-                <Button type="ghost" @click="searchCancel"><Icon type="refresh"></Icon>重置</Button>
+                <Button type="primary" icon="search" @click="searchSubmit">搜索</Button>
+                <Button type="ghost" icon="refresh" @click="searchCancel">重置</Button>
               </Col>
           </div>
         </div>
@@ -91,14 +103,14 @@
           <Col span="8">
           <FormItem label="楼栋">
             <Select v-model="formItem.buildingsLierId" @on-change="change">
-              <Option :value="item.id" v-for="item in buildingsLierList" :key="item.id" >{{item.name}}</Option>
+              <Option :value="item.id" v-for="item in buildingsLierList" :key="item.id">{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="8">
           <FormItem label="单元">
             <Select v-model="formItem.unitLierId">
-              <Option :value="item.id" v-for="item in unitLierList" :key="item.id" >{{item.name}}</Option>
+              <Option :value="item.id" v-for="item in unitLierList" :key="item.id">{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
@@ -111,7 +123,7 @@
           </Col>
           <Col span="8">
           <FormItem label="业主">
-            <Input v-model="modelFormitem.name"></Input>
+            <Input v-model="formItem.customerName"></Input>
           </FormItem>
           </Col>
           <Col span="24">
@@ -147,16 +159,24 @@
     data () {
       return {
         //定义数组
-        buildingsLierList:[],
-        unitLierList:[],
-        roomsLierList:[],
+        buildingList:[],
+        unitList:[],
+        roomList:[],
         searchTime:{
           tStartTime:"",
           tEndTime:"",
         },
-        value1: '1',
-        //表单
+        value1: '1',//表单
         formItem: {
+          status:'',
+          customerName:'',
+          buildingId: '',
+          roomId: '',
+          startUpdateTime: '',
+          endUpdateTime: ''
+        },
+        //表单
+        addItem: {
           home:'',
           name:'',
           select: '',
@@ -169,42 +189,69 @@
         },
         //表格
         tableConfig:{
-          url:"http://rap2api.taobao.org/app/mock/17251/api/goods/list",
+          url:"/apiHost/api/contractBill/list",
               columns:[
                 {
-                  title:"选项",
-                  width:100,
-                  align:'center',
-                  render: (h, params) => {
-                    return h('div', [
-                      h('Button', {
-                          props: {
-                              size: 'small'
-                          },
-                          style: {
-                              marginRight: '5px',
-                              background:"#bbbec4",
-                              color:"white"
-                          },
-                          on: {
-                              click: () => {
-                                  this.editId=params.row.id;
-                                  this.editList();
+                  type: 'selection',
+                  key: '_checked',
+                  width: 60,
+                  align: 'center'
+                },
+                {
+                  title: '状态',
+                  key: 'status',
+                  width: 100,
+                  render:(h,param)=>{
+                      switch (param.row.status){
+                        case 1:
+                            return h('Button', {
+                              props:{
+                                type:'primary'//组件自带样式
+                              },
+                              style:{
+                                width: 80
                               }
-                          }
-                      }, '修改'),
-                    ])
+                            },'进行中')
+                        case 2:
+                          return h('Button', {
+                            props:{
+                              type:'success'//组件自带样式
+                            },
+                            style:{
+                              width: 80
+                            }
+                          },'已归档')
+                        default:
+                          return h('Button', {
+                            props:{
+                              type:'error'//组件自带样式
+                            },
+                            style:{
+                              width: 80
+                            }
+                          },'终止')
+                      }
                   }
                 },
                 {
-                  title: '名称',
+                  title: '业主名字',
+                  key: 'customerName',
+                  width:250
+                },
+                {
+                  title: '楼栋',
                   key: 'buildingName',
-                  align:'center'
+                  width:250
+                },
+                {
+                  title: '房间号',
+                  key: 'roomNum',
+                  width:250
                 },
                 {
                   title: '更新时间',
                   key: 'updatedAt',
-                  align:'center'
+                  width:250
                 }
               ],
         },
@@ -346,18 +393,18 @@
       }
       },
     mounted(){//方法
-      this.getBuildingslier(),
-      this.getUnitLier()
+      this.getBuildings()
+//      this.getUnitLier()
     },
     methods: {//对象
       change(){
         console.log(this.formItem.buildingsLierId)
       },
       //获取楼栋列表
-      getBuildingslier(){
-        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingList", '', res => {
+      getBuildings(){
+        this.$request.post('/apiHost/api/room/getBuildingList', '', res => {
           console.log(res)
-          this.buildingsLierList = res.data.buildings.map(item => ({
+          this.buildingList = res.data.buildings.map(item => ({
             id: item.buildingId,
             name: item.buildingName
           }))
@@ -366,61 +413,56 @@
         })
       },
     //获取单元列表
-      getUnitLier(){
-        this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
+      getUnits(buildingId){
+        this.$request.post("/apiHost/api/room/getBuildingRoom", {
+          orgId:sessionStorage.orgId,
+          projectId:sessionStorage.curProjectId,
+          buildingId
+        }, res => {
           console.log(res)
-          /*this.id=res.data.buildingId,*/
-          this.unitLierList = res.data.units.map(item => ({
+          this.unitList = res.data.units.map(item => ({
             id: item.unitId,
-            name: item.unitName
-          })),
-          this.roomsLierList = res.data.units[0].rooms.map(item => ({
-            id: item.roomId,
-            num: item.roomNum
+            name: item.unitName,
+            rooms:item.rooms
           }))
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-
-        //获取楼栋列表
-        getBuildingslier() {
-          this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingList", '', res => {
-            console.log(res)
-            this.buildingsLierList = res.data.buildings.map(item => ({
-              id: item.buildingId,
-              name: item.buildingName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        },
-        //获取单元列表
-        getUnitLier() {
-          this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
-            console.log(res)
-            /*this.id=res.data.buildingId,*/
-            this.unitLierList = res.data.units.map(item => ({
-              id: item.unitId,
-              name: item.unitName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        },
         //获取房间列表
-        getRoomsLier() {
-          this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
-            console.log(res)
-            this.roomsLierList = res.data.units[0].rooms.map(item => ({
-              id: item.roomId,
-              num: item.roomNum
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
+        getRooms(unitId) {
+          this.unitList.map(item=>{
+              if(item.id===unitId){
+                this.roomList = item.rooms.map(item => ({
+                  id: item.roomId,
+                  name: item.roomNum
+                }))
+              }
           })
         },
-
+        //获取业主信息
+      getCustomer(roomId){
+        this.$request.post("/apiHost/api/room/getRoomCustomer", {
+          roomId
+        }, res => {
+          console.log(res)
+          this.formItem.customerName = ''
+          res.data.data.map(item=>{
+              this.formItem.customerName = this.formItem.customerName + item.customerName + '/'
+          })
+          this.formItem.customerName = this.formItem.customerName.substr(0,this.formItem.customerName.length-1)
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      // 获取查询开始时间（防止出现时间不准确的情况
+      getStartDate(startDate){
+        this.formItem.startUpdateTime = startDate ;
+      },
+      // 获取查询结束时间（防止出现时间不准确的情况）
+      getEndDate(endDate){
+        this.formItem.endUpdateTime = endDate ;
+      },
         handleReset(name) {
           this.$refs[name].resetFields();
         },
@@ -434,7 +476,16 @@
           this.$Message.info('你取消了操作');
         },
         searchSubmit() {
-          this.$refs.table.init();
+          if(this.formItem.roomId){
+            console.log(this.formItem)
+            return
+            this.$refs.table.init();
+          }else{
+            this.$Modal.warning({
+              title: '提示',
+              content: '请选择房间'
+            })
+          }
         },
         searchCancel() {
           this.formItem.select = "";

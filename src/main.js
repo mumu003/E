@@ -14,8 +14,9 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import './assets/css/style.css'
 
-import Request from './assets/js/request'
+import axios from './assets/js/axiosInterCeptor'
 
+import Request from './assets/js/request'
 
 Vue.use(iView)
 Vue.component('route-bar', routeBar)
@@ -24,7 +25,6 @@ Vue.component('collapse-icon', cIcon)
 Vue.component('m-table', mTable)
 
 Vue.prototype.$request = Request
-
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
