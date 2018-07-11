@@ -48,12 +48,12 @@
               </Col>
               <Col span="6">
               <FormItem label="时间">
-                <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
+                <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
                 <FormItem>
-                  <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
+                  <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
                 </FormItem>
               </Col>
             </Row>
@@ -77,16 +77,17 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-              <!--  <Button type="info" icon="edit" @click="editProject">编辑</Button>-->
-                <Button @click="viewProject" icon="clipboard">状态详情</Button>
-                <Button type="error" icon="close"　@click="deleteProject">终止</Button>
+                <Button type="primary" icon="eye" @click="viewProject">查看</Button>
+                <Button type="primary" icon="clipboard">状态详情</Button>
+                <!--<Button type="error" icon="close"　@click="endProject">终止</Button>-->
+                <Button type="error" icon="close"　@click="deleteProject">删除</Button>
               </Col>
               <Col>
               </Col>
             </Row>
         </div>
           <Row class="searchable-table-con">
-            <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime"></m-table>
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime" :isFirst="isFirst"></m-table>
           </Row>
       </Card>
       </Col>
@@ -95,7 +96,7 @@
     <Modal v-model="addModal" title="新增合同备案"
       width="800"
       :loading="loading"
-      @on-ok="ok"
+      @on-ok="addSubmit"
       @on-cancel="cancel">
       <Form  :model="addForm" :label-width="100">
         <Row>
@@ -122,7 +123,7 @@
           </Col>
           <Col span="8">
             <FormItem label="业主姓名">
-            <Input v-model="addForm.customerName" disabled></Input>
+            <Input v-model="addForm.customerName" readonly></Input>
           </FormItem>
           </Col>
           <Col span="24">
@@ -134,29 +135,70 @@
         </Row>
       </Form>
     </Modal>
-    <Modal v-model="viewModal" title="状态详情"
-      width="500"
-      :loading="loading"
-      @on-ok="ok"
-      @on-cancel="cancel">
-      <Row>
-        <Col span="10">
-          <Steps :current="0" direction="vertical" size="small">
-          <Step title="2016-09-27 10:20:57" content="这里是该步骤的描述信息" icon="record" size=""></Step>
-          <Step title="已完成" content="这里是该步骤的描述信息" icon="record"></Step>
-          <Step title="进行中" content="这里是该步骤的描述信息" icon="record"></Step>
-          <Step title="待进行" content="这里是该步骤的描述信息" icon="record"></Step>
-        </Steps>
-        </Col>
-      </Row>
-    </Modal>
 
+    <Modal v-model="viewModal" title="合同备案详情"
+           width="800"
+           :loading="loading">
+      <Form  :model="addForm" :label-width="100">
+        <Row>
+          <Col span="8">
+          <FormItem label="楼栋">
+            <Input v-model="viewForm.buildingName" readonly/>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="单元">
+            <Input v-model="viewForm.unitName" readonly/>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="房间号">
+            <Input v-model="viewForm.roomNum" readonly/>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="业主姓名">
+            <Input v-model="viewForm.customerName" readonly></Input>
+          </FormItem>
+          </Col>
+          <Col span="24">
+          资料
+          </Col>
+          <Col span="24">
+          <Table stripe border :columns="viewContract" :data="viewData"></Table>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
+    <!--<Modal v-model="statuModal" title="状态详情"-->
+      <!--width="500"-->
+      <!--:loading="loading"-->
+      <!--@on-ok="ok"-->
+      <!--@on-cancel="cancel">-->
+      <!--<Row>-->
+        <!--<Col span="10">-->
+          <!--<Steps :current="0" direction="vertical" size="small">-->
+          <!--<Step title="2016-09-27 10:20:57" content="这里是该步骤的描述信息" icon="record" size=""></Step>-->
+          <!--<Step title="已完成" content="这里是该步骤的描述信息" icon="record"></Step>-->
+          <!--<Step title="进行中" content="这里是该步骤的描述信息" icon="record"></Step>-->
+          <!--<Step title="待进行" content="这里是该步骤的描述信息" icon="record"></Step>-->
+        <!--</Steps>-->
+        <!--</Col>-->
+      <!--</Row>-->
+    <!--</Modal>-->
+    <Modal v-model="noteModal" width="300" title="提示信息">
+      <p id="note-info">请选择至少一条数据！</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <Button type="primary" size="default" @click="closes">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
   export default {
     data () {
       return {
+          isFirst: false,
         //定义数组
         buildingList:[],
         unitList:[],
@@ -194,18 +236,27 @@
                         return h('Button',{
                           props:{
                             type:'error'
+                          },
+                          style:{
+                              width: '80px'
                           }
                         },"终止")
                       case 1:
                         return h('Button',{
                           props:{
                             type:'primary'
+                          },
+                          style:{
+                            width: '80px'
                           }
                         },"进行中")
                       case 2:
                         return h('Button',{
                           props:{
                             type:'success'
+                          },
+                          style:{
+                            width: '80px'
                           }
                         },"已归档")
                     }
@@ -236,6 +287,7 @@
         //模态框延迟
         addModal:false,
         viewModal:false,
+        statuModal:false,
         loading:true,
         //模态框表单,表格数据
         addForm:{
@@ -307,12 +359,78 @@
           }
         ],
         addData: [],
+        //模态框表单,表格数据
+        viewForm:{
+          buildingName:'',
+          unitName:'',
+          roomNum:'',
+          customerName:''
+        },
+        viewData: [],
+        viewContract: [
+          {
+            title: '序号',
+            key: 'sort',
+            width:100
+          },
+          {
+            title: '状态',
+            key: 'required',
+            width:150,
+            render:(h,params)=>{
+              switch(parseInt(params.row.required)){
+                case 0:
+                  return h('div',"非必填")
+                case 1:
+                  return h('div',"必填")
+              }
+            }
+          },
+          {
+            title: '资料名称',
+            key: 'name',
+            width:150
+          },
+          {
+            title: '资料数量',
+            key: 'quantity',
+            width:150
+          },
+          {
+            title: '存档',
+            key: 'archive',
+            width:150,
+            render:(h,params)=>{
+              switch(parseInt(params.row.archive)){
+                case 0:
+                  return h('div',"不存档")
+                case 1:
+                  return h('div',"存档")
+              }
+            }
+          },
+          {
+            title: '存档份数',
+            key: 'archiveQuantity',
+            width:150
+          }
+        ],
+        noteModal: false //弹窗
       }
+    },
+    computed: {
+      // 被选择的列表数据条数
+      selected_count(){
+        return this.$refs.table.selected_count
       },
+      // 被选择的列表数据
+      selection(){
+        return this.$refs.table.selection
+      }
+    },
     mounted(){//方法
-      this.getBuildings(),
-      this.getIndex(),
-      this.addModalData()
+      this.getBuildings()
+      this.getIndex()
     },
     methods: {//对象
         //获取楼栋列表
@@ -401,23 +519,15 @@
         })
       },
       //新增接口
-      addModalData() {
-        this.$request.post("/apiHost/api/contractBill/add",{
-          buildingId:this.addForm.buildingId,
-          buildingName:this.addForm.buildingName,
-          unitId:this.addForm.unitId,
-          unitName:this.addForm.unitName,
-          roomId:this.addForm.roomId,
-          roomNum:this.addForm.roomNum,
-          customerName:this.addForm.customerName,
-          dataId:this.addForm.dataId
-        }, res => {
+      addSubmit() {
+        this.$request.post("/apiHost/api/contractBill/add",this.addForm, res => {
           console.log(res)
-          if (res.data.code === 200) {
-            this.$router.push("/contract")
+          if (res.code === 200) {
             this.$Message.success("新增成功！")
+            this.loading = false
+            this.$refs.table.init()
           } else {
-            this.$Message.error(res.data.message)
+            this.$Message.error(res.message)
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -455,24 +565,62 @@
         this.addModal = true
       },
       viewProject(){
-        this.viewModal = true
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        let params = {
+            id: this.selection[0].id
+        }
+        this.$request.post("/apiHost/api/contractBill/view",params,res=>{
+            console.log(res.data)
+          this.viewForm.buildingName = res.data.buildingName
+          this.viewForm.unitName = res.data.unitName
+          this.viewForm.roomNum = res.data.roomNum
+          this.viewForm.customerName = res.data.customerName
+          this.viewData = res.data.details
+          this.viewModal = true
+        },res=>{
+          this.$Message.error("获取失败")
+        })
       },
       deleteProject(){
-
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        this.$Modal.confirm({
+          title: '操作提示',
+          content: '确认删除?',
+          loading: true,
+          onOk: () => {
+            let id = this.selection.map(item=>item.id).toString()
+            let params = {
+                id
+            }
+            this.$request.post("/apiHost/api/contractBill/delete",params,res=>{
+              this.$Message.success("删除成功")
+              this.$Modal.remove()
+              this.$refs.table.init()
+            },res=>{
+              this.$Message.error("删除失败")
+              this.$Modal.remove()
+            })
+          }
+        })
       },
-        ok() {
-          setTimeout(() => {
-            this.addModal = false;
-          }, 2000)
-          this.$refs.addTable.init()
-          console.log(this.addForm)
-          console.log(this.addForm.dataId)
-        },
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
         cancel() {
-          this.$Message.info('你取消了操作');
+          this.$Message.info('你取消了操作')
           this.addForm={
             buildingId: '',
             roomId: '',
@@ -481,8 +629,12 @@
           }
         },
         searchSubmit() {
+            this.isFirst = true
             console.log(this.formItem)
-            this.$refs.table.init()
+            setTimeout(()=>{
+              this.isFirst = false
+              this.$refs.table.init()
+            },200)
           },
         searchCancel() {
           this.formItem={
@@ -494,7 +646,15 @@
             startUpdateTime: '',
             endUpdateTime: ''
           }
-          this.$refs.table.init()
+          this.isFirst = true
+          setTimeout(()=>{
+            this.$refs.table.init()
+            this.isFirst = false
+          },200)
+        },
+        // 提示窗关闭
+        closes () {
+          this.noteModal = false
         }
       }
   }
