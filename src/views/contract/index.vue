@@ -10,14 +10,15 @@
           </p>
           <div id="search-body">
             <Form  :model="formItem" :label-width="80">
-              <Row>
+
+              <Row type="flex" justify="start">
               <Col span="6">
               <FormItem label="状态">
                 <Select v-model="formItem.status" placeholder="全部">
                   <Option value="">全部</Option>
-                  <Option value="0">终止</Option>
                   <Option value="1">进行中</Option>
                   <Option value="2">已归档</Option>
+                  <Option value="0">终止</Option>
                 </Select>
               </FormItem>
               </Col>
@@ -106,7 +107,7 @@
         <Row>
           <Col span="8">
           <FormItem label="楼栋">
-            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
               <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
             </Select>
           </FormItem>
@@ -179,6 +180,18 @@
           unitId:'',
           startUpdateTime:'',
           endUpdateTime:''
+        },
+        //表单
+        addItem: {
+          home:'',
+          name:'',
+          select: '',
+          building: '',
+          date: '',
+          time: '',
+          buildingsLierId:'',
+          unitLierId:'',
+          roomsLierId:''
         },
         //表格
         tableConfig:{
@@ -378,15 +391,13 @@
           roomId
         }, res => {
           console.log(res)
-          this.formItem.customerName=""
-          res.data.data.map(item =>{
-             this.formItem.customerName =this.formItem.customerName+ item.customerName+'/'
+          this.formItem.customerName = ""
+          res.data.data.map(item => {
+            this.formItem.customerName = this.formItem.customerName + item.customerName + '/'
           })
-          this.formItem.customerName=this.formItem.customerName.substr(0,this.formItem.customerName .length-1)//排除最后一个
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
+          this.formItem.customerName = this.formItem.customerName.substr(0, this.formItem.customerName.length - 1)//排除最后一个
         })
-      },
+    },
       //模态框的业主姓名
       getModalName(roomId) {
         this.roomsList.forEach(item=>{
@@ -445,7 +456,6 @@
             this.addModal = false;
           }, 2000)
           console.log(this.addForm)
-
           console.log(this.addForm.selection)
         },
       select(selection){

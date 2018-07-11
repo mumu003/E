@@ -226,7 +226,7 @@
               crossDomain: true
             })
               .then(res => {
-                if (res.data.code == 200) {
+                if (res.data.code === 200) {
                   this.changeLoading()
                   this.modal1 = false
                   this.formValidate.oldPwd = ""

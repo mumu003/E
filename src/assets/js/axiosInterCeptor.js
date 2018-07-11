@@ -6,7 +6,7 @@ axios.interceptors.request.use(
       config.headers.token = `${sessionStorage.token}`
     } else {
       let href=location.href;
-        if (href.indexOf("login") < 0) {
+      if (href.indexOf("login") < 0) {
         window.location.href = "/#/login"
         alert("对不起，您尚未登录，请先登录！")
       }
