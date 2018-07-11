@@ -14,6 +14,8 @@ import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import './assets/css/style.css'
 
+import  axios from'./assets/js/axiosInterCeptor'
+
 import Request from './assets/js/request'
 
 

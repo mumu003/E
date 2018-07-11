@@ -74,12 +74,15 @@
               let fd = new FormData()
               fd.append("username", this.form.userName === '' ? null : this.form.userName)
               fd.append("password", this.form.password === '' ? null : this.form.password)
-              axios.post('https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/user/login', fd)
+              axios.post('/apiHost/api/user/login', fd)
                 .then(res => {
                   console.log(res.data)
                   if (res.data.code === 200) {
-                    sessionStorage.setItem("token", res.data.data.token);
-                    sessionStorage.setItem("name",res.data.data.username);
+                    sessionStorage.setItem("token", res.data.data.token)
+                    sessionStorage.setItem("userId", res.data.data.userId)
+                    sessionStorage.setItem("userName",res.data.data.userName)
+                    sessionStorage.setItem("curProjectId", res.data.data.curProjectId)
+                    sessionStorage.setItem("orgId",res.data.data.orgId)
                     this.$router.push("/")
                     this.$Message.success("登录成功！")
                   } else {

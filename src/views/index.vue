@@ -213,14 +213,15 @@
         this.$refs[name].validate((valid) => {
           if (valid) {
             let param = new URLSearchParams()
-            param.append("oldPassword", this.formValidate.oldPwd)
-            param.append("newPassword", this.formValidate.newPwd)
+            param.append("userId", sessionStorage.userId)
+            param.append("oldPwd", this.formValidate.oldPwd)
+            param.append("newPwd", this.formValidate.newPwd)
             axios({
               headers: {
                 "token": sessionStorage.token,
               },
               method: "post",
-              url: "/apiHost/api/admin/user/update-password",
+              url: "/apiHost/api/user/changePassword",
               data: param,
               crossDomain: true
             })
