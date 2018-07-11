@@ -5,32 +5,31 @@
         <Card class="search-card">
           <p slot="title">
             <Icon type="levels"></Icon>
-              检索
+              {{$route.meta.title}}
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
               <Form  :model="formItem" :label-width="80">
                 <Row>
-                  <Col span="9">
+                  <Col span="6">
                   <FormItem label="状态">
                     <Select v-model="formItem.select" placeholder="全部">
-                      <Option value="all">全部</Option>
-                      <Option value="having">进行中</Option>
-                      <Option value="file">已归档</Option>
+                      <Option value="">全部</Option>
+                      <Option value="1">进行中</Option>
+                      <Option value="2">已归档</Option>
+                      <Option value="0">终止</Option>
                     </Select>
                   </FormItem>
                   </Col>
-                </Row>
-                <Row>
-                  <Col span="9">
-                  <FormItem label="时间">
-                    <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%;"></DatePicker>
-                  </FormItem>
+                  <Col span="6">
+                    <FormItem label="时间">
+                      <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
+                    </FormItem>
                   </Col>
-                  <Col span="9">
-                  <FormItem>
-                    <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
-                  </FormItem>
+                  <Col span="6">
+                    <FormItem>
+                      <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
+                    </FormItem>
                   </Col>
                 </Row>
               </Form>
@@ -38,34 +37,38 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit"><Icon type="search"></Icon> 搜索</Button>
-            <Button @click="searchCancel" type="ghost" ><Icon type="refresh"></Icon>  重置</Button>
+            <Button type="primary" @click="searchSubmit" icon="search">搜索</Button>
+            <Button type="ghost" @click="searchCancel" icon="refresh">重置</Button>
             </Col>
           </div>
         </div>
       </Card>
       </Col>
     </Row>
-    <Row :gutter="10">
+
+    <Row :gutter="10" class="mt10">
       <Col span="24">
-        <Card style="margin-top: 10px;">
-          <Row style="margin:0 0 10px 0px;font-size: 20px">
-            <Col span="1">
-            <Button type="primary" @click="newAgreementmodal = true" icon="plus-round">新增</Button>
-            </Col>
+        <Card>
+          <div class="search-row">
+            <Row>
+              <Col>
+                <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
+              <!--  <Button type="info" icon="edit" @click="editProject">编辑</Button>
+                <Button type="" @click="viewProject"><Icon type="clipboard"></Icon> 状态详情</Button>
+                <Button type="error" @click="deleteProject"><Icon type="close"></Icon> 终止</Button>-->
+              </Col>
+              <Col>
+              </Col>
+            </Row>
+        </div>
+          <Row class="searchable-table-con">
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
           </Row>
-          <Table border :columns="columns1" :data="data1"></Table>
-          <Row style="margin-top: 20px;">
-          <Col span="2">
-            共1000条</Col>
-          <Col span="10" offset="12" >
-          <Page :total="100"></Page>
-          </Col>
-          </Row>
-        </Card>
+      </Card>
       </Col>
     </Row>
-    <Modal v-model="newAgreementmodal" title="新增协议书申请"
+
+    <Modal v-model="addModal" title="新增协议书申请"
         width="800"
         :loading="loading"
         @on-ok="ok"
@@ -136,7 +139,66 @@
           date: '',
           time: '',
           slider: [20, 50],
-          textarea: ''
+          textarea: '',
+          startUpdateTime:'',
+          endUpdateTime:'',
+        },
+        tableConfig:{
+          url:"/apiHost/api/contractApplication/list",
+              columns:[
+                {
+                  type:"selection",
+                  key:'_checked',
+                  width:60
+                },
+                {
+                  title: '状态',
+                  key: 'status',
+                  width:100,
+                  render:(h,params)=>{
+                    switch(params.row.status){
+                      case 0:
+                        return h('Button',{
+                          props:{
+                            type:'error'
+                          }
+                        },"终止")
+                      case 1:
+                        return h('Button',{
+                          props:{
+                            type:'primary'
+                          }
+                        },"进行中")
+                      case 2:
+                        return h('Button',{
+                          props:{
+                            type:'success'
+                          }
+                        },"已归档")
+                    }
+                  }
+                },
+                {
+                  title: '申请份数',
+                  key: 'applyNum',
+                  width:250
+                },
+                {
+                  title: '实发份数',
+                  key: 'actualNum',
+                  width:250
+                },
+                {
+                  title: '差异份数',
+                  key: 'currentStep',
+                  width:250
+                },
+                {
+                  title: '更新时间',
+                  key: 'updatedAt',
+                  width:250
+                }
+              ],
         },
         columns1: [
           {
@@ -225,7 +287,7 @@
             time:'2016-10-03'
           }
         ],
-        newAgreementmodal: false,
+        addModal: false,
         loading: true,
         modelFormitem:{
           select: '',
@@ -289,6 +351,18 @@
       }
     },
     methods: {
+      //开始时间
+      getStartDate(startDate){
+        this.formItem.startUpdateTime=startDate
+      },
+      //结束时间
+      getEndDate(endDate){
+        this.formItem.endUpdateTime=endDate
+      },
+      //新增模态框
+      addProject(){
+        this.addModal=true;
+      },
       //按钮
       btn:function(){
         console.log(this.formItem)
