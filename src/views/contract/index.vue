@@ -25,17 +25,11 @@
               <Col span="6">
                 <FormItem label="楼栋">
                   <Input v-model="formItem.buildingId" placeholder="请输入楼栋号"/>
-                 <!-- <Select v-model="formItem.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(formItem.buildingId)">
-                      <Option :value="item.id" v-for="(item,index) in buildingList" :key="index" >{{item.name}}</Option>
-                  </Select>-->
                 </FormItem>
               </Col>
               <Col span="6">
                 <FormItem label="单元">
                   <Input v-model="formItem.unitId" placeholder="请输入单元号"/>
-                 <!-- <Select v-model="formItem.unitId" placeholder="请选择单元号" @on-change="getRooms(formItem.unitId)">
-                      <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                  </Select>-->
                 </FormItem>
               </Col>
 
@@ -83,16 +77,16 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-              <!--  <Button type="info" icon="edit" @click="editProject">编辑</Button>
-                <Button type="" @click="viewProject"><Icon type="clipboard"></Icon> 状态详情</Button>
-                <Button type="error" @click="deleteProject"><Icon type="close"></Icon> 终止</Button>-->
+              <!--  <Button type="info" icon="edit" @click="editProject">编辑</Button>-->
+                <Button @click="viewProject" icon="clipboard">状态详情</Button>
+                <Button type="error" icon="close"　@click="deleteProject">终止</Button>
               </Col>
               <Col>
               </Col>
             </Row>
         </div>
           <Row class="searchable-table-con">
-            <m-table :config="tableConfig" :searchParams="formItem" ref="table"  :searchTime="searchTime"></m-table>
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime"></m-table>
           </Row>
       </Card>
       </Col>
@@ -135,12 +129,12 @@
             资料
           </Col>
           <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="table" @on-selection-change="select"></Table>
+            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
           </Col>
         </Row>
       </Form>
     </Modal>
-    <Modal v-model="viewContractmodal" title="状态详情"
+    <Modal v-model="viewModal" title="状态详情"
       width="500"
       :loading="loading"
       @on-ok="ok"
@@ -180,18 +174,6 @@
           unitId:'',
           startUpdateTime:'',
           endUpdateTime:''
-        },
-        //表单
-        addItem: {
-          home:'',
-          name:'',
-          select: '',
-          building: '',
-          date: '',
-          time: '',
-          buildingsLierId:'',
-          unitLierId:'',
-          roomsLierId:''
         },
         //表格
         tableConfig:{
@@ -253,8 +235,7 @@
         },
         //模态框延迟
         addModal:false,
-        editContractmodal:false,
-        viewContractmodal:false,
+        viewModal:false,
         loading:true,
         //模态框表单,表格数据
         addForm:{
@@ -330,7 +311,8 @@
       },
     mounted(){//方法
       this.getBuildings(),
-      this.getIndex()
+      this.getIndex(),
+      this.addModalData()
     },
     methods: {//对象
         //获取楼栋列表
@@ -418,6 +400,29 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //新增接口
+      addModalData() {
+        this.$request.post("/apiHost/api/contractBill/add",{
+          buildingId:this.addForm.buildingId,
+          buildingName:this.addForm.buildingName,
+          unitId:this.addForm.unitId,
+          unitName:this.addForm.unitName,
+          roomId:this.addForm.roomId,
+          roomNum:this.addForm.roomNum,
+          customerName:this.addForm.customerName,
+          dataId:this.addForm.dataId
+        }, res => {
+          console.log(res)
+          if (res.data.code === 200) {
+            this.$router.push("/contract")
+            this.$Message.success("新增成功！")
+          } else {
+            this.$Message.error(res.data.message)
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -426,9 +431,6 @@
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
       },
-        handleReset(name) {
-          this.$refs[name].resetFields();
-        },
         //模态框
       //获取模态框表格数据
       getIndex() {
@@ -443,6 +445,7 @@
             quantity: item.quantity,
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
+            id:item.id
           }))
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -451,15 +454,22 @@
       addProject(){
         this.addModal = true
       },
+      viewProject(){
+        this.viewModal = true
+      },
+      deleteProject(){
+
+      },
         ok() {
           setTimeout(() => {
             this.addModal = false;
           }, 2000)
+          this.$refs.addTable.init()
           console.log(this.addForm)
-          console.log(this.addForm.selection)
+          console.log(this.addForm.dataId)
         },
       select(selection){
-        this.addForm.selection = JSON.stringify(selection)
+        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
         cancel() {
           this.$Message.info('你取消了操作');
@@ -471,16 +481,9 @@
           }
         },
         searchSubmit() {
-          if (this.formItem.roomId) {
             console.log(this.formItem)
-            /*this.$refs.table.init();*/
-          }else {
-            this.$Modal.warning({
-              title:'提示',
-              content:'请选择房间'
-            })
-          }
-        },
+            this.$refs.table.init()
+          },
         searchCancel() {
           this.formItem={
             status: '',
