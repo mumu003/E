@@ -78,7 +78,7 @@
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
                 <Button type="primary" icon="eye" @click="viewProject">查看</Button>
-                <Button type="primary" icon="clipboard">状态详情</Button>
+                <Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>
                 <!--<Button type="error" icon="close"　@click="endProject">终止</Button>-->
                 <Button type="error" icon="close"　@click="deleteProject">删除</Button>
               </Col>
@@ -102,7 +102,7 @@
         <Row>
           <Col span="8">
           <FormItem label="楼栋">
-              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
               <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
             </Select>
           </FormItem>
@@ -137,9 +137,9 @@
     </Modal>
 
     <Modal v-model="viewModal" title="合同备案详情"
-           width="800"
-           :loading="loading">
-      <Form  :model="addForm" :label-width="100">
+      width="800"
+     >
+      <Form  :model="viewForm" :label-width="100">
         <Row>
           <Col span="8">
           <FormItem label="楼栋">
@@ -169,23 +169,39 @@
           </Col>
         </Row>
       </Form>
+      <div slot="footer" style="text-align: right;">
+        <Button type="error">驳回</Button>
+        <Button type="success">通过</Button>
+      </div>
     </Modal>
-    <!--<Modal v-model="statuModal" title="状态详情"-->
-      <!--width="500"-->
-      <!--:loading="loading"-->
-      <!--@on-ok="ok"-->
-      <!--@on-cancel="cancel">-->
-      <!--<Row>-->
-        <!--<Col span="10">-->
-          <!--<Steps :current="0" direction="vertical" size="small">-->
-          <!--<Step title="2016-09-27 10:20:57" content="这里是该步骤的描述信息" icon="record" size=""></Step>-->
-          <!--<Step title="已完成" content="这里是该步骤的描述信息" icon="record"></Step>-->
-          <!--<Step title="进行中" content="这里是该步骤的描述信息" icon="record"></Step>-->
-          <!--<Step title="待进行" content="这里是该步骤的描述信息" icon="record"></Step>-->
-        <!--</Steps>-->
-        <!--</Col>-->
-      <!--</Row>-->
-    <!--</Modal>-->
+    <Modal v-model="statuModal" title="状态详情"
+      width="800"
+      :loading="loading"
+     >
+      <Row>
+        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+        <Col span="24">
+          <Steps :current="currentNodeId">
+            <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
+          </Steps>
+        </Col>
+        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+        <Col span="24">
+          <Timeline>
+            <TimelineItem v-for="(item,index) in rateList" :color="item.status === 0 ? 'red' : 'green'">
+              <!--<p v-if="index===0">发起人:{{item.userName}}</p>-->
+              <!--<p v-else>操作人:{{item.userName}}</p>-->
+              <p>{{item.createdAt}}</p>
+              <p v-if="index === 0">发起</p>
+              <p v-else-if="index === rateList.length-1">归档节点:完结</p>
+              <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
+              <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+            </TimelineItem>
+          </Timeline>
+        </Col>
+      </Row>
+    </Modal>
+
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
@@ -415,7 +431,10 @@
             width:150
           }
         ],
-        noteModal: false //弹窗
+        noteModal: false, //弹窗
+        statuList:[],
+        rateList:[],
+        currentNodeId:''
       }
     },
     computed: {
@@ -564,7 +583,9 @@
       addProject(){
         this.addModal = true
       },
+      //查看
       viewProject(){
+        this.viewModal = true
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -590,6 +611,7 @@
           this.$Message.error("获取失败")
         })
       },
+      //删除
       deleteProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -615,6 +637,45 @@
             })
           }
         })
+      },
+      //状态详情
+      statuProject(){
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+
+        let params = {
+          id: this.selection[0].id
+        }
+        this.$request.post("/apiHost/api/contractBill/status",params,res=>{
+          this.statuList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+            this.rateList =res.data.historys.map(item=> ({
+              createdAt:item.createdAt,
+              status:item.status,
+              userName:item.userName
+            }))
+            this.statuList.map((item,i)=>{
+              if(item.id===res.data.currentNodeId){
+                this.currentNodeId = i
+              }
+            })
+          console.log(this.statuList)
+          this.statuModal = true
+        }, res=>{
+          this.$Message.error("获取失败")
+        },
+        )
       },
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
