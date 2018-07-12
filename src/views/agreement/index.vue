@@ -13,7 +13,7 @@
                 <Row>
                   <Col span="6">
                   <FormItem label="状态">
-                    <Select v-model="formItem.select" placeholder="全部">
+                    <Select v-model="formItem.status" placeholder="全部">
                       <Option value="">全部</Option>
                       <Option value="1">进行中</Option>
                       <Option value="2">已归档</Option>
@@ -62,84 +62,40 @@
             </Row>
         </div>
           <Row class="searchable-table-con">
-            <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
+            <m-table :config="tableConfig" :searchParams="formItem" ref="table"></m-table>
           </Row>
       </Card>
       </Col>
     </Row>
 
     <Modal v-model="addModal" title="新增协议书申请"
-        width="800"
-        :loading="loading"
-        @on-ok="ok"
-        @on-cancel="cancel">
-
-        <Form  :model="modelFormitem" :label-width="80">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Select placeholder="全部">
-                <Option value="all">全部</Option>
-                <Option value="having">进行中</Option>
-                <Option value="file">已归档</Option>
-              </Select>
+      :loading="loading"
+      @on-ok="ok"
+      @on-cancel="cancel">
+      <Form  :model="addForm" :label-width="80">
+        <Row>
+          <Col span="24">
+            <FormItem label="申请份数">
+              <Input v-model="addForm.applyNum"></Input>
             </FormItem>
-            </Col>
-
-            <Col span="8">
-            <FormItem label="单元">
-              <Select placeholder="全部">
-                <Option value="all">全部</Option>
-                <Option value="having">进行中</Option>
-                <Option value="file">已归档</Option>
-              </Select>
+          </Col>
+          <Col span="24">
+            <FormItem label="备注说明">
+              <Input v-model="addForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
             </FormItem>
-            </Col>
+          </Col>
+        </Row>
+      </Form>
+    </Modal>
 
-            <Col span="8">
-            <FormItem label="房间号">
-              <Select placeholder="全部">
-                <Option value="all">全部</Option>
-                <Option value="having">进行中</Option>
-                <Option value="file">已归档</Option>
-              </Select>
-            </FormItem>
-            </Col>
-
-            <Col span="8">
-            <FormItem label="业主">
-              <Input v-model="modelFormitem.name"></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-            <Table border :columns="newAgreement" :data="newAgreementdata"></Table>
-            </Col>
-          </Row>
-        </Form>
-
-      </Modal>
   </div>
 </template>
 <script type="text/ecmascript-6">
   export default {
     data () {
       return {
-        value1: '1',
         formItem: {
-          input: '',
-          home:'',
-          name:'',
-          select: '',
-          radio: 'male',
-          checkbox: [],
-          switch: true,
-          date: '',
-          time: '',
-          slider: [20, 50],
-          textarea: '',
+          status:'',
           startUpdateTime:'',
           endUpdateTime:'',
         },
@@ -288,6 +244,10 @@
           }
         ],
         addModal: false,
+        addForm: {
+          applyNum:'',
+          remark:'',
+        },
         loading: true,
         modelFormitem:{
           select: '',
