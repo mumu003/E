@@ -181,7 +181,7 @@
       <Row>
         <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
         <Col span="24">
-          <Steps :current="currentNodeId">
+          <Steps :current="1">
             <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
           </Steps>
         </Col>
@@ -585,7 +585,6 @@
       },
       //查看
       viewProject(){
-        this.viewModal = true
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -674,8 +673,7 @@
           this.statuModal = true
         }, res=>{
           this.$Message.error("获取失败")
-        },
-        )
+        })
       },
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
