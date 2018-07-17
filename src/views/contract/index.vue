@@ -70,6 +70,7 @@
       </Card>
       </Col>
     </Row>
+
     <Row :gutter="10" class="mt10">
       <Col span="24">
         <Card>
@@ -79,7 +80,7 @@
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
                 <Button type="primary" icon="eye" @click="viewProject">查看</Button>
                 <Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>
-                <!--<Button type="error" icon="close"　@click="endProject">终止</Button>-->
+                <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
                 <Button type="error" icon="close"　@click="deleteProject">删除</Button>
               </Col>
               <Col>
@@ -95,27 +96,25 @@
 
     <Modal v-model="addModal" title="新增合同备案"
       width="800"
-      :loading="loading"
-      @on-ok="addSubmit"
-      @on-cancel="cancel">
-      <Form  :model="addForm" :label-width="100">
+      :loading="loading">
+      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-          <FormItem label="楼栋">
+          <FormItem label="楼栋" prop="buildingId">
             <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
               <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="单元">
+            <FormItem label="单元" prop="unitId">
             <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
               <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="房间号">
+            <FormItem label="房间号" prop="roomId">
             <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
               <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
             </Select>
@@ -134,6 +133,10 @@
           </Col>
         </Row>
       </Form>
+      <div slot="footer" style="text-align: right;">
+        <Button type="ghost" @click="cancel">取消</Button>
+        <Button type="primary" @click="addSubmit">确定</Button>
+      </div>
     </Modal>
 
     <Modal v-model="viewModal" title="合同备案详情"
@@ -174,6 +177,7 @@
         <Button type="success">通过</Button>
       </div>
     </Modal>
+
     <Modal v-model="statuModal" title="状态详情"
       width="800"
       :loading="loading"
@@ -181,7 +185,7 @@
       <Row>
         <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
         <Col span="24">
-          <Steps :current="currentNodeId">
+          <Steps :current="1">
             <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
           </Steps>
         </Col>
@@ -248,7 +252,7 @@
                   width:100,
                   render:(h,params)=>{
                     switch(params.row.status){
-                      case 0:
+                      case '0':
                         return h('Button',{
                           props:{
                             type:'error'
@@ -257,7 +261,7 @@
                               width: '80px'
                           }
                         },"终止")
-                      case 1:
+                      case '1':
                         return h('Button',{
                           props:{
                             type:'primary'
@@ -266,7 +270,7 @@
                             width: '80px'
                           }
                         },"进行中")
-                      case 2:
+                      case '2':
                         return h('Button',{
                           props:{
                             type:'success'
@@ -314,7 +318,18 @@
           buildingName:'',
           roomNum:'',
           unitName:'',
-          selection:[]
+          dataId:[]
+        },
+        ruleAdd:{
+          buildingId: [
+              { required: true, message: '请选择楼栋号', trigger: 'change' }
+          ],
+          unitId: [
+              { required: true, message: '请选择单元号', trigger: 'change' }
+          ],
+          roomId: [
+              { required: true, message: '请选择房间号', trigger: 'change' }
+          ]
         },
         addContract: [
           {
@@ -454,7 +469,11 @@
     methods: {//对象
         //获取楼栋列表
         getBuildings() {
-          this.$request.post("/apiHost/api/room/getBuildingList", '', res => {
+          let params = {
+            orgId: sessionStorage.getItem("orgId"),
+            projectId: sessionStorage.getItem("curProjectId")
+          }
+          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
             console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
@@ -472,9 +491,10 @@
             }
           })
           console.log(this.addForm)
+          this.unitList=[];
           this.$request.post("/apiHost/api/room/getBuildingRoom",{
-            orgId:sessionStorage.orgId,
-            projectId:sessionStorage.curProjectId,
+            orgId: sessionStorage.getItem("orgId"),
+            projectId: sessionStorage.getItem("curProjectId"),
             buildingId
           }, res => {
             console.log(res)
@@ -483,9 +503,15 @@
               name: item.unitName,
               rooms:item.rooms
             }))
+            console.log(this.unitList)
           }, res => {
             this.$Modal.error({title: '提示信息', content: res.message})
           })
+          this.addForm.unitId = ""
+          this.addForm.unitName = ""
+          this.addForm.roomId = ""
+          this.addForm.roomNum = ""
+          this.addForm.customerName = ""
         },
         //获取房间列表
         getRooms(unitId) {
@@ -502,23 +528,30 @@
               }))
             }
           })
+          this.addForm.roomId = ""
+          this.addForm.roomNum = ""
+          this.addForm.customerName = ""
         },
-      //业主姓名
-      getName(roomId) {
-        console.log(roomId)
-        this.$request.post("/apiHost/api/room/getRoomCustomer",{
-          roomId
-        }, res => {
-          console.log(res)
-          this.formItem.customerName = ""
-          res.data.data.map(item => {
-            this.formItem.customerName = this.formItem.customerName + item.customerName + '/'
+        //业主姓名
+        getName(roomId) {
+          console.log(roomId)
+          this.$request.post("/apiHost/api/room/getRoomCustomer",{
+            roomId
+          }, res => {
+            console.log(res)
+            this.formItem.customerName = ""
+            res.data.data.map(item => {
+              this.formItem.customerName = this.formItem.customerName + item.customerName + '/'
+            })
+            this.formItem.customerName = this.formItem.customerName.substr(0, this.formItem.customerName.length - 1)//排除最后一个
           })
-          this.formItem.customerName = this.formItem.customerName.substr(0, this.formItem.customerName.length - 1)//排除最后一个
-        })
-    },
+        },
       //模态框的业主姓名
       getModalName(roomId) {
+        console.log("roomId:"+roomId)
+        if(typeof(roomId) == "undefined"){
+            return ;
+        }
         this.roomsList.forEach(item=>{
           if(roomId===item.id){
             this.addForm.roomNum = item.num
@@ -539,17 +572,24 @@
       },
       //新增接口
       addSubmit() {
-        this.$request.post("/apiHost/api/contractBill/add",this.addForm, res => {
-          console.log(res)
-          if (res.code === 200) {
-            this.$Message.success("新增成功！")
-            this.loading = false
-            this.$refs.table.init()
+        console.log(this.addForm)
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            this.$request.post("/apiHost/api/contractBill/add",this.addForm, res => {
+              console.log(res)
+              if (res.code === 200) {
+                this.$Message.success("新增成功！")
+                this.addModal = false
+                this.$refs.table.init()
+              } else {
+                this.$Message.error(res.message)
+              }
+            }, res => {
+              this.$Modal.error({title: '提示信息', content: res.message})
+            })
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
           }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //开始时间
@@ -560,14 +600,14 @@
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
       },
-        //模态框
+      //模态框
       //获取模态框表格数据
       getIndex() {
-        this.$request.post("/apiHost/api/processSetting/data",'', res => {
+        this.$request.post("/apiHost/api/processSetting/data",{"type":"1"}, res => {
           console.log(res)
           this.addData = res.data.map(item=>({
-            _disabled: item.required === 1 ?  true : false,
-            _checked: item.required === 1 ?  true : false,
+            _disabled: item.required === '1' ?  true : false,
+            _checked: item.required === '1' ?  true : false,
             sort: item.sort,
             required: item.required,
             name: item.name,
@@ -579,6 +619,10 @@
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
+        
+         if(required === "1"){
+              this.addForm.dataId.push(item.id)
+            }
       },
       addProject(){
         this.addModal = true
@@ -678,7 +722,9 @@
         )
       },
       select(selection){
+        console.log("select前:"+this.addForm.dataId)
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+        console.log("select后:"+this.addForm.dataId)
       },
         cancel() {
           this.$Message.info('你取消了操作')

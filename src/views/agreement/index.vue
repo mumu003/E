@@ -53,9 +53,10 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="eye" @click="viewProject">查看</Button>
+                <!-- <Button type="primary" icon="eye" @click="viewProject">查看</Button> -->
+                <Button type="primary" icon="edit" @click="editProject">编辑</Button>
                 <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
-                 <Button type="error" icon="close"　@click="endProject">终止</Button>
+                <Button type="error" icon="close"　@click="endProject">终止</Button>
                 <Button type="error" icon="close"　@click="deleteProject">删除</Button>
               </Col>
               <Col>
@@ -101,12 +102,54 @@
             </FormItem>
           </Col>
           <Col span="24">
+            <FormItem label="实发份数">
+              <Input v-model="viewForm.actualNum" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="24">
+            <FormItem label="差异数量">
+              <Input v-model="viewForm.differenceNum" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="24">
             <FormItem label="备注说明">
               <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
             </FormItem>
           </Col>
         </Row>
       </Form>
+    </Modal>
+
+    <Modal v-model="editModal" title="协议书申请编辑"
+      :loading="loading">
+      <Form  :model="viewForm" :label-width="80">
+        <Row>
+          <Col span="24">
+            <FormItem label="申请份数">
+              <Input v-model="viewForm.applyNum" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="24">
+            <FormItem label="实发份数">
+              <Input v-model="viewForm.actualNum" @on-change="actualNumChange"></Input>
+            </FormItem>
+          </Col>
+          <Col span="24">
+            <FormItem label="差异数量">
+              <Input v-model="viewForm.differenceNum" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="24">
+            <FormItem label="备注说明">
+              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="error" size="default" @click="editReject">驳回</Button>
+        <Button type="primary" size="default" @click="editPass">通过</Button>
+      </div>
     </Modal>
 
     <Modal v-model="statusModal" title="状态详情"
@@ -149,6 +192,7 @@
     data () {
       return {
         isFirst: false,
+        loading: true,
         nodesList:[],
         historysList:[],
         formItem: {
@@ -171,19 +215,19 @@
                   render:(h,params)=>{
                     switch(params.row.status){
                       case '0':
-                        return h('Button',{
+                        return h('div',{
                           props:{
                             type:'error'
                           }
                         },"终止")
                       case '1':
-                        return h('Button',{
+                        return h('div',{
                           props:{
                             type:'primary'
                           }
                         },"进行中")
                       case '2':
-                        return h('Button',{
+                        return h('div',{
                           props:{
                             type:'success'
                           }
@@ -203,8 +247,11 @@
                 },
                 {
                   title: '差异份数',
-                  key: 'currentStep',
-                  width:250
+                  key: '',
+                  width:250,
+                  render:(h,params)=>{
+                    return h('div',params.row.actualNum  - params.row.applyNum)
+                  }
                 },
                 {
                   title: '更新时间',
@@ -215,6 +262,7 @@
         },
         addModal: false,
         viewModal:false,
+        editModal:false,
         statusModal:false,
         noteModal:false,//弹窗
         addForm: {
@@ -222,10 +270,12 @@
           remark:'',
         },
         viewForm: {
+          id:'',
           applyNum:'',
+          actualNum:'',
+          differenceNum:'',
           remark:'',
-        },
-        loading: true
+        }
       }
     },
     computed: {
@@ -295,9 +345,82 @@
         }
         this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
             console.log(res.data)
+          this.viewForm.id = res.data.id
           this.viewForm.applyNum = res.data.applyNum
+          this.viewForm.actualNum = res.data.actualNum
+          this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
           this.viewForm.remark = res.data.remark
           this.viewModal = true
+        },res=>{
+          this.$Message.error("获取失败")
+        })
+      },
+      editProject(){
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        let params = {
+            id: this.selection[0].id
+        }
+        this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
+            console.log(res.data)
+          this.viewForm.id = res.data.id
+          this.viewForm.applyNum = res.data.applyNum
+          this.viewForm.actualNum = res.data.actualNum
+          this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
+          this.viewForm.remark = res.data.remark
+          this.editModal = true
+        },res=>{
+          this.$Message.error("获取失败")
+        })
+      },
+      editPass(){
+        let params = {
+            id: this.viewForm.id,
+            actualNum: this.viewForm.actualNum,
+            status:1
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+            console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.editModal = false
+              this.$Message.success("审核通过")
+              this.$refs.table.init()
+            }, 2000);
+          } else {
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.$Message.error("获取失败")
+        })
+      },
+      editReject(){
+        let params = {
+            id: this.viewForm.id,
+            actualNum: this.viewForm.actualNum,
+            status:0
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+            console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.editModal = false
+              this.$Message.success("审核驳回")
+              this.$refs.table.init()
+            }, 2000);
+          } else {
+            this.$Message.error(res.message)
+          }
         },res=>{
           this.$Message.error("获取失败")
         })
@@ -425,7 +548,7 @@
         this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
           console.log(res)
           if (res.code === 200) {
-            this.addForm={
+            this.formItem={
               status:'',
               startUpdateTime:'',
               endUpdateTime:'',
@@ -450,6 +573,9 @@
             this.$refs.table.init()
             this.isFirst = false
           },200)
+      },
+      actualNumChange(){
+        this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
       },
       // 提示窗关闭
       closes () {
