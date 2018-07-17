@@ -629,7 +629,6 @@
       },
       //查看
       viewProject(){
-        this.viewModal = true
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -718,8 +717,7 @@
           this.statuModal = true
         }, res=>{
           this.$Message.error("获取失败")
-        },
-        )
+        })
       },
       select(selection){
         console.log("select前:"+this.addForm.dataId)
