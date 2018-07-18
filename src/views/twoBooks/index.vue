@@ -632,6 +632,7 @@
           this.viewModal = false;
         }, 2000);
       },
+      //通过
       viewPass(){
         let params = {
             id: this.viewForm.id,
@@ -653,6 +654,7 @@
           this.$Message.error("获取失败")
         })
       },
+      //驳回
       viewReject(){
         let params = {
             id: this.viewForm.id,
