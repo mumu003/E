@@ -11,10 +11,10 @@
           <div id="search-body">
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
-                <Col span="9">
-                  <FormItem label="流程名称" prop="status">
-                    <Select v-model="formItem.status" placeholder="全部">
-                      <Option value="all">全部</Option>
+                <Col span="6">
+                  <FormItem label="流程类型" prop="type">
+                    <Select v-model="formItem.type" placeholder="全部">
+                      <Option value="">全部</Option>
                       <Option value="1">合同备案</Option>
                       <Option value="2">发函</Option>
                       <Option value="3">交房通知</Option>
@@ -25,27 +25,25 @@
                     </Select>
                   </FormItem>
                 </Col>
-              </Row>
-              <Row>
-                <Col span="9">
-                  <FormItem label="时间" prop="date">
-                    <DatePicker type="date" placeholder="" v-model="formItem.date" style="width: 100%"></DatePicker>
-                  </FormItem>
+                <Col span="6">
+                <FormItem label="开始时间">
+                  <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                </FormItem>
                 </Col>
-                <Col span="9">
-                  <FormItem>
-                    <TimePicker type="time" placeholder="" v-model="formItem.time" style="width: 100%;"></TimePicker>
-                  </FormItem>
+                <Col span="6">
+                <FormItem label="结束时间">
+                  <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                </FormItem>
                 </Col>
               </Row>
           </Form>
           <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-              <Button type="primary" @click="searchSubmit" ><Icon type="search"></Icon>检索</Button>
-              <Button type="ghost" @click="searchReset" ><Icon type="refresh"></Icon>重置</Button>
-            </Col>
+              <Col>
+              </Col>
+              <Col>
+              <Button type="primary" @click="searchSubmit" icon="search">检索</Button>
+              <Button type="ghost" @click="searchReset" icon="refresh">重置</Button>
+              </Col>
           </div>
         </div>
         </Card>
@@ -56,15 +54,16 @@
       <Col span="24">
         <Card>
           <div class="search-row">
-            <Col>
-              <Button type="primary" @click="addProject" ><Icon type="plus-round"></Icon> 新增</Button>
-              <Button type="info" @click="addProject" ><Icon type="edit"></Icon> 编辑</Button>
-              <Button type="ghost" @click="addProject" ><Icon type="navicon"></Icon> 详情</Button>
-              <Button type="error" @click="addProject" ><Icon type="close"></Icon> 删除</Button>
-              <Button type="primary" @click="addProject" ><Icon type="plus-round"></Icon> 新增资料</Button>
-            </Col>
-            <Col>
-            </Col>
+            <Row>
+              <Col>
+              <Button type="primary" @click="editProject" icon="edit">修改</Button>
+              <Button type="primary" @click="addProject" icon="eye">详情</Button>
+              <Button type="error" @click="addProject" icon="close">删除</Button>
+              <Button type="primary" @click="addProject" icon="gear-b">存档设置</Button>
+              </Col>
+              <Col>
+              </Col>
+            </Row>
           </div>
           <Row class="searchable-table-con">
             <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
@@ -73,14 +72,14 @@
       </Col>
     </Row>
 
-    <Modal title="新增流程设置" v-model="addProcedureModal" width="800" :loading="loading"
+    <Modal title="修改流程设置" v-model="editModal" width="800" :loading="loading"
       @on-ok="ok"
       @on-cancel="cancel">
-      <Form :label-width="100" class="modal-form" :model="addProcedureForm">
+      <Form :label-width="100" class="modal-form" :model="editForm">
         <Row>
           <Col span="12">
-          <FormItem label="流程名称" prop="name">
-            <Select v-model="addProcedureForm.name" placeholder="" style="width: 100%" @on-change="selectChange">
+          <FormItem label="流程名称" prop="type">
+            <Select v-model="editForm.type" disabled>
               <Option value="1">合同备案</Option>
               <Option value="2">发函</Option>
               <Option value="3">交房通知</Option>
@@ -91,25 +90,24 @@
             </Select>
           </FormItem>
           </Col>
-          <Col span="12" v-if="addProcedureForm.name === '3'">
+          <Col span="12" v-if="editForm.type === '3'">
             <FormItem label="房款交齐">
-              <CheckboxGroup v-model="addProcedureForm.right">
+              <CheckboxGroup v-model="editForm.right">
                 <Checkbox label="是"></Checkbox>
               </CheckboxGroup>
             </FormItem>
           </Col>
-          <div v-if="addProcedureForm.name === '3'">
+          <div v-if="editForm.type === '1' || editForm.type === '2' || editForm.type === '6'">
             <Col span="24">
               <FormItem label="资料">
-                <Button type="primary" ><Icon type="plus-round"></Icon> 新增</Button>
-                <Button type="info" ><Icon type="edit"></Icon> 编辑</Button>
-                <Button type="error" ><Icon type="close"></Icon> 删除</Button>
+                <Button type="primary" icon="plus-round">新增</Button>
+                <Button type="primary" icon="edit">编辑</Button>
+                <Button type="error" icon="close">删除</Button>
               </FormItem>
             </Col>
             <Col span="24">
-              <FormItem label="">
-                <Table border :columns="newProcess" :data="newProcessdata"></Table>
-              </FormItem>
+              <Table border stripe :columns="editConfig" :data="editForm.settingDatas"></Table>
+            <!--<m-table :config="editConfig" ref="eTable" :data="editForm.settingDatas"></m-table>-->
             </Col>
           </div>
         </Row>
@@ -125,14 +123,14 @@
           </Col>
           <Col span="12">
           <FormItem label="发起人" prop="initiator">
-            <Select v-model="addProcedureForm.initiator" placeholder="" style="width: 100%">
+            <Select v-model="editForm.initiator" placeholder="" style="width: 100%">
               <Option value="all">客服经理</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="12">
           <FormItem label="关闭节点" prop="closedNode">
-            <Select v-model="addProcedureForm.closedNode" placeholder="" style="width: 100%">
+            <Select v-model="editForm.closedNode" placeholder="" style="width: 100%">
               <Option value="all">客服经理</Option>
             </Select>
           </FormItem>
@@ -235,7 +233,12 @@
         </Row>
       </Form>
     </Modal>
-
+    <Modal v-model="noteModal" width="300" title="提示信息">
+      <p id="note-info">请选择至少一条数据！</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <Button type="primary" size="default" @click="closes">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -245,17 +248,19 @@
     data () {
       return {
         loading: true,
-        addProcedureModal: false,
+        editModal: false,
         selectMaterialModal:false,
         addMaterialModal:false,
         editMaterialModal:false,
         formItem: {
-          name: '',
-          date: '',
-          time:''
+          type: '',
+          startUpdateTime: '',
+          endUpdateTime:''
         },
-        addProcedureForm:{
-          name:'',
+        editForm:{
+          type:'',
+          settingDatas: [],
+          settingNodes: [],
           right:[],
           initiator:'',
           initiatorData:'',
@@ -283,202 +288,138 @@
           censusRegisterNumber:''
         },
         tableConfig:{
-            url:"http://rap2api.taobao.org/app/mock/17251/api/goods/list",
+            url:"/apiHost/api/processSetting/list",
               columns:[
                 {
-                  title:"选项",
-                  width:100,
-                  align:'center',
-                  render: (h, params) => {
-                    return h('div', [
-                      h('Button', {
-                          props: {
-                              size: 'small'
-                          },
-                          style: {
-                              marginRight: '5px',
-                              background:"#bbbec4",
-                              color:"white"
-                          },
-                          on: {
-                              click: () => {
-                                  this.editId=params.row.id;
-                                  this.editList();
-                              }
-                          }
-                      }, '修改'),
-                      h('Button', {
-                          props: {
-                              type: 'error',
-                              size: 'small'
-                          },
-                          on: {
-                              click: () => {
-                                  this.$Modal.confirm({
-                                        title:"操作提示",
-                                        content:"确认删除该网点",
-                                        onOk:()=>{
-                                          this.$request.post('https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/contractBill/list',{id:params.row.id},res=>{
-                                               this.$Message.success(res.message);
-                                               this.$refs.table.init();
-                                          },res=>{
-                                               this.$Message.error({content:res.message,duration:2});
-                                          });
-                                        }
-                                  });
-                              }
-                          }
-                      }, '删除'),
-                    ])
-                  }
+                  type:"selection",
+                  key:'_checked',
+                  width:60
                 },
                 {
                   title: '名称',
-                  key: 'goodsCode',
+                  key: 'name',
+                  align:'center'
+                },
+                {
+                  title: '设置',
+                  key: 'setting',
                   align:'center'
                 },
                 {
                   title: '更新时间',
-                  key: 'unit',
+                  key: 'updatedAt',
                   align:'center'
                 }
-              ],
+              ]
         },
-        data1: [
+        editConfig:[
           {
-            name: 'John Brown',
-            age: 18,
-            address: '合同备案',
-            date: '2016-10-03 12:00:00'
-          },
-          {
-            name: 'Jim Green',
-            age: 24,
-            address: '按揭移交',
-            date: '2016-10-01 12:00:00'
-          },
-          {
-            name: 'Joe Black',
-            age: 30,
-            address: '发函',
-            date: '2016-10-02 12:00:00'
-          }
-        ],
-        newProcess: [
-          {
-            title: '选项',
-            key: 'name',
-            align:"center",
-            width:65,
-            render : function ( h , param ){
-              return h("div",[
-                h("Checkbox","")
-              ])
-            }
-          },
-          {
-            title: '序号',
-            key: 'num',
-            align:"center",
-            width:65
+            type:"selection",
+            key:'_checked',
+            width:60
           },
           {
             title: '状态',
-            key: 'status',
-            align:"center"
+            key: 'required',
+            align:'center',
+            width:100
           },
           {
             title: '资料名称',
             key: 'name',
-            align:"center",
+            align:'center',
+            width:200
           },
           {
             title: '资料数量',
-            key: 'number',
-            align:"center",
+            key: 'quantity',
+            align:'center',
+            width:100
           },
           {
             title: '存档',
-            key: 'save',
-            align:"center",
-          },
-          {
-            title: '存档份数',
-            key: 'saveNumber',
-            align:"center",
+            key: 'archive',
+            align:'center',
+            width:100
           }
         ],
-        newProcessdata: [
-          {
-            num: '1',
-            status: '必填',
-            name: '业主身份证',
-            number: '2',
-            save:'是',
-            saveNumber:'1'
-          },
-          {
-            num: '2',
-            status: '必填',
-            name: '业主户籍证明',
-            number: '2',
-            save:'否',
-            saveNumber:'1'
-          }
-        ]
+        noteModal: false //弹窗
+      }
+    },
+    computed: {
+      // 被选择的列表数据条数
+      selected_count(){
+        return this.$refs.table.selected_count
+      },
+      // 被选择的列表数据
+      selection(){
+        return this.$refs.table.selection
       }
     },
     mounted(){
       // this.getcontractBillList()
     },
     methods:{
+      //开始时间
+      getStartDate(startDate){
+        this.formItem.startUpdateTime=startDate
+      },
+      //结束时间
+      getEndDate(endDate){
+        this.formItem.endUpdateTime=endDate
+      },
       ok () {
         setTimeout(() => {
-          this.addModal = false;
-        }, 2000);
+          this.addModal = false
+        }, 2000)
       },
       cancel () {
-        this.$Message.info('你取消了操作');
+        this.$Message.info('你取消了操作')
       },
       searchSubmit(){
         console.log(this.formItem)
         this.searchReset()
       },
       searchReset(){
-        this.formItem.name="";
-        this.formItem.date="";
-        this.formItem.time="";
+        this.formItem = {
+          type: '',
+          startUpdateTime: '',
+          endUpdateTime: ''
+        }
       },
       addProject(){
-        this.addProcedureModal=true;
+        this.editModal=true
       },
-      //获取列表
-      // getcontractBillList(){
-      //   this.$request.post("http://rap2api.taobao.org/app/mock/17251/api/goods/list", '', res => {
-      //     console.log(res);
-      //     return;
-      //     this.contractBillList = res.data.buildings.map(item => ({
-      //       id: item.buildingId,
-      //       name: item.buildingName
-      //     }))
-      //   }, res => {
-      //     this.$Modal.error({title: '提示信息', content: res.message})
-      //   })
-      // },
-      selectChange(){
-        console.log(this.addProcedureForm.name)
+      editProject(){
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        let params = {
+          type: this.selection[0].type
+        }
+        this.$request.post("/apiHost/api/processSetting/view",params,res=>{
+            console.log(res)
+            this.editForm.type = res.data.type
+            this.editForm.requirePurchase = res.data.requirePurchase
+            this.editForm.settingDatas = res.data.settingDatas
+            this.editForm.settingNodes = res.data.settingNodes
+//            this.$refs.eTable.init()
+            this.editModal = true
+        }, res=>{
+            this.$Message.error("获取失败")
+          })
+      },
+      // 提示窗关闭
+      closes () {
+        this.noteModal = false
       }
-      //获取门牌号
-      // getRoomsList(){
-      //   this.$request.post("https://21161183-d298-4998-83d4-910c7dcea76b.mock.pstmn.io/api/room/getBuildingRoom", '', res => {
-      //     this.roomsList = res.data.units[0].rooms.map(item => ({
-      //       id: item.roomId,
-      //       num: item.roomNum
-      //     }))
-      //   }, res => {
-      //     this.$Modal.error({title: '提示信息', content: res.message})
-      //   })
-      // },
     }
   }
 </script>

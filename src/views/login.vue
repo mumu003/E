@@ -71,31 +71,48 @@
             if (!window.sessionStorage) {
               alert("浏览器不支持sessionStorage")
             } else {
-              let fd = new FormData()
-              fd.append("username", this.form.userName === '' ? null : this.form.userName)
-              fd.append("password", this.form.password === '' ? null : this.form.password)
-              axios.post('/apiHost/api/user/login', fd)
-                .then(res => {
-                  console.log(res.data)
-                  if (res.data.code === 200) {
-                    sessionStorage.setItem("token", res.data.data.token)
-                    sessionStorage.setItem("userId", res.data.data.userId)
-                    sessionStorage.setItem("userName",res.data.data.userName)
-                    sessionStorage.setItem("curProjectId", res.data.data.curProjectId)
-                    sessionStorage.setItem("orgId",res.data.data.orgId)
+            //   let fd = new FormData()
+            //   fd.append("username", this.form.userName === '' ? null : this.form.userName)
+            //   fd.append("password", this.form.password === '' ? null : this.form.password)
+            //   axios.post('/apiHost/api/user/login', fd)
+            //     .then(res => {
+            //       console.log(res.data)
+            //       if (res.data.code === 200) {
+            //         sessionStorage.setItem("token", res.data.data.token)
+            //         sessionStorage.setItem("userId", res.data.data.userId)
+            //         sessionStorage.setItem("userName",res.data.data.userName)
+            //         sessionStorage.setItem("curProjectId", res.data.data.curProjectId)
+            //         sessionStorage.setItem("orgId",res.data.data.orgId)
+            //         this.$router.push("/")
+            //         this.$Message.success("登录成功！")
+            //       } else {
+            //         this.$Message.error(res.data.message)
+            //       }
+            //     })
+            //     .catch(error => {
+            //       this.$Message.error({
+            //         content: "登录失败！",
+            //         duration: 5,
+            //         closeable: true
+            //       })
+            //     })
+            this.$request.post('/apiHost/api/user/login',this.form,                
+              res => {
+                  console.log(res)
+                  if (res.code === 200) {
+                    sessionStorage.setItem("token", res.data.token)
+                    sessionStorage.setItem("userId", res.data.userId)
+                    sessionStorage.setItem("userName",res.data.userName)
+                    sessionStorage.setItem("curProjectId", res.data.curProjectId)
+                    sessionStorage.setItem("orgId",res.data.orgId)
                     this.$router.push("/")
                     this.$Message.success("登录成功！")
                   } else {
-                    this.$Message.error(res.data.message)
+                    this.$Message.error(res.message)
                   }
-                })
-                .catch(error => {
-                  this.$Message.error({
-                    content: "登录失败！",
-                    duration: 5,
-                    closeable: true
-                  })
-                })
+                })            
+
+                
             }
           }
         })

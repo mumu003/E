@@ -12,7 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/apiHost': {
-        target: 'http://rap2api.taobao.org/app/mock/20325',
+        // target: 'http://rap2api.taobao.org/app/mock/20325',
+        target: 'http://128.21.2.4:8080',
         changeOrigin: true,
         pathRewrite: {
           '^/apiHost': ''
