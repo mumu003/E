@@ -95,25 +95,26 @@
 
     <Modal v-model="addModal" title="新增水电过户"
            width="800"
+           @on-cancel="cancel"
     >
-      <Form  :model="addForm" :label-width="100">
+      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-          <FormItem label="楼栋">
+          <FormItem label="楼栋"  prop="buildingId">
             <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
               <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="8">
-          <FormItem label="单元">
+          <FormItem label="单元"  prop="unitId">
             <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
               <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="8">
-          <FormItem label="房间号">
+          <FormItem label="房间号" prop="roomId">
             <Select v-model="addForm.roomId" placeholder="请选择房间号">
               <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
             </Select>
@@ -136,6 +137,7 @@
 
     <Modal v-model="viewModal" title="水电过户详情"
            width="800"
+           @on-cancel="cancel"
     >
       <Form  :model="viewForm" :label-width="100">
         <Row>
@@ -376,6 +378,18 @@
           }
         ],
         addData: [],
+        //新增模态框验证
+        ruleAdd:{
+          buildingId: [
+            { required: true, message: '请选择楼栋号', trigger: 'change' }
+          ],
+          unitId: [
+            { required: true, message: '请选择单元号', trigger: 'change' }
+          ],
+          roomId: [
+            { required: true, message: '请选择房间号', trigger: 'change' }
+          ]
+        },
         //模态框表单,表格数据
         viewForm:{
           buildingName:'',
@@ -458,7 +472,11 @@
     methods: {//对象
       //获取楼栋列表
       getBuildings() {
-        this.$request.post("/apiHost/api/room/getBuildingList", '', res => {
+        let params = {
+          orgId: sessionStorage.getItem("orgId"),
+          projectId: sessionStorage.getItem("curProjectId")
+        }
+        this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
           console.log(res)
           this.buildingList = res.data.buildings.map(item => ({
             id: item.buildingId,
@@ -470,6 +488,9 @@
       },
       //获取单元列表
       getUnits(buildingId) {
+        if(typeof(buildingId) === "undefined"){
+          return ;
+        }
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
             this.addForm.buildingName = item.name
@@ -490,6 +511,11 @@
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
+        this.addForm.unitId = ""
+        this.addForm.unitName = ""
+        this.addForm.roomId = ""
+        this.addForm.roomNum = ""
+        this.addForm.customerName = ""
       },
       //获取房间列表
       getRooms(unitId) {
@@ -506,6 +532,9 @@
             }))
           }
         })
+        this.addForm.roomId = ""
+        this.addForm.roomNum = ""
+        this.addForm.customerName = ""
       },
       //获取地块名称  (接口在哪)
       addarea(areaId){
@@ -523,6 +552,7 @@
       //新增接口
       addProject(){
         this.addModal = true
+
       },
       //获取模态框表格数据
       addPullData(){
@@ -554,7 +584,6 @@
         console.log(this.addData)
         if(this.addForm.roomId){
           if(this.addData.length !== 0){
-
             this.$request.post("/apiHost/api/transfer/add",this.addForm, res => {
               console.log(res)
               if (res.code === 200) {
@@ -572,9 +601,27 @@
                 }, 2000)
               } else {
                 this.$Message.error(res.message)
+                this.addData = []
+                this.isShow = false
+                this.$refs.table.init()
+                this.addModal = false
+                this.addForm={
+                  buildingId: '',
+                  unitId: '',
+                  roomId: ''
+                }
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
+              this.addData = []
+              this.isShow = false
+              this.$refs.table.init()
+              this.addModal = false
+              this.addForm={
+                buildingId: '',
+                unitId: '',
+                roomId: ''
+              }
             })
           }else{
             this.$Modal.error({title: '提示信息', content: '请抓取数据'})
@@ -583,7 +630,7 @@
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
-      //查看
+      //
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -609,7 +656,7 @@
           this.viewData.push(res.data)
           this.viewModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
       },
       //驳回
@@ -624,17 +671,18 @@
               status:0
             }
             this.$request.post("/apiHost/api/transfer/check",params,res=>{
-              this.$Message.success("驳回成功")
+              this.$Message.success("审核驳回!")
               this.$Modal.remove()
               this.viewModal = false
               this.loading = false
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("驳回失败")
+              this.$Message.error(res.message)
               this.viewModal = false
               this.loading = false
-              this.$refs.table.init()
               this.$Modal.remove()
+              this.$refs.table.init()
+
             })
           }
         })
@@ -651,13 +699,19 @@
               status:1
             }
             this.$request.post("/apiHost/api/transfer/check",params,res=>{
-              this.$Message.success("通过成功")
-              this.$Modal.remove()
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
+              if (res.code === 200) {
+                setTimeout(() => {
+                  this.$Message.success("审核通过!")
+                  this.$Modal.remove()
+                  this.viewModal = false
+                  this.loading = false
+                  this.$refs.table.init()
+                }, 2000);
+              } else {
+                this.$Message.error(res.message)
+              }
             },res=>{
-              this.$Message.error("通过失败")
+              this.$Message.error(res.message)
               this.$Modal.remove()
               this.viewModal = false
               this.loading = false
@@ -687,7 +741,7 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("您无法终止该数据，请联系“管理员”")
+              this.$Message.error(res.message)
               this.$Modal.remove()
               this.$refs.table.init()
             })
@@ -715,7 +769,7 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("删除失败")
+              this.$Message.error(res.message)
               this.$Modal.remove()
               this.$refs.table.init()
             })
@@ -757,7 +811,7 @@
             console.log(this.statuList)
             this.statuModal = true
           }, res=>{
-            this.$Message.error("获取失败")
+            this.$Message.error(res.message)
           },
         )
       },
@@ -770,6 +824,7 @@
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
       cancel() {
+        this.addModal = false
         this.$Message.info('你取消了操作')
         this.addForm={
           buildingId: '',

@@ -26,11 +26,11 @@
                     <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" />
                   </FormItem>
                 </Col>
-                <Col span="6">
+                <!--<Col span="6">
                   <FormItem label="单元">
                     <Input v-model="formItem.unitName" :maxlength=20 placeholder="请输入单元号"/>
                   </FormItem>
-                </Col>
+                </Col>-->
                 <Col span="6">
                   <FormItem label="房间号">
                     <Input v-model="formItem.roomName" :maxlength=20 placeholder="请输入房间号"/>
@@ -161,7 +161,7 @@
             资料
           </Col>
           <Col span="24">
-            <Table stripe border :columns="viewContract" :data="viewData"></Table>
+            <Table stripe border :columns="viewContract" :data="viewData" ref="ref"></Table>
           </Col>
         </Row>
       </Form>
@@ -588,6 +588,7 @@
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
+              this.modal_loading = false
             })
           } else {
             this.$Modal.error({title: '提示信息', content: "请选择房间号"})
@@ -597,6 +598,7 @@
       //新增取消
       addCancel (){
         this.addModal = false
+        this.modal_loading = false,
         this.$Message.info('你取消了操作')
         this.$refs.addForm.resetFields()
       },
@@ -678,7 +680,7 @@
             this.$Message.error(res.message)
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
       },
       //驳回
@@ -698,7 +700,7 @@
             this.$Message.error(res.message)
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
       },
       //状态详情
@@ -736,7 +738,7 @@
           console.log(this.nodesList)
           this.statusModal = true
         }, res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
       },
       statusOk () {
@@ -770,7 +772,7 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("终止失败")
+              this.$Message.error(res.message)
               this.$Modal.remove()
             })
           }
@@ -797,7 +799,7 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("删除失败")
+              this.$Message.error(res.message)
               this.$Modal.remove()
             })
           }
