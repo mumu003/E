@@ -18,7 +18,7 @@ npm run build
 npm run build --report
 ```
 
-## 加入特房信息 gitlab地址
+## 加入特房信息-gitlab地址
 
 ```
 git remote set-url --add origin http://128.10.7.8/xmtfit/gitlab/meiqi/teamwork-web.git
