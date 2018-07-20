@@ -53,8 +53,7 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <!-- <Button type="primary" icon="eye" @click="viewProject">查看</Button> -->
-                <Button type="primary" icon="edit" @click="editProject">编辑</Button>
+                <Button type="primary" icon="edit" @click="viewProject">审核</Button>
                 <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
                 <Button type="error" icon="close"　@click="deleteProject">删除</Button>
@@ -72,56 +71,30 @@
 
     <Modal v-model="addModal" title="新增协议书申请"
       :loading="loading"
-      @on-ok="addSubmit"
       @on-cancel="addCancel">
       <Form  :model="addForm" :label-width="80">
         <Row>
           <Col span="24">
             <FormItem label="申请份数">
-              <Input v-model="addForm.applyNum"></Input>
+              <Input v-model="addForm.applyNum" :maxlength=10></Input>
             </FormItem>
           </Col>
           <Col span="24">
             <FormItem label="备注说明">
-              <Input v-model="addForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
+              <Input v-model="addForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :maxlength=50></Input>
             </FormItem>
           </Col>
         </Row>
       </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost"  @click="addCancel">取消</Button>
+        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
+      </div>
     </Modal>
 
     <Modal v-model="viewModal" title="协议书申请详情"
       :loading="loading"
-      @on-ok="viewOk"
       @on-cancel="cancel">
-      <Form  :model="viewForm" :label-width="80">
-        <Row>
-          <Col span="24">
-            <FormItem label="申请份数">
-              <Input v-model="viewForm.applyNum" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="实发份数">
-              <Input v-model="viewForm.actualNum" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="差异数量">
-              <Input v-model="viewForm.differenceNum" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="备注说明">
-              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
-
-    <Modal v-model="editModal" title="协议书申请编辑"
-      :loading="loading">
       <Form  :model="viewForm" :label-width="80">
         <Row>
           <Col span="24">
@@ -147,8 +120,8 @@
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="error" size="default" @click="editReject">驳回</Button>
-        <Button type="primary" size="default" @click="editPass">通过</Button>
+        <Button type="error" size="default" @click="viewReject">驳回</Button>
+        <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
       </div>
     </Modal>
 
@@ -193,6 +166,12 @@
       return {
         isFirst: false,
         loading: true,
+        modal_loading: false, //延迟
+        addModal: false,
+        viewModal:false,
+        editModal:false,
+        statusModal:false,
+        noteModal:false,//弹窗
         nodesList:[],
         historysList:[],
         formItem: {
@@ -216,20 +195,23 @@
                     switch(params.row.status){
                       case '0':
                         return h('div',{
-                          props:{
-                            type:'error'
+                          style:{
+                              width: '80px',
+                              color: '#ED3F14'
                           }
                         },"终止")
                       case '1':
                         return h('div',{
-                          props:{
-                            type:'primary'
+                          style:{
+                            width: '80px',
+                            color: '#2D8CF0'
                           }
                         },"进行中")
                       case '2':
                         return h('div',{
-                          props:{
-                            type:'success'
+                          style:{
+                            width: '80px',
+                            color: '#19BE6B'
                           }
                         },"已归档")
                     }
@@ -260,11 +242,6 @@
                 }
               ],
         },
-        addModal: false,
-        viewModal:false,
-        editModal:false,
-        statusModal:false,
-        noteModal:false,//弹窗
         addForm: {
           applyNum:'',
           remark:'',
@@ -303,27 +280,32 @@
       },
       addSubmit () {
         console.log(this.addForm)
+        this.modal_loading = true;
         this.$request.post("/apiHost/api/contractApplication/add",this.addForm, res => {
           console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
+              this.modal_loading = false;
               this.addModal = false;
               this.addForm={
-              applyNum: '',
-              remark: ''
+                applyNum: '',
+                remark: ''
               }
               this.$Message.success("新增成功！")
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false;
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
+          this.modal_loading = false;
         })
       },
       addCancel () {
         this.$Message.info('你取消了操作')
+        this.addModal = false;
         this.addForm={
           applyNum: '',
           remark: ''
@@ -355,33 +337,8 @@
           this.$Message.error("获取失败")
         })
       },
-      editProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-            id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
-            console.log(res.data)
-          this.viewForm.id = res.data.id
-          this.viewForm.applyNum = res.data.applyNum
-          this.viewForm.actualNum = res.data.actualNum
-          this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
-          this.viewForm.remark = res.data.remark
-          this.editModal = true
-        },res=>{
-          this.$Message.error("获取失败")
-        })
-      },
-      editPass(){
+      viewPass(){
+        this.modal_loading = true;
         let params = {
             id: this.viewForm.id,
             actualNum: this.viewForm.actualNum,
@@ -392,18 +349,20 @@
             console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
-              this.editModal = false
+              this.modal_loading = false;
+              this.viewModal = false
               this.$Message.success("审核通过")
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      editReject(){
+      viewReject(){
         let params = {
             id: this.viewForm.id,
             actualNum: this.viewForm.actualNum,
@@ -414,15 +373,15 @@
             console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
-              this.editModal = false
+              this.viewModal = false
               this.$Message.success("审核驳回")
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusProject(){
@@ -574,6 +533,7 @@
             this.isFirst = false
           },200)
       },
+      //差异份数
       actualNumChange(){
         this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
       },

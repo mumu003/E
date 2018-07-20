@@ -23,24 +23,24 @@
                 </Col>
                 <Col span="6">
                   <FormItem label="业主姓名">
-                    <Input v-model="formItem.customerName" placeholder="请输入业主姓名"></Input>
+                    <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem label="联系电话">
-                    <Input v-model="formItem.phone" placeholder="请输入联系电话"></Input>
+                    <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入联系电话"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem label="楼栋">
-                    <Input v-model="formItem.buildingId" placeholder="请输入楼栋"></Input>
+                    <Input v-model="formItem.buildingId" :maxlength=30 placeholder="请输入楼栋"></Input>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col span="6">
                   <FormItem label="房间号">
-                    <Input v-model="formItem.roomNum" placeholder="请输入房间号"></Input>
+                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
@@ -75,7 +75,7 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="eye" @click="viewProject">查看</Button>
+                <Button type="primary" icon="edit" @click="viewProject">审核</Button>
                 <!-- <Button type="primary" icon="edit" @click="editProject">审核</Button>  -->
                 <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
@@ -94,104 +94,77 @@
 
     <Modal v-model="addModal" title="新增两书"
       width="800"
-      :loading="loading">
-      <Form  :model="addForm" :label-width="80">
+      @on-cancel="addCancel">
+      <Form  ref="addForm" :model="addForm" :label-width="80" :rules="ruleAdd">
         <Row>
           <Col span="8">
-            <FormItem label="楼栋">
+            <FormItem label="楼栋" prop="buildingId">
               <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
                 <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="单元">
+            <FormItem label="单元" prop="unitId">
               <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
                 <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="房间号">
-              <Select v-model="addForm.roomId" placeholder="请选择房间号" >
+            <FormItem label="房间号" prop="roomId">
+              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="clearAddData">
                 <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="24">
-            <FormItem label="资料">
-            </FormItem>
+            资料
           </Col>
           <Col span="24">
-            <FormItem label="">
-              <Table stripe border :columns="addTable" :data="addData" ref="addTable" v-show="isShow"></Table>
-            </FormItem>
+            <Table stripe border :columns="addTable" :data="addData" ref="addTable" v-show="isShow"></Table>
           </Col>
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="primary" size="default" @click="addPullData" :disabled="addForm.roomId ? false : true">抓取数据</Button>
         <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit">确定</Button>
+        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
     <Modal v-model="viewModal" title="两书详情"
+      width="800" 
       :loading="loading"
-      @on-ok="viewOk"
       @on-cancel="cancel">
       <Form  :model="viewForm" :label-width="110">
         <Row>
-          <Col span="24">
-            <FormItem label="业主姓名">
-              <Input v-model="viewForm.customerName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="联系电话">
-              <Input v-model="viewForm.phone" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="业主身份证号">
-              <Input v-model="viewForm.idCard" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
+          <Col span="8">
             <FormItem label="楼栋">
               <Input v-model="viewForm.buildingName" readonly></Input>
             </FormItem>
           </Col>
-          <Col span="24">
+          <Col span="8">
+            <FormItem label="单元">
+              <Input v-model="viewForm.unitName" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="8">
             <FormItem label="房间号">
               <Input v-model="viewForm.roomNum" readonly></Input>
             </FormItem>
           </Col>
           <Col span="24">
-            <FormItem label="用途">
-              <Input v-model="viewForm.purpose" readonly></Input>
-            </FormItem>
+            资料
           </Col>
           <Col span="24">
-            <FormItem label="建筑面积">
-              <Input v-model="viewForm.area" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="合同交互期限">
-              <Input v-model="viewForm.deliveryDate" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="房屋实际交互日期">
-              <Input v-model="viewForm.actualDate" readonly></Input>
-            </FormItem>
+            <Table stripe border :columns="viewTable" :data="viewData" ></Table>
           </Col>
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="error" size="default" @click="viewReject">驳回</Button>
-        <Button type="primary" size="default" @click="viewPass">通过</Button>
+        <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
       </div>
     </Modal>
 
@@ -238,6 +211,7 @@
         isFirst: false,
         isShow:false,
         loading: true,
+        modal_loading: false, //延迟
         addModal: false,
         viewModal: false,
         statusModal: false,
@@ -246,6 +220,7 @@
         unitList:[],
         roomsList:[],
         addData:[],
+        viewData:[],
         nodesList:[],
         historysList:[],
         formItem: {
@@ -273,21 +248,24 @@
                   render:(h,params)=>{
                     switch(params.row.status){
                       case '0':
-                        return h('Button',{
-                          props:{
-                            type:'error'
+                        return h('div',{
+                          style:{
+                              width: '80px',
+                              color: '#ED3F14'
                           }
                         },"终止")
                       case '1':
-                        return h('Button',{
-                          props:{
-                            type:'primary'
+                        return h('div',{
+                          style:{
+                            width: '80px',
+                            color: '#2D8CF0'
                           }
                         },"进行中")
                       case '2':
-                        return h('Button',{
-                          props:{
-                            type:'success'
+                        return h('div',{
+                          style:{
+                            width: '80px',
+                            color: '#19BE6B'
                           }
                         },"已归档")
                     }
@@ -303,13 +281,13 @@
                   title: '联系电话',
                   key: 'phone',
                   align: 'center',
-                  width:100
+                  width:120
                 },
                 {
                   title: '业主身份证',
                   key: 'idCard',
                   align: 'center',
-                  width:150
+                  width:160
                 },
                 {
                   title: '楼栋',
@@ -356,16 +334,41 @@
               ],
         },
         addForm:{
+          areaId:'',
+          areaName:'',
           buildingId:'',
           buildingName:'',
           unitId:'',
           unitName:'',
-          roomId:''
+          roomId:'',
+          roomNum:'',
+          customerName:'',
+          area:'',
+          idCard:'',
+          contract:'',
+          purpose:'',
+          phone:'',
+          address:'',
+          remark:'',
+          deliveryDate:'',
+          actualDate:''
+        },
+        //新增模态框验证
+        ruleAdd:{
+          buildingId: [
+              { required: true, message: '请选择楼栋号', trigger: 'change' }
+          ],
+          unitId: [
+              { required: true, message: '请选择单元号', trigger: 'change' }
+          ],
+          roomId: [
+              { required: true, message: '请选择房间号', trigger: 'change' }
+          ]
         },
         addTable: [
           {
             title: '地块',
-            key: '',
+            key: 'rommNum',
             width:150,
             align: 'center'
           },
@@ -384,64 +387,126 @@
           {
             title: '合同交互期限',
             key: 'deliveryDate',
-            width:150,
+            width:180,
             align: 'center'
           },
           {
             title: '建筑面积',
             key: 'area',
-            width:150,
+            width:100,
             align: 'center'
           },
           {
             title: '业主姓名',
             key: 'customerName',
-            width:150,
+            width:100,
             align: 'center'
           },
           {
             title: '业主身份证号',
             key: 'idNumber',
-            width:150,
+            width:160,
             align: 'center'
           },
           {
             title: '联系电话',
             key: 'phone',
-            width:150,
+            width:120,
             align: 'center'
           },
           {
             title: '联系地址',
             key: 'address',
-            width:150,
+            width:200,
             align: 'center'
           },
           {
             title: '用途',
             key: 'purpose',
-            width:150,
+            width:100,
             align: 'center'
           },
           {
             title: '备注',
-            key: '',
+            key: 'rommNum',
             width:150,
             align: 'center'
           }
         ],
         viewForm: {
           id: '',
-          customerName: '',
-          phone: '',
-          idCard: '',
           buildingName: '',
+          unitName: '',
           roomNum: '',
-          purpose: '',
-          area: '',
-          deliveryDate: '',
-          actualDate: ''
-        }
+        },
+        viewTable: [
+          {
+            title: '地块',
+            key: 'areaName',
+            width:150,
+            align: 'center'
+          },
+          {
+            title: '房间号',
+            key: 'roomNum',
+            width:100,
+            align: 'center'
+          },
+          {
+            title: '商品买卖合同号/拆迁协议号',
+            key: 'contract',
+            width:200,
+            align: 'center'
+          },
+          {
+            title: '合同交互期限',
+            key: 'deliveryDate',
+            width:180,
+            align: 'center'
+          },
+          {
+            title: '建筑面积',
+            key: 'area',
+            width:100,
+            align: 'center'
+          },
+          {
+            title: '业主姓名',
+            key: 'customerName',
+            width:100,
+            align: 'center'
+          },
+          {
+            title: '业主身份证号',
+            key: 'idCard',
+            width:160,
+            align: 'center'
+          },
+          {
+            title: '联系电话',
+            key: 'phone',
+            width:120,
+            align: 'center'
+          },
+          {
+            title: '联系地址',
+            key: 'address',
+            width:200,
+            align: 'center'
+          },
+          {
+            title: '用途',
+            key: 'purpose',
+            width:100,
+            align: 'center'
+          },
+          {
+            title: '备注',
+            key: 'remark',
+            width:150,
+            align: 'center'
+          }
+        ]
       }
     },
     mounted(){
@@ -468,7 +533,11 @@
       },
       //获取楼栋列表
       getBuildings() {
-        this.$request.post("/apiHost/api/room/getBuildingList", '', res => {
+        let params = {
+          orgId: sessionStorage.getItem("orgId"),
+          projectId: sessionStorage.getItem("curProjectId")
+        }
+        this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
           console.log(res)
           this.buildingList = res.data.buildings.map(item => ({
             id: item.buildingId,
@@ -480,15 +549,19 @@
       },
       //获取单元列表
       getUnits(buildingId) {
+        if(typeof(buildingId) === "undefined"){
+            return ;
+        }
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
             this.addForm.buildingName = item.name
           }
         })
         console.log(this.addForm)
+        this.unitList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
-          orgId:sessionStorage.orgId,
-          projectId:sessionStorage.curProjectId,
+          orgId: sessionStorage.getItem("orgId"),
+          projectId: sessionStorage.getItem("curProjectId"),
           buildingId
         }, res => {
           console.log(res)
@@ -497,9 +570,15 @@
             name: item.unitName,
             rooms:item.rooms
           }))
+          console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
+        this.addForm.unitId = ""
+        this.addForm.unitName = ""
+        this.addForm.roomId = ""
+        this.addForm.roomNum = ""
+        this.isShow = false
       },
       //获取房间列表
       getRooms(unitId) {
@@ -516,10 +595,18 @@
             }))
           }
         })
+        this.addForm.roomId = ""
+        this.addForm.roomNum = ""
+        this.isShow = false
+      },
+      //清除抓取数据
+      clearAddData(){
+        this.isShow = false
       },
       //新增
       addProject(){
         this.addModal = true
+        this.modal_loading = false
       },
       addPullData(){
         if(this.addForm.roomId !== ''){
@@ -530,6 +617,14 @@
           console.log(params)
           this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
             console.log(res)
+            this.addForm.idCard = res.data.idNumber
+            this.addForm.customerName = res.data.customerName
+            this.addForm.roomNum = res.data.rommNum
+            this.addForm.purpose = res.data.purpose
+            this.addForm.deliveryDate = res.data.deliveryDate
+            this.addForm.area = res.data.area
+            this.addForm.phone = res.data.phone
+            this.addForm.address = res.data.address
             this.addData = []
             this.addData.push(res.data)
           }, res => {
@@ -541,60 +636,43 @@
       },
       addCancel(){
         this.addModal = false
-        this.addForm.buildingId = ""
-        this.addForm.unitId = ""
-        this.addForm.roomId = ""
+        this.$refs.addForm.resetFields()
         this.addData = []
         this.isShow=false
         this.$Message.info('你取消了操作')
       },
       addSubmit(){
         console.log(this.addData)
-        if(this.addForm.roomId){
-          if(this.addData.length !== 0){
-            let params = {
-              buildingId: this.addForm.buildingId,
-              buildingName: this.addForm.buildingName,
-              unitId: this.addForm.unitId,
-              unitName: this.addForm.unitName,
-              roomId: this.addForm.roomId,
-              roomNum: this.addData.roomNum,
-              customerName: this.addData.customerName,
-              area: this.addData.area,
-              idCard: this.addData.idNumber,
-              purpose: this.addData.purpose,
-              phone: this.addData.phone,
-              address: this.addData.address,
-              deliveryDate: this.addData.deliveryDate,
-              actualDate: this.addData.actualDate
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            if(this.addData.length !== 0){
+              this.modal_loading = true
+              console.log(this.addForm)
+              this.$request.post("/apiHost/api/twoFileBill/add",this.addForm, res => {
+                console.log(res)
+                if (res.code === 200) {
+                  setTimeout(() => {
+                    this.modal_loading = false
+                    this.addModal = false
+                    this.$refs.addForm.resetFields()
+                    this.addData = []
+                    this.isShow = false
+                    this.$Message.success("新增成功！")
+                    this.$refs.table.init()
+                  }, 2000)
+                } else {
+                  this.$Message.error(res.message)
+                }
+              }, res => {
+                this.$Modal.error({title: '提示信息', content: res.message})
+              })
+            }else{
+              this.$Modal.error({title: '提示信息', content: '请抓取数据'})
             }
-            this.$request.post("/apiHost/api/twoFileBill/add",this.params, res => {
-              console.log(res)
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.addModal = false
-                  this.addForm={
-                    buildingId: '',
-                    unitId: '',
-                    roomId: ''
-                  }
-                  this.addData = []
-                  this.isShow = false
-                  this.$Message.success("新增成功！")
-                  this.$refs.table.init()
-                }, 2000)
-              } else {
-                this.$Message.error(res.message)
-              }
-            }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
-            })
-          }else{
-            this.$Modal.error({title: '提示信息', content: '请抓取数据'})
+          } else {
+            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
           }
-        }else{
-          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
-        }
+        })
       },
       viewProject(){
         if (this.selected_count === 0) {
@@ -613,19 +691,15 @@
         this.$request.post("/apiHost/api/twoFileBill/view",params,res=>{
             console.log(res.data)
           this.viewForm.id = res.data.id
-          this.viewForm.customerName = res.data.customerName
-          this.viewForm.phone = res.data.phone
-          this.viewForm.idCard = res.data.idCard
           this.viewForm.buildingName = res.data.buildingName
+          this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
-          this.viewForm.purpose = res.data.purpose
-          this.viewForm.area = res.data.area
-          this.viewForm.deliveryDate = res.data.deliveryDate
-          this.viewForm.actualDate = res.data.actualDate
+          this.viewData.push(res.data)
           this.viewModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
+        this.viewData = []
       },
       viewOk (){
         setTimeout(() => {
@@ -634,6 +708,7 @@
       },
       //通过
       viewPass(){
+        this.modal_loading = true
         let params = {
             id: this.viewForm.id,
             status:1
@@ -643,6 +718,7 @@
             console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
+              this.modal_loading = false
               this.viewModal = false
               this.$Message.success("审核通过")
               this.$refs.table.init()

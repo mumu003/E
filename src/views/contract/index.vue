@@ -27,13 +27,8 @@
                   </FormItem>
                 </Col>
                 <Col span="6">
-                  <FormItem label="单元">
-                    <Input v-model="formItem.unitName" :maxlength=20 placeholder="请输入单元号"/>
-                  </FormItem>
-                </Col>
-                <Col span="6">
                   <FormItem label="房间号">
-                    <Input v-model="formItem.roomName" :maxlength=20 placeholder="请输入房间号"/>
+                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
                   </FormItem>
                 </Col>
                 <Col span="6">
@@ -90,7 +85,8 @@
     </Row>
 
     <Modal v-model="addModal" title="新增合同备案"
-      width="800" >
+      width="800" 
+      @on-cancel="addCancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
@@ -134,7 +130,8 @@
     </Modal>
 
     <Modal v-model="viewModal" title="合同备案详情"
-      width="800" >
+      width="800" 
+      @on-cancel="viewCancel">
       <Form  :model="viewForm" :label-width="100">
         <Row>
           <Col span="8">
@@ -236,7 +233,7 @@
           status:'',
           buildingName:'',
           unitName:'',
-          roomName:'',
+          roomNum:'',
           customerName:'',
           startUpdateTime:'',
           endUpdateTime:'',
@@ -588,9 +585,11 @@
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
+              this.modal_loading = false
             })
           } else {
             this.$Modal.error({title: '提示信息', content: "请选择房间号"})
+            this.modal_loading = false
           }
         })
       },
@@ -675,7 +674,8 @@
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
           }
         },res=>{
           this.$Message.error("获取失败")
@@ -700,6 +700,12 @@
         },res=>{
           this.$Message.error("获取失败")
         })
+      },
+      //取消
+      viewCancel (){
+        this.viewModal = false
+        this.$Message.info('你取消了操作')
+        this.$refs.addForm.resetFields()
       },
       //状态详情
       statusProject (){
@@ -805,23 +811,42 @@
       },
       //搜索
       searchSubmit () {
-        this.isFirst = true
         console.log(this.formItem)
-        setTimeout(()=>{
-          this.isFirst = false
-          this.$refs.table.init()
-        },200)
+        this.isFirst = true
+        this.$request.post("/apiHost/api/contractBill/list",this.formItem, res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.formItem={
+              status:'',
+              buildingName:'',
+              unitName:'',
+              roomNum:'',
+              customerName:'',
+              startUpdateTime:'',
+              endUpdateTime:'',
+              page:'1'
+            }
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Message.error(res.message)
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //重置
       searchCancel () {
         this.formItem={
-          status: '',
-          customerName: '',
-          buildingId: '',
-          roomId: '',
-          unitId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          status:'',
+          buildingName:'',
+          unitName:'',
+          roomNum:'',
+          customerName:'',
+          startUpdateTime:'',
+          endUpdateTime:'',
+          page:'1'
         }
         this.isFirst = true
         setTimeout(()=>{
