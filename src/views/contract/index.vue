@@ -26,11 +26,6 @@
                     <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" />
                   </FormItem>
                 </Col>
-                <!--<Col span="6">
-                  <FormItem label="单元">
-                    <Input v-model="formItem.unitName" :maxlength=20 placeholder="请输入单元号"/>
-                  </FormItem>
-                </Col>-->
                 <Col span="6">
                   <FormItem label="房间号">
                     <Input v-model="formItem.roomName" :maxlength=20 placeholder="请输入房间号"/>
