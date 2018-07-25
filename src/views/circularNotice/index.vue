@@ -21,19 +21,19 @@
                 </Select>
               </FormItem>
               </Col>
-              <Col span="6">
+             <!-- <Col span="6">
               <FormItem label="地块">
                 <Input v-model="formItem.areaId" placeholder="请输入地块名称"/>
               </FormItem>
-              </Col>
+              </Col>-->
               <Col span="6">
               <FormItem label="楼栋">
-                <Input v-model="formItem.buildingId" placeholder="请输入楼栋号"/>
+                <Input v-model="formItem.buildingName" placeholder="请输入楼栋号"/>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="房间号">
-                <Input v-model="formItem.roomId" placeholder="请输入房间号"/>
+                <Input v-model="formItem.roomNum" placeholder="请输入房间号"/>
               </FormItem>
               </Col>
               <Col span="6">
@@ -70,7 +70,7 @@
             <Button type="primary" icon="edit" @click="viewProject">审核</Button>
             <Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>
             <Button type="error" icon="close"　@click="endProject">终止</Button>
-            <Button type="error" icon="close"　@click="deleteProject">删除</Button>
+            <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
             </Col>
@@ -128,6 +128,7 @@
 
     <Modal v-model="viewModal" title="交房通知详情"
            width="800"
+           @on-cancel="cancel"
     >
       <Form  :model="viewForm" :label-width="100">
         <Row>
@@ -237,7 +238,7 @@
           status:'',
           areaId:'',
           buildingId:'',
-          roomId:'',
+          roomNum:'',
           startUpdateTime:'',
           endUpdateTime:''
         },
@@ -685,59 +686,51 @@
       },
       //驳回
       viewReject(id){
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认驳回',
-          loading: true,
-          onOk: () => {
-            let params = {
-              id,
-              status:0
-            }
-            this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
-              this.$Message.success("审核驳回!")
-              this.$Modal.remove()
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
-              this.$Modal.remove()
-            })
-          }
+        let params = {
+          id,
+          status:0
+        }
+        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+          this.$Message.success("审核驳回!")
+          this.$Modal.remove()
+          this.viewModal = false
+          this.loading = false
+          this.$refs.table.init()
+        },res=>{
+          this.$Message.error(res.message)
+          this.viewModal = false
+          this.loading = false
+          this.$refs.table.init()
+          this.$Modal.remove()
         })
       },
       //通过
       viewPass(id){
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认通过',
-          loading: true,
-          onOk: () => {
+            this.modal_loading = true
             let params = {
               id,
               status:1
             }
             this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
-              this.$Message.success("审核通过!")
-              this.$Modal.remove()
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
-
-
+              if (res.code === 200) {
+                setTimeout(() => {
+                  this.modal_loading = false
+                  this.viewModal = false
+                  this.$Message.success("审核通过!")
+                  this.$refs.table.init()
+                }, 2000)
+              } else {
+                this.viewModal = false
+                this.modal_loading = false
+                this.$refs.table.init()
+                this.$Message.error(res.message)
+              }
             },res=>{
-              this.$Message.error( res.message)
-              this.$Modal.remove()
+              this.$Message.error(res.message)
               this.viewModal = false
-              this.loading = false
+              this.modal_loading = false
               this.$refs.table.init()
             })
-          }
-        })
       },
       //终止
       endProject(){
@@ -854,13 +847,32 @@
         }
         this.$refs.table.init()
       },
-      searchSubmit() {
-        this.isFirst = true
+      //搜索
+      searchSubmit () {
         console.log(this.formItem)
-        setTimeout(()=>{
-          this.isFirst = false
-          this.$refs.table.init()
-        },200)
+        this.isFirst = true
+        this.$request.post("/apiHost/api/deliveryNotice/list",this.formItem, res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.formItem={
+              status:'',
+              buildingName:'',
+              unitName:'',
+              roomNum:'',
+              customerName:'',
+              startUpdateTime:'',
+              endUpdateTime:'',
+              page:'1'
+            }
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Message.error(res.message)
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       searchCancel() {
         this.formItem={

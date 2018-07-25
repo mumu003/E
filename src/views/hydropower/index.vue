@@ -80,7 +80,7 @@
             <Button type="primary" icon="edit" @click="viewProject">审核</Button>
             <Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>
             <Button type="error" icon="close"　@click="endProject">终止</Button>
-            <Button type="error" icon="close"　@click="deleteProject">删除</Button>
+            <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
             </Col>
@@ -131,10 +131,9 @@
       <div slot="footer" style="text-align: right;">
         <Button type="primary" @click="addPullData" :disabled="addForm.roomId ? false : true">抓取数据</Button>
         <Button @click="cancel">取消</Button>
-        <Button type="primary"  @click="addSubmit">确定</Button>
+        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-
     <Modal v-model="viewModal" title="水电过户详情"
            width="800"
            @on-cancel="cancel"
@@ -166,7 +165,7 @@
       </Form>
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
         <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
-        <Button type="success" @click="viewPass(viewForm.id)">通过</Button>
+        <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
       </div>
     </Modal>
 
@@ -211,6 +210,7 @@
   export default {
     data () {
       return {
+        modal_loading: false, //延迟
         isFirst: false,
         //定义数组
         buildingList:[],
@@ -582,6 +582,7 @@
       },
       addSubmit(){
         console.log(this.addData)
+        this.modal_loading = true
         if(this.addForm.roomId){
           if(this.addData.length !== 0){
             this.$request.post("/apiHost/api/transfer/add",this.addForm, res => {
@@ -589,6 +590,7 @@
               if (res.code === 200) {
                 setTimeout(() => {
                   this.addModal = false
+                  this.modal_loading = false
                   this.addForm={
                     buildingId: '',
                     unitId: '',
@@ -605,6 +607,7 @@
                 this.isShow = false
                 this.$refs.table.init()
                 this.addModal = false
+                this.modal_loading = false
                 this.addForm={
                   buildingId: '',
                   unitId: '',
@@ -615,6 +618,7 @@
               this.$Modal.error({title: '提示信息', content: res.message})
               this.addData = []
               this.isShow = false
+              this.modal_loading = false
               this.$refs.table.init()
               this.addModal = false
               this.addForm={
@@ -625,12 +629,13 @@
             })
           }else{
             this.$Modal.error({title: '提示信息', content: '请抓取数据'})
+            this.modal_loading = false
           }
         }else{
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
-      //
+      //审核
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -661,18 +666,12 @@
       },
       //驳回
       viewReject(id){
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认驳回',
-          loading: true,
-          onOk: () => {
             let params = {
               id,
               status:0
             }
             this.$request.post("/apiHost/api/transfer/check",params,res=>{
               this.$Message.success("审核驳回!")
-              this.$Modal.remove()
               this.viewModal = false
               this.loading = false
               this.$refs.table.init()
@@ -680,20 +679,13 @@
               this.$Message.error(res.message)
               this.viewModal = false
               this.loading = false
-              this.$Modal.remove()
               this.$refs.table.init()
-
             })
-          }
-        })
+
       },
       //通过
       viewPass(id){
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认通过',
-          loading: true,
-          onOk: () => {
+        this.modal_loading = true
             let params = {
               id,
               status:1
@@ -701,10 +693,9 @@
             this.$request.post("/apiHost/api/transfer/check",params,res=>{
               if (res.code === 200) {
                 setTimeout(() => {
+                  this.modal_loading = false
                   this.$Message.success("审核通过!")
-                  this.$Modal.remove()
                   this.viewModal = false
-                  this.loading = false
                   this.$refs.table.init()
                 }, 2000);
               } else {
@@ -712,13 +703,10 @@
               }
             },res=>{
               this.$Message.error(res.message)
-              this.$Modal.remove()
               this.viewModal = false
               this.loading = false
               this.$refs.table.init()
             })
-          }
-        })
       },
       //终止
       endProject(){
@@ -834,13 +822,32 @@
         }
         this.$refs.table.init()
       },
-      searchSubmit() {
-        this.isFirst = true
+      //搜索
+      searchSubmit () {
         console.log(this.formItem)
-        setTimeout(()=>{
-          this.isFirst = false
-          this.$refs.table.init()
-        },200)
+        this.isFirst = true
+        this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.formItem={
+              status:'',
+              buildingName:'',
+              unitName:'',
+              roomNum:'',
+              customerName:'',
+              startUpdateTime:'',
+              endUpdateTime:'',
+              page:'1'
+            }
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Message.error(res.message)
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       searchCancel() {
         this.formItem={

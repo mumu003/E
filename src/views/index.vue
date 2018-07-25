@@ -199,13 +199,13 @@
           "name": "流程配置",
           "url": "/procedure",
           "icon": "network"
-        },
+        }/*,
         {
           "id": 3,
           "name": "基础设置",
           "url": "/basics",
           "icon": "gear-b"
-        }
+        }*/
       ]
     },
     methods: {

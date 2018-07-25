@@ -76,7 +76,7 @@
             <Button type="primary" icon="edit" @click="viewProject">审核</Button>
             <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
             <Button type="error" icon="close"　@click="endProject">终止</Button>
-            <Button type="error" icon="close"　@click="deleteProject">删除</Button>
+            <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
             </Col>
@@ -135,7 +135,8 @@
     </Modal>
 
     <Modal v-model="viewModal" title="发函详情"
-           width="800" >
+           width="800"
+           @on-cancel="cancel">
       <Form  :model="viewForm" :label-width="100">
         <Row>
           <Col span="8">
@@ -826,11 +827,30 @@
       },
       //搜索
       searchSubmit () {
+        console.log(this.formItem)
         this.isFirst = true
-        setTimeout(()=>{
-          this.isFirst = false
-          this.$refs.table.init()
-        },200)
+        this.$request.post("/apiHost/api/sendFileBill/list",this.formItem, res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.formItem={
+              status:'',
+              buildingName:'',
+              unitName:'',
+              roomNum:'',
+              customerName:'',
+              startUpdateTime:'',
+              endUpdateTime:'',
+              page:'1'
+            }
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Message.error(res.message)
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //重置
       searchCancel () {

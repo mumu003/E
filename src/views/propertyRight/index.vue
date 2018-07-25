@@ -72,7 +72,7 @@
                 <Button type="primary" icon="edit" @click="viewProject">审核</Button>
                 <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
-                <Button type="error" icon="close"　@click="deleteProject">删除</Button>
+                <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
               </Col>
               <Col>
               </Col>
@@ -86,7 +86,7 @@
     </Row>
 
     <Modal v-model="addModal" title="新增产权办理"
-        width="800" 
+        width="800"
         @on-cancel="addCancel">
         <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAdd">
           <Row>
@@ -134,13 +134,11 @@
         width="800"
         :loading="loading"
         @on-cancel="batchCancel">
-        <Form  :model="batchForm" :label-width="100">
+        <Form  :model="batchForm" :label-width="36">
           <Row>
             <Col span="24">
-              <FormItem label="房间">
-                <Select v-model="batchForm.roomIdsList" placeholder="请选择房间号"  @on-change="" filterable multiple>
-                  <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-                </Select>
+              <FormItem label="楼栋">
+                <Input v-model="batchForm.buildingName" placeholder="请选择楼栋" @on-focus="batchHouse"></Input>
               </FormItem>
             </Col>
             <Col span="24">
@@ -157,8 +155,63 @@
         </div>
     </Modal>
 
+    <Modal v-model="batchHouseModal" title="房屋选择"
+        width="700"
+        :loading="loading"
+        @on-cancel="batchHouseCancel">
+        <Form  :model="batchForm" :label-width="36">
+          <Row>
+            <Col span="24">
+              <FormItem label="楼栋">
+                <Select v-model="batchForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(batchForm.buildingId),getRooms(batchForm.unitId)">
+                  <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+                </Select>
+              </FormItem>
+            </Col>
+            <Col span="24" style="margin-bottom: 10px">
+              <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag>
+            </Col>
+            <!--<Col span="24">-->
+              <!--<div class="left-house float-lf">
+                <div class="house bg-gray" v-for="item in floorsList">{{item.floor}}</div>
+              </div>
+            <div  v-for="item in floorsList">
+               <div class="right-house float-lf">
+                <div class="house float-lf house-width" v-for="(i,index) in item.rooms"  :class="{'bg-green':i.status=='Purchase','bg-gray':i.status=='Onshow','bg-red':i.status=='Sign'}"  @click="toggle(index)">
+                  {{i.roomNum}}
+                  <Icon type="ios-checkmark-outline"  v-show="i.isShow" class="img-position"></Icon>&lt;!&ndash;item.isShow&ndash;&gt;
+                </div>
+              </div>
+            </div>-->
+            <!--<div style="width: 5%;float: left">
+              <Tag v-for="item in floorsList" style="width: 30px;text-align: center">{{item.floor}}</Tag>
+            </div>
+            <div style="float: left;margin-left: 5px" v-for="item in floorsList">
+              <Tag v-for="(i,index) in item.rooms" :class="{'bg-green':i.status=='Purchase','bg-gray':i.status=='Onshow','bg-red':i.status=='Sign'}" >{{i.roomNum}}</Tag>
+            </div>-->
+            <!--</Col>-->
+            <Col span="24" v-for="item in floorsList">
+                <Col span="2">
+                  <div class="house bg-gray">{{item.floor}}</div>
+                </Col>
+                 <Col span="22">
+                   <div class="test"  @click="toggle(item.floor,it.roomNum)" :class="{'bg-green':it.status=='Purchase','bg-gray':it.status=='Onshow','bg-red':it.status=='Sign'}"    v-for="it in item.rooms">
+                    {{it.roomNum}}
+                     <Icon type="ios-checkmark-outline" v-show="it.isShow" class="img-position"></Icon><!--v-show="i.isShow"-->
+                   </div>
+                  </Col>
+            </Col>
+
+          </Row>
+        </Form>
+        <div slot="footer" style="text-align:right;margin:0 auto;">
+          <Button type="ghost" size="default" @click="batchHouseCancel">取消</Button>
+          <Button type="primary" size="default" @click="batchHouseSubmit" :loading="modal_loading">确定</Button>
+        </div>
+    </Modal>
+
     <Modal v-model="viewModal" title="产权办理详情"
-      width="800" 
+      width="800"
       @on-cancel="cancel">
       <Form  :model="viewForm" :label-width="80">
         <Row>
@@ -232,15 +285,56 @@
 
   </div>
 </template>
+<style>
+  .test{
+    display: inline-block;
+    width:50px;
+    height:30px;
+    text-align: center;
+    line-height: 30px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    color: white;
+    position: relative;
+  }
+ .house{
+   width:40px;
+   height:30px;
+   text-align: center;
+   line-height: 30px;
+   color: white;
+   margin: 0 3px 9px 3px;
+ }
+  .bg-gray{
+    background-color: #808080;
+    color: white;
+  }
+  .bg-green{
+    background-color: #1cad1f;
+    color: white;
+  }
+  .bg-red{
+    background-color: #e42a2d;
+    color: white;
+  }
+  .img-position{
+    position: absolute;
+    top: 2px;
+    right: 3px;
+  }
+</style>
 <script type="text/ecmascript-6">
+  import index from "../../router"
   export default {
     data () {
       return {
+        isShow:false,//显示隐藏
         isFirst: false,
         loading: true,
         modal_loading: false, //延迟
         addModal: false,
         batchModal: false,
+        batchHouseModal:false,
         viewModal: false,
         editModal: false,
         statusModal: false,
@@ -249,10 +343,28 @@
         buildingList: [],
         unitList: [],
         roomsList: [],
+        floorsList:[],
+        roomsArray:[],
         nodesList: [],
         historysList: [],
         addData: [],
         batchData: [],
+       /* houseList: [
+          {
+            roomId : '1',
+            roomName :'11',
+            isShow : false
+          },
+          {
+            roomId : '2',
+            roomName :'22',
+            isShow : false
+          },{
+            roomId : '3',
+            roomName :'33',
+            isShow : false
+          }
+        ],*/
         formItem: {
           status:'',
           customerName:'',
@@ -406,8 +518,14 @@
           }
         ],
         batchForm: {
-          roomIdsList:[],
-          dataId:[]
+          buildingId: '',
+          buildingName: '',
+          unitId: '',
+          unitName: '',
+          roomId: '',
+          roomNum: '',
+          customerName: '',
+          dataId: []
         },
         viewForm: {
           id:'',
@@ -491,6 +609,9 @@
       this.getBuildings()
     },
     methods: {
+      numSort: function (a,b) {
+        return a.count-b.count;
+      },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -523,21 +644,55 @@
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
             this.addForm.buildingName = item.name
+            this.batchForm.buildingName=item.name
           }
         })
-        console.log(this.addForm)
         this.unitList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           buildingId
         }, res => {
-          console.log(res)
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
             rooms:item.rooms
           }))
+
+          let floorsArray = new Array();
+          for (let k = 0, length = this.unitList.length; k < length; k++) {
+           let unit = this.unitList[k];
+            floorsArray = unit.rooms.map(function(i){
+              return i.floor;
+            });
+          }
+          let floorsSet = new Set(floorsArray);
+          let floorsObj = [];
+          floorsSet.forEach(function (element, sameElement, set) {
+            floorsObj.push({"floor":element,"rooms":[]})
+          })
+
+          for (let k = 0, length = this.unitList.length; k < length; k++) {
+            let unit = this.unitList[k];
+            let isShow
+            unit.rooms.map(function(i){
+              i.isShow=false;
+              floorsObj.forEach(function (element, sameElement, set) {
+                if(element.floor==i.floor){
+                  element.rooms.push(i)
+                }
+              })
+            })
+          }
+          this.floorsList = floorsObj;
+
+        // this.floorsList.rooms.forEach(item=>({
+        //     id:item.roomId,
+        //     Num:item.roomNum
+        //   }))
+
+          console.log(JSON.stringify(floorsObj))
+          console.log(JSON.stringify(this.floorsList))
           console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -553,14 +708,20 @@
         this.unitList.forEach(item=>{
           if(unitId===item.id){
             this.addForm.unitName = item.name
+            this.batchForm.unitName=item.name
           }
         })
         this.unitList.map((item,i)=>{
           if (item.id===unitId) {
+
             this.roomsList = item.rooms.map(item => ({
               id: item.roomId,
-              num: item.roomNum
+              num: item.roomNum,
+              status:item.status,
+              floor:item.floor
             }))
+            console.log( this.roomsList)
+            console.log(123)
           }
         })
         this.addForm.roomId = ""
@@ -576,6 +737,7 @@
         this.roomsList.forEach(item=>{
           if(roomId===item.id){
             this.addForm.roomNum = item.num
+            this.batchForm.roomNum=item.num
           }
         })
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
@@ -585,8 +747,10 @@
           this.addForm.customerName=""
           res.data.data.map(item =>{
             this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
+            this.batchForm.customerName =this.batchForm.customerName+ item.customerName+'/'
           })
           this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
+          this.batchForm.customerName=this.batchForm.customerName.substr(0,this.batchForm.customerName .length-1)//排除最后一个
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -622,13 +786,11 @@
           var dataIdArray = new Array();
           for (var i = 0; i < this.addData.length; i++) {
             if(this.addData[i].required === '1'){
-              console.log(i)
               dataIdArray.push(this.addData[i].id);
             }
           }
           this.addForm.dataId = dataIdArray.toString();
           this.batchForm.dataId = dataIdArray.toString();
-          console.log(this.addForm.dataId)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -671,19 +833,65 @@
         this.$Message.info('你取消了操作')
         this.$refs.addForm.resetFields()
       },
+      //批量
+      //显示隐藏
+      toggle(param1,param2){
+        this.floorsList.map(item=>{
+          if (item.floor==param1){
+            item.rooms.map(it=>{
+              if (it.roomNum==param2&&it.status=='Sign') {
+                setTimeout(() => {
+                  alert(111);
+                  it.isShow=!it.isShow
+                }, 2000)
+
+              }
+            })
+          }
+        })
+        console.log("&&&&");
+        console.log(this.floorsList);
+
+        // this.floorsList[index].isShow = !this.floorsList[index].isShow
+        // this.isShow=!this.isShow
+      },
       batchProject(){
         this.batchModal = true
         this.getIndex()
       },
       batchSubmit(){
         console.log(this.batchForm)
+      //  将得到的数值传给后台调用接口
+      },
+      batchHouseSubmit(){
+        //1.通过房间查找到状态为true的房间ID,然后用,拼接起来
+      //  2.提交到前一个模态框
+        this.floorsList.map(item=> {
+          item.rooms.map(it => {
+            if (it.isShow == 'true' && it.status == 'Sign') {
+              roomId=it.roomId
+            }
+          })
+          
+          console.log('this.batchForm.roomId:'+this.batchForm.roomId)
+        })
       },
       batchCancel(){
         this.batchModal=false
         this.$Message.info('你取消了操作')
         this.batchForm.roomIdsList=[]
+        this.batchForm.buildingsList=[]
         this.batchForm.dataId=[]
       },
+      batchHouseCancel(){
+        this.batchHouseModal=false
+        this.$Message.info('你取消了操作')
+      },
+      batchHouse(){
+        this.batchHouseModal = true
+        this.getRooms()
+      },
+
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -727,7 +935,7 @@
               this.modal_loading = false
               this.$Message.success("审核通过")
               this.$refs.table.init()
-            }, 2000);
+            }, 2000)
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
@@ -786,7 +994,7 @@
             if(item.id===res.data.currentNodeId){
               this.currentNodeId = i
             }
-          }) 
+          })
           console.log(this.nodesList)
           this.statusModal = true
         },res=>{
