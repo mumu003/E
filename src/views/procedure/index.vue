@@ -57,9 +57,8 @@
             <Row>
               <Col>
               <Button type="primary" @click="editProject" icon="edit">编辑</Button>
-              <Button type="primary" @click="addProject" icon="eye">详情</Button>
-             <!--  <Button type="error" @click="addProject" icon="close">删除</Button> -->
-              <Button type="primary" @click="addProject" icon="gear-b">存档设置</Button>
+              <Button type="primary" @click="editArchiveProject" icon="gear-b">存档设置</Button>
+              <Button type="primary" @click="viewProject" icon="eye">详情</Button>
               </Col>
               <Col>
               </Col>
@@ -105,23 +104,29 @@
               </FormItem>
             </Col>
             <Col span="24">
-              <Table border stripe :columns="editConfig" :data="editForm.settingDatas" ref="editTable" @on-selection-change="selection_edit"></Table>
+              <Table border stripe :columns="editConfig" :data="settingDatas" ref="editTable" @on-selection-change="selection_edit"></Table>
             </Col>
           </div>
           <Col span="12" style="margin-top: 10px">
-          <FormItem label="流程参与角色">
-            <Button type="primary" icon="plus-round" @click="addNode">新建角色</Button>
-          </FormItem>
+            <FormItem label="流程参与角色">
+              <Button type="primary" icon="plus-round" @click="addNode">新建角色</Button>
+            </FormItem>
           </Col>
         </Row>
-        <Row v-for="(item,index) in divList" :key="index">
+        <Row v-for="(item,index) in settingNodes" :key="index">
           <Col span="12">
-          <FormItem :label="item.name" >
-            <Select  placeholder="请选择角色" style="width: 100%">
-              <Option :value="1">客服经理</Option>
-              <Option :value="2">总经理</Option>
-            </Select>
-          </FormItem>
+            <FormItem :label="item.name" >
+              <Select  placeholder="请选择角色" style="width: 100%" v-model="item.roleId" @on-change="getRoleName(item.roleId,index)">
+                <Option :value="it.roleId" v-for="(it,ind) in roleList" :key="ind">{{it.roleName}}</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="6" style="margin-left: 10px" v-if="index === 0">
+          </Col>
+          <Col span="6" style="margin-left: 10px" v-else-if="index === settingNodes.length-1">
+          </Col>
+          <Col span="6" style="margin-left: 10px" v-else>
+            <Button type="error" icon="close" @click="deleteNode(index)">删除角色</Button>
           </Col>
         </Row>
       </Form>
@@ -205,23 +210,69 @@
       </div>
     </Modal>
 
-    <Modal title="选择存档资料" v-model="selectMaterialModal" :closable="false" width="400px">
-      <Form :label-width="100" class="modal-form" :model="selectMaterialForm">
+    <Modal title="编辑存档设置" v-model="editArchiveModal" width="800" :loading="loading"
+      @on-cancel="editArchiveCancel">
+      <Form :label-width="100" class="modal-form" :model="editArchiveForm">
         <Row>
-          <Col span="24" >
-          <Checkbox  v-model="selectMaterialForm.idCard" value="">业主身份证</Checkbox>
-          <Select v-model="selectMaterialForm.idCardNumber" placeholder="1份">
-            <Option value="all">1份</Option>
-          </Select>
+          <Col span="8">
+            <FormItem label="流程名称" prop="type">
+              <Select v-model="editArchiveForm.type" disabled>
+                <Option value="1">合同备案</Option>
+                <Option value="5">发函</Option>
+                <Option value="6">交房通知</Option>
+                <Option value="2">水电过户</Option>
+                <Option value="3">两书</Option>
+                <Option value="4">产权办理</Option>
+                <Option value="7">协议书申请</Option>
+              </Select>
+            </FormItem>
           </Col>
-          <Col span="24" >
-          <Checkbox  v-model="selectMaterialForm.censusRegister">业主户籍证明</Checkbox>
-          <Select v-model="selectMaterialForm.censusRegisterNumber" placeholder="1份">
-            <Option value="all">1份</Option>
-          </Select>
+        </Row>
+        <Row v-for="(item,index) in archiveSettingNodes" :key="index">
+          <Col span="8">
+            <FormItem :label="item.labelName" >
+              <Input v-model="item.roleName"  disabled />
+            </FormItem>
+          </Col>
+          <Col span="16" v-if="index !== archiveSettingNodes.length-1">
+            <FormItem label="存档资料" >
+              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)">
+                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
+              </div>
+            </FormItem>
           </Col>
         </Row>
       </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="editArchiveCancel">取消</Button>
+        <Button type="primary" size="default" @click="editArchiveSubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+
+    <Modal title="选择存档资料" v-model="selectMaterialModal" :closable="false" width="400px">
+      <Form :label-width="10" class="modal-form" :model="selectMaterialForm" >
+        <CheckboxGroup v-model="selectMaterialForm.dataIds">
+          <Row v-for="(item,index) in selectMaterialList" :key="index">
+            <Col span="24" >
+              <FormItem label="" >
+                <Checkbox :label="item.id">{{item.name}}</Checkbox>
+                <Select placeholder="请选择存档份数" style="width: 150px" v-model="item.indexQuantity" @on-change="getQuantity(item.indexQuantity,index)">
+                  <Option :value="ind" v-for="(it,ind) in item.quantity" :key="ind">{{ind+1}}份</Option>
+                </Select>
+              </FormItem>
+            </Col>
+          </Row>
+        </CheckboxGroup>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="selectMaterialCancel">取消</Button>
+        <Button type="primary" size="default" @click="selectMaterialSubmit" >确定</Button>
+      </div>
+    </Modal>
+
+    <Modal title="流程设置详情" v-model="viewModal" width="800" :loading="loading"
+      >
     </Modal>
 
     <Modal v-model="noteModal" width="300" title="提示信息">
@@ -262,6 +313,20 @@
         selectMaterialModal:false,
         addMaterialModal:false,
         editMaterialModal:false,
+        editArchiveModal:false,
+        viewModal : false,
+        settingDatas:[],
+        settingNodes:[],
+        settingNodesLength:'',
+        archiveSetting:[],
+        archiveSettingTwo:[],
+        archiveSettingNodes:[],
+        archiveType:'',
+        archiveDatas:[],
+        noteArchiveList:[],
+        selectMaterialList:[],
+        selectMaterialListTwo:[],
+        backupSelectMaterialList:[],
         formItem: {
           type: '',
           startUpdateTime: '',
@@ -307,10 +372,8 @@
           ]
         },
         selectMaterialForm:{
-          idCard:'',
-          idCardNumber:'',
-          censusRegister:'',
-          censusRegisterNumber:''
+          index: '',
+          dataIds:[]
         },
         tableConfig:{
             url:"/apiHost/api/processSetting/list",
@@ -384,6 +447,7 @@
           }
         ],
         editSelect:[],
+        roleList:[],
         divList:[
           {
             name:"发起人",
@@ -406,6 +470,10 @@
           required:'',
           archive:''
         },
+        editArchiveForm:{
+          type:'',
+          requirePurchase:[],
+        },
         noteModal: false //弹窗
       }
     },
@@ -420,9 +488,31 @@
       }
     },
     mounted(){
-      // this.getcontractBillList()
+      this.getRoleList()
     },
     methods:{
+      //获取角色
+      getRoleList(){
+        this.$request.post("/apiHost/api/user/getRoleList", '', res => {
+          console.log(res)
+          console.log(res.data)
+          this.roleList = res.data.data.map(item => ({
+            roleId: item.roleId,
+            roleName: item.roleName
+          }))
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //获取角色名称
+      getRoleName(roleId,index){
+        console.log("roleId="+roleId+"---------index="+index)
+        this.roleList.forEach(item=>{
+          if(roleId === item.roleId){
+            this.settingNodes[index].roleName = item.roleName
+          }
+        })
+      },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -439,6 +529,7 @@
       cancel () {
         this.$Message.info('你取消了操作')
       },
+      //搜索提交
       searchSubmit(){
         console.log(this.formItem)
         this.isFirst = true
@@ -461,6 +552,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //搜索重置
       searchReset(){
         this.formItem = {
           type: '',
@@ -468,9 +560,11 @@
           endUpdateTime: ''
         }
       },
-      addProject(){
-        this.editModal=true
+      //流程设置详情
+      viewProject(){
+        this.viewModal = true
       },
+      //编辑流程设置
       editProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -489,7 +583,7 @@
             console.log(res)
             this.editForm.type = res.data.type
             this.editForm.requirePurchase = res.data.requirePurchase
-            this.editForm.settingDatas = res.data.settingDatas.map(item=>({
+            this.settingDatas = res.data.settingDatas.map(item=>({
               sort: item.sort,
               required: item.required,
               name: item.name,
@@ -497,15 +591,50 @@
               archive: item.archive,
               id:item.id
             }))
-            // this.editForm.settingDatas = res.data.settingDatas
-            this.editForm.settingNodes = res.data.settingNodes
-            //            this.$refs.eTable.init()
+            console.log(res.data.settingNodes)
+            this.settingNodes = res.data.settingNodes
+            this.settingNodesLength = this.settingNodes.length-1
             this.editModal = true
           }, res=>{
             this.$Message.error("获取失败")
           })
       },
-      editSubmit () {},
+      //编辑流程配置确定
+      editSubmit () {
+        console.log(this.settingNodes)
+        this.modal_loading = true
+        this.editForm.settingDatas = this.settingDatas.map(item=>({
+          id:item.id,
+          required: item.required,
+          name: item.name,
+          quantity: item.quantity,
+          archive: item.archive
+        }))
+        this.editForm.settingNodes = this.settingNodes.map(item=>({
+          id:item.id,
+          roleId:item.roleId,
+          roleName:item.roleName
+        }))
+        console.log(this.editForm)
+        console.log(JSON.stringify(this.editForm))
+        this.$request.post("/apiHost/api/processSetting/update",this.editForm,res=>{
+            console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.editModal = false
+              this.modal_loading = false
+              this.$Message.success("提交成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Message.error(res.message)
+            this.modal_loading = false
+          }
+        },res=>{
+          this.$Message.error("获取失败")
+        })
+      },
+      //编辑流程配置取消
       editCancel () {
         this.editModal = false
         this.$Message.info('你取消了操作')
@@ -514,39 +643,43 @@
       closes () {
         this.noteModal = false
       },
+      //新增资料
       addMaterial () {
         this.addMaterialModal = true
         this.$refs.addMaterialForm.resetFields()
       },
+      //新增资料确定
       addSubmit () {
         this.$refs.addMaterialForm.validate((valid) => {
           if (valid) {
             this.modal_loading = true
             console.log(this.addMaterialForm)
-            console.log("push前"+this.editForm.settingDatas.length)
+            console.log("push前"+this.settingDatas.length)
             this.addDataForm={
               id:'',
-              sort:this.editForm.settingDatas.length+1,
+              sort:this.settingDatas.length+1,
               name:this.addMaterialForm.name,
               quantity:this.addMaterialForm.quantity,
               required:this.addMaterialForm.required,
               archive:this.addMaterialForm.archive
             },
-            this.editForm.settingDatas.push(this.addDataForm)
-            console.log("push后"+this.editForm.settingDatas.length)
+            this.settingDatas.push(this.addDataForm)
+            console.log("push后"+this.settingDatas.length)
             this.addMaterialModal = false
             this.modal_loading = false
           }
         })
       },
+      //新增资料取消
       addCancel () {
         this.addMaterialModal = false
         this.$refs.addMaterialForm.resetFields()
       },
-      // 编辑流程配置模态框资料表格
+      //编辑流程配置模态框资料表格
       selection_edit(selection){
         this.editSelect = selection
       },
+      //编辑资料
       editMaterial () {
         console.log(this.editSelect.length)
         if (this.editSelect.length === 0) {
@@ -570,6 +703,7 @@
         }
         this.editMaterialModal = true
       },
+      //编辑资料确定
       editMaterialSubmit (){
         console.log(this.editMaterialForm)
         this.$refs.editMaterialForm.validate((valid) => {
@@ -585,17 +719,19 @@
               required:this.editMaterialForm.required,
               archive:this.editMaterialForm.archive
             }
-            this.$Vue.set(this.editForm.settingDatas,dataSort,obj)
-            console.log(this.editForm.settingDatas)
+            this.$Vue.set(this.settingDatas,dataSort,obj)
+            console.log(this.settingDatas)
             this.editMaterialModal = false
             this.modal_loading = false
           }
         })
       },
+      //编辑资料取消
       editMaterialCancel (){
         this.editMaterialModal = false
         this.$Message.info('你取消了操作')
       },
+      //删除资料
       deleteMaterial () {
         console.log(this.editSelect.length)
         if (this.editSelect.length === 0) {
@@ -614,25 +750,262 @@
           loading: true,
           onOk: () => {
             let dataIndex = this.editSelect[0].sort-1
-            this.editForm.settingDatas.splice(dataIndex,1)
+            this.settingDatas.splice(dataIndex,1)
             this.$Message.success("删除成功")
             this.$Modal.remove()
-            // this.$Vue.set(this.editForm.settingDatas,dataSort,obj)
+            // this.$Vue.set(this.settingDatas,dataSort,obj)
           }
         })
       },
+      //新增角色
       addNode(){
-        let divlength = this.divList.length-1
-        console.log(divlength)
-        let divNodeNum = divlength+1
-        this.divNode={
-          name:"节点"+divNodeNum,
-          type:"3"
+        if(this.settingNodes.length <= 18){
+          let divlength = this.settingNodes.length-1
+          console.log(divlength)
+          let divNodeNum = divlength+1
+          this.divNode={
+            name:"节点"+divNodeNum,
+            type:"3"
+          }
+          this.settingNodes.splice(divlength,0,this.divNode)
+        }else{
+          this.$Modal.error({title: '提示信息', content: '节点角色最多20个'})
         }
-        this.divList.splice(divlength,0,this.divNode)
         // this.divList.push(this.divNode)
+      },
+      //删除节点角色
+      deleteNode(index){
+        console.log(index)
+        this.$Modal.confirm({
+          title: '操作提示',
+          content: '确认删除该节点?',
+          loading: true,
+          onOk: () => {
+            this.settingNodes.splice(index,1)
+            this.$Message.success("删除成功")
+            this.$Modal.remove()
+            // this.$Vue.set(this.settingDatas,dataSort,obj)
+          }
+        })
+      },
+      //存档资料
+      editArchiveProject (){
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        let params = {
+          type: this.selection[0].type
+        }
+        this.archiveType = this.selection[0].type
+        this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
+          console.log(res)
+          this.editArchiveForm.type = this.archiveType
+          this.archiveSetting = res.data.map(item=>({
+            roleName : item.roleName,
+            nodeId : item.nodeId,
+            data : item.data,
+            labelName : ''
+          }))
+
+          this.archiveSettingTwo = this.archiveSetting
+
+          for(var i = 0; i<this.archiveSettingTwo.length; i++){
+            let endIndex = this.archiveSettingTwo.length-1
+            if(i === 0){
+              this.archiveSettingTwo[i].labelName = '发起人'
+            }else if(i === endIndex) {
+              this.archiveSettingTwo[i].labelName = '关闭节点'
+            }else {
+              let indexJia = i+1
+              this.archiveSettingTwo[i].labelName = '节点'+indexJia
+            }
+          }
+
+          this.archiveSettingNodes = this.archiveSettingTwo
+
+          console.log("archiveSettingNodes")
+          console.log(this.archiveSettingNodes)
+        }, res=>{
+          this.$Message.error("获取失败")
+        }),
+        this.$request.post("/apiHost/api/processSetting/archiveList",params,res=>{
+          console.log(res)
+          this.noteArchiveList = res.data.map(item=>({
+            id : item.id,
+            name : item.name,
+            quantity : item.quantity,
+            archiveQuantity : 0,
+            surplusQuantity : item.quantity,
+            indexQuantity : 0
+          }))
+          console.log(this.noteArchiveList)
+          this.selectMaterialList = this.noteArchiveList
+          this.editArchiveModal = true
+        }, res=>{
+          this.$Message.error("获取失败")
+        })
+      },
+      //节点存档
+      noteArchive(index){
+        console.log(index)//节点
+        this.selectMaterialForm.index = index
+
+        //节点的data
+        this.archiveDatas = this.archiveSettingNodes[index].data
+        console.log("archiveDatas节点ID的长度="+this.archiveDatas.length)
+        console.log(this.archiveDatas)
+
+        //复选框
+        var dataIdArray = new Array()
+        for (var i = 0; i < this.archiveDatas.length; i++) {
+            dataIdArray.push(this.archiveDatas[i].dataId)
+        }
+        this.selectMaterialForm.dataIds = dataIdArray
+        console.log("this.selectMaterialForm.dataIds.length="+this.selectMaterialForm.dataIds.length)
+        console.log(this.selectMaterialForm.dataIds)
+
+        if(this.selectMaterialForm.dataIds[0] !== null){
+          console.log("this.selectMaterialForm.dataIds[0]--------------不是空的")
+          for (var j = 0; j < this.selectMaterialList.length; j++){
+          for (var k = 0; k < this.archiveDatas.length; k++){
+            let noteId = this.selectMaterialList[j].id
+            let archiveId = this.archiveDatas[k].dataId
+            console.log("noteId="+noteId+" ----archiveId="+archiveId)
+            if(noteId === archiveId){
+              let arQuantity = this.archiveDatas[k].quantity
+              console.log("arQuantity="+arQuantity)
+              console.log(this.selectMaterialList[j])
+              this.selectMaterialList[j].indexQuantity = arQuantity-1
+              console.log("this.selectMaterialList["+j+"].indexQuantity="+this.selectMaterialList[j].indexQuantity)
+              console.log(j)
+              this.selectMaterialList[j].archiveQuantity = arQuantity
+              this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.selectMaterialList[j].archiveQuantity
+            }
+          }
+        }
+        }else{
+          console.log("this.selectMaterialForm.dataIds[0]是空的")
+          for (var l = 0; l < this.selectMaterialList.length; l++){
+            this.selectMaterialList[l].indexQuantity = 0
+          }
+        }
+
+        // this.selectMaterialListTwo = this.selectMaterialList
+        this.backupSelectMaterialList = this.selectMaterialList.map(item=>({
+          id : item.id,
+          name : item.name,
+          quantity : item.quantity,
+          archiveQuantity : item.archiveQuantity,
+          surplusQuantity : item.surplusQuantity,
+          indexQuantity : item.indexQuantity,
+        }))
+
+        this.selectMaterialModal = true
+        setTimeout(() => {
+          console.log(this.selectMaterialList)
+        }, 2000);
+      },
+      //存档资料-》获得选择的份数
+      getQuantity(indexQuantity,index){
+        console.log("indexQuantity="+indexQuantity+"---------index="+index)
+        let surplusNum = this.selectMaterialList[index].surplusQuantity
+        if(surplusNum >= 0){
+          this.selectMaterialList[index].archiveQuantity = indexQuantity+1
+          this.selectMaterialList[index].surplusQuantity = this.selectMaterialList[index].quantity - this.selectMaterialList[index].archiveQuantity
+          console.log(this.selectMaterialList[index])
+        }else{
+          this.$Modal.error({title: '提示信息', content: "资料剩余:"+surplusNum+"份"})
+        }
+      },
+      //选择存档资料确定
+      selectMaterialSubmit (){
+        console.log("this.selectMaterialForm.index"+this.selectMaterialForm.index)
+        console.log(this.selectMaterialForm.dataIds)
+        console.log("this.selectMaterialList.length="+this.selectMaterialList.length)
+        console.log("this.selectMaterialForm.dataIds.length="+this.selectMaterialForm.dataIds.length)
+        console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
+        console.log("this.backupSelectMaterialList"+JSON.stringify(this.backupSelectMaterialList))
+        for (var i = 0; i < this.selectMaterialList.length; i++) {
+          for (var j = 0; j < this.selectMaterialForm.dataIds.length; j++) {
+            console.log("i="+i+" j="+j)
+            if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
+              // console.log("------------ID被勾选")
+              console.log("this.selectMaterialList[i].indexQuantity="+this.selectMaterialList[i].indexQuantity)
+              console.log("this.backupSelectMaterialList[i].indexQuantity="+this.backupSelectMaterialList[i].indexQuantity)
+              if(this.selectMaterialList[i].indexQuantity === this.backupSelectMaterialList[i].indexQuantity){
+                console.log("------------ID被勾选----------没有更改存档数量")
+              }else{
+                console.log("------------ID被勾选---------------------更改存档数量")
+              }
+              // if(this.selectMaterialList[i].surplusQuantity === 0){
+              //   let kIndex = this.selectMaterialForm.index+1
+              //   for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
+              //     for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
+              //       if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
+              //         this.archiveSettingNodes[k].data.splice(l,1)
+              //       }
+              //     }
+              //   }
+              // }else {
+              //   let kIndex = this.selectMaterialForm.index+1
+              //   for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
+              //     for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
+              //       if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
+              //         if(this.archiveSettingNodes[k].data[l].quantity <= this.selectMaterialList[i].surplusQuantity){
+              //           this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity - this.archiveSettingNodes[k].data[l].quantity
+              //         }else{
+              //           this.archiveSettingNodes[k].data.splice(l,1)
+              //         }
+              //       }
+              //     }
+              //   }
+              // }
+            }else{
+              // console.log("ID没有勾选")
+              console.log("this.selectMaterialList[i].indexQuantity="+this.selectMaterialList[i].indexQuantity)
+              console.log("this.backupSelectMaterialList[i].indexQuantity="+this.backupSelectMaterialList[i].indexQuantity)
+              if(this.selectMaterialList[i].indexQuantity === this.backupSelectMaterialList[i].indexQuantity){
+                console.log("ID没有勾选----------没有更改存档数量")
+              }else{
+                console.log("ID没有勾选-------------------------------更改存档数量")
+              }
+              // if(this.selectMaterialList[i].indexQuantity === this.backupSelectMaterialList[i].indexQuantity){
+              //   this.selectMaterialList[i].archiveQuantity = this.backupSelectMaterialList[i].archiveQuantity
+              //   this.selectMaterialList[i].surplusQuantity = this.backupSelectMaterialList[i].surplusQuantity
+              // }else{
+              //   this.selectMaterialList[i].indexQuantity = 0
+              //   this.selectMaterialList[i].archiveQuantity = this.backupSelectMaterialList[i].archiveQuantity
+              //   this.selectMaterialList[i].surplusQuantity = this.backupSelectMaterialList[i].surplusQuantity
+              // }
+            }
+          }
+        }
+      },
+      //选择存档资料取消
+      selectMaterialCancel () {
+        this.selectMaterialModal = false
+        this.$Message.info('你取消了操作')
+      },
+      //编辑档案资料-Tag删除
+      handleClose (indexId,ind){
+        this.archiveSettingNodes[indexId].data.splice(ind, 1)
+      },
+      //存档资料确定
+      editArchiveSubmit () {
+        
+      },
+      //存档资料取消
+      editArchiveCancel () {
+        this.editArchiveModal = false
+        this.$Message.info('你取消了操作')
       }
     }
   }
 </script>
-
