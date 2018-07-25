@@ -78,7 +78,7 @@
             <Col>
             <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
             <Button type="primary" icon="edit" @click="viewProject">审核</Button>
-            <Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>
+            <!--<Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>-->
             <Button type="error" icon="close"　@click="endProject">终止</Button>
             <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
@@ -134,42 +134,68 @@
         <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-    <Modal v-model="viewModal" title="水电过户详情"
+    <Modal v-model="viewModal"
            width="800"
            @on-cancel="cancel"
     >
-      <Form  :model="viewForm" :label-width="100">
-        <Row>
-          <Col span="8">
-          <FormItem label="楼栋">
-            <Input v-model="viewForm.buildingName" readonly/>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="单元">
-            <Input v-model="viewForm.unitName" readonly/>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="房间号">
-            <Input v-model="viewForm.roomNum" readonly/>
-          </FormItem>
-          </Col>
-          <Col span="24">
-          资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="viewContract" :data="viewData"></Table>
-          </Col>
-        </Row>
-      </Form>
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
+        <TabPane label="水电过户审核"  >
+          <Form  :model="viewForm" :label-width="100">
+            <Row>
+              <Col span="8">
+              <FormItem label="楼栋">
+                <Input v-model="viewForm.buildingName" readonly/>
+              </FormItem>
+              </Col>
+              <Col span="8">
+              <FormItem label="单元">
+                <Input v-model="viewForm.unitName" readonly/>
+              </FormItem>
+              </Col>
+              <Col span="8">
+              <FormItem label="房间号">
+                <Input v-model="viewForm.roomNum" readonly/>
+              </FormItem>
+              </Col>
+              <Col span="24">
+              资料
+              </Col>
+              <Col span="24">
+                <Table stripe border :columns="viewContract" :data="viewData"></Table>
+              </Col>
+            </Row>
+          </Form>
+        </TabPane>
+        <TabPane label="状态详情" >
+          <Row>
+            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+            <Col span="24">
+            <Steps :current="1">
+              <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
+            </Steps>
+            </Col>
+            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+            <Col span="24">
+            <Timeline>
+              <TimelineItem v-for="(item,index) in rateList" :color="item.status === 0 ? 'red' : 'green'">
+                <p>{{item.createdAt}}</p>
+                <p v-if="index === 0">发起</p>
+                <p v-else-if="index === rateList.length-1">归档节点:完结</p>
+                <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
+                <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+              </TimelineItem>
+            </Timeline>
+            </Col>
+          </Row>
+        </TabPane>
+      </Tabs>
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
         <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
         <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
       </div>
     </Modal>
 
-    <Modal v-model="statuModal" title="状态详情"
+   <!-- <Modal v-model="statuModal" title="状态详情"
            width="800"
            :loading="loading"
            @on-ok="statuSubmit"
@@ -195,7 +221,7 @@
         </Timeline>
         </Col>
       </Row>
-    </Modal>
+    </Modal>-->
 
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
@@ -470,6 +496,9 @@
       /*this.getIndex()*/
     },
     methods: {//对象
+      changs() {
+        this.statuProject()
+      },
       //获取楼栋列表
       getBuildings() {
         let params = {

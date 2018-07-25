@@ -171,8 +171,8 @@
             <Col span="24" style="margin-bottom: 10px">
               <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag>
             </Col>
-            <!--<Col span="24">-->
-              <!--<div class="left-house float-lf">
+           <!-- <Col span="24">
+              <div class="left-house float-lf">
                 <div class="house bg-gray" v-for="item in floorsList">{{item.floor}}</div>
               </div>
             <div  v-for="item in floorsList">
@@ -182,14 +182,14 @@
                   <Icon type="ios-checkmark-outline"  v-show="i.isShow" class="img-position"></Icon>&lt;!&ndash;item.isShow&ndash;&gt;
                 </div>
               </div>
-            </div>-->
-            <!--<div style="width: 5%;float: left">
+            </div>
+            <div style="width: 5%;float: left">
               <Tag v-for="item in floorsList" style="width: 30px;text-align: center">{{item.floor}}</Tag>
             </div>
             <div style="float: left;margin-left: 5px" v-for="item in floorsList">
               <Tag v-for="(i,index) in item.rooms" :class="{'bg-green':i.status=='Purchase','bg-gray':i.status=='Onshow','bg-red':i.status=='Sign'}" >{{i.roomNum}}</Tag>
-            </div>-->
-            <!--</Col>-->
+            </div>
+            </Col>-->
             <Col span="24" v-for="item in floorsList">
                 <Col span="2">
                   <div class="house bg-gray">{{item.floor}}</div>
@@ -295,6 +295,7 @@
     margin-right: 5px;
     margin-bottom: 5px;
     color: white;
+    background-color: #000;
     position: relative;
   }
  .house{
@@ -801,7 +802,6 @@
       },
       //新增
       addSubmit() {
-        console.log(this.addForm)
         this.modal_loading = true;
         this.$refs.addForm.validate((valid) => {
           if (valid) {
@@ -840,41 +840,63 @@
           if (item.floor==param1){
             item.rooms.map(it=>{
               if (it.roomNum==param2&&it.status=='Sign') {
-                setTimeout(() => {
                   alert(111);
                   it.isShow=!it.isShow
-                }, 2000)
-
               }
             })
           }
         })
         console.log("&&&&");
-        console.log(this.floorsList);
-
+        console.log(this.floorsList)
         // this.floorsList[index].isShow = !this.floorsList[index].isShow
         // this.isShow=!this.isShow
       },
       batchProject(){
         this.batchModal = true
+        this.batchForm.buildingName=''
         this.getIndex()
-      },
-      batchSubmit(){
-        console.log(this.batchForm)
-      //  将得到的数值传给后台调用接口
       },
       batchHouseSubmit(){
         //1.通过房间查找到状态为true的房间ID,然后用,拼接起来
       //  2.提交到前一个模态框
+        this.selectedStaff="";
         this.floorsList.map(item=> {
-          item.rooms.map(it => {
-            if (it.isShow == 'true' && it.status == 'Sign') {
-              roomId=it.roomId
+          item.rooms.filter(it=> it.isShow).map(it => {
+            if (it.status=='Sign') {
+              this.selectedStaff=this.selectedStaff+","+it.roomId
+              this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
             }
           })
-          
-          console.log('this.batchForm.roomId:'+this.batchForm.roomId)
+          console.log('this.selectedStaff:'+ this.selectedStaff)
         })
+        this.batchHouseModal=false
+      },
+      batchSubmit(){
+        let params = {
+          dataId: this.batchForm.dataId,
+          roomId:this.selectedStaff
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/ownershipBill/batch",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.batchModal = false
+              this.modal_loading = false
+              this.$Message.success(res.message)
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
+          }
+        },res=>{
+          this.$Message.error(res.message)
+          this.modal_loading = false
+        })
+        this.batchForm.buildingName=''
+        //  将得到的数值传给后台调用接口
+
       },
       batchCancel(){
         this.batchModal=false

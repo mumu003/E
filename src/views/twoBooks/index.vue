@@ -33,7 +33,7 @@
                 </Col>
                 <Col span="6">
                   <FormItem label="楼栋">
-                    <Input v-model="formItem.buildingId" :maxlength=30 placeholder="请输入楼栋"></Input>
+                    <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋"></Input>
                   </FormItem>
                 </Col>
               </Row>
@@ -79,7 +79,7 @@
                 <!-- <Button type="primary" icon="edit" @click="editProject">审核</Button>  -->
                 <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
-                <Button type="error" icon="close"　@click="deleteProject">删除</Button> 
+                <Button type="error" icon="close"　@click="deleteProject">删除</Button>
               </Col>
               <Col>
               </Col>
@@ -134,7 +134,7 @@
     </Modal>
 
     <Modal v-model="viewModal" title="两书详情"
-      width="800" 
+      width="800"
       :loading="loading"
       @on-cancel="cancel">
       <Form  :model="viewForm" :label-width="110">
@@ -228,6 +228,7 @@
           customerName:'',
           phone:'',
           buildingId:'',
+          buildingName:'',
           roomNum:'',
           startUpdateTime:'',
           endUpdateTime: '',
@@ -782,7 +783,7 @@
             if(item.id===res.data.currentNodeId){
               this.currentNodeId = i
             }
-          }) 
+          })
           console.log(this.statuList)
           this.statusModal = true
         },res=>{
@@ -879,7 +880,7 @@
               status: '',
               customerName:'',
               phone:'',
-              buildingId:'',
+              buildingName:'',
               roomNum:'',
               startUpdateTime:'',
               endUpdateTime: ''

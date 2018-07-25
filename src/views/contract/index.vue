@@ -68,7 +68,7 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="edit" @click="viewProject">审核</Button>
+                <Button type="primary" icon="edit" @click="viewProject">审核</Button><!--warning-->
                 <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
                 <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
@@ -132,7 +132,7 @@
            @on-cancel="cancel"
     >
       <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="合同备案"  >
+        <TabPane label="合同备案审核"  >
           <Form  :model="viewForm" :label-width="100">
             <Row>
               <Col span="8">
