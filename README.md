@@ -9,7 +9,7 @@
 npm install
 
 # serve with hot reload at localhost:8080
-npm run dev
+npm run dev sudo docker login --username= registry.cn-hangzhou.aliyuncs.com
 
 # build for production with minification
 npm run build
@@ -18,7 +18,7 @@ npm run build
 npm run build --report
 ```
 
-## 加入特房信息-gitlab地址
+## 加入特房信息gitlab地址
 
 ```
 git remote set-url --add origin http://128.10.7.8/xmtfit/gitlab/meiqi/teamwork-web.git
