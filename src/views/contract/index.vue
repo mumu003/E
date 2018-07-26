@@ -189,6 +189,7 @@
       </Tabs>
 
       <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button size="default" @click="cancel" >取消</Button>
         <Button type="error" size="default" @click="viewReject" >驳回</Button>
         <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
       </div>

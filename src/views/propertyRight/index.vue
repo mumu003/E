@@ -70,7 +70,7 @@
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
                 <Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>
                 <Button type="primary" icon="edit" @click="viewProject">审核</Button>
-                <Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>
+                <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
                 <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
               </Col>
@@ -171,32 +171,13 @@
             <Col span="24" style="margin-bottom: 10px">
               <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag>
             </Col>
-           <!-- <Col span="24">
-              <div class="left-house float-lf">
-                <div class="house bg-gray" v-for="item in floorsList">{{item.floor}}</div>
-              </div>
-            <div  v-for="item in floorsList">
-               <div class="right-house float-lf">
-                <div class="house float-lf house-width" v-for="(i,index) in item.rooms"  :class="{'bg-green':i.status=='Purchase','bg-gray':i.status=='Onshow','bg-red':i.status=='Sign'}"  @click="toggle(index)">
-                  {{i.roomNum}}
-                  <Icon type="ios-checkmark-outline"  v-show="i.isShow" class="img-position"></Icon>&lt;!&ndash;item.isShow&ndash;&gt;
-                </div>
-              </div>
-            </div>
-            <div style="width: 5%;float: left">
-              <Tag v-for="item in floorsList" style="width: 30px;text-align: center">{{item.floor}}</Tag>
-            </div>
-            <div style="float: left;margin-left: 5px" v-for="item in floorsList">
-              <Tag v-for="(i,index) in item.rooms" :class="{'bg-green':i.status=='Purchase','bg-gray':i.status=='Onshow','bg-red':i.status=='Sign'}" >{{i.roomNum}}</Tag>
-            </div>
-            </Col>-->
             <Col span="24" v-for="item in floorsList">
                 <Col span="2">
                   <div class="house bg-gray">{{item.floor}}</div>
                 </Col>
                  <Col span="22">
-                   <div class="test"  @click="toggle(item.floor,it.roomNum)" :class="{'bg-green':it.status=='Purchase','bg-gray':it.status=='Onshow','bg-red':it.status=='Sign'}"    v-for="it in item.rooms">
-                    {{it.roomNum}}
+                   <div class="test"  @click="toggle(item.floor,it.roomNum)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
+                      {{it.isShow}}{{it.roomNum}}
                      <Icon type="ios-checkmark-outline" v-show="it.isShow" class="img-position"></Icon><!--v-show="i.isShow"-->
                    </div>
                   </Col>
@@ -210,46 +191,72 @@
         </div>
     </Modal>
 
-    <Modal v-model="viewModal" title="产权办理详情"
+    <Modal v-model="viewModal"
       width="800"
       @on-cancel="cancel">
-      <Form  :model="viewForm" :label-width="80">
-        <Row>
-          <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="viewForm.buildingName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="viewForm.unitName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="viewForm.roomNum" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="viewForm.customerName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="viewContract" :data="viewData"></Table>
-          </Col>
-        </Row>
-      </Form>
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
+        <TabPane label="产权办理审核"  >
+          <Form  :model="viewForm" :label-width="80">
+            <Row>
+              <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="viewForm.buildingName" readonly></Input>
+                </FormItem>
+              </Col>
+              <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="viewForm.unitName" readonly></Input>
+                </FormItem>
+              </Col>
+              <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="viewForm.roomNum" readonly></Input>
+                </FormItem>
+              </Col>
+              <Col span="8">
+                <FormItem label="业主姓名">
+                  <Input v-model="viewForm.customerName" readonly></Input>
+                </FormItem>
+              </Col>
+              <Col span="24">
+                资料
+              </Col>
+              <Col span="24">
+                <Table stripe border :columns="viewContract" :data="viewData"></Table>
+              </Col>
+            </Row>
+          </Form>
+        </TabPane>
+        <TabPane label="状态详情" >
+          <Row>
+            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+            <Col span="24">
+            <Steps :current="currentNodeId">
+              <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
+            </Steps>
+            </Col>
+            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+            <Col span="24">
+            <Timeline>
+              <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
+                <p>{{item.createdAt}}</p>
+                <p v-if="index === 0">发起</p>
+                <p v-else-if="index === historysList.length-1">归档节点:完结</p>
+                <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
+                <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+              </TimelineItem>
+            </Timeline>
+            </Col>
+          </Row>
+        </TabPane>
+      </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="error" size="default" @click="viewReject">驳回</Button>
         <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
       </div>
     </Modal>
 
-    <Modal v-model="statusModal" title="状态详情"
+   <!-- <Modal v-model="statusModal" title="状态详情"
       width="800"
       :loading="loading"
       @on-ok="statusOk"
@@ -274,7 +281,7 @@
           </Timeline>
         </Col>
       </Row>
-    </Modal>
+    </Modal>-->
 
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
@@ -295,7 +302,6 @@
     margin-right: 5px;
     margin-bottom: 5px;
     color: white;
-    background-color: #000;
     position: relative;
   }
  .house{
@@ -610,6 +616,9 @@
       this.getBuildings()
     },
     methods: {
+      changs(){
+        this.statusProject()
+      },
       numSort: function (a,b) {
         return a.count-b.count;
       },
@@ -652,7 +661,8 @@
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
-          buildingId
+          buildingId,
+          type:4
         }, res => {
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
@@ -686,11 +696,6 @@
             })
           }
           this.floorsList = floorsObj;
-
-        // this.floorsList.rooms.forEach(item=>({
-        //     id:item.roomId,
-        //     Num:item.roomNum
-        //   }))
 
           console.log(JSON.stringify(floorsObj))
           console.log(JSON.stringify(this.floorsList))
@@ -838,22 +843,25 @@
       toggle(param1,param2){
         this.floorsList.map(item=>{
           if (item.floor==param1){
-            item.rooms.map(it=>{
-              if (it.roomNum==param2&&it.status=='Sign') {
-                  alert(111);
-                  it.isShow=!it.isShow
+            item.rooms.map((it,index)=>{
+              if (it.roomNum==param2&&it.status=='ToDo') {
+                alert(item.rooms[index].isShow)
+                item.rooms[index].isShow=!item.rooms[index].isShow
+                alert(item.rooms[index].isShow)
               }
             })
+
           }
         })
         console.log("&&&&");
         console.log(this.floorsList)
-        // this.floorsList[index].isShow = !this.floorsList[index].isShow
-        // this.isShow=!this.isShow
       },
       batchProject(){
         this.batchModal = true
         this.batchForm.buildingName=''
+        this.batchForm.buildingId=''
+        this.unitList=[]
+        this.floorsList=[]
         this.getIndex()
       },
       batchHouseSubmit(){
@@ -862,7 +870,7 @@
         this.selectedStaff="";
         this.floorsList.map(item=> {
           item.rooms.filter(it=> it.isShow).map(it => {
-            if (it.status=='Sign') {
+            if (it.status=='ToDo') {
               this.selectedStaff=this.selectedStaff+","+it.roomId
               this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
             }
@@ -871,7 +879,9 @@
         })
         this.batchHouseModal=false
       },
-      batchSubmit(){
+      batchSubmit(){ //  将得到的数值传给后台调用接口
+        if(this.batchForm.buildingName != ''){
+        this.modal_loading = true
         let params = {
           dataId: this.batchForm.dataId,
           roomId:this.selectedStaff
@@ -894,9 +904,9 @@
           this.$Message.error(res.message)
           this.modal_loading = false
         })
-        this.batchForm.buildingName=''
-        //  将得到的数值传给后台调用接口
-
+        }else {
+          this.$Modal.error({title: '提示信息', content:  "您还未选择房间号,请选择有效房间才可提交"})
+        }
       },
       batchCancel(){
         this.batchModal=false
@@ -907,10 +917,18 @@
       },
       batchHouseCancel(){
         this.batchHouseModal=false
+        this.batchForm.buildingId=''
+        this.batchForm.buildingName=''
+        this.unitList=[]
+        this.floorsList=[]
         this.$Message.info('你取消了操作')
       },
       batchHouse(){
         this.batchHouseModal = true
+        this.batchForm.buildingId=''
+        this.batchForm.buildingName=''
+        this.unitList=[]
+        this.floorsList=[]
         this.getRooms()
       },
 
@@ -1054,6 +1072,7 @@
               this.$refs.table.init()
             },res=>{
               this.$Message.error("终止失败")
+              this.$refs.table.init()
               this.$Modal.remove()
             })
           }
@@ -1106,6 +1125,7 @@
         }, 2000);
       },
       cancel () {
+        this.$refs.table.init()
         this.$Message.info('你取消了操作');
       },
       //搜索
