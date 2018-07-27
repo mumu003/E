@@ -75,6 +75,14 @@
       <Form  ref="addForm" :model="addForm" :label-width="80" :rules="ruleAdd">
         <Row>
           <Col span="24">
+            <FormItem label="协议书名称" >
+              <Select placeholder="请选择协议书名称"  >
+                 <!-- <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option> -->
+                 <Option>协议书申请</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="24">
             <FormItem label="申请份数" prop="applyNum">
               <Input v-model="addForm.applyNum" ></Input>
             </FormItem>
@@ -96,7 +104,7 @@
       :loading="loading"
       @on-cancel="cancel">
       <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="合同备案审核"  >
+        <TabPane label="协议书申请审核"  >
           <Form  ref="viewForm"  :model="viewForm" :label-width="80" :rules="ruleView">
             <Row>
               <Col span="24">
