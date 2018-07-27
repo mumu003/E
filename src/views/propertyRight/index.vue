@@ -176,9 +176,9 @@
                   <div class="house bg-gray">{{item.floor}}</div>
                 </Col>
                  <Col span="22">
-                   <div class="test"  @click="toggle(item.floor,it.roomNum)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
-                      {{it.isShow}}{{it.roomNum}}
-                     <Icon type="ios-checkmark-outline" v-show="it.isShow" class="img-position"></Icon><!--v-show="i.isShow"-->
+                   <div class="test"  @click="toggle(item.floor,it.roomId)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
+                     {{it.roomNum}}
+                     <Icon type="ios-checkmark-outline" v-show="it.show" class="img-position"></Icon><!--v-show="i.isShow"-->
                    </div>
                   </Col>
             </Col>
@@ -350,7 +350,7 @@
         buildingList: [],
         unitList: [],
         roomsList: [],
-        floorsList:[],
+        floorsList:[ ],
         roomsArray:[],
         nodesList: [],
         historysList: [],
@@ -687,7 +687,6 @@
             let unit = this.unitList[k];
             let isShow
             unit.rooms.map(function(i){
-              i.isShow=false;
               floorsObj.forEach(function (element, sameElement, set) {
                 if(element.floor==i.floor){
                   element.rooms.push(i)
@@ -696,8 +695,7 @@
             })
           }
           this.floorsList = floorsObj;
-
-          console.log(JSON.stringify(floorsObj))
+          // console.log(JSON.stringify(floorsObj))
           console.log(JSON.stringify(this.floorsList))
           console.log(this.unitList)
         }, res => {
@@ -844,13 +842,10 @@
         this.floorsList.map(item=>{
           if (item.floor==param1){
             item.rooms.map((it,index)=>{
-              if (it.roomNum==param2&&it.status=='ToDo') {
-                alert(item.rooms[index].isShow)
-                item.rooms[index].isShow=!item.rooms[index].isShow
-                alert(item.rooms[index].isShow)
+              if (it.roomId==param2&&it.status=='ToDo') {
+                item.rooms[index].show=!item.rooms[index].show
               }
             })
-
           }
         })
         console.log("&&&&");
@@ -869,13 +864,12 @@
       //  2.提交到前一个模态框
         this.selectedStaff="";
         this.floorsList.map(item=> {
-          item.rooms.filter(it=> it.isShow).map(it => {
+          item.rooms.filter(it=> it.show).map(it => {
             if (it.status=='ToDo') {
               this.selectedStaff=this.selectedStaff+","+it.roomId
               this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
             }
           })
-          console.log('this.selectedStaff:'+ this.selectedStaff)
         })
         this.batchHouseModal=false
       },
@@ -925,9 +919,9 @@
       },
       batchHouse(){
         this.batchHouseModal = true
-        this.batchForm.buildingId=''
+         this.batchForm.buildingId=''
         this.batchForm.buildingName=''
-        this.unitList=[]
+       this.unitList=[]
         this.floorsList=[]
         this.getRooms()
       },

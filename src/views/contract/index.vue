@@ -159,7 +159,8 @@
               资料
               </Col>
               <Col span="24">
-                <Table stripe border :columns="viewContract" :data="viewData" ref="ref"></Table>
+                <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
+                <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
               </Col>
             </Row>
           </Form>
@@ -188,10 +189,17 @@
         </TabPane>
       </Tabs>
 
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button size="default" @click="cancel" >取消</Button>
-        <Button type="error" size="default" @click="viewReject" >驳回</Button>
-        <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+      <div slot="footer" style="text-align:right;">
+        <Row>
+          <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
+              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+            </span>
+          </Col>
+        </Row>
       </div>
     </Modal>
 
@@ -251,6 +259,9 @@
         nodesList: [],  //处理进度
         historysList: [],  //进度详情
         currentNodeId:'', //状态详情节点
+        checkButton:false,
+        startButton:false,
+        buttons:{ },
         //搜索时间
         searchTime:{
           tStartTime:"",
@@ -416,7 +427,8 @@
           buildingName:'',
           unitName:'',
           roomNum:'',
-          customerName:''
+          customerName:'',
+          dataId:[]
         },
         //审核模态框资料
         viewContract: [
@@ -424,6 +436,64 @@
             title: '序号',
             key: 'sort',
             width:80
+          },
+          {
+            title: '状态',
+            key: 'required',
+            width:100,
+            render:(h,params)=>{
+              switch(parseInt(params.row.required)){
+                case 0:
+                  return h('div',"非必填")
+                case 1:
+                  return h('div',"必填")
+              }
+            }
+          },
+          {
+            title: '资料名称',
+            key: 'name',
+            width:250
+          },
+          {
+            title: '资料数量',
+            key: 'quantity',
+            width:80
+          },
+          {
+            title: '存档',
+            key: 'archive',
+            width:80,
+            render:(h,params)=>{
+              switch(parseInt(params.row.archive)){
+                case 0:
+                  return h('div',"不存档")
+                case 1:
+                  return h('div',"存档")
+              }
+            }
+          },
+          {
+            title: '存档份数',
+            key: 'archiveQuantity',
+            width:80
+          }
+        ],
+        viewStartContract: [
+          {
+            type:"selection",
+            key:'_disabled',
+            width:0
+          },
+          {
+            type:"selection",
+            key:'_checked',
+            width:80
+          },
+          {
+            title: '序号',
+            key: 'sort',
+            width:100
           },
           {
             title: '状态',
@@ -594,6 +664,11 @@
       //新增表格选项
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+
+      },
+      //审核表单选项
+      viewselect(selection){
+        this.viewForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
       //新增确定
       addSubmit () {
@@ -676,15 +751,38 @@
         }
         this.$request.post("/apiHost/api/contractBill/view",params,res=>{
             console.log(res.data)
+
           this.viewForm.id = res.data.id
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
           this.viewForm.customerName = res.data.customerName
-          this.viewData = res.data.details
+          this.buttons.start = res.data.buttons.start
+          this.buttons.stop = res.data.buttons.stop
+          this.buttons.check = res.data.buttons.check
+          this.viewData = res.data.details.map(item=>({
+            _disabled: item.required === '1' ?  true : false,
+            _checked: item.required === '1' ?  true : false,
+            sort: item.sort,
+            required: item.required,
+            name: item.name,
+            quantity: item.quantity,
+            archive: item.archive,
+            archiveQuantity: item.archiveQuantity,
+            id:item.id
+          }))
+          var dataIdArray = new Array();
+          for (var i = 0; i < this.viewData.length; i++) {
+            if(this.viewData[i].required === '1'){
+              dataIdArray.push(this.viewData[i].id);
+            }
+          }
+          this.viewForm.dataId = dataIdArray.toString();
           this.viewModal = true
+          console.log(' this.buttons.start:'+ this.buttons.start)
+
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
       },
       //通过
@@ -730,6 +828,40 @@
         },res=>{
           this.$Message.error(res.message)
         })
+      },
+      //发起
+      start(){
+        if(this.viewselect[0] !== ''){
+        this.modal_loading = true
+        let params = {
+          id: this.viewForm.id,
+          dataId: this.viewForm.dataId
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractBill/start",params,res=>{
+            console.log(res)
+            if (res.code === 200) {
+              setTimeout(() => {
+                this.modal_loading = false
+                this.viewModal = false
+                this.viewForm.dataId=[ ]
+                this.$Message.success("发起成功!")
+                this.$refs.table.init()
+              }, 2000)
+            } else {
+              this.modal_loading = false
+              this.viewModal = false
+              this.$refs.table.init()
+              this.$Message.error(res.message)
+            }
+          },res=>{
+          this.modal_loading = false
+          this.viewModal = false
+          this.$refs.table.init()
+          this.$Message.error(res.message)
+        })}else {
+          this.$Modal.error({title: '提示信息', content: '请选择数据'})
+        }
       },
       //状态详情
       statusProject (){
