@@ -391,6 +391,11 @@
         selectMaterialListTwo:[],
         backupSelectMaterialList:[],
         backNoteArchiveList:[],
+        archiveUpdateArchiveList:[],
+        archiveUpdateList:{
+          type:'',
+          archive:''
+        },//存档资料更新list
         isTrue:'',
         backNoteArchive:{
           dataId:'',
@@ -1083,63 +1088,75 @@
 
         if(this.selectMaterialForm.dataIds[0] !== null){
           console.log("this.selectMaterialForm.dataIds[0]--------------不是空的")
+          console.log("this.selectMaterialList="+JSON.stringify(this.selectMaterialList))
           for (var j = 0; j < this.selectMaterialList.length; j++){
+            let isExist = 0
             for (var k = 0; k < this.archiveDatas.length; k++){
               let noteId = this.selectMaterialList[j].id
               let archiveId = this.archiveDatas[k].dataId
               // console.log("noteId="+noteId+" ----archiveId="+archiveId)
               if(noteId === archiveId){
-                console.log("当前节点有存在")
-                // let arQuantity = this.archiveDatas[k].quantity
-                // console.log("arQuantity="+arQuantity)
-                // this.selectMaterialList[j].indexQuantity = arQuantity-1
-                // if(index === 0){
-                //   this.selectMaterialList[j].archiveQuantity = arQuantity
-                //   this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
-                // }else{
-                //   for(var m = 0; m<index; m++){
-                //     for(var n = 0; n<this.archiveSettingNodes[m].data.length-1; n++){
-                //       if(noteId === this.archiveSettingNodes[m].data[n].dataId){
-                //         if(m === 0){
-                //           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
-                //         }else{
-                //           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
-                //         }
-                //       }
-                //     }
-                //   }
-                //   if(this.selectMaterialList[j].surplusQuantity === 0){
-                //     this.selectMaterialList[j].archiveQuantity = 0
-                //   }else{
-                //     this.selectMaterialList[j].archiveQuantity = arQuantity
-                //   }
-                // }
+                console.log("当前divlist中有存在该资料 j="+j+" k="+k)
+                let arQuantity = this.archiveDatas[k].quantity
+                this.selectMaterialList[j].indexQuantity = arQuantity-1
+                console.log("archiveQuantity="+this.archiveDatas[k].quantity)
+                if(index === 0){
+                  this.selectMaterialList[j].archiveQuantity = arQuantity
+                  this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
+                }else{
+                  for(var m = 0; m<index; m++){
+                    console.log("index="+index)
+                    for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){
+                      console.log("data.length="+this.archiveSettingNodes[m].data.length)
+                      console.log("m="+m+" n="+n)
+                      console.log("nodeId="+noteId+"data[n].dataId="+this.archiveSettingNodes[m].data[n].dataId)
+                      if(noteId === this.archiveSettingNodes[m].data[n].dataId){
+                        if(m === 0){
+                          console.log("m=0------总数量是="+this.selectMaterialList[j].quantity)
+                          console.log("m=0------tag数量是="+this.archiveSettingNodes[m].data[n].quantity)
+                          this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
+                          console.log("m=0------数量相减后剩余数量="+this.selectMaterialList[j].surplusQuantity)
+                        }else{
+                          console.log("m不等于0------剩余数量是="+this.selectMaterialList[j].surplusQuantity)
+                          console.log("tag数量是="+this.archiveSettingNodes[m].data[n].quantity)
+                          this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
+                          console.log("数量相减后剩余数量="+this.selectMaterialList[j].surplusQuantity)
+                        }
+                      }
+                    }
+                  }
+                  if(this.selectMaterialList[j].surplusQuantity === 0){
+                    this.selectMaterialList[j].archiveQuantity = 0
+                  }else{
+                    this.selectMaterialList[j].archiveQuantity = arQuantity
+                  }
+                }
               }else{
-                console.log("---------当前节点没有存在")
-                if(k === this.archiveDatas.length-1){
-                  console.log("kIndex是最后一个")
-                  // this.selectMaterialList[j].indexQuantity = 0
-                  // this.selectMaterialList[j].archiveQuantity = 0
-                  // if(index === 0){
-                  //   this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
-                  // }else{
-                  //   for(var l=0; l<index; l++){
-                  //     for(var m=0; m<this.archiveSettingNodes[l].data.length; m++){
-                  //       if (noteId === this.archiveSettingNodes[l].data[m].dataId) {
-                  //         if(l === 0){
-                  //           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[l].data[m].quantity
-                  //         }else{
-                  //           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity-this.archiveSettingNodes[l].data[m].quantity
-                  //         }
-                  //       }
-                  //     }
-                  //   }
-                  //   if(this.selectMaterialList[j].surplusQuantity === 0){
-                  //     this.selectMaterialList[j].archiveQuantity = 0
-                  //   }else{
-                  //     this.selectMaterialList[j].archiveQuantity = 1
-                  //   }
-                  // }
+                isExist=isExist+1
+                // console.log("isExist="+isExist+" j="+j+" k="+k)
+                if(isExist === this.archiveDatas.length){
+                  this.selectMaterialList[j].indexQuantity = 0
+                  if(index === 0){
+                    this.selectMaterialList[j].archiveQuantity = 1
+                    this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[l].quantity
+                  }else{
+                    for(var m = 0; m<index; m++){
+                      for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){
+                        if(noteId === this.archiveSettingNodes[m].data[n].dataId){
+                          if(m === 0){
+                            this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
+                          }else{
+                            this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
+                          }
+                        }
+                      }
+                    }
+                    if(this.selectMaterialList[j].surplusQuantity === 0){
+                      this.selectMaterialList[j].archiveQuantity = 0
+                    }else{
+                      this.selectMaterialList[j].archiveQuantity = 1
+                    }
+                  }
                 }
               }
             }
@@ -1295,7 +1312,36 @@
       },
       //存档资料确定
       editArchiveSubmit () {
-        
+        this.modal_loading = true
+        console.log("this.archiveSettingNodes="+JSON.stringify(this.archiveSettingNodes))
+        this.archiveUpdateArchiveList = this.archiveSettingNodes.map(item=>({
+          nodeId : item.nodeId,
+          data : item.data.map(it=>({
+            dataId : it.dataId,
+            quantity : it.quantity
+          }))
+        }))
+        console.log("this.archiveUpdateArchiveList="+JSON.stringify(this.archiveUpdateArchiveList))
+        this.archiveUpdateList.type = this.editArchiveForm.type
+        this.archiveUpdateList.archive = JSON.stringify(this.archiveUpdateArchiveList)
+        console.log(this.archiveUpdateList)
+        this.$request.post("/apiHost/api/processSetting/updateArchive",this.archiveUpdateList, res => {
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.editArchiveModal = false
+              this.modal_loading = false
+              this.$Message.success("更新存档资料成功！")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.editArchiveModal = false
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.editArchiveModal = false
+        })
       },
       //存档资料取消
       editArchiveCancel () {
