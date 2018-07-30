@@ -143,6 +143,7 @@
     },
     created(){
       this.head = headImg
+      this.username=sessionStorage.userName
       this.menuList = [
         {
           "id": 1,

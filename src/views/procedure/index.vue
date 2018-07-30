@@ -253,6 +253,14 @@
               </div>
             </FormItem>
           </Col>
+          <!-- <Col span="16" v-if="index === archiveSettingNodes.length-1">
+            <FormItem label="存档资料" >
+              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1;height: 36px"  >
+                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind">{{it.dataName}}{{it.quantity}}份</Tag>
+              </div>
+            </FormItem>
+          </Col> -->
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
@@ -322,8 +330,8 @@
               <Input v-model="item.roleName"  disabled />
             </FormItem>
           </Col>
-          <Col span="16" v-if="index !== viewSettingNodes.length-1">
-            <FormItem label="存档资料" >
+          <Col span="16" >
+            <FormItem label="存档资料" v-if="index !== viewSettingNodes.length-1">
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
                   border: 1px solid #dddee1;height: 36px" >
                 <Tag v-for="(it,ind) in viewSettingNodes[index].data" :key="ind"  v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
@@ -366,48 +374,49 @@
         }
       };
       return {
-        loading : true,
-        modal_loading : false,
-        editModal: false,
-        selectMaterialModal:false,
-        addMaterialModal:false,
-        editMaterialModal:false,
-        editArchiveModal:false,
-        viewModal : false,
-        viewSettingDatas :[],
-        viewSettingNodesOne :[],
-        viewSettingNodesTwo:[],
-        viewSettingNodes :[],
-        settingDatas:[],
-        settingNodes:[],
-        settingNodesLength:'',
-        archiveSetting:[],
-        archiveSettingTwo:[],
-        archiveSettingNodes:[],
-        archiveType:'',
-        archiveDatas:[],
-        noteArchiveList:[],
-        selectMaterialList:[],
-        selectMaterialListTwo:[],
-        backupSelectMaterialList:[],
-        backNoteArchiveList:[],
-        archiveUpdateArchiveList:[],
+        loading : true,//加载
+        modal_loading : false,//模态框加载
+        editModal: false,//编辑流程设置模态框
+        selectMaterialModal:false,//选择资料模态框
+        addMaterialModal:false,//新增资料模态框
+        editMaterialModal:false,//编辑资料模态框
+        editArchiveModal:false,//编辑流程存档资料模态框
+        viewModal : false,//流程设置详情模态框
+        editSelect:[],//编辑流程选择勾选
+        roleList:[],//角色list
+        viewSettingDatas :[],//流程设置详情数据
+        viewSettingNodesOne :[],//流程设置详情数据接收list
+        viewSettingNodesTwo:[],//流程设置详情数据中间转换list
+        viewSettingNodes :[],//流程设置详情显示list
+        settingDatas:[],//设置数据
+        settingNodes:[],//设置节点
+        settingNodesLength:'',//设置节点长度
+        archiveSetting:[],//存档资料接收list
+        archiveSettingTwo:[],//存档资料数据中间转换list
+        archiveSettingNodes:[],//存档资料数据list
+        archiveType:'',//存档资料类型
+        archiveDatas:[],//存档资料数据
+        noteArchiveList:[],//节点存档资料数据
+        selectMaterialList:[],//选择资料list
+        selectMaterialListTwo:[],//选择资料中间转换list
+        backupSelectMaterialList:[],//备份选择资料list
+        backNoteArchiveList:[],//回传资料list
+        archiveUpdateArchiveList:[],//更新存档资料list
         archiveUpdateList:{
           type:'',
           archive:''
         },//存档资料更新list
-        isTrue:'',
         backNoteArchive:{
           dataId:'',
           dataName:'',
           quantity:''
-        },
+        },//回传资料tag显示
         formItem: {
           type: '',
           startUpdateTime: '',
           endUpdateTime:'',
           page:1
-        },
+        },//搜索模块数据
         editForm:{
           type:'',
           name:'',
@@ -416,14 +425,14 @@
           overName:'',
           settingDatas: [],
           settingNodes: []
-        },
+        },//编辑模块数据
         addMaterialForm:{
           id : '',
           name:'',
           quantity:'',
           required:'1',
           archive:'1'
-        },
+        },//新增资料数据
         ruleAddMaterial:{
           name: [
             { required: true, message: '请输入资料名称', trigger: 'blur' }
@@ -432,14 +441,14 @@
             { validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
           ]
-        },
+        },//检测新增资料数据
         editMaterialForm:{
           id : '',
           name:'',
           quantity:'',
           required:'',
           archive:''
-        },
+        },//编辑资料数据
         ruleEditMaterial:{
           name: [
             { required: true, message: '请输入资料名称', trigger: 'blur' }
@@ -448,11 +457,11 @@
             { validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
           ]
-        },
+        },//检测编辑资料数据
         selectMaterialForm:{
           index: '',
           dataIds:[]
-        },
+        },//选择资料数据
         tableConfig:{
             url:"/apiHost/api/processSetting/list",
               columns:[
@@ -467,17 +476,12 @@
                   align:'center'
                 },
                 {
-                  title: '设置',
-                  key: 'setting',
-                  align:'center'
-                },
-                {
                   title: '更新时间',
                   key: 'updatedAt',
                   align:'center'
                 }
               ]
-        },
+        },//页面表格渲染
         editConfig:[
           {
             type:"selection",
@@ -515,7 +519,7 @@
             align:'center',
             width:70,
             render:(h,params)=>{
-              switch(params.row.required){
+              switch(params.row.archive){
                 case '0':
                   return h('div',"否")
                 case '1':
@@ -523,7 +527,7 @@
               }
             }
           }
-        ],
+        ],//编辑流程设置表格渲染
         viewConfig:[
           {
             title: '序号',
@@ -571,23 +575,11 @@
               }
             }
           }
-        ],
-        editSelect:[],
-        roleList:[],
-        divList:[
-          {
-            name:"发起人",
-            type:"1"
-          },
-          {
-            name:"关闭节点",
-            type:"2"
-          }
-        ],
+        ],//详情流程设置表格渲染
         divNode:{
           name:'',
           type:''
-        },
+        },//新增角色数据
         addDataForm:{
           id:'',
           sort:'',
@@ -595,15 +587,15 @@
           quantity:'',
           required:'',
           archive:''
-        },
+        },//新增资料数据
         editArchiveForm:{
           type:'',
           requirePurchase:[],
-        },
+        },//编辑资料数据
         viewForm :{
           type: '',
           requirePurchase: '1'
-        },
+        },//详情数据
         noteModal: false //弹窗
       }
     },
@@ -618,7 +610,7 @@
       }
     },
     mounted(){
-      this.getRoleList()
+      this.getRoleList()//获取角色
     },
     methods:{
       //获取角色
@@ -659,14 +651,6 @@
       //结束时间
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
-      },
-      ok () {
-        setTimeout(() => {
-          this.addModal = false
-        }, 2000)
-      },
-      cancel () {
-        this.$Message.info('你取消了操作')
       },
       //搜索提交
       searchSubmit(){
@@ -1138,7 +1122,7 @@
                   this.selectMaterialList[j].indexQuantity = 0
                   if(index === 0){
                     this.selectMaterialList[j].archiveQuantity = 1
-                    this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[l].quantity
+                    this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
                   }else{
                     for(var m = 0; m<index; m++){
                       for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){

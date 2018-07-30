@@ -78,7 +78,7 @@
             <FormItem label="协议书名称" >
               <Select placeholder="请选择协议书名称"  >
                  <!-- <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option> -->
-                 <Option>协议书申请</Option>
+                 <Option value="1">协议书申请</Option>
               </Select>
             </FormItem>
           </Col>

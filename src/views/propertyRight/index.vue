@@ -1060,7 +1060,7 @@
             let params = {
                 id
             }
-            this.$request.post("/apiHost/api/twoFileBill/cutOut",params,res=>{
+            this.$request.post("/apiHost/api/ownershipBill/cutOut",params,res=>{
               this.$Message.success("终止成功")
               this.$Modal.remove()
               this.$refs.table.init()
