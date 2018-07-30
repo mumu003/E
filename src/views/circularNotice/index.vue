@@ -162,18 +162,18 @@
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
-            <Steps :current="1">
-              <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
+            <Steps :current="Number(currentNodeId)">
+              <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
             </Steps>
             </Col>
             <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
             <Col span="24">
             <Timeline>
-              <TimelineItem v-for="(item,index) in rateList" :color="item.status === 0 ? 'red' : 'green'">
+              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
                 <p>{{item.createdAt}}</p>
                 <p v-if="index === 0">发起</p>
-                <p v-else-if="index === rateList.length-1">归档节点:完结</p>
-                <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
+                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
                 <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
               </TimelineItem>
             </Timeline>
@@ -205,16 +205,16 @@
         <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
         <Col span="24">
         <Steps :current="1">
-          <Step v-for="item in statuList" :title="item.name" :content="item.roleName" ></Step>
+          <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
         </Steps>
         </Col>
         <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
         <Col span="24">
         <Timeline>
-          <TimelineItem v-for="(item,index) in rateList" :color="item.status === 0 ? 'red' : 'green'">
+          <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
             <p>{{item.createdAt}}</p>
             <p v-if="index === 0">发起</p>
-            <p v-else-if="index === rateList.length-1">归档节点:完结</p>
+            <p v-else-if="index === historysList.length-1">归档节点:完结</p>
             <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
             <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
           </TimelineItem>
@@ -245,8 +245,8 @@
         loading:true,
         noteModal: false,
         isShow:false,//弹窗
-        statuList:[],
-        rateList:[],
+        nodesList:[],
+        historysList:[],
         currentNodeId:'',
         //定义数组
         buildingList:[],
@@ -877,22 +877,23 @@
           id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/deliveryNotice/status",params,res=>{
-            this.statuList = res.data.nodes.map(item => ({
+            this.nodesList = res.data.nodes.map(item => ({
               roleName: item.roleName,
               name: item.name,
               id:item.id
             }))
-            this.rateList =res.data.historys.map(item=> ({
+            this.historysList =res.data.historys.map(item=> ({
               createdAt:item.createdAt,
               status:item.status,
+              nodeName:item.nodeName,
               userName:item.userName
             }))
-            this.statuList.map((item,i)=> {
+            this.nodesList.map((item,i)=> {
               if(item.id === res.data.currentNodeId){
                 this.currentNodeId = i
               }
             })
-            console.log(this.statuList)
+            console.log(this.nodesList)
             this.statuModal = true
           }, res=>{
             this.$Message.error( res.message)
@@ -926,16 +927,6 @@
         this.$request.post("/apiHost/api/deliveryNotice/list",this.formItem, res => {
           console.log(res)
           if (res.code === 200) {
-            this.formItem={
-              status:'',
-              buildingName:'',
-              unitName:'',
-              roomNum:'',
-              customerName:'',
-              startUpdateTime:'',
-              endUpdateTime:'',
-              page:'1'
-            }
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
