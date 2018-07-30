@@ -78,7 +78,7 @@
             <FormItem label="协议书名称" >
               <Select placeholder="请选择协议书名称"  >
                  <!-- <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option> -->
-                 <Option>协议书申请</Option>
+                 <Option value="1">协议书申请</Option>
               </Select>
             </FormItem>
           </Col>
@@ -154,8 +154,16 @@
         </TabPane>
       </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="error" size="default" @click="viewReject">驳回</Button>
-        <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+        <Row>
+          <Col span="24">
+          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+          <span v-else-if="buttons.check" >
+              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+            </span>
+          </Col>
+        </Row>
       </div>
     </Modal>
 
@@ -198,7 +206,7 @@
   export default {
     data () {
       const validateNumber = (rule, value, callback) => {
-        let dot=value.indexOf(".");
+        let dot=value.indexOf(".")
         if (!value) {
             return callback(new Error('不能为空'));
         }
@@ -226,6 +234,7 @@
         noteModal:false,//弹窗
         nodesList:[],
         historysList:[],
+        buttons:{ },
         formItem: {
           status:'',
           startUpdateTime:'',
@@ -403,9 +412,43 @@
           this.viewForm.actualNum = res.data.actualNum
           this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
           this.viewForm.remark = res.data.remark
+          this.buttons.start = res.data.buttons.start
+          this.buttons.stop = res.data.buttons.stop
+          this.buttons.check = res.data.buttons.check
           this.viewModal = true
         },res=>{
           this.$Message.error("获取失败")
+        })
+      },
+      //发起
+      start(){
+        this.modal_loading = true
+        let params = {
+          id: this.viewForm.id,
+          dataId: this.viewForm.dataId
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.viewModal = false
+              this.viewForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.viewModal = false
+            this.$refs.table.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.viewModal = false
+          this.$refs.table.init()
+          this.$Message.error(res.message)
         })
       },
       viewPass(){
@@ -578,6 +621,7 @@
       },
       cancel () {
         this.$refs.table.init()
+        this.viewModal=false
         this.$Message.info('你取消了操作');
       },
       //搜索

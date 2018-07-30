@@ -134,6 +134,7 @@
         <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
+
     <Modal v-model="viewModal"
            width="800"
            @on-cancel="cancel"
@@ -190,8 +191,16 @@
         </TabPane>
       </Tabs>
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
-        <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
-        <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
+        <Row>
+          <Col span="24">
+          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+          <span v-else-if="buttons.check" >
+              <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
+              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
+            </span>
+          </Col>
+        </Row>
       </div>
     </Modal>
 
@@ -242,6 +251,7 @@
         buildingList:[],
         unitList:[],
         roomsList:[],
+        buttons:{ },
         searchTime:{
           tStartTime:"",
           tEndTime:"",
@@ -687,9 +697,42 @@
           this.viewForm.roomNum = res.data.roomNum
           this.viewForm.id=res.data.id
           this.viewForm.status=res.status
+          this.buttons.start = res.data.buttons.start
+          this.buttons.stop = res.data.buttons.stop
+          this.buttons.check = res.data.buttons.check
           this.viewData.push(res.data)
           this.viewModal = true
         },res=>{
+          this.$Message.error(res.message)
+        })
+      },
+      //发起
+      start(){
+        this.modal_loading = true
+        let params = {
+          id: this.viewForm.id
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/transfer/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.viewModal = false
+              this.viewForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.viewModal = false
+            this.$refs.table.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.viewModal = false
+          this.$refs.table.init()
           this.$Message.error(res.message)
         })
       },

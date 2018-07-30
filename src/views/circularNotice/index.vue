@@ -153,7 +153,7 @@
               资料
               </Col>
               <Col span="24">
-              <Table stripe border :columns="viewContract" :data="viewData"></Table>
+                <Table stripe border :columns="viewContract" :data="viewData"></Table>
               </Col>
             </Row>
           </Form>
@@ -182,8 +182,16 @@
         </TabPane>
       </Tabs>
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
-        <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
-        <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
+        <Row>
+          <Col span="24">
+          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+          <span v-else-if="buttons.check" >
+              <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
+              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
+            </span>
+          </Col>
+        </Row>
       </div>
     </Modal>
 
@@ -244,6 +252,7 @@
         buildingList:[],
         unitList:[],
         roomsList:[],
+        buttons:{ },
         searchTime:{
           tStartTime:"",
           tEndTime:"",
@@ -685,7 +694,7 @@
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
-      //查看
+      //审核
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -708,10 +717,43 @@
           this.viewForm.roomNum = res.data.roomNum
           this.viewForm.id=res.data.id
           this.viewForm.status=res.status
+          this.buttons.start = res.data.buttons.start
+          this.buttons.stop = res.data.buttons.stop
+          this.buttons.check = res.data.buttons.check
           this.viewData.push(res.data)
           this.viewModal = true
         },res=>{
           this.$Message.error( res.message)
+        })
+      },
+      //发起
+      start(){
+        this.modal_loading = true
+        let params = {
+          id: this.viewForm.id
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.viewModal = false
+              this.viewForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.viewModal = false
+            this.$refs.table.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.viewModal = false
+          this.$refs.table.init()
+          this.$Message.error(res.message)
         })
       },
       //驳回
