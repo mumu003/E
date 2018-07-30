@@ -14,7 +14,8 @@ module.exports = {
       '/apiHost': {
          // target: 'http://rap2api.taobao.org/app/mock/20325',
         //target: 'http://128.21.2.4:8080',
-        target: 'http://128.9.1.71:8080',
+        // target: 'http://128.9.1.71:8080',
+        target: 'http://128.9.7.47:8080',
         changeOrigin: true,
         pathRewrite: {
           '^/apiHost': ''
@@ -23,7 +24,8 @@ module.exports = {
     },
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    //host: 'localhost', // can be overwritten by process.env.HOST
+    host: '0.0.0.0',
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,

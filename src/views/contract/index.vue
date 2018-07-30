@@ -23,12 +23,12 @@
                 </Col>
                 <Col span="6">
                   <FormItem label="楼栋">
-                    <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" />
+                    <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" ></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem label="房间号">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
+                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
@@ -831,7 +831,6 @@
       },
       //发起
       start(){
-        if(this.viewselect[0] !== ''){
         this.modal_loading = true
         let params = {
           id: this.viewForm.id,
@@ -859,9 +858,7 @@
           this.viewModal = false
           this.$refs.table.init()
           this.$Message.error(res.message)
-        })}else {
-          this.$Modal.error({title: '提示信息', content: '请选择数据'})
-        }
+        })
       },
       //状态详情
       statusProject (){
