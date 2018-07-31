@@ -330,8 +330,19 @@
           </Row>
         </Form>
         <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="error" size="default" @click="viewReject">驳回</Button>
-          <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsOrderContract.check" >
+               <Button type="error" size="default" @click="viewReject">驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+            </span>
+            </Col>
+          </Row>
+
+
         </div>
       </Modal>
 
@@ -358,6 +369,7 @@ export default {
           buttonsTransfer:{ },
           buttonsTwoFile:{ },
           buttonsOwnership:{ },
+          buttonsOrderContract:{ },
           //提示标签
           badge:{
             contract:'',
@@ -375,6 +387,7 @@ export default {
               h('Badge', {
                 props: {
                   count: this.badge.contract,
+                  showZero:true
                 },
                 style:{
                   marginLeft:'5px'
@@ -389,6 +402,7 @@ export default {
               h('Badge', {
                 props: {
                   count: this.badge.sendFile,
+                  showZero:true
                 },
                 style:{
                   marginLeft:'5px'
@@ -403,6 +417,7 @@ export default {
               h('Badge', {
                 props: {
                   count: this.badge.deliveryNotice,
+                  showZero:true
                 },
                 style:{
                   marginLeft:'5px'
@@ -1679,7 +1694,7 @@ export default {
           this.contractForm.dataId = dataIdArray.toString();
           this.editContractModal = true
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editContractModal=true
       },
@@ -1706,13 +1721,13 @@ export default {
             this.modal_loading = false
             this.editContractModal = false
             this.$refs.contracttable.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editContractModal = false
           this.$refs.contracttable.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -1734,7 +1749,7 @@ export default {
               this.$refs.contracttable.init()
             }, 2000)
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
             this.editContractModal = false
             this.$refs.contracttable.init()
@@ -1742,7 +1757,7 @@ export default {
         },res=>{
           this.modal_loading = false
           this.editContractModal = false
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
@@ -1760,12 +1775,12 @@ export default {
             this.getAgency()
             this.$refs.contracttable.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.editContractModal = false
             this.$refs.contracttable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -1804,7 +1819,7 @@ export default {
           this.sendFileForm.dataId = dataIdArray.toString()
           this.editSendFileModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editSendFileModal=true;
       },
@@ -1831,13 +1846,13 @@ export default {
             this.modal_loading = false
             this.editSendFileModal = false
             this.$refs.sendFiletable.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editSendFileModal = false
           this.$refs.sendFiletable.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -1861,11 +1876,11 @@ export default {
           } else {
             this.editSendFileModal = false
             this.modal_loading = false
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.sendFiletable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.editSendFileModal = false
         })
@@ -1885,12 +1900,12 @@ export default {
             this.getAgency()
             this.$refs.sendFiletable.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.editSendFileModal = false
             this.$refs.sendFiletable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -1939,13 +1954,13 @@ export default {
             this.modal_loading = false
             this.editDeliveryNoticeModal = false
             this.$refs.deliveryNoticetable.init()
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editDeliveryNoticeModal = false
           this.$refs.deliveryNoticetable.init()
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -1969,11 +1984,11 @@ export default {
           } else {
             this.editDeliveryNoticeModal = false
             this.modal_loading = false
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.deliveryNoticetable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.editDeliveryNoticeModal = false
         })
@@ -1993,12 +2008,12 @@ export default {
             this.getAgency()
             this.$refs.deliveryNoticetable.init()
           } else {
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.editDeliveryNoticeModal = false
             this.$refs.deliveryNoticetable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -2047,13 +2062,13 @@ export default {
             this.modal_loading = false
             this.editTransferModal = false
             this.$refs.transfertable.init()
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editTransferModal = false
           this.$refs.transfertable.init()
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2077,11 +2092,11 @@ export default {
           } else {
             this.editTransferModal = false
             this.modal_loading = false
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.transfertable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.editTransferModal = false
         })
@@ -2101,12 +2116,12 @@ export default {
             this.getAgency()
             this.$refs.transfertable.init()
           } else {
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.editTransferModal = false
             this.$refs.transfertable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -2155,13 +2170,13 @@ export default {
             this.modal_loading = false
             this.editTwoFileModal = false
             this.$refs.twoFiletable.init()
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editTwoFileModal = false
           this.$refs.twoFiletable.init()
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2185,11 +2200,11 @@ export default {
           } else {
             this.editTwoFileModal = false
             this.modal_loading = false
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.twoFiletable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.editTwoFileModal = false
         })
@@ -2209,12 +2224,12 @@ export default {
             this.getAgency()
             this.$refs.twoFiletable.init()
           } else {
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.editTwoFileModal = false
             this.$refs.twoFiletable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -2280,13 +2295,13 @@ export default {
             this.modal_loading = false
             this.editOwnershipModal = false
             this.$refs.ownershiptable.init()
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.editOwnershipModal = false
           this.$refs.ownershiptable.init()
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2310,11 +2325,11 @@ export default {
           } else {
             this.editOwnershipModal = false
             this.modal_loading = false
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.ownershiptable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.editOwnershipModal = false
         })
@@ -2334,12 +2349,12 @@ export default {
             this.getAgency()
             this.$refs.ownershiptable.init()
           } else {
-            this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
             this.editOwnershipModal = false
             this.$refs.ownershiptable.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+        this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
 
@@ -2354,6 +2369,9 @@ export default {
           this.viewForm.applyNum = res.data.applyNum
           this.viewForm.actualNum = res.data.actualNum
           this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
+          this.buttonsOrderContract.start = res.data.buttons.start
+          this.buttonsOrderContract.stop = res.data.buttons.stop
+          this.buttonsOrderContract.check = res.data.buttons.check
           this.viewForm.remark = res.data.remark
           this.editOrderContractModal = true
         },res=>{
