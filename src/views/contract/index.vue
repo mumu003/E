@@ -459,7 +459,7 @@
           },
           {
             title: '资料数量',
-            key: 'quantity',
+            key: 'restQuantity',
             width:80
           },
           {
@@ -517,7 +517,7 @@
           },
           {
             title: '资料数量',
-            key: 'quantity',
+            key: 'restQuantity',
             width:80
           },
           {
@@ -776,6 +776,7 @@
             name: item.name,
             quantity: item.quantity,
             archive: item.archive,
+            restQuantity: item.restQuantity,
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))

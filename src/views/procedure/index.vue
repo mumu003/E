@@ -151,9 +151,9 @@
       <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
           <Col span="22" >
-          <FormItem label="资料名称"  prop="name">
-            <Input v-model="addMaterialForm.name" placeholder="请输入资料名称" :maxlength=50 style="width: 100%"></Input>
-          </FormItem>
+            <FormItem label="资料名称"  prop="name">
+              <Input v-model="addMaterialForm.name" placeholder="请输入资料名称" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
           </Col>
           <Col span="22" >
           <FormItem label="资料数量" prop="quantity">
@@ -248,8 +248,13 @@
           <Col span="16" v-if="index !== archiveSettingNodes.length-1">
             <FormItem label="存档资料" >
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)">
+                  border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
+                  v-if="archiveSettingNodes[index].data[0].dataId !== null">
                 <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
+              </div>
+              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
+                  v-if="archiveSettingNodes[index].data[0].dataId === null">
               </div>
             </FormItem>
           </Col>
@@ -380,6 +385,41 @@
             callback();
         }
       };
+      const validatorMaterialName = (rule, value, callback) =>{
+        let settingDatasLength = this.settingDatas.length;
+        let isExistence = false;
+        for(var i=0; i<settingDatasLength; i++){
+          if(value === this.settingDatas[i].name){
+            isExistence = true
+          }
+        }
+        if(isExistence){
+          return callback(new Error('资料已存在'));
+        }else{
+          callback();
+        }
+      };
+      const validatorMaterialNameEdit = (rule, value, callback) =>{
+        let settingDatasLength = this.settingDatas.length;
+        let editMaterialIndex = this.editSelect[0].sort-1;
+        let editMaterialIndexJia = editMaterialIndex+1;
+        let isExistence = 1;
+        for(var i=0; i<editMaterialIndex; i++){
+          if(value === this.settingDatas[i].name){
+            isExistence = isExistence +1
+          }
+        }
+        for(var i=editMaterialIndexJia; i<settingDatasLength; i++){
+          if(value === this.settingDatas[i].name){
+            isExistence = isExistence +1
+          }
+        }
+        if(isExistence > 1){
+          return callback(new Error('资料已存在'));
+        }else{
+          callback();
+        }
+      };
       return {
         loading : true,//加载
         modal_loading : false,//模态框加载
@@ -442,7 +482,8 @@
         },//新增资料数据
         ruleAddMaterial:{
           name: [
-            { required: true, message: '请输入资料名称', trigger: 'blur' }
+            { required: true, message: '请输入资料名称', trigger: 'blur' },
+            { validator:validatorMaterialName , trigger: 'change'}
           ],
           quantity: [
             { validator:validateNumber, trigger: 'blur' },
@@ -458,7 +499,8 @@
         },//编辑资料数据
         ruleEditMaterial:{
           name: [
-            { required: true, message: '请输入资料名称', trigger: 'blur' }
+            { required: true, message: '请输入资料名称', trigger: 'blur' },
+            { validator:validatorMaterialNameEdit , trigger: 'change'}
           ],
           quantity: [
             { validator:validateNumber, trigger: 'blur' },
@@ -938,18 +980,21 @@
           this.noteModal = true
           return false
         }
-        if (this.editSelect.length > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
+        console.log(this.editSelect)
+        let sortLength = this.editSelect.length
         this.$Modal.confirm({
           title: '操作提示',
           content: '确认删除?',
           loading: true,
           onOk: () => {
-            let dataIndex = this.editSelect[0].sort-1
-            this.settingDatas.splice(dataIndex,1)
+            for(var i=0; i<sortLength; i++){
+              console.log("i="+i)
+              let dataIndex = this.editSelect[i].sort-1-i
+              console.log("前this.settingDatas="+JSON.stringify(this.settingDatas))
+              console.log("dataIndex="+dataIndex)
+              this.settingDatas.splice(dataIndex,1)
+              console.log("删除后this.settingDatas="+JSON.stringify(this.settingDatas))
+            }
             this.$Message.success("删除成功")
             this.$Modal.remove()
             // this.$Vue.set(this.settingDatas,dataSort,obj)
