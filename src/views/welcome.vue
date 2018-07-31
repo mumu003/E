@@ -305,7 +305,7 @@
       </Modal>
 
       <Modal v-model="editOrderContractModal" title="编辑协议书申请">
-        <Form  :model="viewForm" :label-width="80">
+      <!--  <Form  :model="viewForm" :label-width="80">
           <Row>
             <Col span="24">
             <FormItem label="申请份数">
@@ -328,13 +328,44 @@
             </FormItem>
             </Col>
           </Row>
+        </Form>-->
+        <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
+          <Row>
+            <Col span="24">
+            <FormItem label="协议书名称">
+              <Select placeholder="请选择协议书名称" v-model="viewForm.name" :disabled="!buttonsOrderContract.start">
+                <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
+              </Select>
+            </FormItem>
+            </Col>
+            <Col span="24">
+            <FormItem label="申请份数">
+              <Input v-model="viewForm.applyNum" readonly ></Input>
+            </FormItem>
+            </Col>
+            <Col span="24">
+            <FormItem label="实发份数" prop="actualNum">
+              <Input v-model="viewForm.actualNum" @on-change="actualNumChange" ></Input>
+            </FormItem>
+            </Col>
+            <Col span="24">
+            <FormItem label="差异数量">
+              <Input v-model="viewForm.differenceNum" readonly></Input>
+            </FormItem>
+            </Col>
+            <Col span="24">
+            <FormItem label="备注说明">
+              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
+            </FormItem>
+            </Col>
+          </Row>
         </Form>
-        <div slot="footer" style="text-align:right;margin:0 auto;">
 
+        <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
             <Col span="24">
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
+            <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsOrderContract.check" >
                <Button type="error" size="default" @click="viewReject">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
@@ -361,6 +392,27 @@
 <script type="text/ecmascript-6">
 export default {
     data () {
+      const validateActualNum = (rule, value, callback) => {
+        let aNum= this.viewForm.applyNum
+        if (value>10) {
+          return callback(new Error('份数不能大于10'));
+        }else if(value < aNum){
+          return callback(new Error('实发份数不能小于申请分数'));
+        }else {
+          callback()
+        }
+      }
+      const validateNumber = (rule, value, callback) => {
+        let dot=value.indexOf(".")
+        if (!value) {
+          return callback(new Error('不能为空'));
+        }
+        if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
+          callback(new Error('只能为正整数'));
+        } else {
+          callback()
+        }
+      }
 
         return {
           buttons:{ },
@@ -370,6 +422,14 @@ export default {
           buttonsTwoFile:{ },
           buttonsOwnership:{ },
           buttonsOrderContract:{ },
+          agreementNameList:[
+            {name:"集团本部《商品房定购协议书》"},
+            {name:"银溪墅府C1地块商品房定购协议书"},
+            {name:"银溪墅府C2/C3地块商品房定购协议书"},
+            {name:"银溪墅府C4地块商品房定购协议书"},
+            {name:"银溪墅府C5地块商品房定购协议书"},
+            {name:"银溪墅府C6地块商品房定购协议书"}
+          ],
           //提示标签
           badge:{
             contract:'',
@@ -1594,12 +1654,18 @@ export default {
           //协议书申请
           viewForm: {
             id:'',
+            name:'',
             applyNum:'',
             actualNum:'',
             differenceNum:'',
-            remark:'',
-            dataId:[ ]
-          }
+            remark:''
+          },
+          ruleView : {
+            actualNum: [
+              { validator:validateNumber, trigger: 'blur' },
+              { validator:validateActualNum, trigger: 'blur' }
+            ]
+          },
 
         }
     },
@@ -2375,7 +2441,42 @@ export default {
           this.viewForm.remark = res.data.remark
           this.editOrderContractModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //发起
+      viewstart(){
+        this.modal_loading = true
+        let params = {
+          id: this.viewForm.id,
+          name: this.viewForm.name,
+          actualNum:this.viewForm.actualNum,
+          remark:this.viewForm.remark,
+          applyNum:this.viewForm.applyNum,
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editOrderContractModal = false
+              this.viewForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.orderContracttable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editOrderContractModal = false
+            this.$refs.orderContracttable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editOrderContractModal = false
+          this.$refs.orderContracttable.init()
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewPass(){
@@ -2392,6 +2493,7 @@ export default {
               this.modal_loading = false;
               this.editOrderContractModal = false
               this.$Message.success("审核通过")
+              this.getAgency()
               this.$refs.orderContracttable.init()
             }, 2000);
           } else {
@@ -2415,6 +2517,7 @@ export default {
             setTimeout(() => {
               this.editOrderContractModal = false
               this.$Message.success("审核驳回")
+              this.getAgency()
               this.$refs.orderContracttable.init()
             }, 2000);
           } else {

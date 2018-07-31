@@ -711,7 +711,7 @@
                   }, 2000)
                 } else {
                   this.modal_loading = false
-                  this.$Message.error(res.message)
+                  this.$Modal.error({title: '提示信息', content: res.message})
                 }
               }, res => {
                 this.modal_loading = false
@@ -752,7 +752,7 @@
           this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.viewData = []
       },
@@ -777,13 +777,13 @@
             this.modal_loading = false
             this.viewModal = false
             this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewOk (){
@@ -809,12 +809,12 @@
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
             this.viewModal = false
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.viewModal = false
         })
@@ -835,10 +835,10 @@
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusProject(){
@@ -876,7 +876,7 @@
           console.log(this.statuList)
           this.statusModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusOk () {
@@ -976,7 +976,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
