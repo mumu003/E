@@ -85,7 +85,9 @@
     </Row>
 
     <Modal v-model="addModal" title="新增合同备案"
-      width="800" >
+      width="800"
+      @on-cancel="addCancel"
+    >
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">

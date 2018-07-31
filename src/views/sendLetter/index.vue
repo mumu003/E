@@ -462,7 +462,7 @@
           },
           {
             title: '资料数量',
-            key: 'quantity',
+            key: 'restQuantity',
             width:80
           },
           {
@@ -520,7 +520,7 @@
           },
           {
             title: '资料数量',
-            key: 'quantity',
+            key: 'restQuantity',
             width:80
           },
           {
@@ -691,15 +691,13 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
-                this.$Message.error(res.message)
-                this.addModal = false
+                this.$Modal.error({title: '提示信息', content: res.message})
                 this.modal_loading = false
                 this.$refs.addForm.resetFields()
                 this.$refs.table.init()
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
-              this.addModal = false
               this.modal_loading = false
               this.$refs.addForm.resetFields()
               this.$refs.table.init()
