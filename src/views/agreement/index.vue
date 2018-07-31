@@ -77,13 +77,7 @@
           <Col span="24">
             <FormItem label="协议书名称" prop="name">
               <Select placeholder="请选择协议书名称" v-model="addForm.name">
-                 <!-- <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option> -->
-                <Option value="集团本部《商品房定购协议书》">集团本部《商品房定购协议书》</Option>
-                <Option value="银溪墅府C1地块商品房定购协议书">银溪墅府C1地块商品房定购协议书</Option>
-                <Option value="银溪墅府C2/C3地块商品房定购协议书">银溪墅府C2/C3地块商品房定购协议书</Option>
-                <Option value="银溪墅府C4地块商品房定购协议书">银溪墅府C4地块商品房定购协议书</Option>
-                <Option value="银溪墅府C5地块商品房定购协议书">银溪墅府C5地块商品房定购协议书</Option>
-                <Option value="银溪墅府C6地块商品房定购协议书">银溪墅府C6地块商品房定购协议书</Option>
+                <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
               </Select>
             </FormItem>
           </Col>
@@ -108,18 +102,20 @@
     <Modal v-model="viewModal"
       :loading="loading"
       @on-cancel="viewCancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="协议书申请审核" >
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
+        <TabPane label="协议书申请审核" name="name1">
           <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
             <Row>
               <Col span="24">
                 <FormItem label="协议书名称">
-                  <Input v-model="viewForm.name" readonly></Input>
+                  <Select placeholder="请选择协议书名称" v-model="viewForm.name" :disabled="!buttons.start">
+                    <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
+                  </Select>
                 </FormItem>
               </Col>
               <Col span="24">
                 <FormItem label="申请份数">
-                  <Input v-model="viewForm.applyNum" readonly></Input>
+                  <Input v-model="viewForm.applyNum" readonly ></Input>
                 </FormItem>
               </Col>
               <Col span="24">
@@ -140,7 +136,7 @@
             </Row>
           </Form>
         </TabPane>
-        <TabPane label="状态详情" >
+        <TabPane label="状态详情" name="name2">
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
@@ -165,13 +161,16 @@
       </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Row>
-          <Col span="24">
-            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
+          <Col span="24" v-if="viewTabs === 'name1'">
+            <Button size="default" @click="viewCancel" style="margin-right: 10px">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
               <Button type="error" size="default" @click="viewReject" >驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
+          </Col>
+          <Col span="24" v-if="viewTabs === 'name2'">
+            <Button size="default" @click="viewCancel" >取消</Button>
           </Col>
         </Row>
       </div>
@@ -233,6 +232,16 @@
             callback();
         }
       };
+      const validateActualNum = (rule, value, callback) => {
+        let aNum= this.viewForm.applyNum
+        if (value>10) {
+            return callback(new Error('份数不能大于10'));
+        }else if(value < aNum){
+            return callback(new Error('实发份数不能小于申请分数'));
+        }else {
+            callback();
+        }
+      };
       return {
         isFirst: false,
         isChange: false,
@@ -244,8 +253,17 @@
         statusModal:false,
         noteModal:false,//弹窗
         currentNodeId:'',
+        viewTabs:'name1',
         nodesList:[],
         historysList:[],
+        agreementNameList:[
+          {name:"集团本部《商品房定购协议书》"},
+          {name:"银溪墅府C1地块商品房定购协议书"},
+          {name:"银溪墅府C2/C3地块商品房定购协议书"},
+          {name:"银溪墅府C4地块商品房定购协议书"},
+          {name:"银溪墅府C5地块商品房定购协议书"},
+          {name:"银溪墅府C6地块商品房定购协议书"}
+        ],
         buttons:{ },
         formItem: {
           status:'',
@@ -345,7 +363,7 @@
         ruleView : {
           actualNum: [
             { validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { validator:validateActualNum, trigger: 'blur' }
           ]
         }
       }
@@ -362,7 +380,12 @@
     },
     methods: {
       changs(){
-        this.statusProject()
+        if(this.viewTabs === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusProject()
+        }
       },
       //开始时间
       getStartDate(startDate){
@@ -385,22 +408,20 @@
               console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
-                  this.modal_loading = false;
-                  this.addModal = false;
-                  this.addForm={
-                    applyNum: '',
-                    remark: ''
-                  }
+                  this.modal_loading = false
+                  this.addModal = false
+                  this.$refs.addForm.resetFields()
+                  this.addForm.remark = ''
                   this.$Message.success("新增成功！")
                   this.$refs.table.init()
                 }, 2000);
               } else {
                 this.$Modal.error({title: '提示信息', content: res.message})
-                this.modal_loading = false;
+                this.modal_loading = false
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
-              this.modal_loading = false;
+              this.modal_loading = false
             })
           }
         })
@@ -432,13 +453,14 @@
             id : res.data.id,
             name : res.data.name,
             applyNum : res.data.applyNum,
-            actualNum : res.data.actualNum,
+            actualNum : res.data.actualNum.toString(),
             differenceNum : res.data.actualNum - res.data.applyNum,
             remark : res.data.remark
           }
           this.buttons.start = res.data.buttons.start
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
+          this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -708,8 +730,13 @@
       viewCancel () {
         this.$refs.table.init()
         this.viewModal = false 
-        this.$refs.viewForm.resetFields();
-        this.$Message.info('你取消了操作');
+        this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.$refs.viewForm.resetFields()
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
       },
       //搜索
       searchSubmit(){

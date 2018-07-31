@@ -78,7 +78,7 @@
             <Col>
             <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
             <Button type="primary" icon="edit" @click="viewProject">审核</Button>
-            <!--<Button type="primary" icon="clipboard" @click="statuProject">状态详情</Button>-->
+            <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
             <Button type="error" icon="close"　@click="endProject">终止</Button>
             <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
@@ -135,12 +135,9 @@
       </div>
     </Modal>
 
-    <Modal v-model="viewModal"
-           width="800"
-           @on-cancel="cancel"
-    >
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="水电过户审核"  >
+    <Modal v-model="viewModal" width="800" @on-cancel="viewCancel" >
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
+        <TabPane label="水电过户审核" name="name1">
           <Form  :model="viewForm" :label-width="100">
             <Row>
               <Col span="8">
@@ -167,7 +164,7 @@
             </Row>
           </Form>
         </TabPane>
-        <TabPane label="状态详情" >
+        <TabPane label="状态详情" name="name2">
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
@@ -192,13 +189,16 @@
       </Tabs>
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
         <Row>
-          <Col span="24">
-          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
-          <span v-else-if="buttons.check" >
+          <Col span="24" v-if="viewTabs === 'name1'">
+            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
               <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
               <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
             </span>
+          </Col>
+          <Col span="24" v-if="viewTabs === 'name2'">
+            <Button size="default" @click="viewCancel" >取消</Button>
           </Col>
         </Row>
       </div>
@@ -247,6 +247,7 @@
       return {
         modal_loading: false, //延迟
         isFirst: false,
+        viewTabs:'name1',
         //定义数组
         buildingList:[],
         unitList:[],
@@ -507,7 +508,12 @@
     },
     methods: {//对象
       changs() {
-        this.statuProject()
+        if(this.viewTabs === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusProject()
+        }
       },
       //获取楼栋列表
       getBuildings() {
@@ -702,10 +708,21 @@
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
           this.viewData.push(res.data)
+          this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
           this.$Message.error(res.message)
         })
+      },
+      viewCancel(){
+        this.$refs.table.init()
+        this.viewModal = false 
+        this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
       },
       //发起
       start(){
@@ -838,7 +855,7 @@
         })
       },
       //状态详情
-      statuProject(){
+      statusProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true

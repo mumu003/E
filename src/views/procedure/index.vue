@@ -896,7 +896,7 @@
           id : this.editSelect[0].id,
           sort : this.editSelect[0].sort,
           name : this.editSelect[0].name,
-          quantity : this.editSelect[0].quantity,
+          quantity : this.editSelect[0].quantity.toString(),
           required : this.editSelect[0].required,
           archive : this.editSelect[0].archive
         }

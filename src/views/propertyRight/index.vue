@@ -193,9 +193,9 @@
 
     <Modal v-model="viewModal"
       width="800"
-      @on-cancel="cancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="产权办理审核"  >
+      @on-cancel="viewCancel">
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
+        <TabPane label="产权办理审核" name="name1">
           <Form  :model="viewForm" :label-width="80">
             <Row>
               <Col span="8">
@@ -228,7 +228,7 @@
             </Row>
           </Form>
         </TabPane>
-        <TabPane label="状态详情" >
+        <TabPane label="状态详情" name="name2">
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
@@ -253,13 +253,16 @@
       </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Row>
-          <Col span="24">
-          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
-          <span v-else-if="buttons.check" >
+          <Col span="24" v-if="viewTabs === 'name1'">
+            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
               <Button type="error" size="default" @click="viewReject" >驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
+          </Col>
+          <Col span="24" v-if="viewTabs === 'name2'">
+            <Button size="default" @click="viewCancel" >取消</Button>
           </Col>
         </Row>
       <!--  <Button type="error" size="default" @click="viewReject">驳回</Button>
@@ -358,6 +361,7 @@
         statusModal: false,
         noteModal: false,
         currentNodeId: '',
+        viewTabs:'name1',
         buildingList: [],
         unitList: [],
         roomsList: [],
@@ -672,7 +676,12 @@
     },
     methods: {
       changs(){
-        this.statusProject()
+        if(this.viewTabs === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusProject()
+        }
       },
       numSort: function (a,b) {
         return a.count-b.count;
@@ -1034,10 +1043,21 @@
             }
           }
           this.viewForm.dataId = dataIdArray.toString()
+          this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
+      },
+      viewCancel () {
+        this.$refs.table.init()
+        this.viewModal = false 
+        this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
       },
       //发起
       start(){

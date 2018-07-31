@@ -136,9 +136,9 @@
     <Modal v-model="viewModal"
       width="800"
       :loading="loading"
-      @on-cancel="cancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="两书审核"  >
+      @on-cancel="viewCancel">
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
+        <TabPane label="两书审核" name="name1">
           <Form  :model="viewForm" :label-width="110">
             <Row>
               <Col span="8">
@@ -165,7 +165,7 @@
             </Row>
           </Form>
         </TabPane>
-        <TabPane label="状态详情" >
+        <TabPane label="状态详情" name="name2">
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
@@ -190,13 +190,16 @@
       </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Row>
-          <Col span="24">
-          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
-          <span v-else-if="buttons.check" >
+          <Col span="24" v-if="viewTabs === 'name1'">
+            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
               <Button type="error" size="default" @click="viewReject" >驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
+          </Col>
+          <Col span="24" v-if="viewTabs === 'name2'">
+            <Button size="default" @click="viewCancel" >取消</Button>
           </Col>
         </Row>
       </div>
@@ -258,6 +261,7 @@
         nodesList:[],
         historysList:[],
         currentNodeId:'', //状态详情节点
+        viewTabs:'name1',
         buttons:{ },
         formItem: {
           status: '',
@@ -561,7 +565,12 @@
     },
     methods: {
       changs(){
-        this.statusProject()
+        if(this.viewTabs === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusProject()
+        }
       },
       //开始时间
       getStartDate(startDate){
@@ -740,6 +749,7 @@
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
           this.viewData.push(res.data)
+          this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
           this.$Message.error(res.message)
@@ -945,10 +955,15 @@
           this.twoNewbooksmodal = false;
         }, 2000);
       },
-      cancel () {
+      viewCancel () {
         this.$refs.table.init()
         this.viewModal = false
-        this.$Message.info('你取消了操作');
+        this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
       },
       //搜索
       searchSubmit(){
@@ -968,13 +983,15 @@
         })
       },
       searchCancel(){
-        this.formItem.status=""
-        this.formItem.customerName=""
-        this.formItem.phone=""
-        this.formItem.buildingId=""
-        this.formItem.roomNum=""
-        this.formItem.startUpdateTime=""
-        this.formItem.endUpdateTime=""
+        this.formItem={
+          status:'',
+          customerName:'',
+          phone:'',
+          buildingId:'',
+          roomNum:'',
+          startUpdateTime:'',
+          endUpdateTime:''
+        }
         this.$refs.table.init();
       },
       // 提示窗关闭

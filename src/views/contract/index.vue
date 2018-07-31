@@ -129,10 +129,9 @@
     </Modal>
 
     <Modal v-model="viewModal" width="800"
-           @on-cancel="cancel"
-    >
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="合同备案审核"  >
+      @on-cancel="viewCancel" >
+      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
+        <TabPane label="合同备案审核" name="name1">
           <Form  :model="viewForm" :label-width="100">
             <Row>
               <Col span="8">
@@ -165,7 +164,7 @@
             </Row>
           </Form>
         </TabPane>
-        <TabPane label="状态详情" >
+        <TabPane label="状态详情" name="name2">
           <Row>
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;">处理进度</Col>
             <Col span="24">
@@ -188,16 +187,18 @@
           </Row>
         </TabPane>
       </Tabs>
-
       <div slot="footer" style="text-align:right;">
         <Row>
-          <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+          <Col span="24" v-if="viewTabs === 'name1'">
+            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
               <Button type="error" size="default" @click="viewReject" >驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
+          </Col>
+          <Col span="24" v-if="viewTabs === 'name2'">
+            <Button size="default" @click="viewCancel" >取消</Button>
           </Col>
         </Row>
       </div>
@@ -259,6 +260,7 @@
         nodesList: [],  //处理进度
         historysList: [],  //进度详情
         currentNodeId:'', //状态详情节点
+        viewTabs:'name1',
         checkButton:false,
         startButton:false,
         buttons:{ },
@@ -554,7 +556,12 @@
     },
     methods: {
       changs(){
-        this.statusProject ()
+        if(this.viewTabs === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusProject ()
+        }
       },
       //开始时间
       getStartDate(startDate){
@@ -778,7 +785,8 @@
               dataIdArray.push(this.viewData[i].id);
             }
           }
-          this.viewForm.dataId = dataIdArray.toString();
+          this.viewForm.dataId = dataIdArray.toString()
+          this.viewTabs = 'name1'
           this.viewModal = true
           console.log(' this.buttons.start:'+ this.buttons.start)
 
@@ -1000,10 +1008,15 @@
         },200)
       },
       //取消操作
-      cancel () {
+      viewCancel () {
         this.viewModal=false
         this.$refs.table.init()
         this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
       },
       //提示窗关闭
       closes () {
