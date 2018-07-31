@@ -134,18 +134,18 @@
           <Row>
         <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
         <Col span="24">
-        <Steps :current="1">
+        <Steps :current="Number(currentNodeId)">
           <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
         </Steps>
         </Col>
         <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
         <Col span="24">
         <Timeline>
-          <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
+          <TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
             <p>{{item.createdAt}}</p>
             <p v-if="index === 0">发起</p>
-            <p v-else-if="index === historysList.length-1">归档节点:完结</p>
-            <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
+            <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+            <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
             <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
           </TimelineItem>
         </Timeline>
@@ -232,6 +232,7 @@
         editModal:false,
         statusModal:false,
         noteModal:false,//弹窗
+        currentNodeId:'',
         nodesList:[],
         historysList:[],
         buttons:{ },
@@ -530,9 +531,10 @@
           this.historysList =res.data.historys.map(item=> ({
             createdAt:item.createdAt,
             status:item.status,
+            nodeName:item.nodeName,
             userName:item.userName
           }))
-          this.historysList.map((item,i)=>{
+          this.nodesList.map((item,i)=>{
             if(item.id===res.data.currentNodeId){
               this.currentNodeId = i
             }
@@ -631,11 +633,6 @@
         this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
           console.log(res)
           if (res.code === 200) {
-            this.formItem={
-              status:'',
-              startUpdateTime:'',
-              endUpdateTime:'',
-            }
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()

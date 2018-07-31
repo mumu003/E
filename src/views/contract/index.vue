@@ -972,16 +972,6 @@
         this.$request.post("/apiHost/api/contractBill/list",this.formItem, res => {
           console.log(res)
           if (res.code === 200) {
-            this.formItem={
-              status:'',
-              buildingName:'',
-              unitName:'',
-              roomNum:'',
-              customerName:'',
-              startUpdateTime:'',
-              endUpdateTime:'',
-              page:'1'
-            }
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()

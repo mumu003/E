@@ -427,7 +427,7 @@
           settingNodes: []
         },//编辑模块数据
         addMaterialForm:{
-          id : '',
+          id : 0,
           name:'',
           quantity:'',
           required:'1',
@@ -787,6 +787,7 @@
             this.settingNodes = res.data.settingNodes
             this.settingNodesLength = this.settingNodes.length-1
             this.editModal = true
+            this.modal_loading = false
           }, res=>{
             this.$Message.error("获取失败")
           })
