@@ -72,13 +72,18 @@
     <Modal v-model="addModal" title="新增协议书申请"
       :loading="loading"
       @on-cancel="addCancel">
-      <Form  ref="addForm" :model="addForm" :label-width="80" :rules="ruleAdd">
+      <Form  ref="addForm" :model="addForm" :label-width="90" :rules="ruleAdd">
         <Row>
           <Col span="24">
-            <FormItem label="协议书名称" >
-              <Select placeholder="请选择协议书名称"  >
+            <FormItem label="协议书名称" prop="name">
+              <Select placeholder="请选择协议书名称" v-model="addForm.name">
                  <!-- <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option> -->
-                 <Option value="1">协议书申请</Option>
+                <Option value="集团本部《商品房定购协议书》">集团本部《商品房定购协议书》</Option>
+                <Option value="银溪墅府C1地块商品房定购协议书">银溪墅府C1地块商品房定购协议书</Option>
+                <Option value="银溪墅府C2/C3地块商品房定购协议书">银溪墅府C2/C3地块商品房定购协议书</Option>
+                <Option value="银溪墅府C4地块商品房定购协议书">银溪墅府C4地块商品房定购协议书</Option>
+                <Option value="银溪墅府C5地块商品房定购协议书">银溪墅府C5地块商品房定购协议书</Option>
+                <Option value="银溪墅府C6地块商品房定购协议书">银溪墅府C6地块商品房定购协议书</Option>
               </Select>
             </FormItem>
           </Col>
@@ -102,11 +107,16 @@
 
     <Modal v-model="viewModal"
       :loading="loading"
-      @on-cancel="cancel">
+      @on-cancel="viewCancel">
       <Tabs type="card"  @on-click="changs" style="margin-top: 12px">
-        <TabPane label="协议书申请审核"  >
-          <Form  ref="viewForm"  :model="viewForm" :label-width="80" :rules="ruleView">
+        <TabPane label="协议书申请审核" >
+          <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
             <Row>
+              <Col span="24">
+                <FormItem label="协议书名称">
+                  <Input v-model="viewForm.name" readonly></Input>
+                </FormItem>
+              </Col>
               <Col span="24">
                 <FormItem label="申请份数">
                   <Input v-model="viewForm.applyNum" readonly></Input>
@@ -132,33 +142,33 @@
         </TabPane>
         <TabPane label="状态详情" >
           <Row>
-        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-        <Col span="24">
-        <Steps :current="Number(currentNodeId)">
-          <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
-        </Steps>
-        </Col>
-        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-        <Col span="24">
-        <Timeline>
-          <TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
-            <p>{{item.createdAt}}</p>
-            <p v-if="index === 0">发起</p>
-            <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-            <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
-            <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-          </TimelineItem>
-        </Timeline>
-        </Col>
-      </Row>
+            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+            <Col span="24">
+              <Steps :current="Number(currentNodeId)">
+                <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
+              </Steps>
+            </Col>
+            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+            <Col span="24">
+              <Timeline>
+                <TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+                  <p>{{item.createdAt}}</p>
+                  <p v-if="index === 0">发起</p>
+                  <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                  <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
+                  <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                </TimelineItem>
+              </Timeline>
+            </Col>
+          </Row>
         </TabPane>
       </Tabs>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Row>
           <Col span="24">
-          <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
-          <span v-else-if="buttons.check" >
+            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
               <Button type="error" size="default" @click="viewReject" >驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
@@ -225,6 +235,7 @@
       };
       return {
         isFirst: false,
+        isChange: false,
         loading: true,
         modal_loading: false, //延迟
         addModal: false,
@@ -280,19 +291,24 @@
                   }
                 },
                 {
+                  title: '协议书名称',
+                  key: 'name',
+                  width:250
+                },
+                {
                   title: '申请份数',
                   key: 'applyNum',
-                  width:250
+                  width:150
                 },
                 {
                   title: '实发份数',
                   key: 'actualNum',
-                  width:250
+                  width:150
                 },
                 {
                   title: '差异份数',
                   key: '',
-                  width:250,
+                  width:150,
                   render:(h,params)=>{
                     return h('div',params.row.actualNum  - params.row.applyNum)
                   }
@@ -305,10 +321,14 @@
               ],
         },
         addForm: {
+          name:'',
           applyNum:'',
           remark:'',
         },
         ruleAdd: {
+          name: [
+            { required: true, message: '请选择协议书名称', trigger: 'change' }
+          ],
           applyNum: [
             { validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
@@ -316,6 +336,7 @@
         },
         viewForm: {
           id:'',
+          name:'',
           applyNum:'',
           actualNum:'',
           differenceNum:'',
@@ -386,11 +407,10 @@
       },
       addCancel () {
         this.$Message.info('你取消了操作')
-        this.addModal = false;
-        this.addForm={
-          applyNum: '',
-          remark: ''
-        }
+        this.addModal = false
+        this.$refs.addForm.resetFields()
+        this.addForm.remark = ''
+        this.$refs.table.init()
       },
       viewProject () {
         if (this.selected_count === 0) {
@@ -404,21 +424,24 @@
           return false
         }
         let params = {
-            id: this.selection[0].id
+          id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
-            console.log(res.data)
-          this.viewForm.id = res.data.id
-          this.viewForm.applyNum = res.data.applyNum
-          this.viewForm.actualNum = res.data.actualNum
-          this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
-          this.viewForm.remark = res.data.remark
+          console.log(res.data)
+          this.viewForm={
+            id : res.data.id,
+            name : res.data.name,
+            applyNum : res.data.applyNum,
+            actualNum : res.data.actualNum,
+            differenceNum : res.data.actualNum - res.data.applyNum,
+            remark : res.data.remark
+          }
           this.buttons.start = res.data.buttons.start
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
           this.viewModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //发起
@@ -426,7 +449,10 @@
         this.modal_loading = true
         let params = {
           id: this.viewForm.id,
-          dataId: this.viewForm.dataId
+          name: this.viewForm.name,
+          actualNum:this.viewForm.actualNum,
+          remark:this.viewForm.remark,
+          applyNum:this.viewForm.applyNum,
         }
         console.log(params)
         this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
@@ -443,69 +469,127 @@
             this.modal_loading = false
             this.viewModal = false
             this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewPass(){
-        this.$refs.viewForm.validate((valid) => {
-          if (valid) {
-            this.modal_loading = true;
-            let params = {
-                id: this.viewForm.id,
-                actualNum: this.viewForm.actualNum,
-                status:1
-            }
-            console.log(params)
-            this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-                console.log(res)
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.modal_loading = false;
-                  this.viewModal = false
-                  this.$Message.success("审核通过")
-                  this.$refs.table.init()
-                }, 2000);
-              } else {
-                this.modal_loading = false
-                this.$Modal.error({title: '提示信息', content: res.message})
+        if(this.isChange === true){
+          this.$refs.viewForm.validate((valid) => {
+            if (valid) {
+              this.modal_loading = true
+              let params = {
+                  id: this.viewForm.id,
+                  actualNum: this.viewForm.actualNum,
+                  status:1
               }
-            },res=>{
-              this.$Modal.error({title: '提示信息', content: res.message})
-            })
+              console.log(params)
+              this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+                console.log(res)
+                if (res.code === 200) {
+                  setTimeout(() => {
+                    this.modal_loading = false
+                    this.viewModal = false
+                    this.isChange = false
+                    this.$Message.success("审核通过")
+                    this.$refs.table.init()
+                  }, 2000);
+                } else {
+                  this.modal_loading = false
+                  this.$Modal.error({title: '提示信息', content: res.message})
+                }
+              },res=>{
+                this.$Modal.error({title: '提示信息', content: res.message})
+                this.modal_loading = false
+              })
+            }
+          })
+        }else{
+          this.modal_loading = true
+          let params = {
+              id: this.viewForm.id,
+              actualNum: this.viewForm.actualNum,
+              status:1
           }
-        })
+          console.log(params)
+          this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+            console.log(res)
+            if (res.code === 200) {
+              setTimeout(() => {
+                this.modal_loading = false
+                this.viewModal = false
+                this.$Message.success("审核通过")
+                this.$refs.table.init()
+              }, 2000);
+            } else {
+              this.modal_loading = false
+              this.$Modal.error({title: '提示信息', content: res.message})
+            }
+          },res=>{
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
+          })
+        }
       },
       viewReject(){
-        this.$refs.viewForm.validate((valid) => {
-          if (valid) {
-            let params = {
-                id: this.viewForm.id,
-                actualNum: this.viewForm.actualNum,
-                status:0
-            }
-            console.log(params)
-            this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-                console.log(res)
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.viewModal = false
-                  this.$Message.success("审核驳回")
-                  this.$refs.table.init()
-                }, 2000);
-              } else {
-                this.$Modal.error({title: '提示信息', content: res.message})
+        if(this.isChange === true){
+          this.$refs.viewForm.validate((valid) => {
+            if (valid) {
+              let params = {
+                  id: this.viewForm.id,
+                  actualNum: this.viewForm.actualNum,
+                  status:0
               }
-            },res=>{
-              this.$Modal.error({title: '提示信息', content: res.message})
-            })
+              console.log(params)
+              this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+                console.log(res)
+                if (res.code === 200) {
+                  setTimeout(() => {
+                    this.viewModal = false
+                    this.isChange = false
+                    this.$Message.success("审核驳回")
+                    this.$refs.table.init()
+                  }, 2000);
+                } else {
+                  this.$Modal.error({title: '提示信息', content: res.message})
+                  this.isChange = false
+                }
+              },res=>{
+                this.$Modal.error({title: '提示信息', content: res.message})
+                this.isChange = false
+              })
+            }
+          })
+        }else{
+          let params = {
+            id: this.viewForm.id,
+            actualNum: this.viewForm.actualNum,
+            status:0
           }
-        })
+          console.log(params)
+          this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+            console.log(res)
+            if (res.code === 200) {
+              setTimeout(() => {
+                this.viewModal = false
+                this.isChange = false
+                this.$Message.success("审核驳回")
+                this.$refs.table.init()
+              }, 2000);
+            } else {
+              this.$Modal.error({title: '提示信息', content: res.message})
+              this.isChange = false
+            }
+          },res=>{
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.isChange = false
+          })
+        }
       },
       statusProject(){
         if (this.selected_count === 0) {
@@ -621,9 +705,10 @@
           this.statusModal = false;
         }, 2000);
       },
-      cancel () {
+      viewCancel () {
         this.$refs.table.init()
-        this.viewModal=false
+        this.viewModal = false 
+        this.$refs.viewForm.resetFields();
         this.$Message.info('你取消了操作');
       },
       //搜索
@@ -656,6 +741,7 @@
       },
       //差异份数
       actualNumChange(){
+        this.isChange = true
         this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
       },
       // 提示窗关闭

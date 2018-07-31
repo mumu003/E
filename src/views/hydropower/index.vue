@@ -672,6 +672,7 @@
           }
         }else{
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
+          this.modal_loading = false
         }
       },
       //审核

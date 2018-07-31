@@ -318,9 +318,16 @@
                 <Checkbox v-model="viewForm.requirePurchase" label="1" disabled>是</Checkbox>
             </FormItem>
           </Col>
-          <Col span="24">
+          <Col span="24" v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
             <FormItem label="资料">
               <Table border stripe :columns="viewConfig" :data="viewSettingDatas" ></Table>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="8">
+            <FormItem label="流程终止角色" >
+              <Input v-model="viewForm.overName"  disabled />
             </FormItem>
           </Col>
         </Row>
@@ -330,7 +337,7 @@
               <Input v-model="item.roleName"  disabled />
             </FormItem>
           </Col>
-          <Col span="16" >
+          <Col span="16" v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
             <FormItem label="存档资料" v-if="index !== viewSettingNodes.length-1">
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
                   border: 1px solid #dddee1;height: 36px" >
@@ -577,6 +584,7 @@
           }
         ],//详情流程设置表格渲染
         divNode:{
+          id:0,
           name:'',
           type:''
         },//新增角色数据
@@ -594,7 +602,8 @@
         },//编辑资料数据
         viewForm :{
           type: '',
-          requirePurchase: '1'
+          requirePurchase: '1',
+          overName:''
         },//详情数据
         noteModal: false //弹窗
       }
@@ -659,12 +668,6 @@
         this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
           console.log(res)
           if (res.code === 200) {
-            this.formItem={
-              type:'',
-              startUpdateTime: '',
-              endUpdateTime: '',
-              page:1
-            },
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
@@ -701,6 +704,7 @@
         this.$request.post("/apiHost/api/processSetting/view",params,res=>{
           console.log(res)
           this.viewForm.type = res.data.type
+          this.viewForm.overName = res.data.overName
           this.viewSettingDatas = res.data.settingDatas.map(item=>({
             sort: item.sort,
             required: item.required,
@@ -851,7 +855,7 @@
             console.log(this.addMaterialForm)
             console.log("push前"+this.settingDatas.length)
             this.addDataForm={
-              id:'',
+              id:0,
               sort:this.settingDatas.length+1,
               name:this.addMaterialForm.name,
               quantity:this.addMaterialForm.quantity,
@@ -959,6 +963,7 @@
           console.log(divlength)
           let divNodeNum = divlength+1
           this.divNode={
+            id:0,
             name:"节点"+divNodeNum,
             type:"3"
           }
@@ -977,6 +982,13 @@
           loading: true,
           onOk: () => {
             this.settingNodes.splice(index,1)
+            console.log("this.settingNodes="+JSON.stringify(this.settingNodes))
+            let indexLength = this.settingNodes.length-1
+            for(var i=index; i<indexLength; i++){
+              console.log("i=index   i="+i+"    indexLength="+indexLength)
+              let indexJia = i+1
+              this.settingNodes[i].name = '节点'+indexJia
+            }
             this.$Message.success("删除成功")
             this.$Modal.remove()
             // this.$Vue.set(this.settingDatas,dataSort,obj)

@@ -671,7 +671,7 @@
       },
       //新增确定
       addSubmit () {
-        this.modal_loading = true;
+        this.modal_loading = true
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$request.post("/apiHost/api/sendFileBill/add",this.addForm, res => {
@@ -699,6 +699,7 @@
             })
           } else {
             this.$Modal.error({title: '提示信息', content: "请选择房间号"})
+            this.modal_loading = false
           }
         })
       },
