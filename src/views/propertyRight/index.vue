@@ -262,11 +262,16 @@
             </span>
           </Col>
         </Row>
-      <!--  <Button type="error" size="default" @click="viewReject">驳回</Button>
-        <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>-->
       </div>
     </Modal>
 
+    <Modal v-model="endModal" title="终止产权办理"
+      :loading="loading"
+      @on-ok="endSubmit"
+      @on-cancel="searchCancel"
+    >
+      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
+    </Modal>
    <!-- <Modal v-model="statusModal" title="状态详情"
       width="800"
       :loading="loading"
@@ -350,6 +355,7 @@
         isFirst: false,
         loading: true,
         modal_loading: false, //延迟
+        endModal:false,
         addModal: false,
         batchModal: false,
         batchHouseModal:false,
@@ -884,7 +890,7 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
-                this.$Message.error(res.message)
+                this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
@@ -927,15 +933,21 @@
       batchHouseSubmit(){
         //1.通过房间查找到状态为true的房间ID,然后用,拼接起来
       //  2.提交到前一个模态框
-        this.selectedStaff="";
+        this.selectedStaff=""
+        this.selectRoomNum=""
         this.floorsList.map(item=> {
           item.rooms.filter(it=> it.show).map(it => {
             if (it.status=='ToDo') {
               this.selectedStaff=this.selectedStaff+","+it.roomId
               this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
+              this.selectRoomNum=this.selectRoomNum+","+it.roomNum
+              if (this.selectRoomNum.substr(0,1)==',') {
+                this.selectRoomNum=this.selectRoomNum.substr(1);
+              }
             }
           })
         })
+        this.batchForm.buildingName=this.batchForm.buildingName+ this.selectRoomNum
         this.batchHouseModal=false
       },
       batchSubmit(){ //  将得到的数值传给后台调用接口
@@ -960,7 +972,7 @@
             this.modal_loading = false
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
         })
         }else {
@@ -1036,7 +1048,7 @@
           this.viewForm.dataId = dataIdArray.toString()
           this.viewModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //发起
@@ -1061,13 +1073,13 @@
             this.modal_loading = false
             this.viewModal = false
             this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewPass(){
@@ -1091,7 +1103,7 @@
             this.modal_loading = false
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
         })
       },
@@ -1108,10 +1120,10 @@
               this.$Message.success("审核驳回")
               this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusProject(){
@@ -1149,7 +1161,7 @@
           console.log(this.nodesList)
           this.statusModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusOk () {
@@ -1168,10 +1180,12 @@
           this.noteModal = true
           return false
         }
-        this.$Modal.confirm({
+        this.endModal=true
+
+        /*this.$Modal.confirm({
           title: '操作提示',
           content: '是否确认终止该流程，终止后将无法继续该流程?',
-          loading: true,
+          loading: this.loading,
           onOk: () => {
             let id = this.selection.map(item=>item.id).toString()
             let params = {
@@ -1182,11 +1196,27 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("终止失败")
-              this.$refs.table.init()
-              this.$Modal.remove()
+              this.$Modal.error({title: '提示信息', content: res.message})
+              this.loading=false
+             /!* this.$refs.table.init()
+              this.$Modal.remove()*!/
             })
           }
+        })*/
+      },
+      endSubmit(){
+        let id = this.selection.map(item=>item.id).toString()
+        let params = {
+          id
+        }
+        this.$request.post("/apiHost/api/ownershipBill/cutOut",params,res=>{
+          this.$Message.success("终止成功")
+         this.endModal=false
+          this.$refs.table.init()
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.loading=false
+          this.$refs.table.init()
         })
       },
       deleteProject(){
@@ -1209,7 +1239,7 @@
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error("删除失败")
+              this.$Modal.error({title: '提示信息', content: res.message})
               this.$Modal.remove()
             })
           }

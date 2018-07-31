@@ -642,6 +642,11 @@
             this.addForm.idCard = res.data.idNumber
             this.addForm.phone = res.data.phone
             this.addForm.address = res.data.address
+            this.addForm.area = res.data.area
+            this.addForm.contract = res.data.contractNumber
+            this.addForm.signDate = res.data.signDate
+            this.addForm.payExpireDate = res.data.payExpire
+            this.addForm.deliveryDate = res.data.deliveryDate
             console.log(res)
             this.addData = []
             this.addData.push(res.data)
