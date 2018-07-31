@@ -701,9 +701,11 @@
                     this.$refs.table.init()
                   }, 2000)
                 } else {
+                  this.modal_loading = false
                   this.$Message.error(res.message)
                 }
               }, res => {
+                this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
               })
             }else{
@@ -740,7 +742,7 @@
           this.viewData.push(res.data)
           this.viewModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
         this.viewData = []
       },

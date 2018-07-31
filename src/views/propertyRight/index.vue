@@ -224,8 +224,6 @@
               <Col span="24">
               <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
               <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-
-             <!-- <Table stripe border :columns="viewContract" :data="viewData"></Table>-->
               </Col>
             </Row>
           </Form>

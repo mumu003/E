@@ -62,13 +62,24 @@
             资料
             </Col>
             <Col span="24">
-              <Table stripe border :columns="viewContract" :data="contractData" ref="ref"></Table>
+              <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
+              <Table stripe border v-else :columns="viewContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
+              <!--<Table stripe border :columns="viewContract" :data="contractData" ref="ref"></Table>-->
             </Col>
           </Row>
         </Form>
         <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="error" size="default" @click="ContractReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="ContractPass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttons.check" >
+              <Button type="error" size="default" @click="ContractReject" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="ContractPass">通过</Button>
+            </span>
+            </Col>
+          </Row>
+
         </div>
       </Modal>
 
@@ -100,13 +111,25 @@
             资料
             </Col>
             <Col span="24">
-              <Table stripe border :columns="viewSendFile" :data="sendFileData" ref="ref"></Table>
+              <Table stripe border v-if="buttonsSend.start" :columns="viewStartSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
+              <Table stripe border v-else :columns="viewSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
+              <!--<Table stripe border :columns="viewSendFile" :data="sendFileData" ref="ref"></Table>-->
             </Col>
           </Row>
         </Form>
         <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="error" size="default" @click="sendFileReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsSend.check" >
+              <Button type="error" size="default" @click="sendFileReject" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>
+            </span>
+            </Col>
+          </Row>
+         <!-- <Button type="error" size="default" @click="sendFileReject" >驳回</Button>
+          <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>-->
         </div>
       </Modal>
 
@@ -139,8 +162,16 @@
           </Row>
         </Form>
         <div slot="footer" style="text-align: right;">
-          <Button type="error" size="default" @click="deliveryNoticeReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsDelivery.check" >
+               <Button type="error" size="default" @click="deliveryNoticeReject" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass">通过</Button>
+            </span>
+            </Col>
+          </Row>
         </div>
       </Modal>
 
@@ -173,8 +204,16 @@
           </Row>
         </Form>
         <div slot="footer" style="text-align: right;">
-          <Button type="error" size="default" @click="transferReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsTransfer.check" >
+               <Button type="error" size="default" @click="transferReject" >驳回</Button>
+               <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass">通过</Button>
+            </span>
+            </Col>
+          </Row>
         </div>
       </Modal>
 
@@ -207,8 +246,17 @@
           </Row>
         </Form>
         <div slot="footer" style="text-align: right;">
-          <Button type="error" size="default" @click="twoFileReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsTwoFile.check" >
+              <Button type="error" size="default" @click="twoFileReject" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass">通过</Button>
+            </span>
+            </Col>
+          </Row>
+
         </div>
       </Modal>
 
@@ -236,13 +284,23 @@
             资料
             </Col>
             <Col span="24">
-            <Table stripe border :columns="viewOwnership" :data="ownershipData"></Table>
+              <Table stripe border v-if="buttonsOwnership.start" :columns="viewStartOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
+              <Table stripe border v-else :columns="viewOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
+              <!--<Table stripe border :columns="viewOwnership" :data="ownershipData"></Table>-->
             </Col>
           </Row>
         </Form>
         <div slot="footer" style="text-align: right;">
-          <Button type="error" size="default" @click="ownershipReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass">通过</Button>
+          <Row>
+            <Col span="24">
+            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
+            <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading">发起</Button>
+            <span v-else-if="buttonsOwnership.check" >
+               <Button type="error" size="default" @click="ownershipReject" >驳回</Button>
+               <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass">通过</Button>
+            </span>
+            </Col>
+          </Row>
         </div>
       </Modal>
 
@@ -294,6 +352,12 @@ export default {
     data () {
 
         return {
+          buttons:{ },
+          buttonsSend:{ },
+          buttonsDelivery:{ },
+          buttonsTransfer:{ },
+          buttonsTwoFile:{ },
+          buttonsOwnership:{ },
           //提示标签
           badge:{
             contract:'',
@@ -879,19 +943,22 @@ export default {
 
               },
               {
-                title: '业主姓名',
-                key: 'customerName',
+                title: '申请份数',
+                key: 'applyNum',
                 width:150
               },
               {
-                title: '楼栋',
-                key:'buildingName',
+                title: '实发份数',
+                key:'actualNum',
                 width:150,
               },
               {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
+                title: '差异份数',
+                key: '',
+                width:150,
+                render:(h,params)=>{
+                  return h('div',params.row.actualNum  - params.row.applyNum)
+                }
               },
               {
                 title: '更新时间',
@@ -940,9 +1007,68 @@ export default {
             buildingName:'',
             unitName:'',
             roomNum:'',
-            customerName:''
+            customerName:'',
+            dataId:[ ]
           },
           //合同备案模态框表格
+          viewStartContract: [
+            {
+              type:"selection",
+              key:'_disabled',
+              width:0
+            },
+            {
+              type:"selection",
+              key:'_checked',
+              width:100
+            },
+            {
+              title: '序号',
+              key: 'sort',
+              width:80
+            },
+            {
+              title: '状态',
+              key: 'required',
+              width:100,
+              render:(h,params)=>{
+                switch(parseInt(params.row.required)){
+                  case 0:
+                    return h('div',"非必填")
+                  case 1:
+                    return h('div',"必填")
+                }
+              }
+            },
+            {
+              title: '资料名称',
+              key: 'name',
+              width:250
+            },
+            {
+              title: '资料数量',
+              key: 'quantity',
+              width:80
+            },
+            {
+              title: '存档',
+              key: 'archive',
+              width:80,
+              render:(h,params)=>{
+                switch(parseInt(params.row.archive)){
+                  case 0:
+                    return h('div',"不存档")
+                  case 1:
+                    return h('div',"存档")
+                }
+              }
+            },
+            {
+              title: '存档份数',
+              key: 'archiveQuantity',
+              width:80
+            }
+          ],
           viewContract: [
             {
               title: '序号',
@@ -999,8 +1125,67 @@ export default {
             buildingName:'',
             unitName:'',
             roomNum:'',
-            customerName:''
+            customerName:'',
+            dataId:[ ]
           },
+          viewStartSendFile: [
+            {
+              type:"selection",
+              key:'_disabled',
+              width:0
+            },
+            {
+              type:"selection",
+              key:'_checked',
+              width:100
+            },
+            {
+              title: '序号',
+              key: 'sort',
+              width:80
+            },
+            {
+              title: '状态',
+              key: 'required',
+              width:100,
+              render:(h,params)=>{
+                switch(parseInt(params.row.required)){
+                  case 0:
+                    return h('div',"非必填")
+                  case 1:
+                    return h('div',"必填")
+                }
+              }
+            },
+            {
+              title: '资料名称',
+              key: 'name',
+              width:250
+            },
+            {
+              title: '资料数量',
+              key: 'quantity',
+              width:80
+            },
+            {
+              title: '存档',
+              key: 'archive',
+              width:80,
+              render:(h,params)=>{
+                switch(parseInt(params.row.archive)){
+                  case 0:
+                    return h('div',"不存档")
+                  case 1:
+                    return h('div',"存档")
+                }
+              }
+            },
+            {
+              title: '存档份数',
+              key: 'archiveQuantity',
+              width:80
+            }
+          ],
           viewSendFile: [
             {
               title: '序号',
@@ -1057,7 +1242,8 @@ export default {
             unitName:'',
             roomNum:'',
             status:'',
-            id:''
+            id:'',
+            dataId:[ ]
           },
           viewDeliveryNotice: [
             {
@@ -1140,7 +1326,8 @@ export default {
             roomNum:'',
             customerName:'',
             status:'',
-            id:''
+            id:'',
+            dataId:[ ]
           },
           transferData: [],
           viewTransfer: [
@@ -1198,7 +1385,8 @@ export default {
             roomNum:'',
             customerName:'',
             status:'',
-            id:''
+            id:'',
+            dataId:[ ]
           },
           twoFileData: [],
           viewTwoFile: [
@@ -1277,9 +1465,68 @@ export default {
             roomNum:'',
             customerName:'',
             status:'',
-            id:''
+            id:'',
+            dataId:[ ]
           },
           ownershipData: [],
+          viewStartOwnership: [
+            {
+              type:"selection",
+              key:'_disabled',
+              width:0
+            },
+            {
+              type:"selection",
+              key:'_checked',
+              width:100
+            },
+            {
+              title: '序号',
+              key: 'sort',
+              width: 80
+            },
+            {
+              title: '状态',
+              key: 'required',
+              width: 100,
+              render:(h,params)=>{
+                switch(parseInt(params.row.required)){
+                  case 0:
+                    return h('div',"非必填")
+                  case 1:
+                    return h('div',"必填")
+                }
+              }
+            },
+            {
+              title: '资料名称',
+              key: 'name',
+              width: 250
+            },
+            {
+              title: '资料数量',
+              key: 'quantity',
+              width: 80
+            },
+            {
+              title: '存档',
+              key: 'archive',
+              width: 80,
+              render:(h,params)=>{
+                switch(parseInt(params.row.archive)){
+                  case 0:
+                    return h('div',"不存档")
+                  case 1:
+                    return h('div',"存档")
+                }
+              }
+            },
+            {
+              title: '存档份数',
+              key: 'archiveQuantity',
+              width: 80
+            }
+          ],
           viewOwnership: [
             {
               title: '序号',
@@ -1336,6 +1583,7 @@ export default {
             actualNum:'',
             differenceNum:'',
             remark:'',
+            dataId:[ ]
           }
 
         }
@@ -1344,6 +1592,33 @@ export default {
       this.getAgency()
     },
     methods: {
+      cancel(){
+        this.editContractModal = false
+        this.editDeliveryNoticeModal=false
+        this.editOrderContractModal=false
+        this.editOwnershipModal=false
+        this.editSendFileModal=false
+        this.editTransferModal=false
+        this.editTwoFileModal=false
+        this.$refs.contracttable.init()
+        this.$refs.sendFiletable.init()
+        this.$refs.deliveryNoticetable.init()
+        this.$refs.transfertable.init()
+        this.$refs.twoFiletable.init()
+        this.$refs.ownershiptable.init()
+        this.$refs.orderContracttable.init()
+      },
+      //审核表单选项
+      viewselect(selection){
+        this.contractForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      },
+      viewselect2(selection){
+        this.sendFileForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      },
+      viewselect3(selection){
+        this.ownershipForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      },
+
       changs(){
         this.$refs.contracttable.init()
         this.$refs.sendFiletable.init()
@@ -1381,12 +1656,64 @@ export default {
           this.contractForm.unitName = res.data.unitName
           this.contractForm.roomNum = res.data.roomNum
           this.contractForm.customerName = res.data.customerName
-          this.contractData = res.data.details
+          this.buttons.start = res.data.buttons.start
+          this.buttons.stop = res.data.buttons.stop
+          this.buttons.check = res.data.buttons.check
+          this.contractData = res.data.details.map(item=>({
+            _disabled: item.required === '1' ?  true : false,
+            _checked: item.required === '1' ?  true : false,
+            sort: item.sort,
+            required: item.required,
+            name: item.name,
+            quantity: item.quantity,
+            archive: item.archive,
+            archiveQuantity: item.archiveQuantity,
+            id:item.id
+          }))
+          var dataIdArray = new Array();
+          for (var i = 0; i < this.contractData.length; i++) {
+            if(this.contractData[i].required === '1'){
+              dataIdArray.push(this.contractData[i].id);
+            }
+          }
+          this.contractForm.dataId = dataIdArray.toString();
           this.editContractModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Message.error(res.message)
         })
         this.editContractModal=true
+      },
+      //发起
+      ContractStart(){
+        this.modal_loading = true
+        let params = {
+          id: this.contractForm.id,
+          dataId: this.contractForm.dataId
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/contractBill/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editContractModal = false
+              this.contractForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.contracttable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editContractModal = false
+            this.$refs.contracttable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editContractModal = false
+          this.$refs.contracttable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       ContractPass(){
@@ -1403,6 +1730,7 @@ export default {
               this.modal_loading = false
               this.editContractModal = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.contracttable.init()
             }, 2000)
           } else {
@@ -1429,6 +1757,7 @@ export default {
           if (res.code === 200) {
             this.editContractModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.contracttable.init()
           } else {
             this.$Message.error(res.message)
@@ -1452,12 +1781,64 @@ export default {
           this.sendFileForm.unitName = res.data.unitName
           this.sendFileForm.roomNum = res.data.roomNum
           this.sendFileForm.customerName = res.data.customerName
-          this.sendFileData = res.data.details
+          this.buttonsSend.start = res.data.buttons.start
+          this.buttonsSend.stop = res.data.buttons.stop
+          this.buttonsSend.check = res.data.buttons.check
+          this.sendFileData = res.data.details.map(item=>({
+            _disabled: item.required === '1' ?  true : false,
+            _checked: item.required === '1' ?  true : false,
+            sort: item.sort,
+            required: item.required,
+            name: item.name,
+            quantity: item.quantity,
+            archive: item.archive,
+            archiveQuantity: item.archiveQuantity,
+            id:item.id
+          }))
+          var dataIdArray = new Array();
+          for (var i = 0; i < this.sendFileData.length; i++) {
+            if(this.sendFileData[i].required === '1'){
+              dataIdArray.push(this.sendFileData[i].id);
+            }
+          }
+          this.sendFileForm.dataId = dataIdArray.toString()
           this.editSendFileModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
         this.editSendFileModal=true;
+      },
+      //发起
+      sendFileStart(){
+        this.modal_loading = true
+        let params = {
+          id: this.sendFileForm.id,
+          dataId: this.sendFileForm.dataId
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.sendFileForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.editSendFileModal = false
+              this.$refs.sendFiletable.init()
+              this.getAgency()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editSendFileModal = false
+            this.$refs.sendFiletable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editSendFileModal = false
+          this.$refs.sendFiletable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       sendFilePass(){
@@ -1474,6 +1855,7 @@ export default {
               this.editSendFileModal = false
               this.modal_loading = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.sendFiletable.init()
             }, 2000)
           } else {
@@ -1500,6 +1882,7 @@ export default {
           if (res.code === 200) {
             this.editSendFileModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.sendFiletable.init()
           } else {
             this.$Message.error(res.message)
@@ -1513,6 +1896,7 @@ export default {
 
       //编辑交房通知
       editDeliveryNoticeList(){
+        this.deliveryNoticeData=[ ]
         let params = {
           id: this.editDeliveryNoticeId
         }
@@ -1523,12 +1907,46 @@ export default {
           this.deliveryNoticeForm.roomNum = res.data.roomNum
           this.deliveryNoticeForm.id=res.data.id
           this.deliveryNoticeForm.status=res.status
+          this.buttonsDelivery.start = res.data.buttons.start
+          this.buttonsDelivery.stop = res.data.buttons.stop
+          this.buttonsDelivery.check = res.data.buttons.check
           this.deliveryNoticeData.push(res.data)
           this.editDeliveryNoticeModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
         this.editDeliveryNoticeModal=true
+      },
+      //发起
+      deliveryNoticestart(){
+        this.modal_loading = true
+        let params = {
+          id: this.deliveryNoticeForm.id
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editDeliveryNoticeModal = false
+              this.deliveryNoticeForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.deliveryNoticetable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editDeliveryNoticeModal = false
+            this.$refs.deliveryNoticetable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editDeliveryNoticeModal = false
+          this.$refs.deliveryNoticetable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       deliveryNoticePass(){
@@ -1545,6 +1963,7 @@ export default {
               this.editDeliveryNoticeModal = false
               this.modal_loading = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.deliveryNoticetable.init()
             }, 2000)
           } else {
@@ -1571,6 +1990,7 @@ export default {
           if (res.code === 200) {
             this.editDeliveryNoticeModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.deliveryNoticetable.init()
           } else {
             this.$Message.error(res.message)
@@ -1584,6 +2004,7 @@ export default {
 
       //编辑水电过户
       editTransferList(){
+        this.transferData=[ ]
         let params = {
           id: this.editTransferId
         }
@@ -1594,12 +2015,46 @@ export default {
           this.transferForm.roomNum = res.data.roomNum
           this.transferForm.id=res.data.id
           this.transferForm.status=res.status
+          this.buttonsTransfer.start = res.data.buttons.start
+          this.buttonsTransfer.stop = res.data.buttons.stop
+          this.buttonsTransfer.check = res.data.buttons.check
           this.transferData.push(res.data)
           this.editTransferModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
         this.editTransferModal=true
+      },
+      //发起
+      transferStart(){
+        this.modal_loading = true
+        let params = {
+          id: this.transferForm.id
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/transfer/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editTransferModal = false
+              this.transferForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.transfertable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editTransferModal = false
+            this.$refs.transfertable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editTransferModal = false
+          this.$refs.transfertable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       transferPass(){
@@ -1616,6 +2071,7 @@ export default {
               this.editTransferModal = false
               this.modal_loading = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.transfertable.init()
             }, 2000)
           } else {
@@ -1642,6 +2098,7 @@ export default {
           if (res.code === 200) {
             this.editTransferModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.transfertable.init()
           } else {
             this.$Message.error(res.message)
@@ -1655,6 +2112,7 @@ export default {
 
       //编辑两书
       editTwoFileList(){
+        this.twoFileData=[ ]
         let params = {
           id: this.editTwoFileId
         }
@@ -1665,12 +2123,46 @@ export default {
           this.twoFileForm.roomNum = res.data.roomNum
           this.twoFileForm.id=res.data.id
           this.twoFileForm.status=res.status
+          this.buttonsTwoFile.start = res.data.buttons.start
+          this.buttonsTwoFile.stop = res.data.buttons.stop
+          this.buttonsTwoFile.check = res.data.buttons.check
           this.twoFileData.push(res.data)
           this.editTwoFileModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
         this.editTwoFileModal=true
+      },
+      //发起
+      twoFilestart(){
+        this.modal_loading = true
+        let params = {
+          id: this.twoFileForm.id
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/twoFileBill/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editTwoFileModal = false
+              this.twoFileForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.twoFiletable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editTwoFileModal = false
+            this.$refs.twoFiletable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editTwoFileModal = false
+          this.$refs.twoFiletable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       twoFilePass(){
@@ -1687,6 +2179,7 @@ export default {
               this.editTwoFileModal = false
               this.modal_loading = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.twoFiletable.init()
             }, 2000)
           } else {
@@ -1708,11 +2201,12 @@ export default {
           status:'0'
         }
         console.log(params)
-        this.$request.post("/apiHost/api/transfer/check",params,res=>{
+        this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
             this.editTwoFileModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.twoFiletable.init()
           } else {
             this.$Message.error(res.message)
@@ -1736,12 +2230,64 @@ export default {
           this.ownershipForm.roomNum = res.data.roomNum
           this.ownershipForm.id=res.data.id
           this.ownershipForm.status=res.status
-          this.ownershipData= res.data.details
+          this.buttonsOwnership.start = res.data.buttons.start
+          this.buttonsOwnership.stop = res.data.buttons.stop
+          this.buttonsOwnership.check = res.data.buttons.check
+          this.ownershipData= res.data.details.map(item=>({
+            _disabled: item.required === '1' ?  true : false,
+            _checked: item.required === '1' ?  true : false,
+            sort: item.sort,
+            required: item.required,
+            name: item.name,
+            quantity: item.quantity,
+            archive: item.archive,
+            archiveQuantity: item.archiveQuantity,
+            id:item.id
+          }))
+          var dataIdArray = new Array();
+          for (var i = 0; i < this.ownershipData.length; i++) {
+            if(this.ownershipData[i].required === '1'){
+              dataIdArray.push(this.ownershipData[i].id);
+            }
+          }
+          this.ownershipForm.dataId = dataIdArray.toString()
           this.editOwnershipModal = true
         },res=>{
           this.$Message.error("获取失败")
         })
         this.editOwnershipModal=true
+      },
+      //发起
+      ownershipStart(){
+        this.modal_loading = true
+        let params = {
+          id: this.ownershipForm.id,
+          dataId: this.ownershipForm.dataId
+        }
+        console.log(params)
+        this.$request.post("/apiHost/api/ownershipBill/start",params,res=>{
+          console.log(res)
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.editOwnershipModal = false
+              this.ownershipForm.dataId=[ ]
+              this.$Message.success("发起成功!")
+              this.getAgency()
+              this.$refs.ownershiptable.init()
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.editOwnershipModal = false
+            this.$refs.ownershiptable.init()
+            this.$Message.error(res.message)
+          }
+        },res=>{
+          this.modal_loading = false
+          this.editOwnershipModal = false
+          this.$refs.ownershiptable.init()
+          this.$Message.error(res.message)
+        })
       },
       //通过
       ownershipPass(){
@@ -1758,6 +2304,7 @@ export default {
               this.editOwnershipModal = false
               this.modal_loading = false
               this.$Message.success("审核通过!")
+              this.getAgency()
               this.$refs.ownershiptable.init()
             }, 2000)
           } else {
@@ -1784,6 +2331,7 @@ export default {
           if (res.code === 200) {
             this.editOwnershipModal = false
             this.$Message.success("审核驳回!")
+            this.getAgency()
             this.$refs.ownershiptable.init()
           } else {
             this.$Message.error(res.message)
