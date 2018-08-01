@@ -193,7 +193,7 @@
             <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" @click="viewReject(viewForm.id)">驳回</Button>
+              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading">驳回</Button>
               <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
             </span>
           </Col>
@@ -254,6 +254,7 @@
     data () {
       return {
         modal_loading: false, //延迟
+        reject_loading:false,
         isFirst: false,
         addModal:false,
         viewModal:false,
@@ -750,15 +751,25 @@
       },
       //驳回
       viewReject(id){
+        this.reject_loading = true
         let params = {
           id,
           status:0
         }
         this.$request.post("/apiHost/api/transfer/check",params,res=>{
-          this.$Message.success("审核驳回!")
-          this.viewModal = false
-          this.$refs.table.init()
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.reject_loading = false
+              this.$Message.success("审核驳回!")
+              this.viewModal = false
+              this.$refs.table.init()
+            }, 2000);
+          } else {
+            this.reject_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
         },res=>{
+          this.reject_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },

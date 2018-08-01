@@ -194,7 +194,7 @@
             <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
           </Col>
@@ -257,6 +257,7 @@
         isShow:false,
         loading: true,
         modal_loading: false, //延迟
+        reject_loading: false,
         addModal: false,
         viewModal: false,
         statusModal: false,
@@ -573,6 +574,7 @@
       }
     },
     methods: {
+      //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -788,14 +790,10 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -822,18 +820,17 @@
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
-            this.viewModal = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.viewModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       viewReject(){
+        this.reject_loading = true
         let params = {
             id: this.viewForm.id,
             status:2
@@ -844,13 +841,16 @@
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
+              this.reject_loading = false
               this.$Message.success("审核驳回")
               this.$refs.table.init()
             }, 2000);
           } else {
+            this.reject_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
+          this.reject_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },

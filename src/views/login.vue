@@ -96,21 +96,22 @@
                     closeable: true
                   })
                 })*/
-            this.$request.post('/apiHost/api/user/login',this.form,
-              res => {
-                  console.log(res)
-                  if (res.code === 200) {
-                    sessionStorage.setItem("token", res.data.token)
-                    sessionStorage.setItem("userId", res.data.userId)
-                    sessionStorage.setItem("userName",res.data.userName)
-                    sessionStorage.setItem("curProjectId", res.data.curProjectId)
-                    sessionStorage.setItem("orgId",res.data.orgId)
-                    this.$router.push("/")
-                    this.$Message.success("登录成功！")
-                  } else {
-                    this.$Message.error(res.message)
-                  }
-                })
+              this.$request.post('/apiHost/api/user/login',this.form,res => {
+                console.log(res)
+                if (res.code === 200) {
+                  sessionStorage.setItem("token", res.data.token)
+                  sessionStorage.setItem("userId", res.data.userId)
+                  sessionStorage.setItem("userName",res.data.userName)
+                  sessionStorage.setItem("curProjectId", res.data.curProjectId)
+                  sessionStorage.setItem("orgId",res.data.orgId)
+                  this.$router.push("/")
+                  this.$Message.success("登录成功！")
+                } else {
+                  this.$Modal.error({title: '提示信息', content: res.message})
+                }
+              },res=>{
+                this.$Modal.error({title: '提示信息', content: res.message})
+              })
             }
           }
         })

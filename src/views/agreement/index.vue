@@ -165,7 +165,7 @@
             <Button size="default" @click="viewCancel" style="margin-right: 10px">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
           </Col>
@@ -255,6 +255,7 @@
         isChange: false,
         loading: true,
         modal_loading: false, //延迟
+        reject_loading:false,
         addModal: false,
         viewModal:false,
         editModal:false,
@@ -388,6 +389,7 @@
       }
     },
     methods: {
+      //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -425,12 +427,12 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
-                this.$Modal.error({title: '提示信息', content: res.message})
                 this.modal_loading = false
+                this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
               this.modal_loading = false
+              this.$Modal.error({title: '提示信息', content: res.message})
             })
           }
         })
@@ -478,6 +480,7 @@
       //发起
       start(){
         this.modal_loading = true
+        console.log(this.viewForm)
         let params = {
           id: this.viewForm.id,
           name: this.viewForm.name,
@@ -498,14 +501,10 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -535,8 +534,8 @@
                   this.$Modal.error({title: '提示信息', content: res.message})
                 }
               },res=>{
-                this.$Modal.error({title: '提示信息', content: res.message})
                 this.modal_loading = false
+                this.$Modal.error({title: '提示信息', content: res.message})
               })
             }
           })
@@ -562,12 +561,13 @@
               this.$Modal.error({title: '提示信息', content: res.message})
             }
           },res=>{
-            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           })
         }
       },
       viewReject(){
+        this.reject_loading = true
         if(this.isChange === true){
           this.$refs.viewForm.validate((valid) => {
             if (valid) {
@@ -583,16 +583,19 @@
                   setTimeout(() => {
                     this.viewModal = false
                     this.isChange = false
+                    this.reject_loading = false
                     this.$Message.success("审核驳回")
                     this.$refs.table.init()
                   }, 2000);
                 } else {
-                  this.$Modal.error({title: '提示信息', content: res.message})
                   this.isChange = false
+                  this.reject_loading = false
+                  this.$Modal.error({title: '提示信息', content: res.message})
                 }
               },res=>{
-                this.$Modal.error({title: '提示信息', content: res.message})
                 this.isChange = false
+                this.reject_loading = false
+                this.$Modal.error({title: '提示信息', content: res.message})
               })
             }
           })
@@ -609,16 +612,19 @@
               setTimeout(() => {
                 this.viewModal = false
                 this.isChange = false
+                this.reject_loading = false
                 this.$Message.success("审核驳回")
                 this.$refs.table.init()
               }, 2000);
             } else {
-              this.$Modal.error({title: '提示信息', content: res.message})
               this.isChange = false
+              this.reject_loading = false
+              this.$Modal.error({title: '提示信息', content: res.message})
             }
           },res=>{
-            this.$Modal.error({title: '提示信息', content: res.message})
             this.isChange = false
+            this.reject_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           })
         }
       },
@@ -657,7 +663,7 @@
           console.log(this.statuList)
           this.statusModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       endProject(){
@@ -782,7 +788,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -795,9 +801,9 @@
         this.formItem.endUpdateTime="";
         this.isFirst = true
         setTimeout(()=>{
-            this.$refs.table.init()
-            this.isFirst = false
-          },200)
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       //差异份数
       actualNumChange(){

@@ -205,7 +205,7 @@
           <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
           <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
           <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
           </Col>
@@ -266,6 +266,7 @@
       return {
         loading: true, //延迟
         modal_loading: false, //延迟
+        reject_loading: false,
         isFirst: false, //是否是第一页
         addModal: false, //新增模态框
         viewModal: false, //查看模态框
@@ -672,6 +673,7 @@
         this.addForm.roomId = ""
         this.addForm.roomNum = ""
         this.addForm.customerName = ""
+        this.addForm.fileType = ""
       },
       //获取房间列表
       getRooms(unitId) {
@@ -691,6 +693,7 @@
         this.addForm.roomId = ""
         this.addForm.roomNum = ""
         this.addForm.customerName = ""
+        this.addForm.fileType = ""
       },
       //模态框的业主姓名
       getModalName(roomId) {
@@ -890,20 +893,17 @@
               this.$refs.table.init()
             }, 2000);
           } else {
-            this.modal_loading = false;
-            this.viewModal = false
+            this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.table.init()
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       viewReject(){
+        this.reject_loading = true
         let params = {
           id: this.viewForm.id,
           status:'0'
@@ -911,20 +911,16 @@
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             this.viewModal = false
-            this.modal_loading = false
+            this.reject_loading = false
             this.$Message.success("审核驳回!")
             this.$refs.table.init()
           } else {
-            this.modal_loading = false
-            this.viewModal = false
+            this.reject_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.table.init()
           }
         },res=>{
+          this.reject_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
-          this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
         })
       },
       //状态详情

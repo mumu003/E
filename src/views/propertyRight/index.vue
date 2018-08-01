@@ -257,7 +257,7 @@
           <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
           <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
           <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" >驳回</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
           </Col>
@@ -355,6 +355,7 @@
         isFirst: false,
         loading: true,
         modal_loading: false, //延迟
+        reject_loading: false,
         endModal:false,
         addModal: false,
         batchModal: false,
@@ -677,6 +678,7 @@
       this.getBuildings()
     },
     methods: {
+      //Tabs切换
       changs(){
         this.statusProject()
       },
@@ -890,15 +892,16 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
+                this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
               this.modal_loading = false
+              this.$Modal.error({title: '提示信息', content: res.message})
             })
           } else {
-            this.$Modal.error({title: '提示信息', content: "业主姓名不能为空"})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: "业主姓名不能为空"})
           }
         })
       },
@@ -968,12 +971,12 @@
               this.$refs.table.init()
             }, 2000)
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         }else {
           this.$Modal.error({title: '提示信息', content:  "您还未选择房间号,请选择有效房间才可提交"})
@@ -996,9 +999,9 @@
       },
       batchHouse(){
         this.batchHouseModal = true
-         this.batchForm.buildingId=''
+        this.batchForm.buildingId=''
         this.batchForm.buildingName=''
-       this.unitList=[]
+        this.unitList=[]
         this.floorsList=[]
         this.getRooms()
       },
@@ -1071,14 +1074,10 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -1099,15 +1098,16 @@
               this.$refs.table.init()
             }, 2000)
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewReject(){
+        this.reject_loading = true
         let params = {
             id: this.viewForm.id,
             status:0
@@ -1117,12 +1117,15 @@
             console.log(res)
           if (res.code === 200) {
               this.viewModal = false
+              this.reject_loading = false
               this.$Message.success("审核驳回")
               this.$refs.table.init()
           } else {
+            this.reject_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
+          this.reject_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -1216,10 +1219,8 @@
           this.endModal=false
           this.$refs.table.init()
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading=false
-          this.endModal=false
-          this.$refs.table.init()
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       endCancel(){
@@ -1284,7 +1285,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})

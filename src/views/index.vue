@@ -265,6 +265,12 @@
         this.shrink = !this.shrink
       },
       logout(){
+        sessionStorage.removeItem("token")
+        sessionStorage.removeItem("userId")
+        sessionStorage.removeItem("userName")
+        sessionStorage.removeItem("curProjectId")
+        sessionStorage.removeItem("orgId")
+        this.$Message.success("退出登录成功！")
         this.$router.push('/login')
       }
     }
