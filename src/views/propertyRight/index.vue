@@ -266,9 +266,9 @@
     </Modal>
 
     <Modal v-model="endModal" title="终止产权办理"
-      :loading="loading"
+      :loading="modal_loading"
       @on-ok="endSubmit"
-      @on-cancel="searchCancel"
+      @on-cancel="endCancel"
     >
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
@@ -1181,6 +1181,7 @@
           return false
         }
         this.endModal=true
+        this.modal_loading=true
 
         /*this.$Modal.confirm({
           title: '操作提示',
@@ -1211,13 +1212,20 @@
         }
         this.$request.post("/apiHost/api/ownershipBill/cutOut",params,res=>{
           this.$Message.success("终止成功")
-         this.endModal=false
+          this.modal_loading=false
+          this.endModal=false
           this.$refs.table.init()
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
-          this.loading=false
+          this.modal_loading=false
+          this.endModal=false
           this.$refs.table.init()
         })
+      },
+      endCancel(){
+        this.$Message.info('你取消了操作')
+        this.endModal=false
+        this.$refs.table.init()
       },
       deleteProject(){
         if (this.selected_count === 0) {

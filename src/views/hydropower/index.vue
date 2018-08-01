@@ -204,6 +204,14 @@
       </div>
     </Modal>
 
+    <Modal v-model="endModal" title="终止水电过户"
+           :loading="modal_loading"
+           @on-ok="endSubmit"
+           @on-cancel="endCancel"
+    >
+      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
+    </Modal>
+
    <!-- <Modal v-model="statuModal" title="状态详情"
            width="800"
            :loading="loading"
@@ -247,6 +255,13 @@
       return {
         modal_loading: false, //延迟
         isFirst: false,
+        addModal:false,
+        viewModal:false,
+        statuModal:false,
+        endModal:false,
+        noteModal: false, //弹窗
+        isShow:false,
+        loading:true,
         viewTabs:'name1',
         //定义数组
         buildingList:[],
@@ -345,11 +360,6 @@
             }
           ],
         },
-        //模态框延迟
-        addModal:false,
-        viewModal:false,
-        statuModal:false,
-        loading:true,
         //模态框表单,表格数据
         addForm:{
           areaId:'',
@@ -484,11 +494,9 @@
             width:150
           }
         ],
-        noteModal: false, //弹窗
         nodesList:[],
         historysList:[],
-        currentNodeId:'',
-        isShow:false
+        currentNodeId:''
       }
     },
     computed: {
@@ -615,7 +623,11 @@
             this.addForm.idCard = res.data.idNumber
             this.addForm.phone = res.data.phone
             this.addForm.address = res.data.address
-            console.log(res)
+            this.addForm.area = res.data.area
+            this.addForm.contract = res.data.contractNumber
+            this.addForm.signDate = res.data.signDate
+            this.addForm.payExpireDate = res.data.payExpire
+            this.addForm.deliveryDate = res.data.deliveryDate
             this.addData = []
             this.addData.push(res.data)
           }, res => {
@@ -716,7 +728,7 @@
       },
       viewCancel(){
         this.$refs.table.init()
-        this.viewModal = false 
+        this.viewModal = false
         this.$Message.info('你取消了操作')
         setTimeout(() => {
           this.viewTabs = 'name1'
@@ -805,7 +817,14 @@
           this.noteModal = true
           return false
         }
-        this.$Modal.confirm({
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        this.endModal=true
+        this.modal_loading=true
+       /* this.$Modal.confirm({
           title: '操作提示',
           content: '是否确认终止该流程，终止后将无法继续该流程?',
           loading: true,
@@ -824,7 +843,29 @@
               this.$refs.table.init()
             })
           }
+        })*/
+      },
+      endSubmit(){
+        let id = this.selection.map(item=>item.id).toString()
+        let params = {
+          id
+        }
+        this.$request.post("/apiHost/api/transfer/cutOut",params,res=>{
+          this.$Message.success("终止成功")
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
         })
+      },
+      endCancel(){
+        this.$Message.info('你取消了操作')
+        this.endModal=false
+        this.$refs.table.init()
       },
       //删除
       deleteProject(){

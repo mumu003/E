@@ -209,6 +209,14 @@
       </div>
     </Modal>
 
+    <Modal v-model="endModal" title="终止发函"
+           :loading="modal_loading"
+           @on-ok="endSubmit"
+           @on-cancel="endCancel"
+    >
+      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
+    </Modal>
+
    <!-- <Modal v-model="statusModal" title="状态详情"
            width="800"
            :loading="loading"
@@ -255,6 +263,7 @@
         addModal: false, //新增模态框
         viewModal: false, //查看模态框
         statusModal: false, //状态模态框
+        endModal:false,//终止模态框
         noteModal: false, //弹窗
         buildingList: [],  //楼栋
         unitList: [],   //单元
@@ -938,7 +947,9 @@
           this.noteModal = true
           return false
         }
-        this.$Modal.confirm({
+        this.endModal=true
+        this.modal_loading=true
+       /* this.$Modal.confirm({
           title: '操作提示',
           content: '是否确认终止该流程，终止后将无法继续该流程?',
           loading: true,
@@ -957,7 +968,29 @@
               this.$refs.table.init()
             })
           }
+        })*/
+      },
+      endSubmit(){
+        let id = this.selection.map(item=>item.id).toString()
+        let params = {
+          id
+        }
+        this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+          this.$Message.success("终止成功")
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
         })
+      },
+      endCancel(){
+        this.$Message.info('你取消了操作')
+        this.endModal=false
+        this.$refs.table.init()
       },
       //删除
       deleteProject (){
