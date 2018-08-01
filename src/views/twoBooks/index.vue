@@ -205,6 +205,14 @@
       </div>
     </Modal>
 
+    <Modal v-model="endModal" title="终止两书"
+           :loading="modal_loading"
+           @on-ok="endSubmit"
+           @on-cancel="endCancel"
+    >
+      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
+    </Modal>
+
     <!--<Modal v-model="statusModal" title="状态详情"
       width="800"
       :loading="loading"
@@ -252,6 +260,7 @@
         addModal: false,
         viewModal: false,
         statusModal: false,
+        endModal:false,
         noteModal: false,
         buildingList:[],
         unitList:[],
@@ -674,6 +683,10 @@
             this.addForm.area = res.data.area
             this.addForm.phone = res.data.phone
             this.addForm.address = res.data.address
+            this.addForm.addressNum = res.data.addressNum
+            this.addForm.contract = res.data.contractNumber
+            this.addForm.signDate = res.data.signDate
+            this.addForm.payExpireDate = res.data.payExpire
             this.addData = []
             this.addData.push(res.data)
           }, res => {
@@ -895,7 +908,9 @@
           this.noteModal = true
           return false
         }
-        this.$Modal.confirm({
+        this.endModal=true
+        this.modal_loading=true
+        /*this.$Modal.confirm({
           title: '操作提示',
           content: '是否确认终止该流程，终止后将无法继续该流程?',
           loading: true,
@@ -913,7 +928,29 @@
               this.$Modal.remove()
             })
           }
+        })*/
+      },
+      endSubmit(){
+        let id = this.selection.map(item=>item.id).toString()
+        let params = {
+          id
+        }
+        this.$request.post("/apiHost/api/twoFileBill/cutOut",params,res=>{
+          this.$Message.success("终止成功")
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.modal_loading=false
+          this.endModal=false
+          this.$refs.table.init()
         })
+      },
+      endCancel(){
+        this.$Message.info('你取消了操作')
+        this.endModal=false
+        this.$refs.table.init()
       },
       deleteProject(){
         if (this.selected_count === 0) {
