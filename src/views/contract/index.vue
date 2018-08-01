@@ -84,37 +84,35 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增合同备案"
-      width="800"
-      @on-cancel="addCancel"
-    >
+    <Modal v-model="addModal" title="新增合同备案" width="800"
+      @on-cancel="addCancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-          <FormItem label="楼栋" prop="buildingId">
-            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-              <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="楼栋" prop="buildingId">
+              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
             <FormItem label="单元" prop="unitId">
-            <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-              <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-            </Select>
-          </FormItem>
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
             <FormItem label="房间号" prop="roomId">
-            <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-              <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-            </Select>
-          </FormItem>
+              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
+                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
             <FormItem label="业主姓名">
-            <Input v-model="addForm.customerName" readonly></Input>
-          </FormItem>
+              <Input v-model="addForm.customerName" readonly></Input>
+            </FormItem>
           </Col>
           <Col span="24">
             资料
@@ -554,9 +552,11 @@
       }
     },
     mounted(){
+      //获取楼栋
       this.getBuildings()
     },
     methods: {
+      //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -673,7 +673,6 @@
       //新增表格选项
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-
       },
       //审核表单选项
       viewselect(selection){
@@ -696,7 +695,8 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
-                this.$Message.error(res.message)
+                this.$Modal.error({title: '提示信息', content: res.message})
+                this.modal_loading = false
               }
             }, res => {
               this.$Modal.error({title: '提示信息', content: res.message})
@@ -760,8 +760,7 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/contractBill/view",params,res=>{
-            console.log(res.data)
-
+          console.log(res.data)
           this.viewForm.id = res.data.id
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
@@ -792,9 +791,8 @@
           this.viewTabs = 'name1'
           this.viewModal = true
           console.log(' this.buttons.start:'+ this.buttons.start)
-
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -815,10 +813,10 @@
               this.$refs.table.init()
             }, 2000)
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
@@ -835,10 +833,10 @@
             this.$Message.success("审核驳回!")
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //发起
@@ -863,13 +861,13 @@
               this.modal_loading = false
               this.viewModal = false
               this.$refs.table.init()
-              this.$Message.error(res.message)
+              this.$Modal.error({title: '提示信息', content: res.message})
             }
           },res=>{
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //状态详情
@@ -884,7 +882,6 @@
           this.noteModal = true
           return false
         }
-
         let params = {
           id: this.selection[0].id
         }
@@ -909,7 +906,7 @@
           console.log(this.historysList)
           this.statusModal = true
         }, res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statusOk () {
@@ -987,7 +984,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})

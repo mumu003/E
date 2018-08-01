@@ -5,7 +5,7 @@
       <Card class="search-card">
         <p slot="title">
           <Icon type="levels"></Icon>
-          {{$route.meta.title}}
+            {{$route.meta.title}}
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
@@ -94,36 +94,43 @@
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-          <FormItem label="楼栋" prop="buildingId">
-            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-              <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="楼栋" prop="buildingId">
+              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
-          <FormItem label="单元" prop="unitId">
-            <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-              <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="单元" prop="unitId">
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
-          <FormItem label="房间号" prop="roomId">
-            <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-              <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-            </Select>
-          </FormItem>
+            <FormItem label="房间号" prop="roomId">
+              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
+                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="8">
-          <FormItem label="业主姓名">
-            <Input v-model="addForm.customerName" readonly></Input>
-          </FormItem>
+            <FormItem label="业主姓名">
+              <Input v-model="addForm.customerName" readonly></Input>
+            </FormItem>
+          </Col>
+          <Col span="8">
+            <FormItem label="发函类型" prop="fileType">
+              <Select v-model="addForm.fileType" placeholder="请选择发函类型" >
+                <Option :value="item.fileType" v-for="(item,index) in fileTypeList" :key="index">{{item.fileName}}</Option>
+              </Select>
+            </FormItem>
           </Col>
           <Col span="24">
-          资料
+            资料
           </Col>
           <Col span="24">
-          <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
+            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
           </Col>
         </Row>
       </Form>
@@ -265,6 +272,20 @@
         historysList: [],  //进度详情
         currentNodeId:'', //状态详情节点
         viewTabs:'name1',
+        fileTypeList:[
+          {
+            fileType:'Contract',
+            fileName:'未按时转签约'
+          },
+          {
+            fileType:'Payment',
+            fileName:'未按时付款'
+          },
+          {
+            fileType:'Mortgage',
+            fileName:'未按时按揭'
+          }
+        ],
         buttons:{ },
         //搜索时间
         searchTime:{
@@ -322,19 +343,34 @@
               }
             },
             {
+              title: '发函类型',
+              key: 'fileType',
+              width:100,
+              render:(h,params)=>{
+                switch(params.row.fileType){
+                  case 'Contract':
+                    return h('div',"未按时转签约")
+                  case 'Payment':
+                    return h('div',"未按时付款")
+                  case 'Mortgage':
+                    return h('div',"未按时按揭")
+                }
+              }
+            },
+            {
               title: '业主名字',
               key: 'customerName',
-              width:250
+              width:200
             },
             {
               title: '楼栋',
               key: 'buildingName',
-              width:250
+              width:200
             },
             {
               title: '房间号',
               key: 'roomNum',
-              width:250
+              width:150
             },
             {
               title: '更新时间',
@@ -352,6 +388,7 @@
           unitName:'',
           roomNum:'',
           roomId:'',
+          fileType:'',
           selection:[],
           dataId:[]
         },
@@ -365,6 +402,9 @@
           ],
           roomId: [
             { required: true, message: '请选择房间号', trigger: 'change' }
+          ],
+          fileType: [
+            { required: true, message: '请选择发函类型', trigger: 'change' }
           ]
         },
         //新增模态框资料
@@ -555,9 +595,11 @@
       }
     },
     mounted(){
+      //获取楼栋
       this.getBuildings()
     },
     methods: {
+      //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -691,20 +733,16 @@
                   this.$refs.table.init()
                 }, 2000);
               } else {
-                this.$Modal.error({title: '提示信息', content: res.message})
                 this.modal_loading = false
-                this.$refs.addForm.resetFields()
-                this.$refs.table.init()
+                this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
               this.modal_loading = false
-              this.$refs.addForm.resetFields()
-              this.$refs.table.init()
+              this.$Modal.error({title: '提示信息', content: res.message})
             })
           } else {
-            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
           }
         })
       },
@@ -717,7 +755,8 @@
           buildingId: '',
           roomId: '',
           unitId: '',
-          customerName: ''
+          customerName: '',
+          fileType: ''
         }
         this.$refs.addForm.resetFields()
       },
@@ -792,7 +831,7 @@
           this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //发起
@@ -817,13 +856,13 @@
             this.modal_loading = false
             this.viewModal = false
             this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -844,11 +883,11 @@
           } else {
             this.modal_loading = false;
             this.viewModal = false
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.table.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
@@ -869,11 +908,11 @@
           } else {
             this.modal_loading = false
             this.viewModal = false
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.table.init()
           }
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
           this.viewModal = false
           this.$refs.table.init()
@@ -916,7 +955,7 @@
           })
           this.statusModal = true
         }, res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       statuSubmit () {
@@ -997,7 +1036,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})

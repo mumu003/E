@@ -502,11 +502,12 @@
       }
     },
     mounted(){//方法
-      this.getBuildings(),
-        this.addarea()
+      this.getBuildings()
+      // this.addarea()
       /*this.getIndex()*/
     },
     methods: {//对象
+      //Tabs切换
       changs() {
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -593,11 +594,9 @@
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
       },
-      //模态框
-      //新增接口
+      //新增按钮
       addProject(){
         this.addModal = true
-
       },
       //获取模态框表格数据
       addPullData(){
@@ -625,6 +624,7 @@
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
+      //新增模态框提交
       addSubmit(){
         console.log(this.addData)
         this.modal_loading = true
@@ -647,38 +647,20 @@
                   this.$refs.table.init()
                 }, 2000)
               } else {
-                this.$Message.error(res.message)
-                this.addData = []
-                this.isShow = false
-                this.$refs.table.init()
-                this.addModal = false
                 this.modal_loading = false
-                this.addForm={
-                  buildingId: '',
-                  unitId: '',
-                  roomId: ''
-                }
+                this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
-              this.addData = []
-              this.isShow = false
               this.modal_loading = false
-              this.$refs.table.init()
-              this.addModal = false
-              this.addForm={
-                buildingId: '',
-                unitId: '',
-                roomId: ''
-              }
+              this.$Modal.error({title: '提示信息', content: res.message})
             })
           }else{
-            this.$Modal.error({title: '提示信息', content: '请抓取数据'})
             this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: '请抓取数据'})
           }
         }else{
-          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
           this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
       //审核
@@ -711,7 +693,7 @@
           this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewCancel(){
@@ -743,60 +725,50 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       viewReject(id){
-            let params = {
-              id,
-              status:0
-            }
-            this.$request.post("/apiHost/api/transfer/check",params,res=>{
-              this.$Message.success("审核驳回!")
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.viewModal = false
-              this.loading = false
-              this.$refs.table.init()
-            })
-
+        let params = {
+          id,
+          status:0
+        }
+        this.$request.post("/apiHost/api/transfer/check",params,res=>{
+          this.$Message.success("审核驳回!")
+          this.viewModal = false
+          this.$refs.table.init()
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //通过
       viewPass(id){
         this.modal_loading = true
-            let params = {
-              id,
-              status:1
-            }
-            this.$request.post("/apiHost/api/transfer/check",params,res=>{
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.modal_loading = false
-                  this.$Message.success("审核通过!")
-                  this.viewModal = false
-                  this.$refs.table.init()
-                }, 2000);
-              } else {
-                this.$Message.error(res.message)
-              }
-            },res=>{
-              this.$Message.error(res.message)
+        let params = {
+          id,
+          status:1
+        }
+        this.$request.post("/apiHost/api/transfer/check",params,res=>{
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.$Message.success("审核通过!")
               this.viewModal = false
-              this.loading = false
               this.$refs.table.init()
-            })
+            }, 2000);
+          } else {
+            this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        },res=>{
+          this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //终止
       endProject(){
@@ -890,7 +862,7 @@
             console.log(this.nodesList)
             this.statuModal = true
           }, res=>{
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           },
         )
       },
@@ -924,7 +896,7 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})

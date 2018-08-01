@@ -536,11 +536,12 @@
       }
     },
     mounted(){//方法
-      this.getBuildings(),
-        this.addarea()
+      this.getBuildings()
+      // this.addArea()
       /*this.getIndex()*/
     },
     methods: {//对象
+      //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
           this.historysList = []
@@ -616,7 +617,7 @@
         this.addForm.customerName = ""
       },
       //获取地块名称  (接口在哪)
-      addarea(areaId){
+      addArea(areaId){
         console.log(this.addForm)
       },
       //开始时间
@@ -685,18 +686,12 @@
                   this.$refs.table.init()
                 }, 2000)
               } else {
-                this.addModal = false
                 this.modal_loading = false
-                this.isShow = false
-                this.$refs.table.init()
-                this.$Message.error(res.message)
+                this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.$Modal.error({title: '提示信息', content: res.message})
-              this.addModal = false
               this.modal_loading = false
-              this.isShow = false
-              this.$refs.table.init()
+              this.$Modal.error({title: '提示信息', content: res.message})
             })
           }else{
             this.$Modal.error({title: '提示信息', content: '请抓取数据'})
@@ -737,9 +732,10 @@
           this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
-          this.$Message.error( res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //取消
       viewCancel(){
         this.$refs.table.init()
         this.viewModal = false 
@@ -769,15 +765,11 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
@@ -793,40 +785,33 @@
           this.loading = false
           this.$refs.table.init()
         },res=>{
-          this.$Message.error(res.message)
-          this.viewModal = false
           this.loading = false
-          this.$refs.table.init()
-          this.$Modal.remove()
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
       viewPass(id){
-            this.modal_loading = true
-            let params = {
-              id,
-              status:1
-            }
-            this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.modal_loading = false
-                  this.viewModal = false
-                  this.$Message.success("审核通过!")
-                  this.$refs.table.init()
-                }, 2000)
-              } else {
-                this.viewModal = false
-                this.modal_loading = false
-                this.$refs.table.init()
-                this.$Message.error(res.message)
-              }
-            },res=>{
-              this.$Message.error(res.message)
-              this.viewModal = false
+        this.modal_loading = true
+        let params = {
+          id,
+          status:1
+        }
+        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+          if (res.code === 200) {
+            setTimeout(() => {
               this.modal_loading = false
+              this.viewModal = false
+              this.$Message.success("审核通过!")
               this.$refs.table.init()
-            })
+            }, 2000)
+          } else {
+            this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        },res=>{
+          this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //终止
       endProject(){
@@ -896,7 +881,6 @@
           this.noteModal = true
           return false
         }
-
         let params = {
           id: this.selection[0].id
         }
@@ -920,7 +904,7 @@
             console.log(this.nodesList)
             this.statuModal = true
           }, res=>{
-            this.$Message.error( res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           },
         )
       },
@@ -944,7 +928,7 @@
         }
         this.$refs.table.init()
       },
-      //搜索
+      //搜索提交
       searchSubmit () {
         console.log(this.formItem)
         this.isFirst = true
@@ -955,12 +939,13 @@
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //搜索取消
       searchCancel() {
         this.formItem={
           status: '',
