@@ -64,7 +64,6 @@
             <Col span="24">
               <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
               <Table stripe border v-else :columns="viewContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
-              <!--<Table stripe border :columns="viewContract" :data="contractData" ref="ref"></Table>-->
             </Col>
           </Row>
         </Form>
@@ -74,8 +73,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="ContractReject" >驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="ContractPass">通过</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass">通过</Button>
             </span>
             </Col>
           </Row>
@@ -113,7 +112,6 @@
             <Col span="24">
               <Table stripe border v-if="buttonsSend.start" :columns="viewStartSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
               <Table stripe border v-else :columns="viewSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
-              <!--<Table stripe border :columns="viewSendFile" :data="sendFileData" ref="ref"></Table>-->
             </Col>
           </Row>
         </Form>
@@ -123,13 +121,11 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsSend.check" >
-              <Button type="error" size="default" @click="sendFileReject" >驳回</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="sendFileReject" >驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>
             </span>
             </Col>
           </Row>
-         <!-- <Button type="error" size="default" @click="sendFileReject" >驳回</Button>
-          <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>-->
         </div>
       </Modal>
 
@@ -167,7 +163,7 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsDelivery.check" >
-               <Button type="error" size="default" @click="deliveryNoticeReject" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="deliveryNoticeReject" >驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass">通过</Button>
             </span>
             </Col>
@@ -209,7 +205,7 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsTransfer.check" >
-               <Button type="error" size="default" @click="transferReject" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="transferReject" >驳回</Button>
                <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass">通过</Button>
             </span>
             </Col>
@@ -251,7 +247,7 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsTwoFile.check" >
-              <Button type="error" size="default" @click="twoFileReject" >驳回</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="twoFileReject" >驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass">通过</Button>
             </span>
             </Col>
@@ -286,7 +282,6 @@
             <Col span="24">
               <Table stripe border v-if="buttonsOwnership.start" :columns="viewStartOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
               <Table stripe border v-else :columns="viewOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
-              <!--<Table stripe border :columns="viewOwnership" :data="ownershipData"></Table>-->
             </Col>
           </Row>
         </Form>
@@ -296,7 +291,7 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsOwnership.check" >
-               <Button type="error" size="default" @click="ownershipReject" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="ownershipReject" >驳回</Button>
                <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass">通过</Button>
             </span>
             </Col>
@@ -305,30 +300,6 @@
       </Modal>
 
       <Modal v-model="editOrderContractModal" title="编辑协议书申请">
-      <!--  <Form  :model="viewForm" :label-width="80">
-          <Row>
-            <Col span="24">
-            <FormItem label="申请份数">
-              <Input v-model="viewForm.applyNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="实发份数">
-              <Input v-model="viewForm.actualNum" @on-change="actualNumChange" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="差异数量">
-              <Input v-model="viewForm.differenceNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="备注说明">
-              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
-            </FormItem>
-            </Col>
-          </Row>
-        </Form>-->
         <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
           <Row>
             <Col span="24">
@@ -367,13 +338,11 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsOrderContract.check" >
-               <Button type="error" size="default" @click="viewReject">驳回</Button>
+               <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
             </span>
             </Col>
           </Row>
-
-
         </div>
       </Modal>
 
@@ -1015,7 +984,11 @@ export default {
                       },"待发起")
                   }
                 }
-
+              },
+              {
+                title: '协议书名称',
+                key: 'name',
+                width:250
               },
               {
                 title: '申请份数',
@@ -1045,6 +1018,7 @@ export default {
 
           isFirst: false, //是否是第一页
           modal_loading: false, //延迟
+          reject_loading:false,//驳回延迟
           //合同备案ID
           editContractId:"",
           //发函ID
@@ -1122,7 +1096,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width:80
             },
             {
@@ -1170,7 +1144,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width:80
             },
             {
@@ -1239,7 +1213,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width:80
             },
             {
@@ -1287,7 +1261,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width:80
             },
             {
@@ -1580,7 +1554,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width: 80
             },
             {
@@ -1628,7 +1602,7 @@ export default {
             },
             {
               title: '资料数量',
-              key: 'quantity',
+              key: 'restQuantity',
               width: 80
             },
             {
@@ -1785,19 +1759,19 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editContractModal = false
-            this.$refs.contracttable.init()
+            /*this.editContractModal = false
+            this.$refs.contracttable.init()*/
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editContractModal = false
-          this.$refs.contracttable.init()
+         /* this.editContractModal = false
+          this.$refs.contracttable.init()*/
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
-      ContractPass(){
+      contractPass(){
         this.modal_loading = true
         let params = {
           id: this.contractForm.id,
@@ -1817,17 +1791,18 @@ export default {
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
-            this.editContractModal = false
-            this.$refs.contracttable.init()
+           /* this.editContractModal = false
+            this.$refs.contracttable.init()*/
           }
         },res=>{
           this.modal_loading = false
-          this.editContractModal = false
+          // this.editContractModal = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
-      ContractReject(){
+      contractReject(){
+        this.reject_loading=true
         let params = {
           id: this.contractForm.id,
           status:'0'
@@ -1838,15 +1813,18 @@ export default {
           if (res.code === 200) {
             this.editContractModal = false
             this.$Message.success("审核驳回!")
+            this.reject_loading=false
             this.getAgency()
             this.$refs.contracttable.init()
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.editContractModal = false
-            this.$refs.contracttable.init()
+            this.reject_loading=false
+            /*this.editContractModal = false
+            this.$refs.contracttable.init()*/
           }
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -1910,14 +1888,14 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editSendFileModal = false
-            this.$refs.sendFiletable.init()
+            /*this.editSendFileModal = false
+            this.$refs.sendFiletable.init()*/
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editSendFileModal = false
-          this.$refs.sendFiletable.init()
+         /* this.editSendFileModal = false
+          this.$refs.sendFiletable.init()*/
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -1940,19 +1918,19 @@ export default {
               this.$refs.sendFiletable.init()
             }, 2000)
           } else {
-            this.editSendFileModal = false
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.sendFiletable.init()
+           /* this.editSendFileModal = false
+            this.$refs.sendFiletable.init()*/
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.editSendFileModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       sendFileReject(){
+        this.reject_loading=true
         let params = {
           id: this.sendFileForm.id,
           status:'0'
@@ -1962,16 +1940,19 @@ export default {
           console.log(res)
           if (res.code === 200) {
             this.editSendFileModal = false
+            this.reject_loading=false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.sendFiletable.init()
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.editSendFileModal = false
-            this.$refs.sendFiletable.init()
+            this.reject_loading=false
+            /*this.editSendFileModal = false
+            this.$refs.sendFiletable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -1994,7 +1975,7 @@ export default {
           this.deliveryNoticeData.push(res.data)
           this.editDeliveryNoticeModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editDeliveryNoticeModal=true
       },
@@ -2018,15 +1999,15 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editDeliveryNoticeModal = false
-            this.$refs.deliveryNoticetable.init()
-          this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editDeliveryNoticeModal = false
+            this.$refs.deliveryNoticetable.init()*/
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editDeliveryNoticeModal = false
-          this.$refs.deliveryNoticetable.init()
-        this.$Modal.error({title: '提示信息', content: res.message})
+          /*this.editDeliveryNoticeModal = false
+          this.$refs.deliveryNoticetable.init()*/
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2048,19 +2029,19 @@ export default {
               this.$refs.deliveryNoticetable.init()
             }, 2000)
           } else {
-            this.editDeliveryNoticeModal = false
             this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.deliveryNoticetable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editDeliveryNoticeModal = false
+            this.$refs.deliveryNoticetable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.editDeliveryNoticeModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       deliveryNoticeReject(){
+        this.reject_loading=true
         let params = {
           id: this.deliveryNoticeForm.id,
           status:'0'
@@ -2070,16 +2051,19 @@ export default {
           console.log(res)
           if (res.code === 200) {
             this.editDeliveryNoticeModal = false
+            this.reject_loading=false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.deliveryNoticetable.init()
           } else {
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.editDeliveryNoticeModal = false
-            this.$refs.deliveryNoticetable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.reject_loading=false
+            /*this.editDeliveryNoticeModal = false
+            this.$refs.deliveryNoticetable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -2102,7 +2086,7 @@ export default {
           this.transferData.push(res.data)
           this.editTransferModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editTransferModal=true
       },
@@ -2126,15 +2110,15 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editTransferModal = false
-            this.$refs.transfertable.init()
-          this.$Modal.error({title: '提示信息', content: res.message})
+           /* this.editTransferModal = false
+            this.$refs.transfertable.init()*/
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editTransferModal = false
-          this.$refs.transfertable.init()
-        this.$Modal.error({title: '提示信息', content: res.message})
+         /* this.editTransferModal = false
+          this.$refs.transfertable.init()*/
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2156,19 +2140,19 @@ export default {
               this.$refs.transfertable.init()
             }, 2000)
           } else {
-            this.editTransferModal = false
             this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.transfertable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editTransferModal = false
+            this.$refs.transfertable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.editTransferModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       transferReject(){
+        this.reject_loading=true
         let params = {
           id: this.transferForm.id,
           status:'0'
@@ -2178,16 +2162,19 @@ export default {
           console.log(res)
           if (res.code === 200) {
             this.editTransferModal = false
+            this.reject_loading=false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.transfertable.init()
           } else {
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.editTransferModal = false
-            this.$refs.transfertable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.reject_loading=false
+           /* this.editTransferModal = false
+            this.$refs.transfertable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -2210,7 +2197,7 @@ export default {
           this.twoFileData.push(res.data)
           this.editTwoFileModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editTwoFileModal=true
       },
@@ -2234,15 +2221,15 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editTwoFileModal = false
-            this.$refs.twoFiletable.init()
-          this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editTwoFileModal = false
+            this.$refs.twoFiletable.init()*/
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editTwoFileModal = false
-          this.$refs.twoFiletable.init()
-        this.$Modal.error({title: '提示信息', content: res.message})
+          /*this.editTwoFileModal = false
+          this.$refs.twoFiletable.init()*/
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2264,19 +2251,19 @@ export default {
               this.$refs.twoFiletable.init()
             }, 2000)
           } else {
-            this.editTwoFileModal = false
             this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.twoFiletable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editTwoFileModal = false
+            this.$refs.twoFiletable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.editTwoFileModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       twoFileReject(){
+        this.reject_loading=true
         let params = {
           id: this.twoFileForm.id,
           status:'0'
@@ -2286,16 +2273,19 @@ export default {
           console.log(res)
           if (res.code === 200) {
             this.editTwoFileModal = false
+            this.reject_loading=false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.twoFiletable.init()
           } else {
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.editTwoFileModal = false
-            this.$refs.twoFiletable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.reject_loading=false
+           /* this.editTwoFileModal = false
+            this.$refs.twoFiletable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -2334,7 +2324,7 @@ export default {
           this.ownershipForm.dataId = dataIdArray.toString()
           this.editOwnershipModal = true
         },res=>{
-          this.$Message.error("获取失败")
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.editOwnershipModal=true
       },
@@ -2359,15 +2349,15 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editOwnershipModal = false
-            this.$refs.ownershiptable.init()
-          this.$Modal.error({title: '提示信息', content: res.message})
+            /*this.editOwnershipModal = false
+            this.$refs.ownershiptable.init()*/
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editOwnershipModal = false
-          this.$refs.ownershiptable.init()
-        this.$Modal.error({title: '提示信息', content: res.message})
+          /*this.editOwnershipModal = false
+          this.$refs.ownershiptable.init()*/
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
@@ -2389,19 +2379,19 @@ export default {
               this.$refs.ownershiptable.init()
             }, 2000)
           } else {
-            this.editOwnershipModal = false
             this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.$refs.ownershiptable.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
+           /* this.editOwnershipModal = false
+            this.$refs.ownershiptable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
-          this.editOwnershipModal = false
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //驳回
       ownershipReject(){
+        this.reject_loading=true
         let params = {
           id: this.ownershipForm.id,
           status:'0'
@@ -2411,16 +2401,19 @@ export default {
           console.log(res)
           if (res.code === 200) {
             this.editOwnershipModal = false
+            this.reject_loading=false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.ownershiptable.init()
           } else {
           this.$Modal.error({title: '提示信息', content: res.message})
-            this.editOwnershipModal = false
-            this.$refs.ownershiptable.init()
+            this.reject_loading=false
+           /* this.editOwnershipModal = false
+            this.$refs.ownershiptable.init()*/
           }
         },res=>{
-        this.$Modal.error({title: '提示信息', content: res.message})
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.reject_loading=false
         })
       },
 
@@ -2431,10 +2424,14 @@ export default {
         }
         this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
           console.log(res.data)
-          this.viewForm.id = res.data.id
-          this.viewForm.applyNum = res.data.applyNum
-          this.viewForm.actualNum = res.data.actualNum
-          this.viewForm.differenceNum = res.data.actualNum - res.data.applyNum
+          this.viewForm={
+            id : res.data.id,
+            name : res.data.name,
+            applyNum : res.data.applyNum,
+            actualNum : res.data.actualNum.toString(),
+            differenceNum : res.data.actualNum - res.data.applyNum,
+            remark : res.data.remark
+          }
           this.buttonsOrderContract.start = res.data.buttons.start
           this.buttonsOrderContract.stop = res.data.buttons.stop
           this.buttonsOrderContract.check = res.data.buttons.check
@@ -2443,6 +2440,7 @@ export default {
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
+
       },
       //发起
       viewstart(){
@@ -2468,14 +2466,14 @@ export default {
             }, 2000)
           } else {
             this.modal_loading = false
-            this.editOrderContractModal = false
-            this.$refs.orderContracttable.init()
+           /* this.editOrderContractModal = false
+            this.$refs.orderContracttable.init()*/
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.editOrderContractModal = false
-          this.$refs.orderContracttable.init()
+          /*this.editOrderContractModal = false
+          this.$refs.orderContracttable.init()*/
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
@@ -2501,10 +2499,12 @@ export default {
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
+          this.modal_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       viewReject(){
+        this.reject_loading=true
         let params = {
           id: this.viewForm.id,
           actualNum: this.viewForm.actualNum,
@@ -2516,14 +2516,17 @@ export default {
           if (res.code === 200) {
             setTimeout(() => {
               this.editOrderContractModal = false
+              this.reject_loading=false
               this.$Message.success("审核驳回")
               this.getAgency()
               this.$refs.orderContracttable.init()
             }, 2000);
           } else {
+            this.reject_loading=false
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
+          this.reject_loading=false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
