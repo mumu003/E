@@ -939,7 +939,10 @@
           item.rooms.filter(it=> it.show).map(it => {
             if (it.status=='ToDo') {
               this.selectedStaff=this.selectedStaff+","+it.roomId
-              this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
+              if (this.selectedStaff.substr(0,1)==',') {
+                this.selectedStaff=this.selectedStaff.substr(1);
+              }
+              // this.selectedStaff=this.selectedStaff.substr(1,this.selectedStaff.length)
               this.selectRoomNum=this.selectRoomNum+","+it.roomNum
               if (this.selectRoomNum.substr(0,1)==',') {
                 this.selectRoomNum=this.selectRoomNum.substr(1);
