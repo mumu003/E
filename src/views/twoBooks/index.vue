@@ -419,7 +419,7 @@
         addTable: [
           {
             title: '地块',
-            key: 'rommNum',
+            key: 'areaName',
             width:150,
             align: 'center'
           },

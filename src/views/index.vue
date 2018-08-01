@@ -35,9 +35,9 @@
                   <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">登录用户：{{username}}</span>
                   <Icon type="arrow-down-b"></Icon>
                 </a>
-                <DropdownMenu slot="list">
+               <!-- <DropdownMenu slot="list">
                   <DropdownItem name="loginout" @click.native="modal1 = true">修改密码</DropdownItem>
-                </DropdownMenu>
+                </DropdownMenu>-->
                 <DropdownMenu slot="list">
                   <DropdownItem name="loginout" @click.native="modal2 = true">退出登录</DropdownItem>
                 </DropdownMenu>

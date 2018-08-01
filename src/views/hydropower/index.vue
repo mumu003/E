@@ -939,6 +939,7 @@
           unitId: '',
           customerName: ''
         }
+        this.$refs.addForm.resetFields()
         this.$refs.table.init()
       },
       //搜索

@@ -2,32 +2,32 @@
     <div>
         <Row :gutter="10" class="mt10">
           <Col span="24" class="demo-tabs-style1" style="padding:16px;">
-              <Tabs type="card" @on-click="changs">
-                <TabPane label="合同备案" :label="contractLabel" >
+              <Tabs type="card" @on-click="changs"  v-model="viewTabs">
+                <TabPane label="合同备案" name="contract" :label="contractLabel" >
                   <m-table :config="tableConfig"  ref="contracttable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="发函" :label="sendFileLabel">
+                <TabPane label="发函" name="sendFile" :label="sendFileLabel">
                   <m-table :config="tableConfig2"  ref="sendFiletable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="交房通知" :label="deliveryNoticeLabel">
+                <TabPane label="交房通知" name="deliveryNotice" :label="deliveryNoticeLabel">
                   <m-table :config="tableConfig3"  ref="deliveryNoticetable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="水电过户" :label="transferLabel">
+                <TabPane label="水电过户" name="transfer" :label="transferLabel">
                   <m-table :config="tableConfig4"  ref="transfertable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="两书" :label="twoFileLabel">
+                <TabPane label="两书" name="twoFile" :label="twoFileLabel">
                   <m-table :config="tableConfig5"  ref="twoFiletable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="产权办理" :label="ownershipLabel">
+                <TabPane label="产权办理" name="ownership" :label="ownershipLabel">
                   <m-table :config="tableConfig6"  ref="ownershiptable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="协议书申请" :label="orderContractLabel">
+                <TabPane label="协议书申请" name="orderContract" :label="orderContractLabel">
                   <m-table :config="tableConfig7"  ref="orderContracttable"  :isFirst="isFirst"></m-table>
                 </TabPane>
               </Tabs>
@@ -384,6 +384,7 @@ export default {
       }
 
         return {
+          viewTabs:'contract',
           buttons:{ },
           buttonsSend:{ },
           buttonsDelivery:{ },
@@ -1673,16 +1674,31 @@ export default {
       viewselect3(selection){
         this.ownershipForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
-
       changs(){
-        this.$refs.contracttable.init()
+        this.getAgency()
+        if(this.viewTabs === 'contract'){
+          this.$refs.contracttable.init()
+        }else if (this.viewTabs === 'sendFile') {
+          this.$refs.sendFiletable.init()
+        }else if (this.viewTabs === 'deliveryNotice') {
+          this.$refs.deliveryNoticetable.init()
+        }else if (this.viewTabs === 'transfer') {
+          this.$refs.transfertable.init()
+        }else if (this.viewTabs === 'twoFile') {
+          this.$refs.twoFiletable.init()
+        }else if (this.viewTabs === 'ownership') {
+          this.$refs.ownershiptable.init()
+        }else if (this.viewTabs === 'orderContract') {
+          this.$refs.orderContracttable.init()
+        }
+       /* this.$refs.contracttable.init()
         this.$refs.sendFiletable.init()
         this.$refs.deliveryNoticetable.init()
         this.$refs.transfertable.init()
         this.$refs.twoFiletable.init()
         this.$refs.ownershiptable.init()
-        this.$refs.orderContracttable.init()
-        this.getAgency()
+        this.$refs.orderContracttable.init()*/
+
       },
       //待办事项计数统计
       getAgency(){
