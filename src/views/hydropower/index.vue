@@ -115,7 +115,7 @@
           </Col>
           <Col span="8">
           <FormItem label="房间号" prop="roomId">
-            <Select v-model="addForm.roomId" placeholder="请选择房间号">
+            <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="clearAddData">
               <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
             </Select>
           </FormItem>
@@ -635,6 +635,10 @@
         }else{
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
+      },
+      //清除抓取数据
+      clearAddData(){
+        this.isShow = false
       },
       //新增模态框提交
       addSubmit(){
