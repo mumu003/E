@@ -205,8 +205,8 @@
           <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
           <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
           <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
           <Col span="24" v-if="viewTabs === 'name2'">
@@ -264,6 +264,8 @@
   export default {
     data () {
       return {
+        passDisable:false,//防止通过双击事件
+        isDisable:false,//防止驳回双击事件
         loading: true, //延迟
         modal_loading: false, //延迟
         reject_loading: false,
@@ -886,9 +888,11 @@
             setTimeout(() => {
               this.modal_loading = false;
               this.viewModal = false
+              this.passDisable=false
               this.$Message.success("审核通过!")
               this.$refs.table.init()
-            }, 2000);
+            }, 2000)
+            this.passDisable=true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -907,10 +911,14 @@
         }
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
-            this.viewModal = false
-            this.reject_loading = false
-            this.$Message.success("审核驳回!")
-            this.$refs.table.init()
+            setTimeout(() => {
+              this.viewModal = false
+              this.reject_loading = false
+              this.isDisable=true
+              this.$Message.success("审核驳回!")
+              this.$refs.table.init()
+            },2000)
+            this.isDisable=true
           } else {
             this.reject_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})

@@ -184,8 +184,8 @@
             <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading">驳回</Button>
-              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading">通过</Button>
+              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
           <Col span="24" v-if="viewTabs === 'name2'">
@@ -244,8 +244,9 @@
   export default {
     data () {
       return {
-        isFirst: false,
-        //模态框延迟
+        passDisable:false,//防止通过双击事件
+        isDisable:false,//防止驳回双击事件
+        isFirst: false, //模态框延迟
         modal_loading: false, //延迟
         reject_loading: false,
         addModal:false,
@@ -796,9 +797,11 @@
             setTimeout(() => {
               this.reject_loading = false
               this.viewModal = false
+              this.isDisable=false
               this.$Message.success("审核驳回!")
               this.$refs.table.init()
             }, 2000)
+            this.isDisable=true
           } else {
             this.reject_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -821,8 +824,10 @@
               this.modal_loading = false
               this.viewModal = false
               this.$Message.success("审核通过!")
+              this.passDisable=false
               this.$refs.table.init()
             }, 2000)
+            this.passDisable=true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
