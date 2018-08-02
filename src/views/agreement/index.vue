@@ -83,7 +83,7 @@
           </Col>
           <Col span="24">
             <FormItem label="申请份数" prop="applyNum">
-              <Input v-model="addForm.applyNum" ></Input>
+              <Input v-model="addForm.applyNum" :maxlength=2 ></Input>
             </FormItem>
           </Col>
           <Col span="24">
@@ -120,7 +120,7 @@
               </Col>
               <Col span="24">
                 <FormItem label="实发份数" prop="actualNum">
-                  <Input v-model="viewForm.actualNum" @on-change="actualNumChange" ></Input>
+                  <Input v-model="viewForm.actualNum" @on-change="actualNumChange" :maxlength=2 :readonly="!buttons.start && !buttons.check"></Input>
                 </FormItem>
               </Col>
               <Col span="24">
@@ -234,7 +234,9 @@
         }
       };
       const validateSource = (rule, value, callback) => {
-        if (value>10) {
+        if (value<1) {
+            return callback(new Error('份数不能小于1'));
+        }else if (value>10) {
             return callback(new Error('份数不能大于10'));
         }else{
             callback();
@@ -374,7 +376,7 @@
         ruleView : {
           actualNum: [
             { validator:validateNumber, trigger: 'blur' },
-            { validator:validateActualNum, trigger: 'blur' }
+            { validator:validateSource, trigger: 'blur' }
           ]
         }
       }
@@ -424,6 +426,7 @@
                   this.addModal = false
                   this.$refs.addForm.resetFields()
                   this.addForm.remark = ''
+                  this.addForm.applyNum = ''
                   this.$Message.success("新增成功！")
                   this.$refs.table.init()
                 }, 2000);
@@ -443,6 +446,7 @@
         this.addModal = false
         this.$refs.addForm.resetFields()
         this.addForm.remark = ''
+        this.addForm.applyNum = ''
         this.$refs.table.init()
       },
       viewProject () {

@@ -1051,6 +1051,7 @@
             name: item.name,
             quantity: item.quantity,
             archive: item.archive,
+            restQuantity: item.restQuantity,
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))

@@ -752,9 +752,8 @@
               this.modal_loading = false
               this.$Modal.error({title: '提示信息', content: res.message})
             })
-          } else {
+          }else{
             this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
           }
         })
       },
@@ -829,6 +828,7 @@
             required: item.required,
             name: item.name,
             quantity: item.quantity,
+            restQuantity: item.restQuantity,
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
             id:item.id

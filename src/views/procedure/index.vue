@@ -73,7 +73,7 @@
 
     <Modal title="编辑流程设置" v-model="editModal" width="800" :loading="loading"
       @on-cancel="editCancel">
-      <Form :label-width="100" class="modal-form" :model="editForm">
+      <Form :label-width="100" class="modal-form" :model="editForm" >
         <Row>
           <Col span="12">
             <FormItem label="流程名称" prop="type">
@@ -238,8 +238,12 @@
               </Select>
             </FormItem>
           </Col>
+          <Col span="16" v-if="noteArchiveList.length === 0">
+            <FormItem label="没有存档资料！" >
+            </FormItem>
+          </Col>
         </Row>
-        <Row v-for="(item,index) in archiveSettingNodes" :key="index">
+        <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length !== 0">
           <Col span="8">
             <FormItem :label="item.labelName" >
               <Input v-model="item.roleName"  disabled />
@@ -267,10 +271,17 @@
             </FormItem>
           </Col> -->
         </Row>
+        <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length === 0">
+          <Col span="8">
+            <FormItem :label="item.labelName" >
+              <Input v-model="item.roleName"  disabled />
+            </FormItem>
+          </Col>
+        </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="ghost" size="default" @click="editArchiveCancel">取消</Button>
-        <Button type="primary" size="default" @click="editArchiveSubmit" :loading="modal_loading">确定</Button>
+        <Button type="primary" size="default" @click="editArchiveSubmit" :loading="modal_loading" v-if="noteArchiveList.length !== 0">确定</Button>
       </div>
     </Modal>
 
@@ -300,8 +311,7 @@
       </div>
     </Modal>
 
-    <Modal title="流程设置详情" v-model="viewModal" width="800" :loading="loading"
-      @on-ok="viewOk"
+    <Modal title="流程设置详情" v-model="viewModal" width="800" 
       @on-cancel="viewCancel">
       <Form :label-width="100" class="modal-form" :model="viewForm">
         <Row>
@@ -352,6 +362,9 @@
           </Col>
         </Row>
       </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="viewCancel">取消</Button>
+      </div>
     </Modal>
 
     <Modal v-model="noteModal" width="300" title="提示信息">
@@ -473,6 +486,14 @@
           settingDatas: [],
           settingNodes: []
         },//编辑模块数据
+        ruleEdit:{
+          overId: [
+            { required: true, message: '请选择终止角色', trigger: 'change' }
+          ],
+          roleId: [
+            { required: true, message: '请选择流程角色', trigger: 'change' }
+          ]
+        },
         addMaterialForm:{
           id : 0,
           name:'',
@@ -757,7 +778,7 @@
           }))
           console.log(res.data.settingNodes)
         }, res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
           console.log(res)
@@ -783,7 +804,7 @@
           this.viewModal = true
           console.log(this.viewSettingNodes)
         }, res=>{
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //流程设置确定
@@ -835,7 +856,7 @@
             this.editModal = true
             this.modal_loading = false
           }, res=>{
-            this.$Message.error("获取失败")
+            this.$Modal.error({title: '提示信息', content: res.message})
           })
       },
       //编辑流程配置确定
@@ -862,16 +883,17 @@
             setTimeout(() => {
               this.editModal = false
               this.modal_loading = false
+              this.$refs.editForm.resetFields()
               this.$Message.success("提交成功!")
               this.$refs.table.init()
             }, 2000)
           } else {
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
           }
         },res=>{
           console.log(res.message)
-          this.$Message.error(res.message)
+          this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
         })
       },
@@ -879,6 +901,7 @@
       editCancel () {
         this.editModal = false
         this.$Message.info('你取消了操作')
+        this.$refs.editForm.resetFields()
       },
       // 提示窗关闭
       closes () {
@@ -964,13 +987,14 @@
             console.log(this.settingDatas)
             this.editMaterialModal = false
             this.modal_loading = false
+            this.$refs.ruleEditMaterial.resetFields()
           }
         })
       },
       //编辑资料取消
       editMaterialCancel (){
         this.editMaterialModal = false
-        this.$Message.info('你取消了操作')
+        this.$refs.ruleEditMaterial.resetFields()
       },
       //删除资料
       deleteMaterial () {
@@ -1086,7 +1110,7 @@
             console.log("archiveSettingNodes")
             console.log(this.archiveSettingNodes)
           }, res=>{
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           }),
           this.$request.post("/apiHost/api/processSetting/archiveList",params,res=>{
             console.log(res)
@@ -1102,7 +1126,7 @@
             this.selectMaterialList = this.noteArchiveList
             this.editArchiveModal = true
           }, res=>{
-            this.$Message.error(res.message)
+            this.$Modal.error({title: '提示信息', content: res.message})
           })
         }else{
           this.$Modal.info({title: '提示信息', content: this.selection[0].name+"没有资料！"})

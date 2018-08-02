@@ -833,7 +833,7 @@
         this.reject_loading = true
         let params = {
             id: this.viewForm.id,
-            status:2
+            status:0
         }
         console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
