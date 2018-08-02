@@ -1,20 +1,24 @@
-import axios from "axios"
+import axios from 'axios'
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
     if (sessionStorage.token) {
-      config.headers.token = `${sessionStorage.token}`
-    } else {
-      let href=location.href;
-      if (href.indexOf("login") < 0) {
-        window.location.href = "/#/login"
-        alert("对不起，您尚未登录，请先登录！")
+      if (new Date().getTime() - sessionStorage.startTime > sessionStorage.expTime) {
+        window.location.href = '/#/login'
+        alert('对不起，账户已过期，请重新登录！')
+        return false
+      } else {
+        sessionStorage.setItem('startTime', new Date().getTime())
+        config.headers.token = `${sessionStorage.token}`
+        config.headers.storeId = `${sessionStorage.storeId}`
       }
+    } else {
+      window.location.href = '/#/login'
     }
     return config
   },
   err => {
-     return Promise.reject(err)
+    return Promise.reject(err)
   })
 
 // http response 拦截器

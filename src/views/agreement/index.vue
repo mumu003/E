@@ -358,6 +358,7 @@
             { required: true, message: '请选择协议书名称', trigger: 'change' }
           ],
           applyNum: [
+            { required: true, message: '不能为空', trigger: 'blur' },
             { validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
           ]
@@ -509,124 +510,67 @@
         })
       },
       viewPass(){
-        if(this.isChange === true){
-          this.$refs.viewForm.validate((valid) => {
-            if (valid) {
-              this.modal_loading = true
-              let params = {
-                  id: this.viewForm.id,
-                  actualNum: this.viewForm.actualNum,
-                  status:1
-              }
-              console.log(params)
-              this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-                console.log(res)
-                if (res.code === 200) {
-                  setTimeout(() => {
-                    this.modal_loading = false
-                    this.viewModal = false
-                    this.isChange = false
-                    this.$Message.success("审核通过")
-                    this.$refs.table.init()
-                  }, 2000);
-                } else {
+        this.$refs.viewForm.validate((valid) => {
+          if (valid) {
+            this.modal_loading = true
+            let params = {
+                id: this.viewForm.id,
+                actualNum: this.viewForm.actualNum,
+                status:1
+            }
+            console.log(params)
+            this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+              console.log(res)
+              if (res.code === 200) {
+                setTimeout(() => {
                   this.modal_loading = false
-                  this.$Modal.error({title: '提示信息', content: res.message})
-                }
-              },res=>{
+                  this.viewModal = false
+                  this.isChange = false
+                  this.$Message.success("审核通过")
+                  this.$refs.table.init()
+                }, 2000);
+              } else {
                 this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
-              })
-            }
-          })
-        }else{
-          this.modal_loading = true
-          let params = {
-              id: this.viewForm.id,
-              actualNum: this.viewForm.actualNum,
-              status:1
-          }
-          console.log(params)
-          this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-            console.log(res)
-            if (res.code === 200) {
-              setTimeout(() => {
-                this.modal_loading = false
-                this.viewModal = false
-                this.$Message.success("审核通过")
-                this.$refs.table.init()
-              }, 2000);
-            } else {
+              }
+            },res=>{
               this.modal_loading = false
               this.$Modal.error({title: '提示信息', content: res.message})
-            }
-          },res=>{
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
+            })
+          }
+        })
       },
       viewReject(){
         this.reject_loading = true
-        if(this.isChange === true){
-          this.$refs.viewForm.validate((valid) => {
-            if (valid) {
-              let params = {
-                  id: this.viewForm.id,
-                  actualNum: this.viewForm.actualNum,
-                  status:0
-              }
-              console.log(params)
-              this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-                console.log(res)
-                if (res.code === 200) {
-                  setTimeout(() => {
-                    this.viewModal = false
-                    this.isChange = false
-                    this.reject_loading = false
-                    this.$Message.success("审核驳回")
-                    this.$refs.table.init()
-                  }, 2000);
-                } else {
-                  this.isChange = false
+        this.$refs.viewForm.validate((valid) => {
+          if (valid) {
+            let params = {
+                id: this.viewForm.id,
+                actualNum: this.viewForm.actualNum,
+                status:0
+            }
+            console.log(params)
+            this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+              console.log(res)
+              if (res.code === 200) {
+                setTimeout(() => {
+                  this.viewModal = false
                   this.reject_loading = false
-                  this.$Modal.error({title: '提示信息', content: res.message})
-                }
-              },res=>{
-                this.isChange = false
+                  this.$Message.success("审核驳回")
+                  this.$refs.table.init()
+                }, 2000);
+              } else {
                 this.reject_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
-              })
-            }
-          })
-        }else{
-          let params = {
-            id: this.viewForm.id,
-            actualNum: this.viewForm.actualNum,
-            status:0
-          }
-          console.log(params)
-          this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-            console.log(res)
-            if (res.code === 200) {
-              setTimeout(() => {
-                this.viewModal = false
-                this.isChange = false
-                this.reject_loading = false
-                this.$Message.success("审核驳回")
-                this.$refs.table.init()
-              }, 2000);
-            } else {
-              this.isChange = false
+              }
+            },res=>{
               this.reject_loading = false
               this.$Modal.error({title: '提示信息', content: res.message})
-            }
-          },res=>{
-            this.isChange = false
+            })
+          }else{
             this.reject_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
+          }
+        })
       },
       statusProject(){
         if (this.selected_count === 0) {
