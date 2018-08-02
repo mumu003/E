@@ -83,7 +83,7 @@
           </Col>
           <Col span="24">
             <FormItem label="申请份数" prop="applyNum">
-              <Input v-model="addForm.applyNum" ></Input>
+              <Input v-model="addForm.applyNum" :maxlength=2></Input>
             </FormItem>
           </Col>
           <Col span="24">

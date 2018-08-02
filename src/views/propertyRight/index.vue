@@ -138,7 +138,7 @@
           <Row>
             <Col span="24">
               <FormItem label="楼栋">
-                <Input v-model="batchForm.buildingName" placeholder="请选择楼栋" @on-focus="batchHouse"></Input>
+                <Input v-model="batchForm.buildingName" type="textarea" :autosize="true"  placeholder="请选择楼栋" @on-focus="batchHouse"></Input>
               </FormItem>
             </Col>
             <Col span="24">
@@ -275,6 +275,7 @@
     >
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
+
    <!-- <Modal v-model="statusModal" title="状态详情"
       width="800"
       :loading="loading"
@@ -312,6 +313,9 @@
   </div>
 </template>
 <style>
+  textarea{
+    resize:none;
+  }
   .test{
     display: inline-block;
     width:50px;
@@ -897,6 +901,8 @@
                   this.modal_loading = false;
                   this.addModal = false;
                   this.$Message.success("新增成功！")
+                  this.unitList=[ ]
+                  this.roomsList=[ ]
                   this.$refs.addForm.resetFields()
                   this.$refs.table.init()
                 }, 2000);
@@ -917,6 +923,8 @@
       addCancel() {
         this.addModal=false
         this.$Message.info('你取消了操作')
+        this.unitList=[ ]
+        this.roomsList=[ ]
         this.$refs.addForm.resetFields()
       },
       //批量
