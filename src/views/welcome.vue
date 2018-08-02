@@ -1739,6 +1739,7 @@ export default {
             quantity: item.quantity,
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
+            restQuantity: item.restQuantity,
             id:item.id
           }))
           var dataIdArray = new Array();
@@ -1868,6 +1869,7 @@ export default {
             quantity: item.quantity,
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
+            restQuantity: item.restQuantity,
             id:item.id
           }))
           var dataIdArray = new Array();
@@ -2329,6 +2331,7 @@ export default {
             quantity: item.quantity,
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
+            restQuantity: item.restQuantity,
             id:item.id
           }))
           var dataIdArray = new Array();

@@ -741,6 +741,8 @@
                   this.modal_loading = false;
                   this.addModal = false;
                   this.$Message.success("新增成功！")
+                  this.unitList=[ ]
+                  this.roomsList=[ ]
                   this.$refs.addForm.resetFields()
                   this.$refs.table.init()
                 }, 2000);
@@ -762,13 +764,8 @@
         this.addModal = false
         this.modal_loading = false,
         this.$Message.info('你取消了操作')
-        this.addForm={
-          buildingId: '',
-          roomId: '',
-          unitId: '',
-          customerName: '',
-          fileType: ''
-        }
+        this.unitList=[ ]
+        this.roomsList=[ ]
         this.$refs.addForm.resetFields()
       },
       //获取模态框表格数据

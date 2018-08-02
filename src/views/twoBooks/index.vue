@@ -703,6 +703,8 @@
         this.$refs.addForm.resetFields()
         this.addData = []
         this.isShow=false
+        this.unitList=[ ]
+        this.roomsList=[ ]
         this.$Message.info('你取消了操作')
       },
       addSubmit(){
@@ -720,6 +722,8 @@
                     this.addModal = false
                     this.$refs.addForm.resetFields()
                     this.addData = []
+                    this.unitList=[ ]
+                    this.roomsList=[ ]
                     this.isShow = false
                     this.$Message.success("新增成功！")
                     this.$refs.table.init()

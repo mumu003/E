@@ -689,14 +689,12 @@
                 setTimeout(() => {
                   this.addModal = false
                   this.modal_loading = false;
-                  this.addForm={
-                    buildingId: '',
-                    unitId: '',
-                    roomId: ''
-                  }
                   this.addData = []
                   this.isShow = false
                   this.$Message.success("新增成功！")
+                  this.unitList=[ ]
+                  this.roomsList=[ ]
+                  this.$refs.addForm.resetFields()
                   this.$refs.table.init()
                 }, 2000)
               } else {
@@ -970,12 +968,8 @@
         this.addModal=false
         this.isShow = false
         this.$Message.info('你取消了操作')
-        this.addForm={
-          buildingId: '',
-          roomId: '',
-          unitId: '',
-          customerName: ''
-        }
+        this.unitList=[ ]
+        this.roomsList=[ ]
         this.$refs.addForm.resetFields()
         this.$refs.table.init()
       },
