@@ -73,8 +73,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" >驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass">通过</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" :disabled="isDisable">驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -121,8 +121,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsSend.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="sendFileReject" >驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass">通过</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="sendFileReject" :disabled="isDisable">驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -163,8 +163,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsDelivery.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="deliveryNoticeReject" >驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass">通过</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="deliveryNoticeReject" :disabled="isDisable" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -205,8 +205,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsTransfer.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="transferReject" >驳回</Button>
-               <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass">通过</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="transferReject" :disabled="isDisable" >驳回</Button>
+               <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -247,8 +247,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsTwoFile.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="twoFileReject" >驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass">通过</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="twoFileReject" :disabled="isDisable" >驳回</Button>
+              <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -291,8 +291,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsOwnership.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="ownershipReject" >驳回</Button>
-               <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass">通过</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="ownershipReject" :disabled="isDisable" >驳回</Button>
+               <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -338,8 +338,8 @@
             <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
             <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttonsOrderContract.check" >
-               <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+               <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
             </Col>
           </Row>
@@ -384,6 +384,8 @@ export default {
       }
 
         return {
+          passDisable:false,//防止通过双击事件
+          isDisable:false,//防止驳回双击事件
           viewTabs:'contract',
           buttons:{ },
           buttonsSend:{ },
@@ -772,7 +774,6 @@ export default {
                       },"待发起")
                   }
                 }
-
               },
               {
                 title: '业主姓名',
@@ -914,7 +915,6 @@ export default {
                       },"待发起")
                   }
                 }
-
               },
               {
                 title: '业主姓名',
@@ -1802,9 +1802,11 @@ export default {
               this.modal_loading = false
               this.editContractModal = false
               this.$Message.success("审核通过!")
+              this.passDisable = false
               this.getAgency()
               this.$refs.contracttable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
@@ -1828,11 +1830,15 @@ export default {
         this.$request.post("/apiHost/api/contractBill/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
+            setTimeout(() => {
             this.editContractModal = false
+            this.isDisable = false
             this.$Message.success("审核驳回!")
             this.reject_loading=false
             this.getAgency()
             this.$refs.contracttable.init()
+            }, 2000)
+            this.isDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -1931,10 +1937,12 @@ export default {
             setTimeout(() => {
               this.editSendFileModal = false
               this.modal_loading = false
+              this.passDisable = false
               this.$Message.success("审核通过!")
               this.getAgency()
               this.$refs.sendFiletable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -1957,11 +1965,15 @@ export default {
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
-            this.editSendFileModal = false
-            this.reject_loading=false
-            this.$Message.success("审核驳回!")
-            this.getAgency()
-            this.$refs.sendFiletable.init()
+            setTimeout(() => {
+              this.editSendFileModal = false
+              this.reject_loading = false
+              this.isDisable = false
+              this.$Message.success("审核驳回!")
+              this.getAgency()
+              this.$refs.sendFiletable.init()
+            },2000)
+            this.isDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -2042,10 +2054,12 @@ export default {
             setTimeout(() => {
               this.editDeliveryNoticeModal = false
               this.modal_loading = false
+              this.passDisable = false
               this.$Message.success("审核通过!")
               this.getAgency()
               this.$refs.deliveryNoticetable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2068,11 +2082,15 @@ export default {
         this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
+            setTimeout(() => {
             this.editDeliveryNoticeModal = false
             this.reject_loading=false
+              this.isDisable = false
             this.$Message.success("审核驳回!")
             this.getAgency()
             this.$refs.deliveryNoticetable.init()
+            }, 2000)
+            this.isDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -2153,10 +2171,12 @@ export default {
             setTimeout(() => {
               this.editTransferModal = false
               this.modal_loading = false
+              this.passDisable = false
               this.$Message.success("审核通过!")
               this.getAgency()
               this.$refs.transfertable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2179,11 +2199,15 @@ export default {
         this.$request.post("/apiHost/api/transfer/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
-            this.editTransferModal = false
-            this.reject_loading=false
-            this.$Message.success("审核驳回!")
-            this.getAgency()
-            this.$refs.transfertable.init()
+            setTimeout(() => {
+              this.editTransferModal = false
+              this.reject_loading = false
+              this.isDisable = false
+              this.$Message.success("审核驳回!")
+              this.getAgency()
+              this.$refs.transfertable.init()
+            },2000)
+            this.isDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -2264,10 +2288,12 @@ export default {
             setTimeout(() => {
               this.editTwoFileModal = false
               this.modal_loading = false
+              this.passDisable = false
               this.$Message.success("审核通过!")
               this.getAgency()
               this.$refs.twoFiletable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2290,11 +2316,15 @@ export default {
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
-            this.editTwoFileModal = false
-            this.reject_loading=false
-            this.$Message.success("审核驳回!")
-            this.getAgency()
-            this.$refs.twoFiletable.init()
+            setTimeout(() => {
+              this.editTwoFileModal = false
+              this.reject_loading = false
+              this.isDisable = false
+              this.$Message.success("审核驳回!")
+              this.getAgency()
+              this.$refs.twoFiletable.init()
+            },2000)
+            this.isDisable = true
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -2393,10 +2423,12 @@ export default {
             setTimeout(() => {
               this.editOwnershipModal = false
               this.modal_loading = false
+              this.passDisable = false
               this.$Message.success("审核通过!")
               this.getAgency()
               this.$refs.ownershiptable.init()
             }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2419,11 +2451,15 @@ export default {
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
           console.log(res)
           if (res.code === 200) {
-            this.editOwnershipModal = false
-            this.reject_loading=false
-            this.$Message.success("审核驳回!")
-            this.getAgency()
-            this.$refs.ownershiptable.init()
+            setTimeout(() => {
+              this.editOwnershipModal = false
+              this.reject_loading = false
+              this.isDisable = false
+              this.$Message.success("审核驳回!")
+              this.getAgency()
+              this.$refs.ownershiptable.init()
+            },2000)
+            this.isDisable = true
           } else {
           this.$Modal.error({title: '提示信息', content: res.message})
             this.reject_loading=false
@@ -2507,12 +2543,14 @@ export default {
           console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false;
+              this.modal_loading = false
               this.editOrderContractModal = false
+              this.passDisable = false
               this.$Message.success("审核通过")
               this.getAgency()
               this.$refs.orderContracttable.init()
-            }, 2000);
+            }, 2000)
+            this.passDisable = true
           } else {
             this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2536,10 +2574,12 @@ export default {
             setTimeout(() => {
               this.editOrderContractModal = false
               this.reject_loading=false
+              this.isDisable = false
               this.$Message.success("审核驳回")
               this.getAgency()
               this.$refs.orderContracttable.init()
-            }, 2000);
+            }, 2000)
+            this.isDisable = true
           } else {
             this.reject_loading=false
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -2553,7 +2593,6 @@ export default {
       actualNumChange(){
         this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
       },
-
     }
 }
 </script>

@@ -23,12 +23,12 @@
                   </Col>
                   <Col span="6">
                     <FormItem label="时间">
-                      <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
+                      <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
                     </FormItem>
                   </Col>
                   <Col span="6">
                     <FormItem>
-                      <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
+                      <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
                     </FormItem>
                   </Col>
                 </Row>
@@ -165,8 +165,8 @@
             <Button size="default" @click="viewCancel" style="margin-right: 10px">取消</Button>
             <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading">通过</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
           <Col span="24" v-if="viewTabs === 'name2'">
@@ -253,6 +253,8 @@
         }
       };
       return {
+        passDisable:false,//防止通过双击事件
+        isDisable:false,//防止驳回双击事件
         isFirst: false,
         isChange: false,
         loading: true,
@@ -530,9 +532,11 @@
                   this.modal_loading = false
                   this.viewModal = false
                   this.isChange = false
+                  this.passDisable=false
                   this.$Message.success("审核通过")
                   this.$refs.table.init()
-                }, 2000);
+                }, 2000)
+                this.passDisable=true
               } else {
                 this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
@@ -560,9 +564,11 @@
                 setTimeout(() => {
                   this.viewModal = false
                   this.reject_loading = false
+                  this.isDisable=false
                   this.$Message.success("审核驳回")
                   this.$refs.table.init()
-                }, 2000);
+                }, 2000)
+                this.isDisable=true
               } else {
                 this.reject_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
