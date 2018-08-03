@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Row :gutter="10" class="mt10">
+      <Row :gutter="10" class="mt10">
           <Col span="24" class="demo-tabs-style1" style="padding:6px;">
               <Tabs type="card" @on-click="changs"  v-model="viewTabs">
                 <TabPane label="合同备案" name="contract" :label="contractLabel" >
@@ -32,10 +32,9 @@
                 </TabPane>
               </Tabs>
             </Col>
-        </Row>
+      </Row>
 
-      <Modal v-model="editContractModal" title="编辑合同备案"
-             width="800" >
+      <Modal v-model="editContractModal" title="编辑合同备案" width="800" >
         <Form  :model="contractForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -82,8 +81,7 @@
         </div>
       </Modal>
 
-      <Modal v-model="editSendFileModal" title="编辑发函"
-             width="800" >
+      <Modal v-model="editSendFileModal" title="编辑发函" width="800" >
         <Form  :model="sendFileForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -134,9 +132,7 @@
         </div>
       </Modal>
 
-      <Modal v-model="editDeliveryNoticeModal" title="编辑交房通知"
-             width="800"
-      >
+      <Modal v-model="editDeliveryNoticeModal" title="编辑交房通知" width="800" >
         <Form  :model="deliveryNoticeForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -176,9 +172,7 @@
         </div>
       </Modal>
 
-      <Modal v-model="editTransferModal" title="编辑水电过户"
-             width="800"
-      >
+      <Modal v-model="editTransferModal" title="编辑水电过户" width="800">
         <Form  :model="transferForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -218,9 +212,7 @@
         </div>
       </Modal>
 
-      <Modal v-model="editTwoFileModal" title="编辑两书"
-             width="800"
-      >
+      <Modal v-model="editTwoFileModal" title="编辑两书" width="800">
         <Form  :model="twoFileForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -261,9 +253,7 @@
         </div>
       </Modal>
 
-      <Modal v-model="editOwnershipModal" title="编辑产权办理"
-             width="800"
-      >
+      <Modal v-model="editOwnershipModal" title="编辑产权办理" width="800">
         <Form  :model="ownershipForm" :label-width="100">
           <Row>
             <Col span="8">
@@ -350,7 +340,6 @@
           </Row>
         </div>
       </Modal>
-
 
     </div>
 </template>
@@ -592,7 +581,7 @@ export default {
           },
           //发函表格数据
           tableConfig2:{
-            url:"/apiHost/api/sendFileBill/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -677,7 +666,7 @@ export default {
           },
           //交房表格数据
           tableConfig3:{
-            url:"/apiHost/api/deliveryNotice/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -748,7 +737,7 @@ export default {
           },
           //水电过户表格数据
           tableConfig4:{
-            url:"/apiHost/api/transfer/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -818,7 +807,7 @@ export default {
           },
           //两书表格数据
           tableConfig5:{
-            url:"/apiHost/api/twoFileBill/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -889,7 +878,7 @@ export default {
           },
           //产权办理表格数据
           tableConfig6:{
-            url:"/apiHost/api/ownershipBill/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -959,7 +948,7 @@ export default {
           },
           //协议书申请表格数据
           tableConfig7:{
-            url:"/apiHost/api/contractApplication/todoList",
+            url:"",
             columns:[
               {
                 title: '操作',
@@ -1722,7 +1711,6 @@ export default {
       //待办事项计数统计
       getAgency(){
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
         }else{
@@ -1734,7 +1722,12 @@ export default {
             this.badge.ownership=res.data.ownership
             this.badge.twoFile=res.data.twoFile
             this.badge.deliveryNotice=res.data.deliveryNotice
-            console.log(this.badge)
+            this.tableConfig2.url="/apiHost/api/sendFileBill/todoList"
+            this.tableConfig3.url="/apiHost/api/deliveryNotice/todoList"
+            this.tableConfig4.url="/apiHost/api/transfer/todoList"
+            this.tableConfig5.url="/apiHost/api/twoFileBill/todoList"
+            this.tableConfig6.url="/apiHost/api/ownershipBill/todoList"
+            this.tableConfig7.url="/apiHost/api/contractApplication/todoList"
           },res=>{
             this.$Modal.error({ title: '提示信息',content: res.message})
           })
