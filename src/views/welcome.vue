@@ -1718,22 +1718,27 @@ export default {
         this.$refs.twoFiletable.init()
         this.$refs.ownershiptable.init()
         this.$refs.orderContracttable.init()*/
-
       },
       //待办事项计数统计
       getAgency(){
-        this.$request.post("/apiHost/api/index/todoList",'',res=>{
-          this.badge.contract=res.data.contract
-          this.badge.sendFile=res.data.sendFile
-          this.badge.orderContract=res.data.orderContract
-          this.badge.transfer=res.data.transfer
-          this.badge.ownership=res.data.ownership
-          this.badge.twoFile=res.data.twoFile
-          this.badge.deliveryNotice=res.data.deliveryNotice
-          console.log(this.badge)
-        },res=>{
-          this.$Message.error({ title: '提示信息',content: res.message})
-        })
+        let token = sessionStorage.getItem("token")
+        console.log("token="+token)
+        if(token === null){
+          window.location.href = '/#/login'
+        }else{
+          this.$request.post("/apiHost/api/index/todoList",'',res=>{
+            this.badge.contract=res.data.contract
+            this.badge.sendFile=res.data.sendFile
+            this.badge.orderContract=res.data.orderContract
+            this.badge.transfer=res.data.transfer
+            this.badge.ownership=res.data.ownership
+            this.badge.twoFile=res.data.twoFile
+            this.badge.deliveryNotice=res.data.deliveryNotice
+            console.log(this.badge)
+          },res=>{
+            this.$Modal.error({ title: '提示信息',content: res.message})
+          })
+        }
       },
       //编辑合同备案
       editContractList(){

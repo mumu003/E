@@ -563,19 +563,25 @@
       },
       //获取楼栋列表
       getBuildings() {
-        let params = {
-          orgId: sessionStorage.getItem("orgId"),
-          projectId: sessionStorage.getItem("curProjectId")
+        let token = sessionStorage.getItem("token")
+        console.log("token="+token)
+        if(token === null){
+          window.location.href = '/#/login'
+        }else{
+          let params = {
+            orgId: sessionStorage.getItem("orgId"),
+            projectId: sessionStorage.getItem("curProjectId")
+          }
+          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
+            console.log(res)
+            this.buildingList = res.data.buildings.map(item => ({
+              id: item.buildingId,
+              name: item.buildingName
+            }))
+          }, res => {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          })
         }
-        this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-          console.log(res)
-          this.buildingList = res.data.buildings.map(item => ({
-            id: item.buildingId,
-            name: item.buildingName
-          }))
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
       },
       //获取单元列表
       getUnits(buildingId) {
