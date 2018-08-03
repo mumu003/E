@@ -27,12 +27,12 @@
                 </Col>
                 <Col span="6">
                 <FormItem label="开始时间">
-                  <DatePicker type="datetime" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                  <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
                 </FormItem>
                 </Col>
                 <Col span="6">
                 <FormItem label="结束时间">
-                  <DatePicker type="datetime" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                  <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
                 </FormItem>
                 </Col>
               </Row>
@@ -73,7 +73,7 @@
 
     <Modal title="编辑流程设置" v-model="editModal" width="800" :loading="loading"
       @on-cancel="editCancel">
-      <Form :label-width="100" class="modal-form" :model="editForm" >
+      <Form :label-width="100" class="modal-form" :model="editForm" ref="editForm">
         <Row>
           <Col span="12">
             <FormItem label="流程名称" prop="type">
@@ -147,7 +147,7 @@
       </div>
     </Modal>
 
-    <Modal title="新增材料" v-model="addMaterialModal" :closable="false" width="400px">
+    <Modal title="新增材料" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
       <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
           <Col span="22" >
@@ -184,7 +184,8 @@
       </div>
     </Modal>
 
-    <Modal title="编辑材料" v-model="editMaterialModal" :closable="false" width="400px">
+    <Modal title="编辑材料" v-model="editMaterialModal" :closable="false" width="400px"
+      @on-cancel="editMaterialCancel">
       <Form  ref="editMaterialForm" :model="editMaterialForm" :label-width="100" :rules="ruleEditMaterial" >
         <Row>
           <Col span="22" >
@@ -378,7 +379,6 @@
 
 <script>
   export default {
-    name: 'processConfiguration',
     data () {
       const validateNumber = (rule, value, callback) => {
         let dot=value.indexOf(".");
@@ -850,6 +850,7 @@
               archive: item.archive,
               id:item.id
             }))
+            console.log("this.settingDatas="+JSON.stringify(this.settingDatas))
             console.log(res.data.settingNodes)
             this.settingNodes = res.data.settingNodes
             this.settingNodesLength = this.settingNodes.length-1
@@ -902,6 +903,7 @@
         this.editModal = false
         this.$Message.info('你取消了操作')
         this.$refs.editForm.resetFields()
+        this.$refs.table.init()
       },
       // 提示窗关闭
       closes () {
@@ -930,6 +932,7 @@
             this.settingDatas.push(this.addDataForm)
             console.log("push后"+this.settingDatas.length)
             this.addMaterialModal = false
+            this.$refs.addMaterialForm.resetFields()
             this.modal_loading = false
           }
         })
@@ -937,7 +940,6 @@
       //新增资料取消
       addCancel () {
         this.addMaterialModal = false
-        this.$refs.addMaterialForm.resetFields()
       },
       //编辑流程配置模态框资料表格
       selection_edit(selection){
@@ -987,43 +989,49 @@
             console.log(this.settingDatas)
             this.editMaterialModal = false
             this.modal_loading = false
-            this.$refs.ruleEditMaterial.resetFields()
+            this.$refs.editMaterialForm.resetFields()
           }
         })
       },
       //编辑资料取消
       editMaterialCancel (){
         this.editMaterialModal = false
-        this.$refs.ruleEditMaterial.resetFields()
+        this.$refs.editMaterialForm.resetFields()
       },
       //删除资料
       deleteMaterial () {
         console.log(this.editSelect.length)
-        if (this.editSelect.length === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+        if(this.settingDatas.length === 0){
+          document.getElementById('note-info').innerHTML = '没有存档资料！'
           this.noteModal = true
           return false
-        }
-        console.log(this.editSelect)
-        let sortLength = this.editSelect.length
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认删除?',
-          loading: true,
-          onOk: () => {
-            for(var i=0; i<sortLength; i++){
-              console.log("i="+i)
-              let dataIndex = this.editSelect[i].sort-1-i
-              console.log("前this.settingDatas="+JSON.stringify(this.settingDatas))
-              console.log("dataIndex="+dataIndex)
-              this.settingDatas.splice(dataIndex,1)
-              console.log("删除后this.settingDatas="+JSON.stringify(this.settingDatas))
-            }
-            this.$Message.success("删除成功")
-            this.$Modal.remove()
-            // this.$Vue.set(this.settingDatas,dataSort,obj)
+        }else{
+          if (this.editSelect.length === 0) {
+            document.getElementById('note-info').innerHTML = '请选择一条数据！'
+            this.noteModal = true
+            return false
           }
-        })
+          console.log(this.editSelect)
+          let sortLength = this.editSelect.length
+          this.$Modal.confirm({
+            title: '操作提示',
+            content: '确认删除?',
+            loading: true,
+            onOk: () => {
+              for(var i=0; i<sortLength; i++){
+                for(var j=0; j<this.settingDatas.length; j++){
+                  if(this.editSelect[i].sort === this.settingDatas[j].sort){
+                    this.settingDatas.splice(j,1)
+                  }
+                }
+              }
+              this.$Message.success("删除成功")
+              this.$Modal.remove()
+              this.editSelect = []
+              // this.$Vue.set(this.settingDatas,dataSort,obj)
+            }
+          })
+        }
       },
       //新增角色
       addNode(){
@@ -1183,6 +1191,7 @@
                           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
                           console.log("m=0------数量相减后剩余数量="+this.selectMaterialList[j].surplusQuantity)
                         }else{
+                          
                           console.log("m不等于0------剩余数量是="+this.selectMaterialList[j].surplusQuantity)
                           console.log("tag数量是="+this.archiveSettingNodes[m].data[n].quantity)
                           this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
@@ -1374,7 +1383,15 @@
       },
       //编辑档案资料-Tag删除
       handleClose (indexId,ind){
-        this.archiveSettingNodes[indexId].data.splice(ind, 1)
+        console.log("indexId="+indexId+"          ind="+ind)
+        if(this.archiveSettingNodes[indexId].data.length === 1){
+          this.archiveSettingNodes[indexId].data[0].id="null"
+          this.archiveSettingNodes[indexId].data[0].dataId=null
+          this.archiveSettingNodes[indexId].data[0].dataName="null"
+          this.archiveSettingNodes[indexId].data[0].quantity=0
+        }else{
+          this.archiveSettingNodes[indexId].data.splice(ind, 1)
+        }
       },
       //存档资料确定
       editArchiveSubmit () {
