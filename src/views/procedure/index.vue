@@ -253,13 +253,17 @@
           <Col span="16" v-if="index !== archiveSettingNodes.length-1">
             <FormItem label="存档资料" >
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
-                  v-if="archiveSettingNodes[index].data[0].dataId !== null">
-                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
+                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
+                  v-if="archiveSettingNodes[index].data[0].dataId === null">
               </div>
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
                   border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
-                  v-if="archiveSettingNodes[index].data[0].dataId === null">
+                  v-else-if="archiveSettingNodes[index].data[0].quantity === 0">
+              </div>
+              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
+                  v-else="archiveSettingNodes[index].data[0].dataId !== null">
+                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
               </div>
             </FormItem>
           </Col>
@@ -754,6 +758,7 @@
           startUpdateTime: '',
           endUpdateTime: ''
         }
+        this.$refs.table.init()
       },
       //流程设置详情
       viewProject(){
@@ -1126,6 +1131,7 @@
             console.log(this.archiveSettingNodes)
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
+            this.$refs.table.init()
           }),
           this.$request.post("/apiHost/api/processSetting/archiveList",params,res=>{
             console.log(res)
@@ -1133,7 +1139,7 @@
               id : item.id,
               name : item.name,
               quantity : item.quantity,
-              archiveQuantity : 0,
+              archiveQuantity : 1,
               surplusQuantity : item.quantity,
               indexQuantity : 0
             }))
@@ -1142,9 +1148,11 @@
             this.editArchiveModal = true
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
+            this.$refs.table.init()
           })
         }else{
           this.$Modal.info({title: '提示信息', content: this.selection[0].name+"没有资料！"})
+          this.$refs.table.init()
         }
       },
       //节点存档
@@ -1155,7 +1163,7 @@
         //节点的data
         this.archiveDatas = this.archiveSettingNodes[index].data
         console.log("archiveDatas节点ID的长度="+this.archiveDatas.length)
-        console.log(this.archiveDatas)
+        console.log("this.archiveDatas="+JSON.stringify(this.archiveDatas))
         this.selectMaterialForm.dataIds=[]
 
         //复选框
@@ -1167,111 +1175,32 @@
         console.log("this.selectMaterialForm.dataIds.length="+this.selectMaterialForm.dataIds.length)
         console.log(this.selectMaterialForm.dataIds)
 
-        if(this.selectMaterialForm.dataIds[0] !== null){
-          console.log("this.selectMaterialForm.dataIds[0]--------------不是空的")
-          console.log("this.selectMaterialList="+JSON.stringify(this.selectMaterialList))
-          for (var j = 0; j < this.selectMaterialList.length; j++){
-            let isExist = 0
-            for (var k = 0; k < this.archiveDatas.length; k++){
-              let noteId = this.selectMaterialList[j].id
-              let archiveId = this.archiveDatas[k].dataId
-              // console.log("noteId="+noteId+" ----archiveId="+archiveId)
-              if(noteId === archiveId){
-                console.log("当前divlist中有存在该资料 j="+j+" k="+k)
-                let arQuantity = this.archiveDatas[k].quantity
-                this.selectMaterialList[j].indexQuantity = arQuantity-1
-                console.log("archiveQuantity="+this.archiveDatas[k].quantity)
-                if(index === 0){
-                  this.selectMaterialList[j].archiveQuantity = arQuantity
-                  this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
-                }else{
-                  for(var m = 0; m<index; m++){
-                    console.log("index="+index)
-                    for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){
-                      console.log("data.length="+this.archiveSettingNodes[m].data.length)
-                      console.log("m="+m+" n="+n)
-                      console.log("nodeId="+noteId+"data[n].dataId="+this.archiveSettingNodes[m].data[n].dataId)
-                      if(noteId === this.archiveSettingNodes[m].data[n].dataId){
-                        if(m === 0){
-                          console.log("m=0------总数量是="+this.selectMaterialList[j].quantity)
-                          console.log("m=0------tag数量是="+this.archiveSettingNodes[m].data[n].quantity)
-                          this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
-                          console.log("m=0------数量相减后剩余数量="+this.selectMaterialList[j].surplusQuantity)
-                        }else{
-                          
-                          console.log("m不等于0------剩余数量是="+this.selectMaterialList[j].surplusQuantity)
-                          console.log("tag数量是="+this.archiveSettingNodes[m].data[n].quantity)
-                          this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
-                          console.log("数量相减后剩余数量="+this.selectMaterialList[j].surplusQuantity)
-                        }
-                      }
-                    }
-                  }
-                  if(this.selectMaterialList[j].surplusQuantity === 0){
-                    this.selectMaterialList[j].archiveQuantity = 0
-                  }else{
-                    this.selectMaterialList[j].archiveQuantity = arQuantity
-                  }
-                }
-              }else{
-                isExist=isExist+1
-                // console.log("isExist="+isExist+" j="+j+" k="+k)
-                if(isExist === this.archiveDatas.length){
-                  this.selectMaterialList[j].indexQuantity = 0
-                  if(index === 0){
-                    this.selectMaterialList[j].archiveQuantity = 1
-                    this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity
-                  }else{
-                    for(var m = 0; m<index; m++){
-                      for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){
-                        if(noteId === this.archiveSettingNodes[m].data[n].dataId){
-                          if(m === 0){
-                            this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].quantity - this.archiveSettingNodes[m].data[n].quantity
-                          }else{
-                            this.selectMaterialList[j].surplusQuantity = this.selectMaterialList[j].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
-                          }
-                        }
-                      }
-                    }
-                    if(this.selectMaterialList[j].surplusQuantity === 0){
-                      this.selectMaterialList[j].archiveQuantity = 0
-                    }else{
-                      this.selectMaterialList[j].archiveQuantity = 1
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }else{
-          console.log("this.selectMaterialForm.dataIds[0]是空的")
-          this.selectMaterialForm.dataIds.splice(0,1)
-          for (var l = 0; l < this.selectMaterialList.length; l++){
-            this.selectMaterialList[l].indexQuantity = 0
-            this.selectMaterialList[l].archiveQuantity = 0
-            if(index === 0){
-              this.selectMaterialList[l].surplusQuantity =this.selectMaterialList[l].quantity
-            }else{
-              let noteId = this.selectMaterialList[l].id
-              for(var m = 0; m<index; m++){
-                for(var n = 0; n<this.archiveSettingNodes[m].data.length; n++){
-                  if(noteId === this.archiveSettingNodes[m].data[n].dataId){
-                    if(m === 0){
-                      this.selectMaterialList[l].surplusQuantity = this.selectMaterialList[l].quantity - this.archiveSettingNodes[m].data[n].quantity
-                    }else{
-                      this.selectMaterialList[l].surplusQuantity = this.selectMaterialList[l].surplusQuantity - this.archiveSettingNodes[m].data[n].quantity
-                    }
-                  }
-                }
-              }
-              if(this.selectMaterialList[l].surplusQuantity === 0){
-                this.selectMaterialList[l].archiveQuantity = 0
-              }else{
-                this.selectMaterialList[l].archiveQuantity = 1
+        console.log("this.selectMaterialList.length="+this.selectMaterialList.length)
+        console.log("this.archiveSettingNodes.length="+this.archiveSettingNodes.length)
+
+        console.log("计算divlist中该资料还剩余多少")
+        for(var i=0; i<this.selectMaterialList.length; i++){
+          this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].quantity
+          for(var j=0; j<this.archiveSettingNodes.length-1; j++){
+            for(var k=0; k<this.archiveSettingNodes[j].data.length; k++){
+              if(this.selectMaterialList[i].id === this.archiveSettingNodes[j].data[k].dataId){
+                this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity - this.archiveSettingNodes[j].data[k].quantity
               }
             }
           }
         }
+        console.log("计算结束"+JSON.stringify(this.selectMaterialList))
+
+        for(var i=0; i<this.selectMaterialList.length; i++){
+          for(var j=0; j<this.archiveDatas.length; j++){
+            if(this.selectMaterialList[i].id === this.archiveDatas[j].dataId){
+              this.selectMaterialList[i].indexQuantity = this.archiveDatas[j].quantity-1
+              this.selectMaterialList[i].archiveQuantity = this.archiveDatas[j].quantity
+              this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity + this.archiveDatas[j].quantity
+            }
+          }
+        }
+        console.log("计算结束"+JSON.stringify(this.selectMaterialList))
         
         // this.selectMaterialListTwo = this.selectMaterialList
         this.backupSelectMaterialList = this.selectMaterialList.map(item=>({
@@ -1292,14 +1221,7 @@
       getQuantity(indexQuantity,index){
         console.log("indexQuantity="+indexQuantity+"---------index="+index)
         let archiveNum = indexQuantity+1
-        let surplusNum = this.selectMaterialList[index].surplusQuantity
-        let differenceNum = surplusNum-archiveNum
-        if(differenceNum < 0){
-          this.$Modal.info({title: '提示信息', content: "该资料剩余["+surplusNum+"]份"})
-          this.selectMaterialList[index].indexQuantity = 0
-        }else{
-          this.selectMaterialList[index].archiveQuantity = indexQuantity+1
-        }
+        this.selectMaterialList[index].archiveQuantity = archiveNum
       },
       //选择存档资料确定
       selectMaterialSubmit (){
@@ -1308,69 +1230,70 @@
         console.log(this.selectMaterialForm.dataIds)
         if(this.selectMaterialForm.dataIds.length !== 0){
           if(this.selectMaterialForm.dataIds[0] !== null){
-            // this.$Modal.info({title: '提示信息', content: "你选择了"+JSON.stringify(this.selectMaterialForm.dataIds)})
-            for(var i=0; i<this.selectMaterialList.length; i++){
-              this.selectMaterialList[i].surplusQuantity=this.selectMaterialList[i].surplusQuantity-this.selectMaterialList[i].archiveQuantity
-            }
-            console.log("剩余数量计算完成")
-            console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
-            for(var i=0; i<this.selectMaterialList.length; i++){
-              for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
-                // console.log("this.selectMaterialList[i].id"+this.selectMaterialList[i].id)
-                // console.log("this.selectMaterialForm.dataIds[j]"+this.selectMaterialForm.dataIds[j])
+            this.$Modal.info({title: '提示信息', content: "你选择了"+JSON.stringify(this.selectMaterialForm.dataIds)})
+            // for(var i=0; i<this.selectMaterialList.length; i++){
+            //   this.selectMaterialList[i].surplusQuantity=this.selectMaterialList[i].surplusQuantity-this.selectMaterialList[i].archiveQuantity
+            // }
+            // console.log("剩余数量计算完成")
+            // console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
+            // for(var i=0; i<this.selectMaterialList.length; i++){
+            //   for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
+            //     // console.log("this.selectMaterialList[i].id"+this.selectMaterialList[i].id)
+            //     // console.log("this.selectMaterialForm.dataIds[j]"+this.selectMaterialForm.dataIds[j])
 
-                if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
-                  // console.log("------------被勾选了")
-                  if(this.selectMaterialList[i].surplusQuantity === 0){
-                    console.log("剩余数量为0")
-                    let kIndex = this.selectMaterialForm.index+1
-                    for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
-                      for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
-                        if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
-                          console.log("l="+l)
-                          console.log("删除前的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
-                          this.archiveSettingNodes[k].data.splice(l,1)
-                          console.log("删除后的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
-                        }
-                      }
-                    }
-                    //添加Tag
-                    this.backNoteArchive={
-                      dataId:this.selectMaterialList[i].id,
-                      dataName:this.selectMaterialList[i].name,
-                      quantity:this.selectMaterialList[i].archiveQuantity
-                    }
-                    this.backNoteArchiveList.push(this.backNoteArchive)
-                  }else{
-                    let kIndex = this.selectMaterialForm.index+1
-                    for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
-                      for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
-                        if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
-                          if(this.archiveSettingNodes[k].data[l].quantity <= this.selectMaterialList[i].surplusQuantity){
-                            this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity - this.archiveSettingNodes[k].data[l].quantity
-                          }else{
-                            this.archiveSettingNodes[k].data.splice(l,1)
-                          }
-                        }
-                      }
-                    }
-                    //添加Tag
-                    this.backNoteArchive={
-                      dataId:this.selectMaterialList[i].id,
-                      dataName:this.selectMaterialList[i].name,
-                      quantity:this.selectMaterialList[i].archiveQuantity
-                    }
-                    this.backNoteArchiveList.push(this.backNoteArchive)
-                  }
-                }
-              }
-            }
-            console.log("装载完毕")
-            console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
-            console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
-            this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
-            console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
-            this.selectMaterialModal = false 
+            //     if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
+            //       // console.log("------------被勾选了")
+            //       if(this.selectMaterialList[i].surplusQuantity === 0){
+            //         console.log("剩余数量为0")
+            //         let kIndex = this.selectMaterialForm.index+1
+            //         console.log("kIndex="+kIndex+"this.archiveSettingNodes.length-1="+this.archiveSettingNodes.length-1+"this.archiveSettingNodes[k].data.length-1="+this.archiveSettingNodes[k].data.length-1)
+            //         for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
+            //           for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
+            //             if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
+            //               console.log("l="+l)
+            //               console.log("删除前的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
+            //               this.archiveSettingNodes[k].data.splice(l,1)
+            //               console.log("删除后的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
+            //             }
+            //           }
+            //         }
+            //         //添加Tag
+            //         this.backNoteArchive={
+            //           dataId:this.selectMaterialList[i].id,
+            //           dataName:this.selectMaterialList[i].name,
+            //           quantity:this.selectMaterialList[i].archiveQuantity
+            //         }
+            //         this.backNoteArchiveList.push(this.backNoteArchive)
+            //       }else{
+            //         let kIndex = this.selectMaterialForm.index+1
+            //         for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
+            //           for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
+            //             if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
+            //               if(this.archiveSettingNodes[k].data[l].quantity <= this.selectMaterialList[i].surplusQuantity){
+            //                 this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity - this.archiveSettingNodes[k].data[l].quantity
+            //               }else{
+            //                 this.archiveSettingNodes[k].data.splice(l,1)
+            //               }
+            //             }
+            //           }
+            //         }
+            //         //添加Tag
+            //         this.backNoteArchive={
+            //           dataId:this.selectMaterialList[i].id,
+            //           dataName:this.selectMaterialList[i].name,
+            //           quantity:this.selectMaterialList[i].archiveQuantity
+            //         }
+            //         this.backNoteArchiveList.push(this.backNoteArchive)
+            //       }
+            //     }
+            //   }
+            // }
+            // console.log("装载完毕")
+            // console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
+            // console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+            // this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
+            // console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+            // this.selectMaterialModal = false 
           }else{
             this.$Modal.info({title: '提示信息', content: "请选择资料!"})
           }
@@ -1385,6 +1308,7 @@
           this.selectMaterialList[i].archiveQuantity = this.backupSelectMaterialList[i].archiveQuantity
           this.selectMaterialList[i].surplusQuantity = this.backupSelectMaterialList[i].surplusQuantity
         }
+        console.log("取消this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
         this.selectMaterialModal = false
         this.$Message.info('你取消了操作')
       },
