@@ -1,7 +1,7 @@
 <template>
     <div>
         <Row :gutter="10" class="mt10">
-          <Col span="24" class="demo-tabs-style1" style="padding:16px;">
+          <Col span="24" class="demo-tabs-style1" style="padding:6px;">
               <Tabs type="card" @on-click="changs"  v-model="viewTabs">
                 <TabPane label="合同备案" name="contract" :label="contractLabel" >
                   <m-table :config="tableConfig"  ref="contracttable"  :isFirst="isFirst"></m-table>
@@ -104,6 +104,11 @@
             <Col span="8">
             <FormItem label="业主姓名">
               <Input v-model="sendFileForm.customerName" readonly></Input>
+            </FormItem>
+            </Col>
+            <Col span="8">
+            <FormItem label="发函类型">
+              <Input v-model="sendFileForm.fileType" readonly></Input>
             </FormItem>
             </Col>
             <Col span="24">
@@ -632,7 +637,21 @@ export default {
                       },"待发起")
                   }
                 }
-
+              },
+              {
+                title: '发函类型',
+                key: 'fileType',
+                width:100,
+                render:(h,params)=>{
+                  switch(params.row.fileType){
+                    case 'Contract':
+                      return h('div',"未按时转签约")
+                    case 'Payment':
+                      return h('div',"未按时付款")
+                    case 'Mortgage':
+                      return h('div',"未按时按揭")
+                  }
+                }
               },
               {
                 title: '业主姓名',
@@ -1176,6 +1195,7 @@ export default {
             unitName:'',
             roomNum:'',
             customerName:'',
+            fileType:'',
             dataId:[ ]
           },
           viewStartSendFile: [
@@ -1863,6 +1883,13 @@ export default {
           this.sendFileForm.unitName = res.data.unitName
           this.sendFileForm.roomNum = res.data.roomNum
           this.sendFileForm.customerName = res.data.customerName
+          if(res.data.fileType ==='Contract' ){
+            this.sendFileForm.fileType = '未按时转签约'
+          }else if(res.data.fileType ==='Payment' ){
+            this.sendFileForm.fileType = '未按时付款'
+          }else if(res.data.fileType ==='Mortgage' ){
+            this.sendFileForm.fileType = '未按时按揭'
+          }
           this.buttonsSend.start = res.data.buttons.start
           this.buttonsSend.stop = res.data.buttons.stop
           this.buttonsSend.check = res.data.buttons.check

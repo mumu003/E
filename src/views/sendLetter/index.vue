@@ -166,6 +166,11 @@
                 <Input v-model="viewForm.customerName" readonly></Input>
               </FormItem>
               </Col>
+              <Col span="8">
+              <FormItem label="发函类型">
+                <Input v-model="viewForm.fileType" readonly></Input>
+              </FormItem>
+              </Col>
               <Col span="24">
               资料
               </Col>
@@ -485,6 +490,7 @@
           unitName:'',
           roomNum:'',
           customerName:'',
+          fileType:'',
           dataId:[]
         },
         //审核模态框资料
@@ -817,6 +823,13 @@
           this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
           this.viewForm.customerName = res.data.customerName
+          if(res.data.fileType ==='Contract' ){
+            this.viewForm.fileType = '未按时转签约'
+          }else if(res.data.fileType ==='Payment' ){
+            this.viewForm.fileType = '未按时付款'
+          }else if(res.data.fileType ==='Mortgage' ){
+            this.viewForm.fileType = '未按时按揭'
+          }
           this.buttons.start = res.data.buttons.start
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
