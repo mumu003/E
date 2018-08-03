@@ -176,12 +176,25 @@
             <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
             <Col span="24">
             <Timeline>
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+              <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
                 <p>{{item.createdAt}}</p>
                 <p v-if="index === 0">发起</p>
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
                 <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
                 <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+              </TimelineItem>-->
+              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'">
+                <p>{{item.createdAt}}</p>
+                <!--<p v-if="index === 0">发起</p>-->
+                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                <p v-if="index === 0">{{item.nodeName}}</p>
+                <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
               </TimelineItem>
             </Timeline>
             </Col>

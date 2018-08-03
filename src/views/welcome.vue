@@ -1,7 +1,7 @@
 <template>
     <div>
       <Row :gutter="10" class="mt10">
-          <Col span="24" class="demo-tabs-style1" style="padding:6px;">
+          <Col span="24" class="demo-tabs-style1" style="padding-left:6px;">
               <Tabs type="card" @on-click="changs"  v-model="viewTabs">
                 <TabPane label="合同备案" name="contract" :label="contractLabel" >
                   <m-table :config="tableConfig"  ref="contracttable"  :isFirst="isFirst"></m-table>
