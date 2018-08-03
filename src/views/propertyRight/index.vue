@@ -1337,7 +1337,11 @@
           endUpdateTime: '',
           page:1
         },
-        this.$refs.table.init();
+        this.isFirst = true
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       //取消操作
       viewCancel () {

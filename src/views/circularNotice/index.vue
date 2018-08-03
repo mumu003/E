@@ -36,6 +36,8 @@
                 <Input v-model="formItem.roomNum" placeholder="请输入房间号"/>
               </FormItem>
               </Col>
+            </Row>
+              <Row>
               <Col span="6">
               <FormItem label="时间">
                 <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
