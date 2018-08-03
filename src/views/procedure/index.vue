@@ -687,16 +687,22 @@
     methods:{
       //获取角色
       getRoleList(){
-        this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-          console.log(res)
-          console.log(res.data)
-          this.roleList = res.data.data.map(item => ({
-            roleId: item.roleId,
-            roleName: item.roleName
-          }))
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+      	let token = sessionStorage.getItem("token")
+      	console.log("token="+token)
+      	if(token === null){
+      	  window.location.href = '/#/login'
+      	}else{
+      	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
+	          console.log(res)
+	          console.log(res.data)
+	          this.roleList = res.data.data.map(item => ({
+	            roleId: item.roleId,
+	            roleName: item.roleName
+	          }))
+	        }, res => {
+	          this.$Modal.error({title: '提示信息', content: res.message})
+	        })
+      	}
       },
       //获取角色名称
       getRoleName(roleId,index){
@@ -817,6 +823,7 @@
       viewCancel(){
         this.viewModal = false,
         this.$Message.info('你取消了操作')
+        this.$refs.table.init()
       },
       //编辑流程设置
       editProject(){
@@ -1430,6 +1437,7 @@
       editArchiveCancel () {
         this.editArchiveModal = false
         this.$Message.info('你取消了操作')
+        this.$refs.table.init()
       }
     }
   }
