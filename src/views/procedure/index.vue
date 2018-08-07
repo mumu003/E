@@ -90,9 +90,7 @@
           </Col>
           <Col span="12" v-if="editForm.type === '6'">
             <FormItem label="房款交齐">
-              <CheckboxGroup v-model="editForm.requirePurchase">
-                <Checkbox label="1">是</Checkbox>
-              </CheckboxGroup>
+              <Checkbox label="true" v-model="editForm.requirePurchase">是</Checkbox>
             </FormItem>
           </Col>
           <div v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
@@ -250,7 +248,7 @@
               <Input v-model="item.roleName"  disabled />
             </FormItem>
           </Col>
-          <Col span="16" v-if="index !== archiveSettingNodes.length-1">
+          <Col span="16" v-if="index !== archiveSettingNodes.length-1 && index !== 0">
             <FormItem label="存档资料" >
               <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
                   border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
@@ -260,10 +258,10 @@
                   border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
                   v-else-if="archiveSettingNodes[index].data[0].quantity === 0">
               </div>
-              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
+              <div style="background-color: white;padding: 4px 1px 20px 5px;border-radius: 4px;
                   border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
                   v-else="archiveSettingNodes[index].data[0].dataId !== null">
-                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
+                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0" class="div-tag">{{it.dataName}}({{it.quantity}}份)</Tag>
               </div>
             </FormItem>
           </Col>
@@ -312,7 +310,7 @@
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="ghost" size="default" @click="selectMaterialCancel">取消</Button>
-        <Button type="primary" size="default" @click="selectMaterialSubmit" >确定</Button>
+        <Button type="primary" size="default" @click="selectMaterialSubmit" v-if="isNo === 'false'">确定</Button>
       </div>
     </Modal>
 
@@ -338,7 +336,9 @@
                 <Checkbox v-model="viewForm.requirePurchase" label="1" disabled>是</Checkbox>
             </FormItem>
           </Col>
-          <Col span="24" v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
+        </Row>
+        <Row v-if="viewForm.type === '1' || viewForm.type === '4' || viewForm.type === '5'">
+          <Col span="24">
             <FormItem label="资料">
               <Table border stripe :columns="viewConfig" :data="viewSettingDatas" ></Table>
             </FormItem>
@@ -351,18 +351,34 @@
             </FormItem>
           </Col>
         </Row>
-        <Row v-for="(item,index) in viewSettingNodes" :key="index">
+        <Row v-for="(item,index) in viewSettingNodes" :key="index" v-if="viewForm.type === '1' || viewForm.type === '4' || viewForm.type === '5'">
           <Col span="8">
             <FormItem :label="item.labelName" >
               <Input v-model="item.roleName"  disabled />
             </FormItem>
           </Col>
-          <Col span="16" v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
-            <FormItem label="存档资料" v-if="index !== viewSettingNodes.length-1">
-              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px" >
-                <Tag v-for="(it,ind) in viewSettingNodes[index].data" :key="ind"  v-if="it.quantity !== 0">{{it.dataName}}{{it.quantity}}份</Tag>
+          <Col span="16" v-if="index !== viewSettingNodes.length-1 && index !== 0">
+            <FormItem label="存档资料" >
+              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1;height: 36px"  
+                  v-if="viewSettingNodes[index].data[0].dataId === null">
               </div>
+              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1;height: 36px" 
+                  v-else-if="viewSettingNodes[index].data[0].quantity === 0">
+              </div>
+              <div style="background-color: #f3f3f3;padding: 4px 1px 4px 5px;border-radius: 4px;
+                  border: 1px solid #dddee1" 
+                  v-else="viewSettingNodes[index].data[0].dataId !== null">
+                <div class="div-tag-view" v-for="(it,ind) in viewSettingNodes[index].data" :key="ind" v-if="it.quantity !== 0" disabled>{{it.dataName}}({{it.quantity}}份)</div>
+              </div>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row v-for="(item,index) in viewSettingNodes" :key="index" v-if="viewForm.type === '2' || viewForm.type === '3' || viewForm.type === '6' || viewForm.type === '7'">
+          <Col span="8">
+            <FormItem :label="item.labelName" >
+              <Input v-model="item.roleName"  disabled />
             </FormItem>
           </Col>
         </Row>
@@ -380,7 +396,19 @@
     </Modal>
   </div>
 </template>
-
+<style type="text/css">
+  .div-tag{height:auto!important}
+  .div-tag-view{
+    color: #ccc;
+    line-height: 22px;
+    margin: 2px 4px 2px 0;
+    padding: 0 8px;
+    border: 1px solid #e9eaec;
+    border-radius: 3px;
+    background: #f7f7f7;
+    display: inline-flex;
+    height:auto!important;}
+</style>
 <script>
   export default {
     data () {
@@ -446,6 +474,7 @@
         editMaterialModal:false,//编辑资料模态框
         editArchiveModal:false,//编辑流程存档资料模态框
         viewModal : false,//流程设置详情模态框
+        isNo:'false',
         editSelect:[],//编辑流程选择勾选
         roleList:[],//角色list
         viewSettingDatas :[],//流程设置详情数据
@@ -484,7 +513,7 @@
         editForm:{
           type:'',
           name:'',
-          requirePurchase:[],
+          requirePurchase:'',
           overId:'',
           overName:'',
           settingDatas: [],
@@ -692,13 +721,10 @@
       //获取角色
       getRoleList(){
       	let token = sessionStorage.getItem("token")
-      	console.log("token="+token)
       	if(token === null){
       	  window.location.href = '/#/login'
       	}else{
       	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-	          console.log(res)
-	          console.log(res.data)
 	          this.roleList = res.data.data.map(item => ({
 	            roleId: item.roleId,
 	            roleName: item.roleName
@@ -710,7 +736,6 @@
       },
       //获取角色名称
       getRoleName(roleId,index){
-        console.log("roleId="+roleId+"---------index="+index)
         this.roleList.forEach(item=>{
           if(roleId === item.roleId){
             this.settingNodes[index].roleName = item.roleName
@@ -719,7 +744,6 @@
       },
       //获取终止角色
       getOverName(overId){
-        console.log("overId="+overId)
         this.roleList.forEach(item=>{
           if(overId === item.roleId){
             this.editForm.overName = item.roleName
@@ -736,10 +760,8 @@
       },
       //搜索提交
       searchSubmit(){
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -758,7 +780,17 @@
           startUpdateTime: '',
           endUpdateTime: ''
         }
-        this.$refs.table.init()
+        this.isFirst = true
+        this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
+          if (res.code === 200) {
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       },
       //流程设置详情
       viewProject(){
@@ -787,7 +819,7 @@
             archive: item.archive,
             id:item.id
           }))
-          console.log(res.data.settingNodes)
+          console.log(JSON.stringify(this.viewSettingDatas))
         }, res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -812,8 +844,8 @@
             }
           }
           this.viewSettingNodes = this.viewSettingNodesTwo
-          this.viewModal = true
           console.log(this.viewSettingNodes)
+          this.viewModal = true
         }, res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -845,15 +877,17 @@
         let params = {
           type: this.selection[0].type
         }
-        // console.log(this.selection[0])
-        // this.editForm.name = this.selection[0].name
         this.$request.post("/apiHost/api/processSetting/view",params,res=>{
-            console.log(res)
             this.editForm.type = res.data.type
             this.editForm.name = res.data.name
             this.editForm.overId = res.data.overId
             this.editForm.overName = res.data.overName
-            this.editForm.requirePurchase = res.data.requirePurchase
+            if(res.data.requirePurchase === "0"){
+              this.editForm.requirePurchase = false
+            }else{
+              this.editForm.requirePurchase = true
+            }
+
             this.settingDatas = res.data.settingDatas.map(item=>({
               sort: item.sort,
               required: item.required,
@@ -862,19 +896,15 @@
               archive: item.archive,
               id:item.id
             }))
-            console.log("this.settingDatas="+JSON.stringify(this.settingDatas))
-            console.log(res.data.settingNodes)
             this.settingNodes = res.data.settingNodes
             this.settingNodesLength = this.settingNodes.length-1
             this.editModal = true
-            this.modal_loading = false
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
           })
       },
       //编辑流程配置确定
       editSubmit () {
-        console.log(this.settingNodes)
         this.modal_loading = true
         this.editForm.settingDatas = JSON.stringify(this.settingDatas.map(item=>({
           id:item.id,
@@ -888,10 +918,12 @@
           roleId:item.roleId,
           roleName:item.roleName
         })))
-        console.log(this.editForm)
-        console.log(JSON.stringify(this.editForm))
+        if(this.editForm.requirePurchase === "false"){
+          this.editForm.requirePurchase = "0"
+        }else{
+          this.editForm.requirePurchase = "1"
+        }
         this.$request.post("/apiHost/api/processSetting/update",this.editForm,res=>{
-            console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editModal = false
@@ -905,7 +937,6 @@
             this.modal_loading = false
           }
         },res=>{
-          console.log(res.message)
           this.$Modal.error({title: '提示信息', content: res.message})
           this.modal_loading = false
         })
@@ -923,16 +954,18 @@
       },
       //新增资料
       addMaterial () {
-        this.addMaterialModal = true
-        this.$refs.addMaterialForm.resetFields()
+        if(this.settingDatas.length === 20){
+          this.$Modal.info({title: '提示信息', content: "资料最多20个"})
+        }else{
+          this.addMaterialModal = true
+          this.$refs.addMaterialForm.resetFields()
+        }
       },
       //新增资料确定
       addSubmit () {
         this.$refs.addMaterialForm.validate((valid) => {
           if (valid) {
             this.modal_loading = true
-            console.log(this.addMaterialForm)
-            console.log("push前"+this.settingDatas.length)
             this.addDataForm={
               id:0,
               sort:this.settingDatas.length+1,
@@ -942,7 +975,6 @@
               archive:this.addMaterialForm.archive
             },
             this.settingDatas.push(this.addDataForm)
-            console.log("push后"+this.settingDatas.length)
             this.addMaterialModal = false
             this.$refs.addMaterialForm.resetFields()
             this.modal_loading = false
@@ -959,7 +991,6 @@
       },
       //编辑资料
       editMaterial () {
-        console.log(this.editSelect.length)
         if (this.editSelect.length === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -970,7 +1001,6 @@
           this.noteModal = true
           return false
         }
-        console.log(this.editSelect)
         this.editMaterialForm ={
           id : this.editSelect[0].id,
           sort : this.editSelect[0].sort,
@@ -983,11 +1013,9 @@
       },
       //编辑资料确定
       editMaterialSubmit (){
-        console.log(this.editMaterialForm)
         this.$refs.editMaterialForm.validate((valid) => {
           if (valid) {
             this.modal_loading = true
-            console.log(this.editMaterialForm.sort)
             let dataSort = this.editMaterialForm.sort-1
             let obj = {
               id : this.editMaterialForm.id,
@@ -998,7 +1026,6 @@
               archive:this.editMaterialForm.archive
             }
             this.$Vue.set(this.settingDatas,dataSort,obj)
-            console.log(this.settingDatas)
             this.editMaterialModal = false
             this.modal_loading = false
             this.$refs.editMaterialForm.resetFields()
@@ -1012,7 +1039,6 @@
       },
       //删除资料
       deleteMaterial () {
-        console.log(this.editSelect.length)
         if(this.settingDatas.length === 0){
           document.getElementById('note-info').innerHTML = '没有存档资料！'
           this.noteModal = true
@@ -1023,7 +1049,6 @@
             this.noteModal = true
             return false
           }
-          console.log(this.editSelect)
           let sortLength = this.editSelect.length
           this.$Modal.confirm({
             title: '操作提示',
@@ -1049,7 +1074,6 @@
       addNode(){
         if(this.settingNodes.length <= 18){
           let divlength = this.settingNodes.length-1
-          console.log(divlength)
           let divNodeNum = divlength+1
           this.divNode={
             id:0,
@@ -1064,17 +1088,14 @@
       },
       //删除节点角色
       deleteNode(index){
-        console.log(index)
         this.$Modal.confirm({
           title: '操作提示',
           content: '确认删除该节点?',
           loading: true,
           onOk: () => {
             this.settingNodes.splice(index,1)
-            console.log("this.settingNodes="+JSON.stringify(this.settingNodes))
             let indexLength = this.settingNodes.length-1
             for(var i=index; i<indexLength; i++){
-              console.log("i=index   i="+i+"    indexLength="+indexLength)
               let indexJia = i+1
               this.settingNodes[i].name = '节点'+indexJia
             }
@@ -1102,7 +1123,6 @@
         if(this.selection[0].type === '1' || this.selection[0].type === '4' || this.selection[0].type === '5'){
           this.archiveType = this.selection[0].type
           this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
-            console.log(res)
             this.editArchiveForm.type = this.archiveType
             this.archiveSetting = res.data.map(item=>({
               roleName : item.roleName,
@@ -1127,14 +1147,11 @@
 
             this.archiveSettingNodes = this.archiveSettingTwo
 
-            console.log("archiveSettingNodes")
-            console.log(this.archiveSettingNodes)
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.table.init()
           }),
           this.$request.post("/apiHost/api/processSetting/archiveList",params,res=>{
-            console.log(res)
             this.noteArchiveList = res.data.map(item=>({
               id : item.id,
               name : item.name,
@@ -1143,7 +1160,6 @@
               surplusQuantity : item.quantity,
               indexQuantity : 0
             }))
-            console.log(this.noteArchiveList)
             this.selectMaterialList = this.noteArchiveList
             this.editArchiveModal = true
           }, res=>{
@@ -1157,13 +1173,10 @@
       },
       //节点存档
       noteArchive(index){
-        console.log(index)//节点
         this.selectMaterialForm.index = index
 
         //节点的data
         this.archiveDatas = this.archiveSettingNodes[index].data
-        console.log("archiveDatas节点ID的长度="+this.archiveDatas.length)
-        console.log("this.archiveDatas="+JSON.stringify(this.archiveDatas))
         this.selectMaterialForm.dataIds=[]
 
         //复选框
@@ -1172,13 +1185,7 @@
             dataIdArray.push(this.archiveDatas[i].dataId)
         }
         this.selectMaterialForm.dataIds = dataIdArray
-        console.log("this.selectMaterialForm.dataIds.length="+this.selectMaterialForm.dataIds.length)
-        console.log(this.selectMaterialForm.dataIds)
 
-        console.log("this.selectMaterialList.length="+this.selectMaterialList.length)
-        console.log("this.archiveSettingNodes.length="+this.archiveSettingNodes.length)
-
-        console.log("计算divlist中该资料还剩余多少")
         for(var i=0; i<this.selectMaterialList.length; i++){
           this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].quantity
           for(var j=0; j<this.archiveSettingNodes.length-1; j++){
@@ -1189,7 +1196,12 @@
             }
           }
         }
-        console.log("计算结束"+JSON.stringify(this.selectMaterialList))
+
+        for(var i=0; i<this.selectMaterialList.length; i++){
+          this.selectMaterialList[i].indexQuantity = 0
+          this.selectMaterialList[i].archiveQuantity = 1
+          this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity 
+        }
 
         for(var i=0; i<this.selectMaterialList.length; i++){
           for(var j=0; j<this.archiveDatas.length; j++){
@@ -1200,7 +1212,18 @@
             }
           }
         }
-        console.log("计算结束"+JSON.stringify(this.selectMaterialList))
+
+        let sNum = 0
+        for(var i=0; i<this.selectMaterialList.length; i++){
+          if(this.selectMaterialList[i].surplusQuantity === 0){
+            sNum = sNum+1
+          }
+        }
+        if(sNum === this.selectMaterialList.length){
+          this.isNo='true'
+        }else{
+          this.isNo='false'
+        }
         
         // this.selectMaterialListTwo = this.selectMaterialList
         this.backupSelectMaterialList = this.selectMaterialList.map(item=>({
@@ -1213,13 +1236,9 @@
         }))
 
         this.selectMaterialModal = true
-        setTimeout(() => {
-          console.log("加载完成后的selectMaterialList="+JSON.stringify(this.selectMaterialList))
-        }, 2000);
       },
       //存档资料-》获得选择的份数
       getQuantity(indexQuantity,index){
-        console.log("indexQuantity="+indexQuantity+"---------index="+index)
         let archiveNum = indexQuantity+1
         this.selectMaterialList[index].archiveQuantity = archiveNum
       },
@@ -1227,75 +1246,68 @@
       selectMaterialSubmit (){
         //回传给div的list集合
         this.backNoteArchiveList = []
-        console.log(this.selectMaterialForm.dataIds)
         if(this.selectMaterialForm.dataIds.length !== 0){
-          if(this.selectMaterialForm.dataIds[0] !== null){
-            this.$Modal.info({title: '提示信息', content: "你选择了"+JSON.stringify(this.selectMaterialForm.dataIds)})
-            // for(var i=0; i<this.selectMaterialList.length; i++){
-            //   this.selectMaterialList[i].surplusQuantity=this.selectMaterialList[i].surplusQuantity-this.selectMaterialList[i].archiveQuantity
-            // }
-            // console.log("剩余数量计算完成")
-            // console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
-            // for(var i=0; i<this.selectMaterialList.length; i++){
-            //   for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
-            //     // console.log("this.selectMaterialList[i].id"+this.selectMaterialList[i].id)
-            //     // console.log("this.selectMaterialForm.dataIds[j]"+this.selectMaterialForm.dataIds[j])
-
-            //     if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
-            //       // console.log("------------被勾选了")
-            //       if(this.selectMaterialList[i].surplusQuantity === 0){
-            //         console.log("剩余数量为0")
-            //         let kIndex = this.selectMaterialForm.index+1
-            //         console.log("kIndex="+kIndex+"this.archiveSettingNodes.length-1="+this.archiveSettingNodes.length-1+"this.archiveSettingNodes[k].data.length-1="+this.archiveSettingNodes[k].data.length-1)
-            //         for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
-            //           for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
-            //             if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
-            //               console.log("l="+l)
-            //               console.log("删除前的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
-            //               this.archiveSettingNodes[k].data.splice(l,1)
-            //               console.log("删除后的data： "+JSON.stringify(this.archiveSettingNodes[k].data))
-            //             }
-            //           }
-            //         }
-            //         //添加Tag
-            //         this.backNoteArchive={
-            //           dataId:this.selectMaterialList[i].id,
-            //           dataName:this.selectMaterialList[i].name,
-            //           quantity:this.selectMaterialList[i].archiveQuantity
-            //         }
-            //         this.backNoteArchiveList.push(this.backNoteArchive)
-            //       }else{
-            //         let kIndex = this.selectMaterialForm.index+1
-            //         for(var k = kIndex; k < this.archiveSettingNodes.length-1; k++){
-            //           for(var l = 0; l < this.archiveSettingNodes[k].data.length-1; l++){
-            //             if(this.selectMaterialList[i].id === this.archiveSettingNodes[k].data[l].dataId){
-            //               if(this.archiveSettingNodes[k].data[l].quantity <= this.selectMaterialList[i].surplusQuantity){
-            //                 this.selectMaterialList[i].surplusQuantity = this.selectMaterialList[i].surplusQuantity - this.archiveSettingNodes[k].data[l].quantity
-            //               }else{
-            //                 this.archiveSettingNodes[k].data.splice(l,1)
-            //               }
-            //             }
-            //           }
-            //         }
-            //         //添加Tag
-            //         this.backNoteArchive={
-            //           dataId:this.selectMaterialList[i].id,
-            //           dataName:this.selectMaterialList[i].name,
-            //           quantity:this.selectMaterialList[i].archiveQuantity
-            //         }
-            //         this.backNoteArchiveList.push(this.backNoteArchive)
-            //       }
-            //     }
-            //   }
-            // }
-            // console.log("装载完毕")
-            // console.log("this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
-            // console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
-            // this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
-            // console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
-            // this.selectMaterialModal = false 
+          if(this.selectMaterialForm.dataIds.length === 1){
+            if(this.selectMaterialForm.dataIds[0] === null){
+              this.$Modal.info({title: '提示信息', content: "请选择资料!"})
+            }else{
+              for(var i=0; i<this.selectMaterialList.length; i++){
+                for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
+                  if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
+                    this.backNoteArchive={
+                      dataId:this.selectMaterialList[i].id,
+                      dataName:this.selectMaterialList[i].name,
+                      quantity:this.selectMaterialList[i].archiveQuantity
+                    }
+                    this.backNoteArchiveList.push(this.backNoteArchive)
+                  }
+                }
+              }
+              console.log("装载完毕")
+              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
+              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              this.selectMaterialModal = false 
+            }
           }else{
-            this.$Modal.info({title: '提示信息', content: "请选择资料!"})
+            if(this.selectMaterialForm.dataIds[0] === null){
+              this.selectMaterialForm.dataIds.splice(0,1)
+              for(var i=0; i<this.selectMaterialList.length; i++){
+                for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
+                  if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
+                    this.backNoteArchive={
+                      dataId:this.selectMaterialList[i].id,
+                      dataName:this.selectMaterialList[i].name,
+                      quantity:this.selectMaterialList[i].archiveQuantity
+                    }
+                    this.backNoteArchiveList.push(this.backNoteArchive)
+                  }
+                }
+              }
+              console.log("装载完毕")
+              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
+              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              this.selectMaterialModal = false 
+            }else{
+              for(var i=0; i<this.selectMaterialList.length; i++){
+                for(var j=0; j<this.selectMaterialForm.dataIds.length; j++){
+                  if(this.selectMaterialList[i].id === this.selectMaterialForm.dataIds[j]){
+                    this.backNoteArchive={
+                      dataId:this.selectMaterialList[i].id,
+                      dataName:this.selectMaterialList[i].name,
+                      quantity:this.selectMaterialList[i].archiveQuantity
+                    }
+                    this.backNoteArchiveList.push(this.backNoteArchive)
+                  }
+                }
+              }
+              console.log("装载完毕")
+              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
+              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              this.selectMaterialModal = false 
+            }
           }
         }else{
           this.$Modal.info({title: '提示信息', content: "请选择资料!"})
@@ -1308,7 +1320,7 @@
           this.selectMaterialList[i].archiveQuantity = this.backupSelectMaterialList[i].archiveQuantity
           this.selectMaterialList[i].surplusQuantity = this.backupSelectMaterialList[i].surplusQuantity
         }
-        console.log("取消this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
+        // console.log("取消this.selectMaterialList"+JSON.stringify(this.selectMaterialList))
         this.selectMaterialModal = false
         this.$Message.info('你取消了操作')
       },
@@ -1349,12 +1361,12 @@
               this.$refs.table.init()
             }, 2000)
           } else {
+            this.modal_loading = false
             this.$Modal.error({title: '提示信息', content: res.message})
-            this.editArchiveModal = false
           }
         }, res => {
+          this.modal_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
-          this.editArchiveModal = false
         })
       },
       //存档资料取消

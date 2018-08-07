@@ -643,7 +643,6 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
         }else{
@@ -652,7 +651,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            //console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -672,7 +670,6 @@
             this.addForm.buildingName = item.name
           }
         })
-        //console.log(this.addForm)
         this.unitList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
@@ -684,7 +681,6 @@
             name: item.unitName,
             rooms:item.rooms
           }))
-          //console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -802,7 +798,6 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-         // console.log(this.addData)
           var dataIdArray = new Array();
           for (var i = 0; i < this.addData.length; i++) {
             if(this.addData[i].required === '1'){
@@ -877,9 +872,7 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        console.log(params)
         this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -985,7 +978,6 @@
             if(item.id===res.data.currentNodeId){
               // this.currentNodeId = i
               this.currentNodeId= i
-              console.log(this.currentNodeId)
             }
           })
           this.statusModal = true
@@ -1086,10 +1078,8 @@
       },
       //搜索
       searchSubmit () {
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/sendFileBill/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false

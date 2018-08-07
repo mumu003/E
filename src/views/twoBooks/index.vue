@@ -915,7 +915,7 @@
               this.currentNodeId = i
             }
           })
-          console.log(this.statuList)
+          console.log(this.nodesList)
           this.statusModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})

@@ -168,12 +168,18 @@
                 </Select>
               </FormItem>
             </Col>
+            <Col span="24">
+              <div class="batch-house-tips"><span class="batch-house-red">红色</span>-可选择使用</div>
+              <div class="batch-house-tips"><span class="batch-house-green">绿色</span>-已办理</div>
+              <div class="batch-house-tips"><span class="batch-house-gray">灰色</span>-售出</div>
+            </Col>
             <Col span="24" style="margin-bottom: 10px">
-              <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag>
+              <!-- <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag> -->
+              <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input>
             </Col>
             <Col span="24" v-for="item in floorsList">
                 <Col span="2">
-                  <div class="house bg-gray">{{item.floor}}</div>
+                  <div class="house bg-gray">{{item.floor}}层</div>
                 </Col>
                  <Col span="22">
                    <div class="test"  @click="toggle(item.floor,it.roomId)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
@@ -364,6 +370,27 @@
     position: absolute;
     top: 2px;
     right: 3px;
+  }
+  .batch-house-tips{
+    display: inline-block;
+    font-size: 12px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  .batch-house-red{
+    background-color: #e42a2d;
+    padding: 5px;
+    color: #ffffff;
+  }
+  .batch-house-green{
+    background-color: #1cad1f;
+    padding: 5px;
+    color: #ffffff;
+  }
+  .batch-house-gray{
+    background-color: #808080;
+    padding: 5px;
+    color: #ffffff;
   }
 </style>
 <script type="text/ecmascript-6">
@@ -734,7 +761,7 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
+        //console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
         }else{
@@ -743,7 +770,7 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            console.log(res)
+            //console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -802,9 +829,9 @@
             })
           }
           this.floorsList = floorsObj;
-          // console.log(JSON.stringify(floorsObj))
-          console.log(JSON.stringify(this.floorsList))
-          console.log(this.unitList)
+          //console.log(JSON.stringify(floorsObj))
+          //console.log(JSON.stringify(this.floorsList))
+          //console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -831,8 +858,8 @@
               status:item.status,
               floor:item.floor
             }))
-            console.log( this.roomsList)
-            console.log(123)
+            //console.log( this.roomsList)
+            //console.log(123)
           }
         })
         this.addForm.roomId = ""
@@ -841,7 +868,7 @@
       },
       //模态框的业主姓名
       getModalName(roomId) {
-        console.log("roomId:"+roomId)
+        //console.log("roomId:"+roomId)
         if(typeof(roomId) === "undefined"){
             return ;
         }
@@ -854,7 +881,7 @@
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
           roomId
         }, res => {
-          console.log(res)
+          //console.log(res)
           this.addForm.customerName=""
           res.data.data.map(item =>{
             this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
@@ -869,7 +896,7 @@
       //获取模态框表格数据
       getIndex () {
         this.$request.post("/apiHost/api/processSetting/data",{"type":"4"}, res => {
-          console.log(res)
+          //console.log(res)
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -881,7 +908,7 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-          console.log(this.addData)
+          //console.log(this.addData)
           this.batchData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -893,7 +920,7 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-          console.log(this.batchData)
+          //console.log(this.batchData)
           var dataIdArray = new Array();
           for (var i = 0; i < this.addData.length; i++) {
             if(this.addData[i].required === '1'){
@@ -916,7 +943,7 @@
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$request.post("/apiHost/api/ownershipBill/add",this.addForm, res => {
-              console.log(res)
+              //console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
@@ -960,8 +987,8 @@
             })
           }
         })
-        console.log("&&&&");
-        console.log(this.floorsList)
+        //console.log("&&&&");
+        //console.log(this.floorsList)
       },
       batchProject(){
         this.batchModal = true
@@ -1062,7 +1089,7 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/ownershipBill/view",params,res=>{
-            console.log(res.data)
+            //console.log(res.data)
           this.viewForm.id = res.data.id
           this.viewForm.customerName = res.data.customerName
           this.viewForm.status = res.data.status
@@ -1104,9 +1131,9 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        console.log(params)
+        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/start",params,res=>{
-          console.log(res)
+          //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -1130,9 +1157,9 @@
             id: this.viewForm.id,
             status:1
         }
-        console.log(params)
+        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-            console.log(res)
+            //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -1157,9 +1184,9 @@
             id: this.viewForm.id,
             status:0
         }
-        console.log(params)
+        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-            console.log(res)
+            //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -1193,7 +1220,7 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/ownershipBill/status",params,res=>{
-            console.log(res.data)
+            //console.log(res.data)
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -1210,7 +1237,7 @@
               this.currentNodeId = i
             }
           })
-          console.log(this.nodesList)
+          //console.log(this.nodesList)
           this.statusModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -1306,8 +1333,8 @@
 
       //按钮
       btn:function(){
-        console.log(this.formItem)
-        console.log(this.name)
+        //console.log(this.formItem)
+        //console.log(this.name)
       },
       handleReset (name) {
         this.$refs[name].resetFields();
@@ -1325,10 +1352,10 @@
       },
       //搜索
       searchSubmit () {
-        console.log(this.formItem)
+        //console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/ownershipBill/list",this.formItem, res => {
-          console.log(res)
+          //console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false

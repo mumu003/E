@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'babel-polyfill'
 
 //组件
 import routeBar from '../src/components/route-bar.vue'

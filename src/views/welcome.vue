@@ -359,8 +359,6 @@ export default {
         let aNum= this.viewForm.applyNum
         if (value>10) {
           return callback(new Error('份数不能大于10'));
-        }else if(value < aNum){
-          return callback(new Error('实发份数不能小于申请分数'));
         }else {
           callback()
         }

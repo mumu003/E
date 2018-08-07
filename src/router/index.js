@@ -13,17 +13,17 @@ export default new Router({
       },
       component: resolve => require(['@/views/login.vue'], resolve),
     },
-     {
+    {
       path: '/',
-      name: '',
+      name: 'index',
       meta: {
-        title: '工作台'
+        title: ''
       },
       component: resolve => require(['@/views/index.vue'], resolve),
       children:[
         {
           path: '/',
-          name: 'index',
+          name: '',
           meta: {
             title: '工作台'
           },
@@ -84,7 +84,7 @@ export default new Router({
             title: '两书'
           },
           component: resolve => require(['@/views/twoBooks/index.vue'], resolve),
-    },
+        },
         {
           path: '/propertyRight',
           name: 'propertyRight',

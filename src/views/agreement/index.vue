@@ -429,12 +429,12 @@
         this.addModal=true
       },
       addSubmit () {
-        console.log(this.addForm)
+        //console.log(this.addForm)
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.modal_loading = true;
             this.$request.post("/apiHost/api/contractApplication/add",this.addForm, res => {
-              console.log(res)
+              //console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false
@@ -479,7 +479,7 @@
           id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
-          console.log(res.data)
+          //console.log(res.data)
           this.viewForm={
             id : res.data.id,
             name : res.data.name,
@@ -500,7 +500,7 @@
       //发起
       start(){
         this.modal_loading = true
-        console.log(this.viewForm)
+        //console.log(this.viewForm)
         let params = {
           id: this.viewForm.id,
           name: this.viewForm.name,
@@ -508,9 +508,9 @@
           remark:this.viewForm.remark,
           applyNum:this.viewForm.applyNum,
         }
-        console.log(params)
+        //console.log(params)
         this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
-          console.log(res)
+          //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -537,9 +537,9 @@
                 actualNum: this.viewForm.actualNum,
                 status:1
             }
-            console.log(params)
+            //console.log(params)
             this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-              console.log(res)
+              //console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false
@@ -570,9 +570,9 @@
                 actualNum: this.viewForm.actualNum,
                 status:0
             }
-            console.log(params)
+            //console.log(params)
             this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-              console.log(res)
+              //console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.viewModal = false
@@ -610,7 +610,7 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/contractApplication/status",params,res=>{
-            console.log(res.data)
+            //console.log(res.data)
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -627,7 +627,7 @@
               this.currentNodeId = i
             }
           })
-          console.log(this.statuList)
+          //console.log(this.statuList)
           this.statusModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -746,7 +746,7 @@
       },
       //搜索
       searchSubmit(){
-        console.log(this.formItem)
+        //console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
           console.log(res)

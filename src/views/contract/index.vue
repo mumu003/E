@@ -592,7 +592,6 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
         }else{
@@ -601,7 +600,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -621,20 +619,17 @@
             this.addForm.buildingName = item.name
           }
         })
-        console.log(this.addForm)
         this.unitList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           buildingId
         }, res => {
-          console.log(res)
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
             rooms:item.rooms
           }))
-          console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -665,7 +660,6 @@
       },
       //模态框的业主姓名
       getModalName(roomId) {
-        console.log("roomId:"+roomId)
         if(typeof(roomId) === "undefined"){
             return ;
         }
@@ -677,7 +671,6 @@
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
           roomId
         }, res => {
-          console.log(res)
           this.addForm.customerName=""
           res.data.data.map(item =>{
             this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
@@ -702,12 +695,10 @@
       },
       //新增模态框确定
       addSubmit () {
-        console.log(this.addForm)
         this.modal_loading = true
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$request.post("/apiHost/api/contractBill/add",this.addForm, res => {
-              console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false
@@ -744,7 +735,6 @@
       //获取模态框表格数据
       getIndex () {
         this.$request.post("/apiHost/api/processSetting/data",{"type":"1"}, res => {
-          console.log(res)
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -756,16 +746,13 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-          console.log(this.addData)
           var dataIdArray = new Array();
           for (var i = 0; i < this.addData.length; i++) {
             if(this.addData[i].required === '1'){
-              console.log(i)
               dataIdArray.push(this.addData[i].id);
             }
           }
           this.addForm.dataId = dataIdArray.toString();
-          console.log(this.addForm.dataId)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -786,7 +773,6 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/contractBill/view",params,res=>{
-          console.log(res.data)
           this.viewForm.id = res.data.id
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
@@ -816,7 +802,6 @@
           this.viewForm.dataId = dataIdArray.toString()
           this.viewTabs = 'name1'
           this.viewModal = true
-          console.log(' this.buttons.start:'+ this.buttons.start)
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -828,9 +813,7 @@
             id: this.viewForm.id,
             status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/check",params,res=>{
-            console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
@@ -856,9 +839,7 @@
             id: this.viewForm.id,
             status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/check",params,res=>{
-            console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -884,9 +865,7 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/start",params,res=>{
-            console.log(res)
             if (res.code === 200) {
               setTimeout(() => {
                 this.modal_loading = false
@@ -940,8 +919,6 @@
               this.currentNodeId = i
             }
           })
-          console.log(this.nodesList)
-          console.log(this.historysList)
           this.statusModal = true
         }, res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -1037,10 +1014,8 @@
       },
       //搜索
       searchSubmit () {
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/contractBill/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
