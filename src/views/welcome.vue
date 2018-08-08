@@ -1,33 +1,34 @@
 <template>
     <div>
+      
       <Row :gutter="10" class="mt10">
           <Col span="24" class="demo-tabs-style1" style="padding-left:6px;">
               <Tabs type="card" @on-click="changs"  v-model="viewTabs">
-                <TabPane label="合同备案" name="contract" :label="contractLabel" >
+                <TabPane name="contract" :label="contractLabel" >
                   <m-table :config="tableConfig"  ref="contracttable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="发函" name="sendFile" :label="sendFileLabel">
+                <TabPane name="sendFile" :label="sendFileLabel">
                   <m-table :config="tableConfig2"  ref="sendFiletable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="交房通知" name="deliveryNotice" :label="deliveryNoticeLabel">
+                <TabPane name="deliveryNotice" :label="deliveryNoticeLabel">
                   <m-table :config="tableConfig3"  ref="deliveryNoticetable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="水电过户" name="transfer" :label="transferLabel">
+                <TabPane name="transfer" :label="transferLabel">
                   <m-table :config="tableConfig4"  ref="transfertable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="两书" name="twoFile" :label="twoFileLabel">
+                <TabPane name="twoFile" :label="twoFileLabel">
                   <m-table :config="tableConfig5"  ref="twoFiletable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="产权办理" name="ownership" :label="ownershipLabel">
+                <TabPane name="ownership" :label="ownershipLabel">
                   <m-table :config="tableConfig6"  ref="ownershiptable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
-                <TabPane label="协议书申请" name="orderContract" :label="orderContractLabel">
+                <TabPane name="orderContract" :label="orderContractLabel">
                   <m-table :config="tableConfig7"  ref="orderContracttable"  :isFirst="isFirst"></m-table>
                 </TabPane>
               </Tabs>
@@ -1711,6 +1712,7 @@ export default {
         let token = sessionStorage.getItem("token")
         if(token === null){
           window.location.href = '/#/login'
+          window.location.reload()
         }else{
           this.$request.post("/apiHost/api/index/todoList",'',res=>{
             this.badge.contract=res.data.contract

@@ -594,6 +594,7 @@
         let token = sessionStorage.getItem("token")
         if(token === null){
           window.location.href = '/#/login'
+          window.location.reload()
         }else{
           let params = {
             orgId: sessionStorage.getItem("orgId"),

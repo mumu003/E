@@ -380,13 +380,13 @@
                   width:100
                 },
                 {
-                  title: '合同交互期限',
+                  title: '合同交付期限',
                   key: 'deliveryDate',
                   align: 'center',
                   width:150
                 },
                 {
-                  title: '房屋实际交互日期',
+                  title: '房屋实际交付日期',
                   key: 'actualDate',
                   align: 'center',
                   width:150
@@ -451,7 +451,7 @@
             align: 'center'
           },
           {
-            title: '合同交互期限',
+            title: '合同交付期限',
             key: 'deliveryDate',
             width:180,
             align: 'center'
@@ -612,6 +612,7 @@
         console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
+          window.location.reload()
         }else{
           let params = {
             orgId: sessionStorage.getItem("orgId"),

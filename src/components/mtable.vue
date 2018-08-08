@@ -48,6 +48,7 @@ export default {
       //params.currPage = this.isFirst === true ? 1 : this.currentPage
       params.page = this.isFirst === true ? 1 : this.currentPage
       params.limit = this.limit
+      params.t = Math.random()
       this.$request.get(this.config.url, params, data => {
         this.loading = false
 //        let list = data

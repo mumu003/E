@@ -723,6 +723,7 @@
       	let token = sessionStorage.getItem("token")
       	if(token === null){
       	  window.location.href = '/#/login'
+          window.location.reload()
       	}else{
       	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
 	          this.roleList = res.data.data.map(item => ({

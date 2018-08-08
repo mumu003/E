@@ -281,6 +281,7 @@
         noteModal:false,//弹窗
         currentNodeId:'',
         viewTabs:'name1',
+        roleList:[],
         nodesList:[],
         historysList:[],
         agreementNameList:[
@@ -406,7 +407,27 @@
         return this.$refs.table.selection
       }
     },
+    mounted(){//方法
+      this.getRoleList()//获取角色
+    },
     methods: {
+      //获取角色
+      getRoleList(){
+        let token = sessionStorage.getItem("token")
+        if(token === null){
+          window.location.href = '/#/login'
+          window.location.reload()
+        }else{
+          this.$request.post("/apiHost/api/user/getRoleList", '', res => {
+            this.roleList = res.data.data.map(item => ({
+              roleId: item.roleId,
+              roleName: item.roleName
+            }))
+          }, res => {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          })
+        }
+      },
       //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){

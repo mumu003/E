@@ -175,7 +175,8 @@
             </Col>
             <Col span="24" style="margin-bottom: 10px">
               <!-- <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag> -->
-              <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input>
+              <!-- <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input> -->
+              <Button :type="batchButtonFocus === index ? 'primary' : 'ghost'" size="default" v-for="(item,index) in unitList" :key="index" style="margin-right: 10px" @click="getFloorsList(index)">{{item.name}}</Button>
             </Col>
             <Col span="24" v-for="item in floorsList">
                 <Col span="2">
@@ -415,6 +416,7 @@
         statusModal: false,
         noteModal: false,
         currentNodeId: '',
+        batchButtonFocus: 0,
         buildingList: [],
         unitList: [],
         roomsList: [],
@@ -764,6 +766,7 @@
         //console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
+          window.location.reload()
         }else{
           let params = {
             orgId: sessionStorage.getItem("orgId"),
@@ -816,8 +819,9 @@
           floorsSet.forEach(function (element, sameElement, set) {
             floorsObj.push({"floor":element,"rooms":[]})
           })
-
-          for (let k = 0, length = this.unitList.length; k < length; k++) {
+           
+          console.log("this.unitList.length="+this.unitList.length)
+          for (let k = 0, length = 1; k < length; k++) {
             let unit = this.unitList[k];
             let isShow
             unit.rooms.map(function(i){
@@ -829,9 +833,10 @@
             })
           }
           this.floorsList = floorsObj;
+          this.batchButtonFocus = 0 ;
           //console.log(JSON.stringify(floorsObj))
           //console.log(JSON.stringify(this.floorsList))
-          //console.log(this.unitList)
+          console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -976,8 +981,39 @@
         this.$refs.addForm.resetFields()
       },
       //批量
+      getFloorsList(index){
+        console.log(index)
+        this.batchButtonFocus = index 
+        let floorsArray = new Array();
+          for (let k = 0, length = this.unitList.length; k < length; k++) {
+           let unit = this.unitList[k];
+            floorsArray = unit.rooms.map(function(i){
+              return i.floor;
+            });
+          }
+          let floorsSet = new Set(floorsArray);
+          let floorsObj = [];
+          floorsSet.forEach(function (element, sameElement, set) {
+            floorsObj.push({"floor":element,"rooms":[]})
+          })
+           
+          console.log("this.unitList.length="+this.unitList.length)
+          for (let k = index, length = index+1; k < length; k++) {
+            let unit = this.unitList[k];
+            let isShow
+            unit.rooms.map(function(i){
+              floorsObj.forEach(function (element, sameElement, set) {
+                if(element.floor==i.floor){
+                  element.rooms.push(i)
+                }
+              })
+            })
+          }
+          this.floorsList = floorsObj;
+      },
       //显示隐藏
       toggle(param1,param2){
+        console.log("param1="+param1+"param2="+param2)
         this.floorsList.map(item=>{
           if (item.floor==param1){
             item.rooms.map((it,index)=>{
@@ -1000,7 +1036,7 @@
       },
       batchHouseSubmit(){
         //1.通过房间查找到状态为true的房间ID,然后用,拼接起来
-      //  2.提交到前一个模态框
+        //2.提交到前一个模态框
         this.selectedStaff=""
         this.selectRoomNum=""
         this.floorsList.map(item=> {
@@ -1018,8 +1054,12 @@
             }
           })
         })
-        this.batchForm.buildingName=this.batchForm.buildingName+ this.selectRoomNum
-        this.batchHouseModal=false
+        if(this.selectRoomNum === ""){
+          this.$Modal.info({title: '提示信息', content: "请选择房间"})
+        }else{
+          this.batchForm.buildingName=this.batchForm.buildingName+ this.selectRoomNum
+          this.batchHouseModal=false
+        }
       },
       batchSubmit(){ //  将得到的数值传给后台调用接口
         if(this.batchForm.buildingName != ''){
