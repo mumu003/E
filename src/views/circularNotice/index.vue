@@ -62,6 +62,7 @@
       </Card>
       </Col>
     </Row>
+
     <Row :gutter="10" class="mt10">
       <Col span="24">
       <Card>
@@ -85,11 +86,8 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增交房通知"
-           width="800"
-           :loading="loading"
-           @on-cancel="cancel"
-    >
+    <Modal v-model="addModal" title="新增交房通知" width="800" :loading="loading"
+      @on-cancel="cancel" >
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
@@ -204,14 +202,13 @@
     </Modal>
 
     <Modal v-model="endModal" title="终止交房通知"
-           :loading="modal_loading"
-           @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
+      :loading="modal_loading"
+      @on-ok="endSubmit"
+      @on-cancel="endCancel" >
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
-    <!--<Modal v-model="statuModal" title="状态详情"
+    <!--<Modal v-model="statusModal" title="状态详情"
            width="800"
            :loading="loading"
            @on-ok="statuSubmit"
@@ -252,27 +249,28 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
-        isFirst: false, //模态框延迟
+        passDisable: false, //防止通过双击事件
+        isDisable: false, //防止驳回双击事件
+        isFirst: false,  //模态框延迟
         modal_loading: false, //延迟
-        reject_loading: false,
-        addModal:false,
-        viewModal:false,
-        statuModal:false,
-        endModal:false,
-        noteModal: false,
-        isShow:false,//弹窗
-        loading:true,
-        viewTabs:'name1',
-        nodesList:[],
-        historysList:[],
-        currentNodeId:'',
-        //定义数组
-        buildingList:[],
-        unitList:[],
-        roomsList:[],
-        buttons:{ },
+        reject_loading: false, //驳回延迟
+        addModal: false, //新增模态框
+        viewModal: false, //审核模态框
+        statusModal: false, //状态模态框
+        endModal: false, //终止模态框
+        noteModal: false, //提示模态框
+        isShow: false, //新增-资料显示
+        loading: true, //加载
+        viewTabs: 'name1',//Tabs默认
+        currentNodeId: '',//审核节点
+        buildingList: [],//楼栋
+        unitList: [],//单元
+        roomsList: [],//房间
+        nodesList: [],//处理进度
+        historysList: [],//进度详情
+        addData: [],//新增表格数据
+        viewData: [],//审核表格数据
+        buttons:{ },//按钮数组
         searchTime:{
           tStartTime:"",
           tEndTime:"",
@@ -374,7 +372,7 @@
             }
           ],
         },
-        //模态框表单,表格数据
+        //模态框表单数据
         addForm:{
           areaId:'',
           areaName:'',
@@ -396,6 +394,7 @@
           payExpireDate:'',
           deliveryDate:''
         },
+        //模态框表格数据
         addContract: [
           {
             title: '地块',
@@ -459,7 +458,6 @@
             width:150
           }
         ],
-        addData: [],
         //模态框表单,表格数据
         viewForm:{
           buildingName:'',
@@ -469,7 +467,7 @@
           status:'',
           id:''
         },
-        viewData: [],
+        //表格数据
         viewContract: [
           {
             title: '序号',
@@ -572,7 +570,6 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
           window.location.reload()
@@ -582,7 +579,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -602,13 +598,11 @@
             this.addForm.buildingName = item.name
           }
         })
-        console.log(this.addForm)
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId:sessionStorage.orgId,
           projectId:sessionStorage.curProjectId,
           buildingId
         }, res => {
-          console.log(res)
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
@@ -644,7 +638,6 @@
       },
       //获取地块名称  (接口在哪)
       addArea(areaId){
-        console.log(this.addForm)
       },
       //开始时间
       getStartDate(startDate){
@@ -666,7 +659,6 @@
           let params = {
             roomId:this.addForm.roomId
           }
-          console.log(params)
           this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
             this.addForm.customerName = res.data.customerName
             this.addForm.roomNum = res.data.rommNum
@@ -680,7 +672,6 @@
             this.addForm.signDate = res.data.signDate
             this.addForm.payExpireDate = res.data.payExpire
             this.addForm.deliveryDate = res.data.deliveryDate
-            console.log(res)
             this.addData = []
             this.addData.push(res.data)
           }, res => {
@@ -694,13 +685,12 @@
       clearAddData(){
         this.isShow = false
       },
+      //新增提交
       addSubmit(){
-        console.log(this.addData)
         this.modal_loading = true
         if(this.addForm.roomId){
           if(this.addData.length !== 0){
             this.$request.post("/apiHost/api/deliveryNotice/add",this.addForm, res => {
-              console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.addModal = false
@@ -747,7 +737,6 @@
         }
         this.$request.post("/apiHost/api/deliveryNotice/view",params,res=>{
           this.viewData=[]
-          console.log(res.data)
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
@@ -780,9 +769,7 @@
         let params = {
           id: this.viewForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -887,6 +874,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -904,6 +892,7 @@
           this.$refs.table.init()
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false
@@ -969,18 +958,18 @@
                 this.currentNodeId = i
               }
             })
-            console.log(this.nodesList)
-            this.statuModal = true
+            this.statusModal = true
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
           },
         )
       },
       statuSubmit(){
-        this.statuModal = false
+        this.statusModal = false
         this.loading = false
         this.$refs.table.init()
       },
+      //新增-表格选项
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
@@ -995,10 +984,8 @@
       },
       //搜索提交
       searchSubmit () {
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/deliveryNotice/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false

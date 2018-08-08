@@ -356,37 +356,36 @@
 <script type="text/ecmascript-6">
 export default {
     data () {
-      const validateActualNum = (rule, value, callback) => {
-        let aNum= this.viewForm.applyNum
-        if (value>10) {
-          return callback(new Error('份数不能大于10'));
-        }else {
-          callback()
+        const validateActualNum = (rule, value, callback) => {
+          let aNum= this.viewForm.applyNum
+          if (value>10) {
+            return callback(new Error('份数不能大于10'));
+          }else {
+            callback()
+          }
         }
-      }
-      const validateNumber = (rule, value, callback) => {
-        let dot=value.indexOf(".")
-        if (!value) {
-          return callback(new Error('不能为空'));
+        const validateNumber = (rule, value, callback) => {
+          let dot=value.indexOf(".")
+          if (!value) {
+            return callback(new Error('不能为空'));
+          }
+          if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
+            callback(new Error('只能为正整数'));
+          } else {
+            callback()
+          }
         }
-        if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
-          callback(new Error('只能为正整数'));
-        } else {
-          callback()
-        }
-      }
-
         return {
           passDisable:false,//防止通过双击事件
           isDisable:false,//防止驳回双击事件
-          viewTabs:'contract',
-          buttons:{ },
-          buttonsSend:{ },
-          buttonsDelivery:{ },
-          buttonsTransfer:{ },
-          buttonsTwoFile:{ },
-          buttonsOwnership:{ },
-          buttonsOrderContract:{ },
+          viewTabs:'contract',//Tabs
+          buttons:{ },//按钮
+          buttonsSend:{ },//按钮发函
+          buttonsDelivery:{ },//按钮交房通知
+          buttonsTransfer:{ },//按钮水电过户
+          buttonsTwoFile:{ },//按钮两书
+          buttonsOwnership:{ },//按钮产权办理
+          buttonsOrderContract:{ },//按钮协议书
           agreementNameList:[
             {name:"集团本部《商品房定购协议书》"},
             {name:"银溪墅府C1地块商品房定购协议书"},
@@ -1057,7 +1056,6 @@ export default {
           //协议书模态框
           editOrderContractModal:false,
 
-
           //合同备案模态框表单
           contractForm:{
             id:'',
@@ -1126,6 +1124,7 @@ export default {
               width:80
             }
           ],
+          //合同备案审核表格
           viewContract: [
             {
               title: '序号',
@@ -1174,7 +1173,7 @@ export default {
               width:80
             }
           ],
-          contractData: [],  //审核模态框表格数据
+          contractData: [],  //合同备案审核模态框表格数据
 
           //发函模态框表单
           sendFileForm:{
@@ -1186,6 +1185,7 @@ export default {
             fileType:'',
             dataId:[ ]
           },
+          //审核发起发函
           viewStartSendFile: [
             {
               type:"selection",
@@ -1244,6 +1244,7 @@ export default {
               width:80
             }
           ],
+          //审核发函
           viewSendFile: [
             {
               title: '序号',
@@ -1292,7 +1293,7 @@ export default {
               width:80
             }
           ],
-          sendFileData:[],
+          sendFileData:[],//发函审核模态框表格数据
 
           //交房通知
           deliveryNoticeForm:{
@@ -1303,6 +1304,7 @@ export default {
             id:'',
             dataId:[ ]
           },
+          //交房通知审核表格
           viewDeliveryNotice: [
             {
               title: '序号',
@@ -1375,7 +1377,7 @@ export default {
               width:150
             }
           ],
-          deliveryNoticeData: [],
+          deliveryNoticeData: [],//交房通知审核模态框表格数据
 
           //水电过户
           transferForm:{
@@ -1387,7 +1389,8 @@ export default {
             id:'',
             dataId:[ ]
           },
-          transferData: [],
+          transferData: [],//水电过户审核模态框表格数据
+          //水电过户审核表格
           viewTransfer: [
             {
               title: '楼栋号',
@@ -1446,7 +1449,8 @@ export default {
             id:'',
             dataId:[ ]
           },
-          twoFileData: [],
+          twoFileData: [],//两书审核模态框表格数据
+          //两书审核表格
           viewTwoFile: [
             {
               title: '地块',
@@ -1526,7 +1530,8 @@ export default {
             id:'',
             dataId:[ ]
           },
-          ownershipData: [],
+          ownershipData: [],//产权办理模态框表格数据
+          //产权办理审核发起表格数据
           viewStartOwnership: [
             {
               type:"selection",
@@ -1585,6 +1590,7 @@ export default {
               width: 80
             }
           ],
+          //产权办理审核表格数据
           viewOwnership: [
             {
               title: '序号',
@@ -1653,9 +1659,10 @@ export default {
         }
     },
     mounted(){
-      this.getAgency()
+      this.getAgency()//获取角标
     },
     methods: {
+      //取消
       cancel(){
         this.editContractModal = false
         this.editDeliveryNoticeModal=false
@@ -1672,16 +1679,19 @@ export default {
         this.$refs.ownershiptable.init()
         this.$refs.orderContracttable.init()
       },
-      //审核表单选项
+      //合同备案审核表单选项
       viewselect(selection){
         this.contractForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
+      //发函审核表单选项
       viewselect2(selection){
         this.sendFileForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
+      //产权办理审核表单选项
       viewselect3(selection){
         this.ownershipForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
+      //Tabs切换
       changs(){
         this.getAgency()
         if(this.viewTabs === 'contract'){
@@ -1739,7 +1749,6 @@ export default {
           id: this.editContractId
         }
         this.$request.post("/apiHost/api/contractBill/view",params,res=>{
-          console.log(res.data)
           this.contractForm.id = res.data.id
           this.contractForm.buildingName = res.data.buildingName
           this.contractForm.unitName = res.data.unitName
@@ -1780,9 +1789,7 @@ export default {
           id: this.contractForm.id,
           dataId: this.contractForm.dataId
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -1812,9 +1819,7 @@ export default {
           id: this.contractForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -1844,9 +1849,7 @@ export default {
           id: this.contractForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
             this.editContractModal = false
@@ -1875,7 +1878,6 @@ export default {
           id: this.editSendFileId
         }
         this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
-          console.log(res.data)
           this.sendFileForm.id = res.data.id
           this.sendFileForm.buildingName = res.data.buildingName
           this.sendFileForm.unitName = res.data.unitName
@@ -1923,9 +1925,7 @@ export default {
           id: this.sendFileForm.id,
           dataId: this.sendFileForm.dataId
         }
-        console.log(params)
         this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -1955,9 +1955,7 @@ export default {
           id: this.sendFileForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editSendFileModal = false
@@ -1986,9 +1984,7 @@ export default {
           id: this.sendFileForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editSendFileModal = false
@@ -2018,7 +2014,6 @@ export default {
           id: this.editDeliveryNoticeId
         }
         this.$request.post("/apiHost/api/deliveryNotice/view",params,res=>{
-          console.log(res.data)
           this.deliveryNoticeForm.buildingName = res.data.buildingName
           this.deliveryNoticeForm.unitName = res.data.unitName
           this.deliveryNoticeForm.roomNum = res.data.roomNum
@@ -2040,9 +2035,7 @@ export default {
         let params = {
           id: this.deliveryNoticeForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2072,9 +2065,7 @@ export default {
           id: this.deliveryNoticeForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editDeliveryNoticeModal = false
@@ -2103,9 +2094,7 @@ export default {
           id: this.deliveryNoticeForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
             this.editDeliveryNoticeModal = false
@@ -2135,7 +2124,6 @@ export default {
           id: this.editTransferId
         }
         this.$request.post("/apiHost/api/transfer/view",params,res=>{
-          console.log(res.data)
           this.transferForm.buildingName = res.data.buildingName
           this.transferForm.unitName = res.data.unitName
           this.transferForm.roomNum = res.data.roomNum
@@ -2157,9 +2145,7 @@ export default {
         let params = {
           id: this.transferForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/transfer/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2189,9 +2175,7 @@ export default {
           id: this.transferForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/transfer/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editTransferModal = false
@@ -2220,9 +2204,7 @@ export default {
           id: this.transferForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/transfer/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editTransferModal = false
@@ -2252,7 +2234,6 @@ export default {
           id: this.editTwoFileId
         }
         this.$request.post("/apiHost/api/twoFileBill/view",params,res=>{
-          console.log(res.data)
           this.twoFileForm.buildingName = res.data.buildingName
           this.twoFileForm.unitName = res.data.unitName
           this.twoFileForm.roomNum = res.data.roomNum
@@ -2274,9 +2255,7 @@ export default {
         let params = {
           id: this.twoFileForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2306,9 +2285,7 @@ export default {
           id: this.twoFileForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editTwoFileModal = false
@@ -2337,9 +2314,7 @@ export default {
           id: this.twoFileForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editTwoFileModal = false
@@ -2368,7 +2343,6 @@ export default {
           id: this.editOwnershipId
         }
         this.$request.post("/apiHost/api/ownershipBill/view",params,res=>{
-          console.log(res.data)
           this.ownershipForm.buildingName = res.data.buildingName
           this.ownershipForm.unitName = res.data.unitName
           this.ownershipForm.roomNum = res.data.roomNum
@@ -2409,9 +2383,7 @@ export default {
           id: this.ownershipForm.id,
           dataId: this.ownershipForm.dataId
         }
-        console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2441,9 +2413,7 @@ export default {
           id: this.ownershipForm.id,
           status:'1'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editOwnershipModal = false
@@ -2472,9 +2442,7 @@ export default {
           id: this.ownershipForm.id,
           status:'0'
         }
-        console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editOwnershipModal = false
@@ -2503,7 +2471,6 @@ export default {
           id: this.editOrderContractId
         }
         this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
-          console.log(res.data)
           this.viewForm={
             id : res.data.id,
             name : res.data.name,
@@ -2520,7 +2487,6 @@ export default {
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
-
       },
       //发起
       viewstart(){
@@ -2532,9 +2498,7 @@ export default {
           remark:this.viewForm.remark,
           applyNum:this.viewForm.applyNum,
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2557,6 +2521,7 @@ export default {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //通过
       viewPass(){
         this.modal_loading = true;
         let params = {
@@ -2565,7 +2530,6 @@ export default {
           status:1
         }
         this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -2585,6 +2549,7 @@ export default {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //驳回
       viewReject(){
         this.reject_loading=true
         let params = {
@@ -2592,9 +2557,7 @@ export default {
           actualNum: this.viewForm.actualNum,
           status:0
         }
-        console.log(params)
         this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editOrderContractModal = false

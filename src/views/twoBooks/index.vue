@@ -266,28 +266,29 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
-        isFirst: false,
-        isShow:false,
-        loading: true,
+        passDisable: false, //防止通过双击事件
+        isDisable: false, //防止驳回双击事件
+        isFirst: false, //首页
+        isShow: false, //新增抓取数据资料
+        loading: true, //加载
         modal_loading: false, //延迟
-        reject_loading: false,
-        addModal: false,
-        viewModal: false,
-        statusModal: false,
-        endModal:false,
-        noteModal: false,
-        buildingList:[],
-        unitList:[],
-        roomsList:[],
-        addData:[],
-        viewData:[],
-        nodesList:[],
-        historysList:[],
-        currentNodeId:'', //状态详情节点
-        viewTabs:'name1',
-        buttons:{ },
+        reject_loading: false, //驳回
+        addModal: false, //新增模态框
+        viewModal: false, //审核模态框
+        statusModal: false, //状态模态框
+        endModal: false, //终止模态框
+        noteModal: false, //弹窗
+        buildingList: [], //楼栋
+        unitList: [], //单元
+        roomsList: [], //房间
+        addData: [], //新增表格数据
+        viewData: [], //审核表格数据
+        nodesList: [], //处理进度
+        historysList: [], //进度详情
+        currentNodeId: '', //状态详情节点
+        viewTabs: 'name1', //Tabs
+        buttons:{ }, //按钮
+        //表单
         formItem: {
           status: '',
           customerName:'',
@@ -299,6 +300,7 @@
           endUpdateTime: '',
           page:1
         },
+        //表格
         tableConfig:{
           url:"/apiHost/api/twoFileBill/list",
               columns:[
@@ -399,6 +401,7 @@
                 }
               ],
         },
+        //新增-表单
         addForm:{
           areaId:'',
           areaName:'',
@@ -431,6 +434,7 @@
               { required: true, message: '请选择房间号', trigger: 'change' }
           ]
         },
+        //新增表格数据
         addTable: [
           {
             title: '地块',
@@ -499,12 +503,14 @@
             align: 'center'
           }
         ],
+        //审核表单
         viewForm: {
           id: '',
           buildingName: '',
           unitName: '',
           roomNum: '',
         },
+        //审核表格数据
         viewTable: [
           {
             title: '地块',
@@ -576,7 +582,7 @@
       }
     },
     mounted(){
-      this.getBuildings()
+      this.getBuildings()//获取楼栋
     },
     computed: {
       // 被选择的列表数据条数
@@ -609,7 +615,6 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
           window.location.reload()
@@ -619,7 +624,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -639,20 +643,17 @@
             this.addForm.buildingName = item.name
           }
         })
-        console.log(this.addForm)
         this.unitList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           buildingId
         }, res => {
-          console.log(res)
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
             rooms:item.rooms
           }))
-          console.log(this.unitList)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -690,15 +691,14 @@
         this.addModal = true
         this.modal_loading = false
       },
+      //新增抓取数据
       addPullData(){
         if(this.addForm.roomId !== ''){
           this.isShow=true
           let params = {
             roomId:this.addForm.roomId
           }
-          console.log(params)
           this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
-            console.log(res)
             this.addForm.idCard = res.data.idNumber
             this.addForm.customerName = res.data.customerName
             this.addForm.roomNum = res.data.rommNum
@@ -720,6 +720,7 @@
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
+      //新增取消
       addCancel(){
         this.addModal = false
         this.$refs.addForm.resetFields()
@@ -729,15 +730,13 @@
         this.roomsList=[ ]
         this.$Message.info('你取消了操作')
       },
+      //新增提交
       addSubmit(){
-        console.log(this.addData)
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             if(this.addData.length !== 0){
               this.modal_loading = true
-              console.log(this.addForm)
               this.$request.post("/apiHost/api/twoFileBill/add",this.addForm, res => {
-                console.log(res)
                 if (res.code === 200) {
                   setTimeout(() => {
                     this.modal_loading = false
@@ -766,6 +765,7 @@
           }
         })
       },
+      //审核
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -781,7 +781,6 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/twoFileBill/view",params,res=>{
-            console.log(res.data)
           this.viewForm.id = res.data.id
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
@@ -803,9 +802,7 @@
         let params = {
           id: this.viewForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -835,9 +832,7 @@
             id: this.viewForm.id,
             status:1
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
-            console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -863,9 +858,7 @@
             id: this.viewForm.id,
             status:0
         }
-        console.log(params)
         this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
-            console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -884,6 +877,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //状态
       statusProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -899,7 +893,6 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/twoFileBill/status",params,res=>{
-            console.log(res.data)
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -916,7 +909,6 @@
               this.currentNodeId = i
             }
           })
-          console.log(this.nodesList)
           this.statusModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -927,6 +919,7 @@
           this.statusModal = false;
         }, 2000);
       },
+      //终止
       endProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -960,6 +953,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -977,11 +971,13 @@
           this.$refs.table.init()
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false
         this.$refs.table.init()
       },
+      //删除
       deleteProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -1010,11 +1006,6 @@
       },
       //按钮
       btn:function(){
-        console.log(this.formItem)
-        console.log(this.name)
-      },
-      handleReset (name) {
-        this.$refs[name].resetFields();
       },
       //模态框
       ok () {
@@ -1022,6 +1013,7 @@
           this.twoNewbooksmodal = false;
         }, 2000);
       },
+      //审核取消
       viewCancel () {
         this.$refs.table.init()
         this.viewModal = false
@@ -1034,10 +1026,8 @@
       },
       //搜索
       searchSubmit(){
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/twoFileBill/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -1049,6 +1039,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //重置
       searchCancel(){
         this.formItem={
           status:'',
@@ -1064,7 +1055,6 @@
           this.$refs.table.init()
           this.isFirst = false
         },200)
-
       },
       // 提示窗关闭
       closes () {

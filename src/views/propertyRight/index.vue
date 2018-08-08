@@ -399,34 +399,37 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
-        isShow:false,//显示隐藏
-        isFirst: false,
-        loading: true,
+        passDisable: false,//防止通过双击事件
+        isDisable: false,//防止驳回双击事件
+        isShow: false,//显示隐藏
+        isFirst: false, //首页
+        loading: true, //加载
         modal_loading: false, //延迟
-        reject_loading: false,
-        viewTabs:'name1',
-        endModal:false,
-        addModal: false,
-        batchModal: false,
-        batchHouseModal:false,
-        viewModal: false,
-        editModal: false,
-        statusModal: false,
-        noteModal: false,
-        currentNodeId: '',
-        batchButtonFocus: 0,
-        buildingList: [],
-        unitList: [],
-        roomsList: [],
-        floorsList:[ ],
-        roomsArray:[],
-        nodesList: [],
-        historysList: [],
-        addData: [],
-        batchData: [],
-        buttons:{ },
+        reject_loading: false, //驳回
+        viewTabs: 'name1', //Tabs
+        endModal: false, //终止模态框
+        addModal: false, //新增模态框
+        batchModal: false, //批量新增模态框
+        batchHouseModal: false, //批量房间模态框
+        viewModal: false, //审核模态框
+        editModal: false, //编辑模态框
+        statusModal: false, //状态模态框
+        noteModal: false, //弹窗
+        currentNodeId: '', //处理进度节点
+        batchButtonFocus: 0, //批量按钮焦点
+        buildingList: [], //楼栋
+        unitList: [], //单元
+        roomsList: [], //房间
+        floorsList:[ ], //楼层
+        roomsArray:[], //批量房间
+        nodesList: [], //处理进度
+        historysList: [], //进度详情
+        addData: [], //新增-表格数据
+        batchData: [], //批量-表格数据
+        viewData: [], //审核-表格数据
+        editData: [], //编辑-表格数据
+        buttons:{ }, //按钮
+        //表单
         formItem: {
           status:'',
           customerName:'',
@@ -436,6 +439,7 @@
           endUpdateTime: '',
           page:1
         },
+        //表格
         tableConfig:{
           url:"/apiHost/api/ownershipBill/list",
               columns:[
@@ -496,6 +500,7 @@
                 }
               ],
         },
+        //新增-表单数据
         addForm: {
           buildingId: '',
           buildingName: '',
@@ -521,6 +526,7 @@
               { required: true, message: '业主姓名不能为空', trigger: 'blur' }
           ]
         },
+        //新增-表格
         addContract: [
           {
             type:"selection",
@@ -579,6 +585,7 @@
             width:150
           }
         ],
+        //批量-表单
         batchForm: {
           buildingId: '',
           buildingName: '',
@@ -589,6 +596,7 @@
           customerName: '',
           dataId: []
         },
+        //审核-表单
         viewForm: {
           id:'',
           customerName:'',
@@ -598,7 +606,7 @@
           roomNum:'',
           dataId:[]
         },
-        viewData:[],
+        //审核-发起表格
         viewStartContract: [
           {
             type:"selection",
@@ -657,6 +665,7 @@
             width: 80
           }
         ],
+        //审核-表格
         viewContract: [
           {
             title: '序号',
@@ -705,6 +714,7 @@
             width: 80
           }
         ],
+        //编辑表格
         editForm: {
           id:'',
           customerName:'',
@@ -712,8 +722,7 @@
           buildingName:'',
           unitName:'',
           roomNum:''
-        },
-        editData:[]
+        }
       }
     },
     computed: {
@@ -727,7 +736,7 @@
       }
     },
     mounted(){//方法
-      this.getBuildings()
+      this.getBuildings()//获取楼栋
     },
     methods: {
       //Tabs切换
@@ -739,6 +748,7 @@
           this.statusProject ()
         }
       },
+      //顺序
       numSort: function (a,b) {
         return a.count-b.count;
       },
@@ -750,20 +760,21 @@
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
       },
+      //新增-表格选项
       select(selection){
         this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
+      //批量-表格选项
       batchSelect(selection){
         this.batchForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
-      //审核表单选项
+      //审核-表格选项
       viewselect(selection){
         this.viewForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        //console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
           window.location.reload()
@@ -773,7 +784,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            //console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -820,7 +830,6 @@
             floorsObj.push({"floor":element,"rooms":[]})
           })
            
-          console.log("this.unitList.length="+this.unitList.length)
           for (let k = 0, length = 1; k < length; k++) {
             let unit = this.unitList[k];
             let isShow
@@ -832,11 +841,8 @@
               })
             })
           }
-          this.floorsList = floorsObj;
-          this.batchButtonFocus = 0 ;
-          //console.log(JSON.stringify(floorsObj))
-          //console.log(JSON.stringify(this.floorsList))
-          console.log(this.unitList)
+          this.floorsList = floorsObj
+          this.batchButtonFocus = 0 
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -863,8 +869,6 @@
               status:item.status,
               floor:item.floor
             }))
-            //console.log( this.roomsList)
-            //console.log(123)
           }
         })
         this.addForm.roomId = ""
@@ -873,7 +877,6 @@
       },
       //模态框的业主姓名
       getModalName(roomId) {
-        //console.log("roomId:"+roomId)
         if(typeof(roomId) === "undefined"){
             return ;
         }
@@ -886,7 +889,6 @@
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
           roomId
         }, res => {
-          //console.log(res)
           this.addForm.customerName=""
           res.data.data.map(item =>{
             this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
@@ -901,7 +903,6 @@
       //获取模态框表格数据
       getIndex () {
         this.$request.post("/apiHost/api/processSetting/data",{"type":"4"}, res => {
-          //console.log(res)
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -913,7 +914,6 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-          //console.log(this.addData)
           this.batchData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -925,7 +925,6 @@
             archiveQuantity: item.archiveQuantity,
             id:item.id
           }))
-          //console.log(this.batchData)
           var dataIdArray = new Array();
           for (var i = 0; i < this.addData.length; i++) {
             if(this.addData[i].required === '1'){
@@ -938,17 +937,17 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //新增模态框
       addProject(){
         this.addModal=true
         this.getIndex()
       },
-      //新增
+      //新增提交
       addSubmit() {
         this.modal_loading = true;
         this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$request.post("/apiHost/api/ownershipBill/add",this.addForm, res => {
-              //console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
@@ -973,6 +972,7 @@
           }
         })
       },
+      //新增取消
       addCancel() {
         this.addModal=false
         this.$Message.info('你取消了操作')
@@ -980,9 +980,8 @@
         this.roomsList=[ ]
         this.$refs.addForm.resetFields()
       },
-      //批量
+      //批量-单元房间
       getFloorsList(index){
-        console.log(index)
         this.batchButtonFocus = index 
         let floorsArray = new Array();
           for (let k = 0, length = this.unitList.length; k < length; k++) {
@@ -997,7 +996,6 @@
             floorsObj.push({"floor":element,"rooms":[]})
           })
            
-          console.log("this.unitList.length="+this.unitList.length)
           for (let k = index, length = index+1; k < length; k++) {
             let unit = this.unitList[k];
             let isShow
@@ -1013,7 +1011,6 @@
       },
       //显示隐藏
       toggle(param1,param2){
-        console.log("param1="+param1+"param2="+param2)
         this.floorsList.map(item=>{
           if (item.floor==param1){
             item.rooms.map((it,index)=>{
@@ -1023,9 +1020,8 @@
             })
           }
         })
-        //console.log("&&&&");
-        //console.log(this.floorsList)
       },
+      //批量
       batchProject(){
         this.batchModal = true
         this.batchForm.buildingName=''
@@ -1034,6 +1030,7 @@
         this.floorsList=[]
         this.getIndex()
       },
+      //批量房间提交
       batchHouseSubmit(){
         //1.通过房间查找到状态为true的房间ID,然后用,拼接起来
         //2.提交到前一个模态框
@@ -1061,6 +1058,7 @@
           this.batchHouseModal=false
         }
       },
+      //批量提交
       batchSubmit(){ //  将得到的数值传给后台调用接口
         if(this.batchForm.buildingName != ''){
         this.modal_loading = true
@@ -1068,9 +1066,7 @@
           dataId: this.batchForm.dataId,
           roomId:this.selectedStaff
         }
-        console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/batch",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.batchModal = false
@@ -1090,6 +1086,7 @@
           this.$Modal.error({title: '提示信息', content:  "您还未选择房间号,请选择有效房间才可提交"})
         }
       },
+      //批量取消
       batchCancel(){
         this.batchModal=false
         this.$Message.info('你取消了操作')
@@ -1097,6 +1094,7 @@
         this.batchForm.buildingsList=[]
         this.batchForm.dataId=[]
       },
+      //批量房间取消
       batchHouseCancel(){
         this.batchHouseModal=false
         this.batchForm.buildingId=''
@@ -1105,6 +1103,7 @@
         this.floorsList=[]
         this.$Message.info('你取消了操作')
       },
+      //批量房间模态框
       batchHouse(){
         this.batchHouseModal = true
         this.batchForm.buildingId=''
@@ -1113,7 +1112,7 @@
         this.floorsList=[]
         this.getRooms()
       },
-
+      //审核
       viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -1129,7 +1128,6 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/ownershipBill/view",params,res=>{
-            //console.log(res.data)
           this.viewForm.id = res.data.id
           this.viewForm.customerName = res.data.customerName
           this.viewForm.status = res.data.status
@@ -1171,9 +1169,7 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/start",params,res=>{
-          //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -1191,15 +1187,14 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //通过
       viewPass(){
         this.modal_loading = true
         let params = {
             id: this.viewForm.id,
             status:1
         }
-        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-            //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -1218,15 +1213,14 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //驳回
       viewReject(){
         this.reject_loading = true
         let params = {
             id: this.viewForm.id,
             status:0
         }
-        //console.log(params)
         this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
-            //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -1245,6 +1239,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //状态
       statusProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -1260,7 +1255,6 @@
             id: this.selection[0].id
         }
         this.$request.post("/apiHost/api/ownershipBill/status",params,res=>{
-            //console.log(res.data)
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -1277,7 +1271,6 @@
               this.currentNodeId = i
             }
           })
-          //console.log(this.nodesList)
           this.statusModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -1288,6 +1281,7 @@
           this.statusModal = false;
         }, 2000);
       },
+      //终止
       endProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -1324,6 +1318,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -1339,11 +1334,13 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false
         this.$refs.table.init()
       },
+      //删除
       deleteProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
@@ -1370,14 +1367,8 @@
           }
         })
       },
-
       //按钮
       btn:function(){
-        //console.log(this.formItem)
-        //console.log(this.name)
-      },
-      handleReset (name) {
-        this.$refs[name].resetFields();
       },
       //模态框
       ok () {
@@ -1385,6 +1376,7 @@
           this.newPropertyrightsmodal = false;
         }, 2000);
       },
+      //取消
       cancel () {
         this.$refs.table.init()
         this.viewModal=false
@@ -1392,10 +1384,8 @@
       },
       //搜索
       searchSubmit () {
-        //console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/ownershipBill/list",this.formItem, res => {
-          //console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -1407,6 +1397,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //重置
       searchCancel(){
         this.formItem={
           status:'',

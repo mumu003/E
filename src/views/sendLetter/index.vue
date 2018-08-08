@@ -279,7 +279,7 @@
         isDisable:false,//防止驳回双击事件
         loading: true, //延迟
         modal_loading: false, //延迟
-        reject_loading: false,
+        reject_loading: false, //驳回
         isFirst: false, //是否是第一页
         addModal: false, //新增模态框
         viewModal: false, //查看模态框
@@ -294,7 +294,9 @@
         nodesList: [],  //处理进度
         historysList: [],  //进度详情
         currentNodeId:'', //状态详情节点
-        viewTabs:'name1',
+        viewTabs:'name1', //Tabs
+        buttons:{ }, //按钮
+        //发函类型
         fileTypeList:[
           {
             fileType:'Contract',
@@ -309,7 +311,6 @@
             fileName:'未按时按揭'
           }
         ],
-        buttons:{ },
         //搜索时间
         searchTime:{
           tStartTime:"",
@@ -548,6 +549,7 @@
             width:80
           }
         ],
+        //审核发起表格
         viewStartContract: [
           {
             type:"selection",
@@ -1028,6 +1030,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -1045,6 +1048,7 @@
           this.$refs.table.init()
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false

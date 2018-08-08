@@ -225,7 +225,7 @@
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
-   <!-- <Modal v-model="statuModal" title="状态详情"
+   <!-- <Modal v-model="statusModal" title="状态详情"
            width="800"
            :loading="loading"
            @on-ok="statuSubmit"
@@ -266,24 +266,29 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
+        passDisable: false,//防止通过双击事件
+        isDisable: false,//防止驳回双击事件
         modal_loading: false, //延迟
-        reject_loading:false,
-        isFirst: false,
-        addModal:false,
-        viewModal:false,
-        statuModal:false,
-        endModal:false,
+        reject_loading: false, //驳回
+        isFirst: false, //首页
+        addModal: false, //新增模态框
+        viewModal: false, //审核模态框
+        statusModal: false, //状态模态框
+        endModal: false, //终止模态框
         noteModal: false, //弹窗
-        isShow:false,
-        loading:true,
-        viewTabs:'name1',
-        //定义数组
-        buildingList:[],
-        unitList:[],
-        roomsList:[],
-        buttons:{ },
+        isShow: false, //新增-资料抓取显示
+        loading: true, //加载
+        buildingList: [], //楼栋
+        unitList: [], //单元
+        roomsList: [], //房间
+        addData: [], //新增表格数据
+        viewData: [], //审核表格数据
+        nodesList: [], //处理进度
+        historysList: [], //进度详情
+        currentNodeId: '', //处理进度节点
+        viewTabs: 'name1', //Tabs
+        buttons:{ }, //按钮
+        //搜索时间
         searchTime:{
           tStartTime:"",
           tEndTime:"",
@@ -376,7 +381,7 @@
             }
           ],
         },
-        //模态框表单,表格数据
+        //新增-表单数据
         addForm:{
           areaId:'',
           areaName:'',
@@ -393,6 +398,7 @@
           address:'',
           remark:''
         },
+        //新增-表格
         addContract: [
           {
             title: '楼栋号',
@@ -440,7 +446,6 @@
             width:150
           }
         ],
-        addData: [],
         //新增模态框验证
         ruleAdd:{
           buildingId: [
@@ -453,7 +458,7 @@
             { required: true, message: '请选择房间号', trigger: 'change' }
           ]
         },
-        //模态框表单,表格数据
+        //审核-表单数据
         viewForm:{
           buildingName:'',
           unitName:'',
@@ -462,7 +467,7 @@
           status:'',
           id:''
         },
-        viewData: [],
+        //审核-表格数据
         viewContract: [
           {
             title: '楼栋号',
@@ -509,10 +514,7 @@
             key: 'remark',
             width:150
           }
-        ],
-        nodesList:[],
-        historysList:[],
-        currentNodeId:''
+        ]
       }
     },
     computed: {
@@ -543,7 +545,6 @@
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
-        console.log("token="+token)
         if(token === null){
           window.location.href = '/#/login'
           window.location.reload()
@@ -553,7 +554,6 @@
             projectId: sessionStorage.getItem("curProjectId")
           }
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            console.log(res)
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -573,13 +573,11 @@
             this.addForm.buildingName = item.name
           }
         })
-        console.log(this.addForm)
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId:sessionStorage.orgId,
           projectId:sessionStorage.curProjectId,
           buildingId
         }, res => {
-          console.log(res)
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
@@ -615,7 +613,6 @@
       },
       //获取地块名称  (接口在哪)
       addarea(areaId){
-        console.log(this.addForm)
       },
       //开始时间
       getStartDate(startDate){
@@ -636,7 +633,6 @@
           let params = {
             roomId:this.addForm.roomId
           }
-          console.log(params)
           this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
             this.addForm.customerName = res.data.customerName
             this.addForm.roomNum = res.data.rommNum
@@ -665,12 +661,10 @@
       },
       //新增模态框提交
       addSubmit(){
-        console.log(this.addData)
         this.modal_loading = true
         if(this.addForm.roomId){
           if(this.addData.length !== 0){
             this.$request.post("/apiHost/api/transfer/add",this.addForm, res => {
-              console.log(res)
               if (res.code === 200) {
                 setTimeout(() => {
                   this.addModal = false
@@ -700,6 +694,19 @@
           this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
         }
       },
+      //新增-表格选项
+      select(selection){
+        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      },
+      //取消
+      cancel() {
+        this.addModal = false
+        this.$Message.info('你取消了操作')
+        this.unitList=[ ]
+        this.roomsList=[ ]
+        this.$refs.addForm.resetFields()
+        this.$refs.table.init()
+      },
       //审核
       viewProject(){
         if (this.selected_count === 0) {
@@ -717,7 +724,6 @@
         }
         this.$request.post("/apiHost/api/transfer/view",params,res=>{
           this.viewData=[]
-          console.log(res.data)
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
@@ -733,6 +739,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //审核取消
       viewCancel(){
         this.$refs.table.init()
         this.viewModal = false
@@ -749,9 +756,7 @@
         let params = {
           id: this.viewForm.id
         }
-        console.log(params)
         this.$request.post("/apiHost/api/transfer/start",params,res=>{
-          console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -856,6 +861,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -873,6 +879,7 @@
           this.$refs.table.init()
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false
@@ -939,35 +946,21 @@
                 this.currentNodeId = i
               }
             })
-            console.log(this.nodesList)
-            this.statuModal = true
+            this.statusModal = true
           }, res=>{
             this.$Modal.error({title: '提示信息', content: res.message})
           },
         )
       },
       statuSubmit(){
-        this.statuModal = false
+        this.statusModal = false
         this.loading = false
-        this.$refs.table.init()
-      },
-      select(selection){
-        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-      },
-      cancel() {
-        this.addModal = false
-        this.$Message.info('你取消了操作')
-        this.unitList=[ ]
-        this.roomsList=[ ]
-        this.$refs.addForm.resetFields()
         this.$refs.table.init()
       },
       //搜索
       searchSubmit () {
-        console.log(this.formItem)
         this.isFirst = true
         this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
-          console.log(res)
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -979,6 +972,7 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //搜索重置
       searchCancel() {
         this.formItem={
           status: '',

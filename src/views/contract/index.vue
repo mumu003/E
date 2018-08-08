@@ -257,29 +257,29 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
-        reject_loading:false,
+        passDisable: false,//防止通过双击事件
+        isDisable: false,//防止驳回双击事件
+        reject_loading: false, //驳回
         loading: true, //延迟
         modal_loading: false, //延迟
         isFirst: false, //是否是第一页
         addModal: false, //新增模态框
         viewModal: false, //查看模态框
         statusModal: false, //状态模态框
-        endModal:false,//终止模态框
+        endModal: false,//终止模态框
         noteModal: false, //弹窗
-        buildingList: [],  //楼栋
-        unitList: [],   //单元
-        roomsList: [],  //房间
-        addData: [],   //新增模态框表格数据
-        viewData: [],  //审核模态框表格数据
-        nodesList: [],  //处理进度
-        historysList: [],  //进度详情
-        currentNodeId:'', //状态详情节点
-        viewTabs:'name1',
-        checkButton:false,
-        startButton:false,
-        buttons:{ },
+        buildingList: [], //楼栋
+        unitList: [], //单元
+        roomsList: [], //房间
+        addData: [], //新增模态框表格数据
+        viewData: [], //审核模态框表格数据
+        nodesList: [], //处理进度
+        historysList: [], //进度详情
+        currentNodeId: '', //状态详情节点
+        viewTabs: 'name1', //Tabs
+        checkButton: false, //验证
+        startButton: false, //发起
+        buttons:{ }, //按钮
         //搜索时间
         searchTime:{
           tStartTime:"",
@@ -497,6 +497,7 @@
             width:80
           }
         ],
+        //审核-发起表格
         viewStartContract: [
           {
             type:"selection",
@@ -964,6 +965,7 @@
           }
         })*/
       },
+      //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
         let params = {
@@ -981,6 +983,7 @@
           this.$refs.table.init()
         })
       },
+      //终止取消
       endCancel(){
         this.$Message.info('你取消了操作')
         this.endModal=false

@@ -97,7 +97,6 @@
                   })
                 })*/
               this.$request.post('/apiHost/api/user/login',this.form,res => {
-                // console.log(res)
                 if (res.code === 200) {
                   sessionStorage.setItem("token", res.data.token)
                   sessionStorage.setItem("userId", res.data.userId)

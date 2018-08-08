@@ -469,32 +469,32 @@
         loading : true,//加载
         modal_loading : false,//模态框加载
         editModal: false,//编辑流程设置模态框
-        selectMaterialModal:false,//选择资料模态框
-        addMaterialModal:false,//新增资料模态框
-        editMaterialModal:false,//编辑资料模态框
-        editArchiveModal:false,//编辑流程存档资料模态框
+        selectMaterialModal: false,//选择资料模态框
+        addMaterialModal: false,//新增资料模态框
+        editMaterialModal: false,//编辑资料模态框
+        editArchiveModal: false,//编辑流程存档资料模态框
         viewModal : false,//流程设置详情模态框
-        isNo:'false',
-        editSelect:[],//编辑流程选择勾选
-        roleList:[],//角色list
-        viewSettingDatas :[],//流程设置详情数据
-        viewSettingNodesOne :[],//流程设置详情数据接收list
-        viewSettingNodesTwo:[],//流程设置详情数据中间转换list
-        viewSettingNodes :[],//流程设置详情显示list
-        settingDatas:[],//设置数据
-        settingNodes:[],//设置节点
-        settingNodesLength:'',//设置节点长度
-        archiveSetting:[],//存档资料接收list
-        archiveSettingTwo:[],//存档资料数据中间转换list
-        archiveSettingNodes:[],//存档资料数据list
-        archiveType:'',//存档资料类型
-        archiveDatas:[],//存档资料数据
-        noteArchiveList:[],//节点存档资料数据
-        selectMaterialList:[],//选择资料list
-        selectMaterialListTwo:[],//选择资料中间转换list
-        backupSelectMaterialList:[],//备份选择资料list
-        backNoteArchiveList:[],//回传资料list
-        archiveUpdateArchiveList:[],//更新存档资料list
+        isNo: 'false', //选择存档资料中资料全部被选完了
+        editSelect: [],//编辑流程选择勾选
+        roleList: [],//角色list
+        viewSettingDatas: [],//流程设置详情数据
+        viewSettingNodesOne: [],//流程设置详情数据接收list
+        viewSettingNodesTwo: [],//流程设置详情数据中间转换list
+        viewSettingNodes: [],//流程设置详情显示list
+        settingDatas: [],//设置数据
+        settingNodes: [],//设置节点
+        settingNodesLength: '',//设置节点长度
+        archiveSetting: [],//存档资料接收list
+        archiveSettingTwo: [],//存档资料数据中间转换list
+        archiveSettingNodes: [],//存档资料数据list
+        archiveType: '',//存档资料类型
+        archiveDatas: [],//存档资料数据
+        noteArchiveList: [],//节点存档资料数据
+        selectMaterialList: [],//选择资料list
+        selectMaterialListTwo: [],//选择资料中间转换list
+        backupSelectMaterialList: [],//备份选择资料list
+        backNoteArchiveList: [],//回传资料list
+        archiveUpdateArchiveList: [],//更新存档资料list
         archiveUpdateList:{
           type:'',
           archive:''
