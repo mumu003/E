@@ -70,10 +70,10 @@
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" :disabled="isDisable">驳回</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -122,10 +122,10 @@
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsSend.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="sendFileReject" :disabled="isDisable">驳回</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="sendFileReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -162,10 +162,10 @@
         <div slot="footer" style="text-align: right;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsDelivery.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="deliveryNoticeReject" :disabled="isDisable" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="deliveryNoticeReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -202,10 +202,10 @@
         <div slot="footer" style="text-align: right;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsTransfer.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="transferReject" :disabled="isDisable" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="transferReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
                <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -242,10 +242,10 @@
         <div slot="footer" style="text-align: right;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsTwoFile.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="twoFileReject" :disabled="isDisable" >驳回</Button>
+              <Button type="error" size="default" :loading="reject_loading" @click="twoFileReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -284,10 +284,10 @@
         <div slot="footer" style="text-align: right;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsOwnership.check" >
-               <Button type="error" size="default" :loading="reject_loading" @click="ownershipReject" :disabled="isDisable" >驳回</Button>
+               <Button type="error" size="default" :loading="reject_loading" @click="ownershipReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
                <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -322,7 +322,7 @@
             </Col>
             <Col span="24">
             <FormItem label="备注说明">
-              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
+              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :maxlength=50></Input>
             </FormItem>
             </Col>
           </Row>
@@ -331,10 +331,10 @@
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
             <Col span="24">
-            <Button size="default" @click="cancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="cancel" >取消</Button>
+            <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsOrderContract.check" >
-               <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+               <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
             </Col>
@@ -2527,6 +2527,7 @@ export default {
         let params = {
           id: this.viewForm.id,
           actualNum: this.viewForm.actualNum,
+          remark:this.viewForm.remark,
           status:1
         }
         this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
@@ -2555,6 +2556,7 @@ export default {
         let params = {
           id: this.viewForm.id,
           actualNum: this.viewForm.actualNum,
+          remark:this.viewForm.remark,
           status:0
         }
         this.$request.post("/apiHost/api/contractApplication/check",params,res=>{

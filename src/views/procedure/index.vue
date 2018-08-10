@@ -670,7 +670,7 @@
             align:'center',
             width:70,
             render:(h,params)=>{
-              switch(params.row.required){
+              switch(params.row.archive){
                 case '0':
                   return h('div',"否")
                 case '1':
@@ -748,6 +748,8 @@
         this.roleList.forEach(item=>{
           if(overId === item.roleId){
             this.editForm.overName = item.roleName
+            console.log("this.editForm.overName="+this.editForm.overName)
+            console.log("this.editForm.overId="+this.editForm.overId)
           }
         })
       },
@@ -809,9 +811,9 @@
           type: this.selection[0].type
         }
         this.$request.post("/apiHost/api/processSetting/view",params,res=>{
-          console.log(res)
           this.viewForm.type = res.data.type
           this.viewForm.overName = res.data.overName
+          console.log("this.viewForm.overName"+JSON.stringify(res.data))
           this.viewSettingDatas = res.data.settingDatas.map(item=>({
             sort: item.sort,
             required: item.required,
@@ -820,12 +822,10 @@
             archive: item.archive,
             id:item.id
           }))
-          console.log(JSON.stringify(this.viewSettingDatas))
         }, res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
         this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
-          console.log(res)
           this.viewSettingNodesOne = res.data.map(item=>({
             roleName : item.roleName,
             nodeId : item.nodeId,
@@ -845,7 +845,6 @@
             }
           }
           this.viewSettingNodes = this.viewSettingNodesTwo
-          console.log(this.viewSettingNodes)
           this.viewModal = true
         }, res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -906,6 +905,8 @@
       },
       //编辑流程配置确定
       editSubmit () {
+        console.log("this.editForm.overName="+this.editForm.overName)
+        console.log("this.editForm.overId="+this.editForm.overId)
         this.modal_loading = true
         this.editForm.settingDatas = JSON.stringify(this.settingDatas.map(item=>({
           id:item.id,
@@ -924,6 +925,7 @@
         }else{
           this.editForm.requirePurchase = "1"
         }
+        console.log("this.editForm="+JSON.stringify(this.editForm))
         this.$request.post("/apiHost/api/processSetting/update",this.editForm,res=>{
           if (res.code === 200) {
             setTimeout(() => {

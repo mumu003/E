@@ -128,7 +128,7 @@
               </Col>
               <Col span="24">
                 <FormItem label="备注说明">
-                  <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" readonly></Input>
+                  <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :readonly="!buttons.start && !buttons.check" :maxlength=50></Input>
                 </FormItem>
               </Col>
             </Row>
@@ -532,6 +532,7 @@
             let params = {
                 id: this.viewForm.id,
                 actualNum: this.viewForm.actualNum,
+                remark:this.viewForm.remark,
                 status:1
             }
             this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
@@ -563,6 +564,7 @@
             let params = {
                 id: this.viewForm.id,
                 actualNum: this.viewForm.actualNum,
+                remark:this.viewForm.remark,
                 status:0
             }
             this.$request.post("/apiHost/api/contractApplication/check",params,res=>{

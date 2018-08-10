@@ -28,12 +28,12 @@
               </Col>-->
               <Col span="6">
               <FormItem label="楼栋">
-                <Input v-model="formItem.buildingName" placeholder="请输入楼栋号"/>
+                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号"/>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="房间号">
-                <Input v-model="formItem.roomNum" placeholder="请输入房间号"/>
+                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
               </FormItem>
               </Col>
             </Row>
@@ -99,9 +99,16 @@
           </Col>
           <Col span="8">
           <FormItem label="单元" prop="unitId">
-            <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-              <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-            </Select>
+            <div v-if="addUnitNameIsNo !== ''">
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
+              </Select>
+            </div>
+            <div v-if="addUnitNameIsNo === ''">
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
+              </Select>
+            </div>
           </FormItem>
           </Col>
           <Col span="8">
@@ -187,10 +194,10 @@
       <div slot="footer" style="text-align: right;" v-model="viewForm.id">
         <Row>
           <Col span="24" v-if="viewTabs === 'name1'">
-            <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
-            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+            <Button size="default" @click="viewCancel" >取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttons.check" >
-              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
@@ -263,6 +270,7 @@
         loading: true, //加载
         viewTabs: 'name1',//Tabs默认
         currentNodeId: '',//审核节点
+        addUnitNameIsNo:'',//新增名字空的
         buildingList: [],//楼栋
         unitList: [],//单元
         roomsList: [],//房间
@@ -598,16 +606,24 @@
             this.addForm.buildingName = item.name
           }
         })
+        this.unitList=[];
+        this.roomsList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId:sessionStorage.orgId,
           projectId:sessionStorage.curProjectId,
           buildingId
         }, res => {
+          this.addUnitNameIsNo = ''
           this.unitList = res.data.units.map(item => ({
             id: item.unitId,
             name: item.unitName,
             rooms:item.rooms
           }))
+          if(this.unitList[0].name === ''){
+            if(this.addForm.buildingName !== ""){
+              this.addUnitNameIsNo = this.addForm.buildingName
+            }
+          }
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -684,6 +700,7 @@
       //清除抓取数据
       clearAddData(){
         this.isShow = false
+        this.addData = []
       },
       //新增提交
       addSubmit(){

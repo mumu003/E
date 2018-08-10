@@ -99,9 +99,16 @@
             </Col>
             <Col span="8">
               <FormItem label="单元" prop="unitId">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                </Select>
+                  <div v-if="addUnitNameIsNo !== ''">
+                    <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                      <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
+                    </Select>
+                  </div>
+                  <div v-if="addUnitNameIsNo === ''">
+                    <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                      <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
+                    </Select>
+                  </div>
               </FormItem>
             </Col>
             <Col span="8">
@@ -163,33 +170,43 @@
           <Row>
             <Col span="24">
               <FormItem label="楼栋">
-                <Select v-model="batchForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(batchForm.buildingId),getRooms(batchForm.unitId)">
+                <Select v-model="batchForm.buildingId" placeholder="请选择楼栋号"  @on-change="getBatchUnits(batchForm.buildingId),getRooms(batchForm.unitId)">
                   <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
                 </Select>
               </FormItem>
             </Col>
             <Col span="24">
-              <div class="batch-house-tips"><span class="batch-house-red">红色</span>-可选择使用</div>
+              <div class="batch-house-tips"><span class="batch-house-red">红色</span>-已售出</div>
               <div class="batch-house-tips"><span class="batch-house-green">绿色</span>-已办理</div>
-              <div class="batch-house-tips"><span class="batch-house-gray">灰色</span>-售出</div>
+              <div class="batch-house-tips"><span class="batch-house-gray">灰色</span>-不可办理</div>
             </Col>
-            <Col span="24" style="margin-bottom: 10px">
-              <!-- <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag> -->
-              <!-- <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input> -->
-              <Button :type="batchButtonFocus === index ? 'primary' : 'ghost'" size="default" v-for="(item,index) in unitList" :key="index" style="margin-right: 10px" @click="getFloorsList(index)">{{item.name}}</Button>
-            </Col>
-            <Col span="24" v-for="item in floorsList">
-                <Col span="2">
-                  <div class="house bg-gray">{{item.floor}}层</div>
-                </Col>
-                 <Col span="22">
-                   <div class="test"  @click="toggle(item.floor,it.roomId)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
-                     {{it.roomNum}}
-                     <Icon type="ios-checkmark-outline" v-show="it.show" class="img-position"></Icon><!--v-show="i.isShow"-->
-                   </div>
+            <div v-if="batchFloorsListIsNo !== ''">
+              <Col span="24" style="margin-bottom: 10px">
+                <!-- <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag> -->
+                <!-- <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input> -->
+                  <div v-if="unitNameIsNo !== ''">
+                  </div>
+                  <div v-if="unitNameIsNo === ''">
+                    <Button :type="batchButtonFocus === index ? 'primary' : 'ghost'" size="default" v-for="(item,index) in unitList" :key="index" style="margin-right: 10px" @click="getFloorsList(index)">{{item.name}}</Button>
+                  </div>
+              </Col>
+              <Col span="24" v-for="item in floorsList">
+                  <Col span="2">
+                    <div class="house bg-gray">{{item.floor}}层</div>
                   </Col>
-            </Col>
-
+                   <Col span="22">
+                     <div class="test"  @click="toggle(item.floor,it.roomId)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
+                       {{it.roomNum}}
+                       <Icon type="ios-checkmark-outline" v-show="it.show" class="img-position"></Icon><!--v-show="i.isShow"-->
+                     </div>
+                    </Col>
+              </Col>
+            </div>
+            <div v-if="batchFloorsListIsNo === '0'">
+              <Col span="24">
+                该楼栋没有房间！
+              </Col>
+            </div>
           </Row>
         </Form>
         <div slot="footer" style="text-align:right;margin:0 auto;">
@@ -274,10 +291,10 @@
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Row>
           <Col span="24" v-if="viewTabs === 'name1'">
-          <Button size="default" @click="viewCancel" style="margin-right: 10px;">取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading">发起</Button>
+          <Button size="default" @click="viewCancel" >取消</Button>
+          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
           <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable">驳回</Button>
+              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
@@ -417,10 +434,13 @@
         noteModal: false, //弹窗
         currentNodeId: '', //处理进度节点
         batchButtonFocus: 0, //批量按钮焦点
+        batchFloorsListIsNo: '',//批量中楼栋没有数据
+        unitNameIsNo:'',//单元名字是空的
+        addUnitNameIsNo:'',//新增名字空的
         buildingList: [], //楼栋
         unitList: [], //单元
         roomsList: [], //房间
-        floorsList:[ ], //楼层
+        floorsList:[], //楼层
         roomsArray:[], //批量房间
         nodesList: [], //处理进度
         historysList: [], //进度详情
@@ -801,6 +821,45 @@
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
             this.addForm.buildingName = item.name
+          }
+        })
+        this.unitList=[];
+        this.roomsList=[];
+        this.$request.post("/apiHost/api/room/getBuildingRoom",{
+          orgId: sessionStorage.getItem("orgId"),
+          projectId: sessionStorage.getItem("curProjectId"),
+          buildingId,
+          type:4
+        }, res => {
+            this.addUnitNameIsNo = ''
+            this.unitList = res.data.units.map(item => ({
+              id: item.unitId,
+              name: item.unitName,
+              rooms:item.rooms
+            }))
+            if(this.unitList[0].name === ''){
+              if(this.addForm.buildingName !== ""){
+                this.addUnitNameIsNo = this.addForm.buildingName
+              }
+            }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+        this.addForm.unitId = ""
+        this.addForm.unitName = ""
+        this.addForm.roomId = ""
+        this.addForm.roomNum = ""
+        this.addForm.customerName = ""
+      },
+      //获取批量单元列表
+      getBatchUnits(buildingId) {
+        this.floorsList = []
+        this.batchFloorsListIsNo = ''
+        if(typeof(buildingId) === "undefined"){
+            return ;
+        }
+        this.buildingList.forEach(item=>{
+          if(buildingId===item.id){
             this.batchForm.buildingName=item.name
           }
         })
@@ -811,46 +870,59 @@
           buildingId,
           type:4
         }, res => {
-          this.unitList = res.data.units.map(item => ({
-            id: item.unitId,
-            name: item.unitName,
-            rooms:item.rooms
-          }))
+          if(res.data !== null){
+            this.unitNameIsNo = ''
+            this.batchFloorsListIsNo = '1'
+            this.unitList = res.data.units.map(item => ({
+              id: item.unitId,
+              name: item.unitName,
+              rooms:item.rooms
+            }))
+            
+            console.log("this.unitList[0].name="+this.unitList[0].name)
 
-          let floorsArray = new Array();
-          for (let k = 0, length = this.unitList.length; k < length; k++) {
-           let unit = this.unitList[k];
-            floorsArray = unit.rooms.map(function(i){
-              return i.floor;
-            });
-          }
-          let floorsSet = new Set(floorsArray);
-          let floorsObj = [];
-          floorsSet.forEach(function (element, sameElement, set) {
-            floorsObj.push({"floor":element,"rooms":[]})
-          })
-           
-          for (let k = 0, length = 1; k < length; k++) {
-            let unit = this.unitList[k];
-            let isShow
-            unit.rooms.map(function(i){
-              floorsObj.forEach(function (element, sameElement, set) {
-                if(element.floor==i.floor){
-                  element.rooms.push(i)
-                }
-              })
+            if(this.unitList[0].name === ''){
+              console.log("空")
+              if(this.batchForm.buildingName !== ""){
+                this.unitNameIsNo = this.batchForm.buildingName
+              }
+            }else{
+              console.log("不空")
+            }
+            
+            let floorsArray = new Array();
+            for (let k = 0, length = this.unitList.length; k < length; k++) {
+             let unit = this.unitList[k];
+              floorsArray = unit.rooms.map(function(i){
+                return i.floor;
+              });
+            }
+            let floorsSet = new Set(floorsArray);
+            let floorsObj = [];
+            floorsSet.forEach(function (element, sameElement, set) {
+              floorsObj.push({"floor":element,"rooms":[]})
             })
+             
+            for (let k = 0, length = 1; k < length; k++) {
+              let unit = this.unitList[k];
+              let isShow
+              unit.rooms.map(function(i){
+                floorsObj.forEach(function (element, sameElement, set) {
+                  if(element.floor==i.floor){
+                    element.rooms.push(i)
+                  }
+                })
+              })
+            }
+            this.floorsList = floorsObj
+            this.batchButtonFocus = 0 
+          }else{
+            this.batchFloorsListIsNo = '0'
           }
-          this.floorsList = floorsObj
-          this.batchButtonFocus = 0 
+          console.log("this.batchFloorsListIsNo="+this.batchFloorsListIsNo)
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
-        this.addForm.unitId = ""
-        this.addForm.unitName = ""
-        this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
       },
       //获取房间列表
       getRooms(unitId) {
