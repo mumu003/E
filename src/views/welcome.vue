@@ -83,7 +83,7 @@
       </Modal>
 
       <Modal v-model="editSendFileModal" title="编辑发函" width="800" >
-        <Form  :model="sendFileForm" :label-width="100">
+        <Form  :model="sendFileForm" :label-width="100"  ref="viewSendFileForm"  :rules="ruleViewSendFileForm">
           <Row>
             <Col span="8">
             <FormItem label="楼栋">
@@ -101,8 +101,8 @@
             </FormItem>
             </Col>
             <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="sendFileForm.customerName" readonly></Input>
+            <FormItem label="业主姓名" prop="customerName">
+              <Input v-model="sendFileForm.customerName" :readonly="!buttons.start" :maxlength=20 ></Input>
             </FormItem>
             </Col>
             <Col span="8">
@@ -1294,6 +1294,12 @@ export default {
             }
           ],
           sendFileData:[],//发函审核模态框表格数据
+          //检测发函
+          ruleViewSendFileForm:{
+            customerName:[
+              { required: true, message: '请填写客户姓名', trigger: 'blur' }
+            ]
+          },
 
           //交房通知
           deliveryNoticeForm:{
@@ -1921,31 +1927,37 @@ export default {
       //发起
       sendFileStart(){
         this.modal_loading = true
-        let params = {
-          id: this.sendFileForm.id,
-          dataId: this.sendFileForm.dataId
-        }
-        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
-          if (res.code === 200) {
-            setTimeout(() => {
+        this.$refs.ruleViewSendFileForm.validate((valid) => {
+          if (valid) {
+            let params = {
+              id: this.sendFileForm.id,
+              dataId: this.sendFileForm.dataId
+            }
+            this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+              if (res.code === 200) {
+                setTimeout(() => {
+                  this.modal_loading = false
+                  this.sendFileForm.dataId=[ ]
+                  this.$Message.success("发起成功!")
+                  this.editSendFileModal = false
+                  this.$refs.sendFiletable.init()
+                  this.getAgency()
+                }, 2000)
+              } else {
+                this.modal_loading = false
+                /*this.editSendFileModal = false
+                this.$refs.sendFiletable.init()*/
+                this.$Modal.error({title: '提示信息', content: res.message})
+              }
+            },res=>{
               this.modal_loading = false
-              this.sendFileForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.editSendFileModal = false
-              this.$refs.sendFiletable.init()
-              this.getAgency()
-            }, 2000)
-          } else {
+             /* this.editSendFileModal = false
+              this.$refs.sendFiletable.init()*/
+              this.$Modal.error({title: '提示信息', content: res.message})
+            })
+          }else{
             this.modal_loading = false
-            /*this.editSendFileModal = false
-            this.$refs.sendFiletable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
           }
-        },res=>{
-          this.modal_loading = false
-         /* this.editSendFileModal = false
-          this.$refs.sendFiletable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
