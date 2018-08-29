@@ -59,6 +59,7 @@
               <Button type="primary" @click="editProject" icon="edit">编辑</Button>
               <Button type="primary" @click="editArchiveProject" icon="gear-b">存档设置</Button>
               <Button type="primary" @click="viewProject" icon="eye">详情</Button>
+              <Button type="primary" @click="syncProject" icon="android-sync" :disabled="syncDisable">同步房屋</Button>
               </Col>
               <Col>
               </Col>
@@ -466,6 +467,7 @@
         }
       };
       return {
+        syncDisable : false,//异步房屋禁用
         loading : true,//加载
         modal_loading : false,//模态框加载
         editModal: false,//编辑流程设置模态框
@@ -1377,6 +1379,28 @@
         this.editArchiveModal = false
         this.$Message.info('你取消了操作')
         this.$refs.table.init()
+      },
+      //同步房屋
+      syncProject (){
+        this.syncDisable = true
+        this.modal_loading = true
+        this.$request.post("/apiHost/api/index/sync",'', res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.modal_loading = false
+            this.syncDisable = false
+            this.$Message.success("同步房屋成功！")
+            this.$refs.table.init()
+          } else {
+            this.modal_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.syncDisable = false
+          }
+        }, res => {
+          this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.syncDisable = false
+        })
       }
     }
   }
