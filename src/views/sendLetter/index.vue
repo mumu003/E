@@ -122,8 +122,8 @@
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="业主姓名" prop="customerName">
-              <Input v-model="addForm.customerName" :maxlength=20></Input>
+            <FormItem label="业主姓名">
+              <Input v-model="addForm.customerName" readonly></Input>
             </FormItem>
           </Col>
           <Col span="8">
@@ -151,7 +151,7 @@
       @on-cancel="viewCancel">
       <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
         <TabPane label="发函审核" name="name1">
-          <Form  ref="viewForm"  :model="viewForm" :label-width="100"  :rules="ruleView">
+          <Form :model="viewForm" :label-width="100" >
             <Row>
               <Col span="8">
               <FormItem label="楼栋">
@@ -169,8 +169,8 @@
               </FormItem>
               </Col>
               <Col span="8">
-              <FormItem label="业主姓名" prop="customerName">
-                <Input v-model="viewForm.customerName" :readonly="!buttons.start" :maxlength=20></Input>
+              <FormItem label="业主姓名">
+                <Input v-model="viewForm.customerName" readonly></Input>
               </FormItem>
               </Col>
               <Col span="8">
@@ -510,12 +510,6 @@
           customerName:'',
           fileType:'',
           dataId:[]
-        },
-        //检测审核表单
-        ruleView:{
-          customerName:[
-            { required: true, message: '请填写客户姓名', trigger: 'blur' }
-          ]
         },
         //审核模态框资料
         viewContract: [
@@ -895,36 +889,30 @@
       //发起
       start(){
         this.modal_loading = true
-        this.$refs.ruleView.validate((valid) => {
-          if (valid) {
-            let params = {
-              id: this.viewForm.id,
-              dataId: this.viewForm.dataId
-            }
-            this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.modal_loading = false
-                  this.viewModal = false
-                  this.viewForm.dataId=[ ]
-                  this.$Message.success("发起成功!")
-                  this.$refs.table.init()
-                }, 2000)
-              } else {
-                this.modal_loading = false
-                this.viewModal = false
-                this.$refs.table.init()
-                this.$Modal.error({title: '提示信息', content: res.message})
-              }
-            },res=>{
+        let params = {
+          id: this.viewForm.id,
+          dataId: this.viewForm.dataId
+        }
+        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+          if (res.code === 200) {
+            setTimeout(() => {
               this.modal_loading = false
               this.viewModal = false
+              this.viewForm.dataId=[ ]
+              this.$Message.success("发起成功!")
               this.$refs.table.init()
-              this.$Modal.error({title: '提示信息', content: res.message})
-            })
-          }else{
+            }, 2000)
+          } else {
             this.modal_loading = false
+            this.viewModal = false
+            this.$refs.table.init()
+            this.$Modal.error({title: '提示信息', content: res.message})
           }
+        },res=>{
+          this.modal_loading = false
+          this.viewModal = false
+          this.$refs.table.init()
+          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
