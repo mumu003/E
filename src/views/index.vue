@@ -30,6 +30,9 @@
         <div class="header-avator-con">
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
+              <Select v-model="orgId" style="width:200px" @on-change="changeOrg" placeholder="请选择公司">
+  <Option v-for="item in orgs" :value="item.value" :key="item.value" >{{ item.label }}</Option>
+</Select>
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
                   <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">登录用户：{{username}}</span>
@@ -112,6 +115,8 @@
         openedSubmenuArr: [],
         isFullScreen: false,
         menuList: [],
+        orgId: '',
+        orgs: [],
         currentPath: [
           {
             name: "home_index",
@@ -140,6 +145,9 @@
           ]
         }
       }
+    },
+    mounted(){
+      this.getCompany()
     },
     created(){
       this.head = headImg
@@ -272,6 +280,41 @@
         sessionStorage.removeItem("orgId")
         this.$Message.success("退出登录成功！")
         this.$router.push('/login')
+      },
+      getCompany(){
+        let params = {
+          userId: sessionStorage.getItem("userId")
+        }
+        this.$request.post("/apiHost/api/user/getOrgs", params, res => {
+            console.log(res.data)
+            this.orgs = res.data.map(item => ({
+              value: item.orgId,
+              label: item.orgName
+            }))
+            this.orgId = sessionStorage.getItem("orgId")
+          }, res => {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          })
+      },
+      changeOrg(){
+        let params = {
+          orgId: this.orgId,
+          userId: sessionStorage.getItem("userId")
+        }
+        this.$request.post("/apiHost/api/user/setOrg", params, res => {
+          if (res.code === 200) {
+            sessionStorage.setItem("orgId",this.orgId)
+            sessionStorage.setItem("curProjectId",res.data.curProjectId)
+
+            //sessionStorage.setItem("orgId",res.data.curProjectName)
+		//console.log(res)
+              location.reload()
+          }else{
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        }, res => {
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
       }
     }
   }
