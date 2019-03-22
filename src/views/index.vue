@@ -30,8 +30,8 @@
         <div class="header-avator-con">
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <Select v-model="orgId" style="width:200px" @on-change="changeOrg" placeholder="请选择公司">
-  <Option v-for="item in orgs" :value="item.value" :key="item.value" >{{ item.label }}</Option>
+              <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
+  <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
 </Select>
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
@@ -115,8 +115,9 @@
         openedSubmenuArr: [],
         isFullScreen: false,
         menuList: [],
-        orgId: '',
-        orgs: [],
+        company: '',
+        companyPId: '',
+        companyList: [],
         currentPath: [
           {
             name: "home_index",
@@ -285,30 +286,37 @@
         let params = {
           userId: sessionStorage.getItem("userId")
         }
-        this.$request.post("/apiHost/api/user/getOrgs", params, res => {
-            console.log(res.data)
-            this.orgs = res.data.map(item => ({
+        this.$request.post("/apiHost/api/user/getProjects", params, res => {
+            //console.log(res.data)
+            this.companyList = res.data.map(item => ({
               value: item.orgId,
-              label: item.orgName
-            }))
-            this.orgId = sessionStorage.getItem("orgId")
+              label: item.projectName,
+              proId: item.projectId
+            })) 
+            this.companyPId = sessionStorage.getItem("curProjectId");
           }, res => {
             this.$Modal.error({title: '提示信息', content: res.message})
           })
       },
       changeOrg(){
+          // console.log(""+this.companyPId)
+        for(var i=0;i<this.companyList.length;i++){
+          // console.log(""+this.companyList[i].proId+","+this.companyList[i].value+","+this.companyList[i].label)
+          if(this.companyList[i].proId == this.companyPId){
+            this.company = this.companyList[i].value;
+          }
+        }
         let params = {
-          orgId: this.orgId,
+          projectId: this.companyPId,
+          orgId: this.company,
           userId: sessionStorage.getItem("userId")
         }
-        this.$request.post("/apiHost/api/user/setOrg", params, res => {
+        this.$request.post("/apiHost/api/user/setOrgAndProject", params, res => {
           if (res.code === 200) {
-            sessionStorage.setItem("orgId",this.orgId)
-            sessionStorage.setItem("curProjectId",res.data.curProjectId)
-
-            //sessionStorage.setItem("orgId",res.data.curProjectName)
-		//console.log(res)
-              location.reload()
+            //console.log(res.data)
+            sessionStorage.setItem("orgId",this.company)
+            sessionStorage.setItem("curProjectId",this.companyPId)
+            location.reload()
           }else{
             this.$Modal.error({title: '提示信息', content: res.message})
           }

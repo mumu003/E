@@ -499,7 +499,8 @@
         archiveUpdateArchiveList: [],//更新存档资料list
         archiveUpdateList:{
           type:'',
-          archive:''
+          archive:'',
+          objId: '',
         },//存档资料更新list
         backNoteArchive:{
           dataId:'',
@@ -513,6 +514,8 @@
           page:1
         },//搜索模块数据
         editForm:{
+          projectId: '',
+          orgId: '',
           type:'',
           name:'',
           requirePurchase:'',
@@ -750,8 +753,8 @@
         this.roleList.forEach(item=>{
           if(overId === item.roleId){
             this.editForm.overName = item.roleName
-            console.log("this.editForm.overName="+this.editForm.overName)
-            console.log("this.editForm.overId="+this.editForm.overId)
+            //console.log("this.editForm.overName="+this.editForm.overName)
+            //console.log("this.editForm.overId="+this.editForm.overId)
           }
         })
       },
@@ -810,12 +813,12 @@
           return false
         }
         let params = {
-          type: this.selection[0].type
+          objId: this.selection[0].id
         }
         this.$request.post("/apiHost/api/processSetting/view",params,res=>{
           this.viewForm.type = res.data.type
           this.viewForm.overName = res.data.overName
-          console.log("this.viewForm.overName"+JSON.stringify(res.data))
+          //console.log("this.viewForm.overName"+JSON.stringify(res.data))
           this.viewSettingDatas = res.data.settingDatas.map(item=>({
             sort: item.sort,
             required: item.required,
@@ -877,7 +880,7 @@
           return false
         }
         let params = {
-          type: this.selection[0].type
+          objId: this.selection[0].id
         }
         this.$request.post("/apiHost/api/processSetting/view",params,res=>{
             this.editForm.type = res.data.type
@@ -907,8 +910,8 @@
       },
       //编辑流程配置确定
       editSubmit () {
-        console.log("this.editForm.overName="+this.editForm.overName)
-        console.log("this.editForm.overId="+this.editForm.overId)
+        //console.log("this.editForm.overName="+this.editForm.overName)
+        //console.log("this.editForm.overId="+this.editForm.overId)
         this.modal_loading = true
         this.editForm.settingDatas = JSON.stringify(this.settingDatas.map(item=>({
           id:item.id,
@@ -927,7 +930,9 @@
         }else{
           this.editForm.requirePurchase = "1"
         }
-        console.log("this.editForm="+JSON.stringify(this.editForm))
+        this.editForm.projectId = sessionStorage.getItem("curProjectId")
+        this.editForm.orgId = sessionStorage.getItem("orgId")
+        //console.log("this.editForm="+JSON.stringify(this.editForm))
         this.$request.post("/apiHost/api/processSetting/update",this.editForm,res=>{
           if (res.code === 200) {
             setTimeout(() => {
@@ -1123,10 +1128,16 @@
           return false
         }
         let params = {
-          type: this.selection[0].type
+          objId: this.selection[0].id
+        }
+        let params2 = {
+          type : this.selection[0].type,
+          orgId : this.selection[0].orgId,
+          projectId : this.selection[0].projectId
         }
         if(this.selection[0].type === '1' || this.selection[0].type === '4' || this.selection[0].type === '5'){
           this.archiveType = this.selection[0].type
+          this.archiveUpdateList.objId = this.selection[0].id
           this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
             this.editArchiveForm.type = this.archiveType
             this.archiveSetting = res.data.map(item=>({
@@ -1156,7 +1167,8 @@
             this.$Modal.error({title: '提示信息', content: res.message})
             this.$refs.table.init()
           }),
-          this.$request.post("/apiHost/api/processSetting/archiveList",params,res=>{
+          this.$request.post("/apiHost/api/processSetting/archiveList",params2,res=>{
+            //console.log(res.data)
             this.noteArchiveList = res.data.map(item=>({
               id : item.id,
               name : item.name,
@@ -1268,10 +1280,10 @@
                   }
                 }
               }
-              console.log("装载完毕")
-              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              //console.log("装载完毕")
+              //console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
               this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
-              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              //console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
               this.selectMaterialModal = false 
             }
           }else{
@@ -1289,10 +1301,10 @@
                   }
                 }
               }
-              console.log("装载完毕")
-              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              //console.log("装载完毕")
+              //console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
               this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
-              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              //console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
               this.selectMaterialModal = false 
             }else{
               for(var i=0; i<this.selectMaterialList.length; i++){
@@ -1307,10 +1319,10 @@
                   }
                 }
               }
-              console.log("装载完毕")
-              console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
+              //console.log("装载完毕")
+              //console.log("this.backNoteArchiveList="+JSON.stringify(this.backNoteArchiveList))
               this.archiveSettingNodes[this.selectMaterialForm.index].data = this.backNoteArchiveList
-              console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
+              //console.log("this.archiveSettingNodes[this.selectMaterialForm.index].data="+JSON.stringify(this.archiveSettingNodes[this.selectMaterialForm.index].data))
               this.selectMaterialModal = false 
             }
           }
@@ -1331,7 +1343,7 @@
       },
       //编辑档案资料-Tag删除
       handleClose (indexId,ind){
-        console.log("indexId="+indexId+"          ind="+ind)
+        //console.log("indexId="+indexId+"          ind="+ind)
         if(this.archiveSettingNodes[indexId].data.length === 1){
           this.archiveSettingNodes[indexId].data[0].id="null"
           this.archiveSettingNodes[indexId].data[0].dataId=null
@@ -1344,7 +1356,7 @@
       //存档资料确定
       editArchiveSubmit () {
         this.modal_loading = true
-        console.log("this.archiveSettingNodes="+JSON.stringify(this.archiveSettingNodes))
+        //console.log("this.archiveSettingNodes="+JSON.stringify(this.archiveSettingNodes))
         this.archiveUpdateArchiveList = this.archiveSettingNodes.map(item=>({
           nodeId : item.nodeId,
           data : item.data.map(it=>({
@@ -1352,12 +1364,12 @@
             quantity : it.quantity
           }))
         }))
-        console.log("this.archiveUpdateArchiveList="+JSON.stringify(this.archiveUpdateArchiveList))
+        //console.log("this.archiveUpdateArchiveList="+JSON.stringify(this.archiveUpdateArchiveList))
         this.archiveUpdateList.type = this.editArchiveForm.type
         this.archiveUpdateList.archive = JSON.stringify(this.archiveUpdateArchiveList)
-        console.log(this.archiveUpdateList)
+        //console.log(this.archiveUpdateList)
         this.$request.post("/apiHost/api/processSetting/updateArchive",this.archiveUpdateList, res => {
-          console.log(res)
+          //console.log(res)
           if (res.code === 200) {
             setTimeout(() => {
               this.editArchiveModal = false
@@ -1385,7 +1397,7 @@
         this.syncDisable = true
         this.modal_loading = true
         this.$request.post("/apiHost/api/index/sync",'', res => {
-          console.log(res)
+          //console.log(res)
           if (res.code === 200) {
             this.modal_loading = false
             this.syncDisable = false
