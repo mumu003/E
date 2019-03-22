@@ -176,7 +176,7 @@
             <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
             <Col span="24">
             <Steps :current="Number(currentNodeId)">
-              <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
+              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
             </Steps>
             </Col>
             <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
@@ -189,7 +189,7 @@
                 <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
                 <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
               </TimelineItem>-->
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'">
+              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
                 <p>{{item.createdAt}}</p>
                 <!--<p v-if="index === 0">发起</p>-->
                 <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
@@ -404,7 +404,9 @@
           idCard:'',
           phone:'',
           address:'',
-          remark:''
+          remark:'',
+          orgId:'',
+          projectId: '',
         },
         //新增-表格
         addContract: [
@@ -681,6 +683,8 @@
         this.modal_loading = true
         if(this.addForm.roomId){
           if(this.addData.length !== 0){
+            this.addForm.orgId = sessionStorage.getItem("orgId")
+            this.addForm.projectId = sessionStorage.getItem("curProjectId")
             this.$request.post("/apiHost/api/transfer/add",this.addForm, res => {
               if (res.code === 200) {
                 setTimeout(() => {
