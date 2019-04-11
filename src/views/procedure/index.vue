@@ -932,7 +932,6 @@
         }
         this.editForm.projectId = sessionStorage.getItem("curProjectId")
         this.editForm.orgId = sessionStorage.getItem("orgId")
-        //console.log("this.editForm="+JSON.stringify(this.editForm))
         this.$request.post("/apiHost/api/processSetting/update",this.editForm,res=>{
           if (res.code === 200) {
             setTimeout(() => {
