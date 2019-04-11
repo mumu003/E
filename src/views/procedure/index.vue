@@ -273,7 +273,7 @@
                 <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind">{{it.dataName}}{{it.quantity}}份</Tag>
               </div>
             </FormItem>
-          </Col> -->
+          </Col> -->editArchiveSubmit
         </Row>
         <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length === 0">
           <Col span="8">
@@ -925,7 +925,7 @@
           roleId:item.roleId,
           roleName:item.roleName
         })))
-        if(this.editForm.requirePurchase === "false"){
+        if(this.editForm.requirePurchase === "false" || !this.editForm.requirePurchase){
           this.editForm.requirePurchase = "0"
         }else{
           this.editForm.requirePurchase = "1"
