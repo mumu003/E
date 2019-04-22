@@ -15,6 +15,7 @@
                   <FormItem label="状态">
                     <Select v-model="formItem.status" placeholder="全部">
                       <Option value="">全部</Option>
+                      <Option value="-1">待发起</Option>
                       <Option value="1">进行中</Option>
                       <Option value="2">已归档</Option>
                       <Option value="0">终止</Option>
@@ -319,6 +320,13 @@
                   width:100,
                   render:(h,params)=>{
                     switch(params.row.status){
+                      case '-1':
+                        return h('div',{
+                          style:{
+                              width: '80px',
+                              color: '#b725ed'
+                          }
+                        },"待发起")
                       case '0':
                         return h('div',{
                           style:{

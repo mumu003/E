@@ -530,6 +530,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -601,6 +608,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -686,6 +700,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -757,6 +778,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -827,6 +855,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -898,6 +933,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
@@ -968,6 +1010,13 @@ export default {
                 width:150,
                 render:(h,params)=>{
                   switch(params.row.operationStatus){
+                    case '-1':
+                      return h('div',{
+                        style:{
+                          width: '80px',
+                          color: '#b725ed'
+                        }
+                      },"待发起")
                     case '0':
                       return h('div',{
                         style:{
