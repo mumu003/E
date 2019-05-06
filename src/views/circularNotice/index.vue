@@ -621,6 +621,9 @@
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId:sessionStorage.orgId,
           projectId:sessionStorage.curProjectId,
+          userId: sessionStorage.getItem("userId"),
+          type:6,
+          fileType:1,
           buildingId
         }, res => {
           this.addUnitNameIsNo = ''
