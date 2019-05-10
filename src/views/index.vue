@@ -153,6 +153,8 @@
     created(){
       this.head = headImg
       this.username=sessionStorage.userName
+
+
       this.menuList = [
         {
           "id": 1,
@@ -203,20 +205,16 @@
               "icon": "document-text"
             }
           ]
-        },
-        {
+        }
+      ]
+      if("销售总/副总经理" == sessionStorage.roleName){
+        this.menuList.push({
           "id": 2,
           "name": "流程配置",
           "url": "/procedure",
           "icon": "network"
-        }/*,
-        {
-          "id": 3,
-          "name": "基础设置",
-          "url": "/basics",
-          "icon": "gear-b"
-        }*/
-      ]
+        });
+      }
     },
     methods: {
       handleSubmit(name) {
@@ -279,6 +277,8 @@
         sessionStorage.removeItem("userName")
         sessionStorage.removeItem("curProjectId")
         sessionStorage.removeItem("orgId")
+        sessionStorage.removeItem("orgName")
+        sessionStorage.removeItem("roleName")
         this.$Message.success("退出登录成功！")
         this.$router.push('/login')
       },
@@ -313,9 +313,11 @@
         }
         this.$request.post("/apiHost/api/user/setOrgAndProject", params, res => {
           if (res.code === 200) {
-            //console.log(res.data)
+            // console.log(res.data)
             sessionStorage.setItem("orgId",this.company)
             sessionStorage.setItem("curProjectId",this.companyPId)
+            sessionStorage.setItem("orgName",res.data.orgName)
+            sessionStorage.setItem("roleName", res.data.roleName)
             location.reload()
           }else{
             this.$Modal.error({title: '提示信息', content: res.message})

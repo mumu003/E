@@ -103,6 +103,8 @@
                   sessionStorage.setItem("userName",res.data.userName)
                   sessionStorage.setItem("curProjectId", res.data.curProjectId)
                   sessionStorage.setItem("orgId",res.data.orgId)
+                  sessionStorage.setItem("orgName",res.data.orgName)
+                  sessionStorage.setItem("roleName",res.data.roleName)
                   this.$router.push("/")
                   this.$Message.success("登录成功！")
                 } else {
