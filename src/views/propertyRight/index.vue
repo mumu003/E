@@ -841,8 +841,7 @@
           userId: sessionStorage.getItem("userId"),
           type:4,
           fileType:1,
-          buildingId,
-          type:4
+          buildingId
         }, res => {
             this.addUnitNameIsNo = ''
             this.unitList = res.data.units.map(item => ({
@@ -880,7 +879,9 @@
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
+          userId: sessionStorage.getItem("userId"),
           buildingId,
+          fileType:1,
           type:4
         }, res => {
           if(res.data !== null){
