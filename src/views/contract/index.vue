@@ -352,6 +352,16 @@
                   }
                 },
                 {
+                  title: '节点',
+                  key: 'currentNodeName',
+                  width:120
+                },
+                {
+                  title: '办理角色 ',
+                  key: 'currentName',
+                  width:120
+                },
+                {
                   title: '业主名字',
                   key: 'customerName',
                   width:250

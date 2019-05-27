@@ -383,6 +383,16 @@
               }
             },
             {
+              title: '节点',
+              key: 'currentNodeName',
+              width:120
+            },
+            {
+              title: '办理角色 ',
+              key: 'currentName',
+              width:120
+            },
+            {
               title: '发函类型',
               key: 'fileType',
               width:100,

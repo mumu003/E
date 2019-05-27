@@ -315,6 +315,16 @@
                   }
                 },
                 {
+                  title: '节点',
+                  key: 'currentNodeName',
+                  width:120
+                },
+                {
+                  title: '办理角色 ',
+                  key: 'currentName',
+                  width:120
+                },
+                {
                   title: '协议书名称',
                   key: 'name',
                   width:250

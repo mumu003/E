@@ -35,93 +35,159 @@
             </Col>
       </Row>
 
-      <Modal v-model="editContractModal" title="编辑合同备案" width="800" >
-        <Form  :model="contractForm" :label-width="100">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="contractForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="contractForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="contractForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="contractForm.customerName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
-              <Table stripe border v-else :columns="viewContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
-            </Col>
-          </Row>
-        </Form>
+
+      <Modal v-model="editContractModal"  width="800">
+        <Tabs type="card"  @on-click="viewTabChangs" style="margin-top: 12px" v-model="viewTabs_contract">
+          <TabPane label="合同备案审核" name="name1">
+            <Form  :model="contractForm" :label-width="100">
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="contractForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="contractForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="contractForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="业主姓名">
+                  <Input v-model="contractForm.customerName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
+                  <Table stripe border v-else :columns="viewContract" :data="contractData" ref="ref" @on-selection-change="viewselect"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <!-- <p v-else-if="index === historysList.length-1">{{item.nodeName}}</p> -->
+                    <span v-else>
+                      <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                      <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                      <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                    </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
-            <Col span="24">
-            <Button size="default" @click="cancel" >取消</Button>
-            <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-            <span v-else-if="buttons.check" >
-              <Button type="error" size="default" :loading="reject_loading" @click="contractReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass" :disabled="passDisable">通过</Button>
-            </span>
+            <Col span="24" v-if="viewTabs_contract === 'name1'">
+              <Button size="default" @click="cancel" >取消</Button>
+              <Button type="primary" size="default" @click="ContractStart" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
+              <span v-else-if="buttons.check" >
+                <Button type="error" size="default" :loading="reject_loading" @click="contractReject" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
+                <Button type="primary" size="default"  :loading="modal_loading" @click="contractPass" :disabled="passDisable">通过</Button>
+              </span>
+            </Col>
+            <Col span="24" v-if="viewTabs_contract === 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
             </Col>
           </Row>
-
         </div>
       </Modal>
 
-      <Modal v-model="editSendFileModal" title="编辑发函" width="800" >
-        <Form  :model="sendFileForm" :label-width="100" >
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="sendFileForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="sendFileForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="sendFileForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="sendFileForm.customerName" readonly ></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="发函类型">
-              <Input v-model="sendFileForm.fileType" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border v-if="buttonsSend.start" :columns="viewStartSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
-              <Table stripe border v-else :columns="viewSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
-            </Col>
-          </Row>
-        </Form>
+      <Modal v-model="editSendFileModal" width="800" >
+        <Tabs type="card"  @on-click="sendFileViewChangs" style="margin-top: 12px" v-model="viewTabs_sendLeter">
+          <TabPane label="发函审核" name="name1">
+            <Form  :model="sendFileForm" :label-width="100" >
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="sendFileForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="sendFileForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="sendFileForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="业主姓名">
+                  <Input v-model="sendFileForm.customerName" readonly ></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="发函类型">
+                  <Input v-model="sendFileForm.fileType" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border v-if="buttonsSend.start" :columns="viewStartSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
+                  <Table stripe border v-else :columns="viewSendFile" :data="sendFileData" ref="ref" @on-selection-change="viewselect2"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_sendLeter == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="sendFileStart" v-if="buttonsSend.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsSend.check" >
@@ -129,39 +195,74 @@
               <Button type="primary" size="default"  :loading="modal_loading" @click="sendFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
+            <Col span="24" v-if="viewTabs_sendLeter === 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
+            </Col>
           </Row>
         </div>
       </Modal>
 
-      <Modal v-model="editDeliveryNoticeModal" title="编辑交房通知" width="800" >
-        <Form  :model="deliveryNoticeForm" :label-width="100">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="deliveryNoticeForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="deliveryNoticeForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="deliveryNoticeForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border :columns="viewDeliveryNotice" :data="deliveryNoticeData"></Table>
-            </Col>
-          </Row>
-        </Form>
+      <Modal v-model="editDeliveryNoticeModal" width="800" >
+        <Tabs type="card"  @on-click="deliveryNoticeViewChangs" style="margin-top: 12px" v-model="viewTabs_deliveryNotice">
+          <TabPane label="交房通知审核" name="name1">
+            <Form  :model="deliveryNoticeForm" :label-width="100">
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="deliveryNoticeForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="deliveryNoticeForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="deliveryNoticeForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border :columns="viewDeliveryNotice" :data="deliveryNoticeData"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align: right;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_deliveryNotice == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="deliveryNoticestart" v-if="buttonsDelivery.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsDelivery.check" >
@@ -169,39 +270,81 @@
               <Button type="primary" size="default"  :loading="modal_loading" @click="deliveryNoticePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
+            <Col span="24" v-if="viewTabs_deliveryNotice == 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
+            </Col>
           </Row>
         </div>
       </Modal>
 
-      <Modal v-model="editTransferModal" title="编辑水电过户" width="800">
-        <Form  :model="transferForm" :label-width="100">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="transferForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="transferForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="transferForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border :columns="viewTransfer" :data="transferData"></Table>
-            </Col>
-          </Row>
-        </Form>
+      <Modal v-model="editTransferModal" width="800">
+        <Tabs type="card"  @on-click="editTransferViewChangs" style="margin-top: 12px" v-model="viewTabs_transfer">
+          <TabPane label="水电过户审核" name="name1">
+            <Form  :model="transferForm" :label-width="100">
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="transferForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="transferForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="transferForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border :columns="viewTransfer" :data="transferData"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+                    <p>{{item.createdAt}}</p>
+                    <p v-if="index === 0">发起</p>
+                    &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
+                    <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
+                    <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>-->
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align: right;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_transfer == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="transferStart" v-if="buttonsTransfer.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsTransfer.check" >
@@ -209,39 +352,81 @@
                <Button type="primary" size="default"  :loading="modal_loading" @click="transferPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
+            <Col span="24" v-if="viewTabs_transfer == 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
+            </Col>
           </Row>
         </div>
       </Modal>
 
-      <Modal v-model="editTwoFileModal" title="编辑两书" width="800">
-        <Form  :model="twoFileForm" :label-width="100">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="twoFileForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="twoFileForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="twoFileForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border :columns="viewTwoFile" :data="twoFileData"></Table>
-            </Col>
-          </Row>
-        </Form>
+      <Modal v-model="editTwoFileModal" width="800">
+        <Tabs type="card"  @on-click="editTwoFileViewChangs" style="margin-top: 12px" v-model="viewTabs_twoFile">
+          <TabPane label="两书审核" name="name1">
+            <Form  :model="twoFileForm" :label-width="100">
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="twoFileForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="twoFileForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="twoFileForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border :columns="viewTwoFile" :data="twoFileData"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+                    <p>{{item.createdAt}}</p>
+                    <p v-if="index === 0">发起</p>
+                    &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
+                    <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
+                    <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>-->
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align: right;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_twoFile == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="twoFilestart" v-if="buttonsTwoFile.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsTwoFile.check" >
@@ -249,41 +434,83 @@
               <Button type="primary" size="default"  :loading="modal_loading" @click="twoFilePass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
+            <Col span="24" v-if="viewTabs_twoFile == 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
+            </Col>
           </Row>
 
         </div>
       </Modal>
 
-      <Modal v-model="editOwnershipModal" title="编辑产权办理" width="800">
-        <Form  :model="ownershipForm" :label-width="100">
-          <Row>
-            <Col span="8">
-            <FormItem label="楼栋">
-              <Input v-model="ownershipForm.buildingName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="单元">
-              <Input v-model="ownershipForm.unitName" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="8">
-            <FormItem label="房间号">
-              <Input v-model="ownershipForm.roomNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            资料
-            </Col>
-            <Col span="24">
-              <Table stripe border v-if="buttonsOwnership.start" :columns="viewStartOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
-              <Table stripe border v-else :columns="viewOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
-            </Col>
-          </Row>
-        </Form>
+      <Modal v-model="editOwnershipModal" width="800">
+        <Tabs type="card"  @on-click="editOwnershipViewChangs" style="margin-top: 12px" v-model="viewTabs_ownership">
+          <TabPane label="产权办理审核" name="name1">
+            <Form  :model="ownershipForm" :label-width="100">
+              <Row>
+                <Col span="8">
+                <FormItem label="楼栋">
+                  <Input v-model="ownershipForm.buildingName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="单元">
+                  <Input v-model="ownershipForm.unitName" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="8">
+                <FormItem label="房间号">
+                  <Input v-model="ownershipForm.roomNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                资料
+                </Col>
+                <Col span="24">
+                  <Table stripe border v-if="buttonsOwnership.start" :columns="viewStartOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
+                  <Table stripe border v-else :columns="viewOwnership" :data="ownershipData" ref="ref" @on-selection-change="viewselect"></Table>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+                    <p>{{item.createdAt}}</p>
+                    <p v-if="index === 0">发起</p>
+                    &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
+                    <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
+                    <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>-->
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align: right;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_ownership == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="ownershipStart" v-if="buttonsOwnership.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsOwnership.check" >
@@ -291,52 +518,96 @@
                <Button type="primary" size="default"  :loading="modal_loading" @click="ownershipPass" :disabled="passDisable">通过</Button>
             </span>
             </Col>
+            <Col span="24" v-if="viewTabs_ownership == 'name2'">
+              <Button size="default" @click="cancel" >取消</Button>
+            </Col>
           </Row>
         </div>
       </Modal>
 
-      <Modal v-model="editOrderContractModal" title="编辑协议书申请">
-        <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
-          <Row>
-            <Col span="24">
-            <FormItem label="协议书名称">
-              <Select placeholder="请选择协议书名称" v-model="viewForm.name" :disabled="!buttonsOrderContract.start">
-                <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
-              </Select>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="申请份数">
-              <Input v-model="viewForm.applyNum" readonly ></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="实发份数" prop="actualNum">
-              <Input v-model="viewForm.actualNum" @on-change="actualNumChange" ></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="差异数量">
-              <Input v-model="viewForm.differenceNum" readonly></Input>
-            </FormItem>
-            </Col>
-            <Col span="24">
-            <FormItem label="备注说明">
-              <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :maxlength=50></Input>
-            </FormItem>
-            </Col>
-          </Row>
-        </Form>
-
+      <Modal v-model="editOrderContractModal">
+        <Tabs type="card"  @on-click="editOrderContractViewChangs" style="margin-top: 12px" v-model="viewTabs_ordercontract">
+          <TabPane label="协议书申请" name="name1">
+            <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
+              <Row>
+                <Col span="24">
+                <FormItem label="协议书名称">
+                  <Select placeholder="请选择协议书名称" v-model="viewForm.name" :disabled="!buttonsOrderContract.start">
+                    <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
+                  </Select>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                <FormItem label="申请份数">
+                  <Input v-model="viewForm.applyNum" readonly ></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                <FormItem label="实发份数" prop="actualNum">
+                  <Input v-model="viewForm.actualNum" @on-change="actualNumChange" ></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                <FormItem label="差异数量">
+                  <Input v-model="viewForm.differenceNum" readonly></Input>
+                </FormItem>
+                </Col>
+                <Col span="24">
+                <FormItem label="备注说明">
+                  <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :maxlength=50></Input>
+                </FormItem>
+                </Col>
+              </Row>
+            </Form>
+          </TabPane>
+          <TabPane label="状态详情" name="name2">
+            <Row>
+              <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
+              <Col span="24">
+                <Steps :current="Number(currentNodeId)">
+                  <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
+                </Steps>
+              </Col>
+              <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
+              <Col span="24">
+                <Timeline>
+                  <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
+                    <p>{{item.createdAt}}</p>
+                    <p v-if="index === 0">发起</p>
+                    &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
+                    <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
+                    <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>-->
+                  <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
+                    <p>{{item.createdAt}}</p>
+                    <!--<p v-if="index === 0">发起</p>-->
+                    <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
+                    <p v-if="index === 0">{{item.nodeName}}</p>
+                    <span v-else>
+                    <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
+                    <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
+                    <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
+                  </span>
+                    <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
+                    <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
+                  </TimelineItem>
+                </Timeline>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
         <div slot="footer" style="text-align:right;margin:0 auto;">
           <Row>
-            <Col span="24">
+            <Col span="24" v-if="viewTabs_ordercontract == 'name1'">
             <Button size="default" @click="cancel" >取消</Button>
             <Button type="primary" size="default" @click="viewstart" v-if="buttonsOrderContract.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
             <span v-else-if="buttonsOrderContract.check" >
                <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
               <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
+            </Col>
+            <Col span="24" v-if="viewTabs_ordercontract == 'name1'">
+              <Button size="default" @click="cancel" >取消</Button>
             </Col>
           </Row>
         </div>
@@ -355,7 +626,7 @@
 
 <script type="text/ecmascript-6">
 export default {
-    data () {
+  data () {
         const validateActualNum = (rule, value, callback) => {
           let aNum= this.viewForm.applyNum
           if (value>10) {
@@ -379,6 +650,14 @@ export default {
           passDisable:false,//防止通过双击事件
           isDisable:false,//防止驳回双击事件
           viewTabs:'contract',//Tabs
+          viewTabs_sendLeter:'name1',
+          viewTabs_contract:'name1',
+          currentNodeId:"",
+          viewTabs_deliveryNotice:'name1',
+          viewTabs_transfer:'name1',
+          viewTabs_twoFile:'name1',
+          viewTabs_ownership:'name1',
+          viewTabs_ordercontract:'name1',
           buttons:{ },//按钮
           buttonsSend:{ },//按钮发函
           buttonsDelivery:{ },//按钮交房通知
@@ -563,6 +842,16 @@ export default {
 
               },
               {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
+              },
+              {
                 title: '业主姓名',
                 key: 'customerName',
                 width:150
@@ -638,6 +927,16 @@ export default {
                       },"待发起")
                   }
                 }
+              },
+              {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
               },
               {
                 title: '发函类型',
@@ -810,6 +1109,16 @@ export default {
                 }
               },
               {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
+              },
+              {
                 title: '业主姓名',
                 key: 'customerName',
                 width:150
@@ -886,6 +1195,16 @@ export default {
                   }
                 }
 
+              },
+              {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
               },
               {
                 title: '业主姓名',
@@ -965,6 +1284,16 @@ export default {
                 }
               },
               {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
+              },
+              {
                 title: '业主姓名',
                 key: 'customerName',
                 width:150
@@ -1042,6 +1371,16 @@ export default {
                 }
               },
               {
+                title: '节点',
+                key: 'currentNodeName',
+                width:120
+              },
+              {
+                title: '办理角色 ',
+                key: 'currentName',
+                width:120
+              },
+              {
                 title: '协议书名称',
                 key: 'name',
                 width:250
@@ -1089,6 +1428,10 @@ export default {
           editOwnershipId:"",
           //协议书ID
           editOrderContractId:"",
+
+
+          nodesList: [], //处理进度
+          historysList: [], //进度详情
 
           //合同备案模态框
           editContractModal:false,
@@ -1825,6 +2168,7 @@ export default {
             }
           }
           this.contractForm.dataId = dataIdArray.toString();
+          this.viewTabs_contract = 'name1'
           this.editContractModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -1961,6 +2305,7 @@ export default {
             }
           }
           this.sendFileForm.dataId = dataIdArray.toString()
+          this.viewTabs_sendLeter = 'name1'
           this.editSendFileModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -2073,6 +2418,7 @@ export default {
           this.buttonsDelivery.check = res.data.buttons.check
           this.deliveryNoticeData.push(res.data)
           this.editDeliveryNoticeModal = true
+          this.viewTabs_deliveryNotice = 'name1'
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -2182,6 +2528,7 @@ export default {
           this.buttonsTransfer.stop = res.data.buttons.stop
           this.buttonsTransfer.check = res.data.buttons.check
           this.transferData.push(res.data)
+          this.viewTabs_transfer = 'name1'
           this.editTransferModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -2292,6 +2639,7 @@ export default {
           this.buttonsTwoFile.stop = res.data.buttons.stop
           this.buttonsTwoFile.check = res.data.buttons.check
           this.twoFileData.push(res.data)
+          this.viewTabs_twoFile = 'name1'
           this.editTwoFileModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -2419,6 +2767,7 @@ export default {
             }
           }
           this.ownershipForm.dataId = dataIdArray.toString()
+          this.viewTabs_ownership = 'name1'
           this.editOwnershipModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
@@ -2533,6 +2882,7 @@ export default {
           this.buttonsOrderContract.check = res.data.buttons.check
           this.viewForm.remark = res.data.remark
           this.editOrderContractModal = true
+          this.viewTabs_ordercontract = 'name1'
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -2632,6 +2982,249 @@ export default {
       actualNumChange(){
         this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
       },
+
+      viewTabChangs(){
+        if(this.viewTabs_contract === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusContractProject ()
+        }
+      },
+      //状态详情
+      statusContractProject (){
+        let params = {
+          id: this.editContractId
+        }
+        this.$request.post("/apiHost/api/contractBill/status",params,res=>{
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+          this.historysList =res.data.historys.map(item=> ({
+            createdAt:item.createdAt,
+            status:item.status,
+            nodeName:item.nodeName,
+            userName:item.userName
+          }))
+          this.nodesList.map((item,i)=>{
+            if(item.id===res.data.currentNodeId){
+              this.currentNodeId = i
+            }
+          })
+          // this.statusModal = true
+        }, res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      sendFileViewChangs(){
+        if(this.viewTabs_sendLeter === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusSendFileProject ()
+        }
+      },
+      statusSendFileProject (){
+        let params = {
+          id: this.editSendFileId
+        }
+        this.$request.post("/apiHost/api/sendFileBill/status",params,res=>{
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+          this.historysList =res.data.historys.map(item=> ({
+            createdAt:item.createdAt,
+            status:item.status,
+            nodeName:item.nodeName,
+            userName:item.userName
+          }))
+          this.nodesList.map((item,i)=>{
+            if(item.id===res.data.currentNodeId){
+              // this.currentNodeId = i
+              this.currentNodeId= i
+            }
+          })
+          // this.statusModal = true
+        }, res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      deliveryNoticeViewChangs(){
+        if(this.viewTabs_deliveryNotice === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusDeliveryNoticeProject()
+        }
+      },
+      statusDeliveryNoticeProject(){
+        let params = {
+          id: this.editDeliveryNoticeId
+        }
+        this.$request.post("/apiHost/api/deliveryNotice/status",params,res=>{
+            this.nodesList = res.data.nodes.map(item => ({
+              roleName: item.roleName,
+              name: item.name,
+              id:item.id
+            }))
+            this.historysList =res.data.historys.map(item=> ({
+              createdAt:item.createdAt,
+              status:item.status,
+              nodeName:item.nodeName,
+              userName:item.userName
+            }))
+            this.nodesList.map((item,i)=> {
+              if(item.id === res.data.currentNodeId){
+                this.currentNodeId = i
+              }
+            })
+            this.statusModal = true
+          }, res=>{
+            this.$Modal.error({title: '提示信息', content: res.message})
+          },
+        )
+      },
+      editTwoFileViewChangs(){
+        if(this.viewTabs_twoFile === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusTwoFileProject()
+        }
+      },
+      statusTwoFileProject(){
+        let params = {
+          id: this.editTwoFileId
+        }
+        this.$request.post("/apiHost/api/twoFileBill/status",params,res=>{
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+          this.historysList =res.data.historys.map(item=> ({
+            createdAt:item.createdAt,
+            status:item.status,
+            nodeName:item.nodeName,
+            userName:item.userName
+          }))
+          this.nodesList.map((item,i)=>{
+            if(item.id===res.data.currentNodeId){
+              this.currentNodeId = i
+            }
+          })
+          // this.statusModal = true
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      editOwnershipViewChangs(){
+        if(this.viewTabs_ownership === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusOwnershipProject()
+        }
+      },
+      statusOwnershipProject(){
+        let params = {
+          id: this.editOwnershipId
+        }
+        this.$request.post("/apiHost/api/ownershipBill/status",params,res=>{
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+          this.historysList =res.data.historys.map(item=> ({
+            createdAt:item.createdAt,
+            status:item.status,
+            nodeName:item.nodeName,
+            userName:item.userName
+          }))
+          this.nodesList.map((item,i)=>{
+            if(item.id===res.data.currentNodeId){
+              this.currentNodeId = i
+            }
+          })
+          // this.statusModal = true
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      editTransferViewChangs(){
+        if(this.viewTabs_transfer === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusTransferViewProject()
+        }
+      },
+      statusTransferViewProject(){
+        let params = {
+          id: this.editTransferId
+        }
+        this.$request.post("/apiHost/api/transfer/status",params,res=>{
+            this.nodesList = res.data.nodes.map(item => ({
+              roleName: item.roleName,
+              name: item.name,
+              id:item.id
+            }))
+            this.historysList =res.data.historys.map(item=> ({
+              createdAt:item.createdAt,
+              status:item.status,
+              nodeName:item.nodeName,
+              userName:item.userName
+            }))
+            this.nodesList.map((item,i)=> {
+              if(item.id === res.data.currentNodeId){
+                this.currentNodeId = i
+              }
+            })
+            // this.statusModal = true
+          }, res=>{
+            this.$Modal.error({title: '提示信息', content: res.message})
+          },
+        )
+      },
+      editOrderContractViewChangs(){
+        if(this.viewTabs_ordercontract === 'name1'){
+          this.historysList = []
+          this.nodesList = []
+        }else{
+          this.statusOrderContractProject()
+        }
+      },
+      statusOrderContractProject(){
+        let params = {
+          id: this.editOrderContractId
+        }
+        this.$request.post("/apiHost/api/contractApplication/status",params,res=>{
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id:item.id
+          }))
+          this.historysList =res.data.historys.map(item=> ({
+            createdAt:item.createdAt,
+            status:item.status,
+            nodeName:item.nodeName,
+            userName:item.userName
+          }))
+          this.nodesList.map((item,i)=>{
+            if(item.id===res.data.currentNodeId){
+              this.currentNodeId = i
+            }
+          })
+          // this.statusModal = true
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      }
     }
 }
 </script>

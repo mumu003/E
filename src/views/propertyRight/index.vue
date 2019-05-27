@@ -507,6 +507,16 @@
                   }
                 },
                 {
+                  title: '节点',
+                  key: 'currentNodeName',
+                  width:120
+                },
+                {
+                  title: '办理角色 ',
+                  key: 'currentName',
+                  width:120
+                },
+                {
                   title: '业主姓名',
                   key: 'customerName',
                   width:250
@@ -841,7 +851,8 @@
           userId: sessionStorage.getItem("userId"),
           type:4,
           fileType:1,
-          buildingId
+          buildingId,
+          type:4
         }, res => {
             this.addUnitNameIsNo = ''
             this.unitList = res.data.units.map(item => ({
@@ -880,8 +891,8 @@
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           userId: sessionStorage.getItem("userId"),
-          buildingId,
           fileType:1,
+          buildingId,
           type:4
         }, res => {
           if(res.data !== null){
