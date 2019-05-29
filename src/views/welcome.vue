@@ -17,7 +17,7 @@
                 </TabPane>
 
                 <TabPane name="transfer" :label="transferLabel">
-                  <m-table :config="tableConfig4"  ref="transfertable"  :isFirst="isFirst"></m-table>
+                  <m-table :config="tableConfig4" ref="transfertable"  :isFirst="isFirst"></m-table>
                 </TabPane>
 
                 <TabPane name="twoFile" :label="twoFileLabel">
@@ -788,6 +788,7 @@ export default {
           //合同备案表格数据
           tableConfig:{
             url:"/apiHost/api/contractBill/todoList",
+            limit:10000,
             columns:[
               {
                 title: '操作',
@@ -876,6 +877,7 @@ export default {
           //发函表格数据
           tableConfig2:{
             url:"",
+            limit:10000,
             columns:[
               {
                 title: '操作',
@@ -978,6 +980,7 @@ export default {
           //交房表格数据
           tableConfig3:{
             url:"",
+            limit:10000,
             columns:[
               {
                 title: '操作',
@@ -1056,6 +1059,7 @@ export default {
           //水电过户表格数据
           tableConfig4:{
             url:"",
+            limit:10000,
             columns:[
               {
                 title: '操作',
@@ -1143,6 +1147,7 @@ export default {
           //两书表格数据
           tableConfig5:{
             url:"",
+            limit:10000,
             columns:[
               {
                 title: '操作',
@@ -1318,6 +1323,7 @@ export default {
           //协议书申请表格数据
           tableConfig7:{
             url:"",
+            limit:10000,
             columns:[
               {
                 title: '操作',
