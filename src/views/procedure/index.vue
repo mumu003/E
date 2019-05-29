@@ -259,11 +259,11 @@
                   border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
                   v-else-if="archiveSettingNodes[index].data[0].quantity === 0">
               </div>
-              <div style="background-color: white;padding: 4px 1px 20px 5px;border-radius: 4px;
+              <ivu-row style="background-color: white;padding: 4px 1px 20px 5px;border-radius: 4px;
                   border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
                   v-else="archiveSettingNodes[index].data[0].dataId !== null">
                 <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0" class="div-tag">{{it.dataName}}({{it.quantity}}份)</Tag>
-              </div>
+              </ivu-row>
             </FormItem>
           </Col>
           <!-- <Col span="16" v-if="index === archiveSettingNodes.length-1">
@@ -273,7 +273,7 @@
                 <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind">{{it.dataName}}{{it.quantity}}份</Tag>
               </div>
             </FormItem>
-          </Col> -->editArchiveSubmit
+          </Col> -->
         </Row>
         <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length === 0">
           <Col span="8">
@@ -843,7 +843,7 @@
             if(i === 0){
               this.viewSettingNodesTwo[i].labelName = '发起人'
             }else if(i === endIndex) {
-              this.viewSettingNodesTwo[i].labelName = '关闭节点'
+              this.viewSettingNodesTwo[i].labelName = '存档节点'
             }else {
               let indexJia = i+1
               this.viewSettingNodesTwo[i].labelName = '节点'+indexJia
@@ -1153,7 +1153,7 @@
               if(i === 0){
                 this.archiveSettingTwo[i].labelName = '发起人'
               }else if(i === endIndex) {
-                this.archiveSettingTwo[i].labelName = '关闭节点'
+                this.archiveSettingTwo[i].labelName = '存档节点'
               }else {
                 let indexJia = i+1
                 this.archiveSettingTwo[i].labelName = '节点'+indexJia
