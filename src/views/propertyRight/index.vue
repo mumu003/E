@@ -69,7 +69,7 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>
+                <!--<Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>-->
                 <Button type="primary" icon="edit" @click="viewProject">办理</Button>
                 <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
                 <Button type="error" icon="close"　@click="endProject">终止</Button>
