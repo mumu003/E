@@ -126,13 +126,6 @@
         company: '',
         companyPId: '',
         companyList: [],
-        // currentPath: [
-        //   {
-        //     name: "home_index",
-        //     path: "/",
-        //     title: "首页"
-        //   }
-        // ],
         head: "",
         username: "",
         loading: true,
