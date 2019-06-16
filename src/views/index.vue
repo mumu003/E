@@ -33,7 +33,7 @@
               <!-- <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
                 <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
               </Select> -->
-              <button class="set-pwd">修改密码</button>
+              <button class="set-pwd">修改密码sihun</button>
               <!-- <Icon type="md-notifications" /> -->
 
               <Dropdown transfer trigger="click">
