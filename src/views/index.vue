@@ -34,6 +34,8 @@
                 <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
               </Select> -->
               <button class="set-pwd">修改密码</button>
+              <!-- <Icon type="md-notifications" /> -->
+
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
                   <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">{{username}}</span>
