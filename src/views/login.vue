@@ -34,44 +34,42 @@
   </div>
 </template>
 <script>
-  import '../assets/css/login.css'    // 使用 CSS
-  import axios from "axios"
-  export default {
-    data () {
-      return {
-        form: {
-          userName: '',
-          password: ''
-        },
-        rules: {
-          userName: [
-            {required: true, message: '账号不能为空', trigger: 'blur'}
-          ],
-          password: [
-            {required: true, message: '密码不能为空', trigger: 'blur'}
-          ]
-        }
-      }
-    },
-    mounted(){
-      this.addListen()
-    },
-    methods: {
-      addListen(){
-        document.onkeydown = (e) => {
-          var e = event || window.event || arguments.callee.caller.arguments[0]
-          if (e.keyCode == 13) {
-            this.handleSubmit()
-          }
-        }
+import "../assets/css/login.css"; // 使用 CSS
+import axios from "axios";
+export default {
+  data() {
+    return {
+      form: {
+        userName: "",
+        password: ""
       },
-      handleSubmit () {
-        this.$refs.loginForm.validate((valid) => {
-          if (valid) {
-            if (!window.sessionStorage) {
-              alert("浏览器不支持sessionStorage")
-            } else {
-           /*   let fd = new FormData()
+      rules: {
+        userName: [
+          { required: true, message: "账号不能为空", trigger: "blur" }
+        ],
+        password: [{ required: true, message: "密码不能为空", trigger: "blur" }]
+      }
+    };
+  },
+  mounted() {
+    this.addListen();
+  },
+  methods: {
+    addListen() {
+      document.onkeydown = e => {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e.keyCode == 13) {
+          this.handleSubmit();
+        }
+      };
+    },
+    handleSubmit() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          if (!window.sessionStorage) {
+            alert("浏览器不支持sessionStorage");
+          } else {
+            /*   let fd = new FormData()
               fd.append("username", this.form.userName === '' ? null : this.form.userName)
               fd.append("password", this.form.password === '' ? null : this.form.password)
               axios.post('/apiHost/api/user/login', fd)
@@ -96,27 +94,42 @@
                     closeable: true
                   })
                 })*/
-              this.$request.post('/apiHost/api/user/login',this.form,res => {
-                if (res.code === 200) {
-                  sessionStorage.setItem("token", res.data.token)
-                  sessionStorage.setItem("userId", res.data.userId)
-                  sessionStorage.setItem("userName",res.data.userName)
-                  sessionStorage.setItem("curProjectId", res.data.curProjectId)
-                  sessionStorage.setItem("orgId",res.data.orgId)
-                  sessionStorage.setItem("orgName",res.data.orgName)
-                  sessionStorage.setItem("roleName",res.data.roleName)
-                  this.$router.push("/")
-                  this.$Message.success("登录成功！")
-                } else {
-                  this.$Modal.error({title: '提示信息', content: res.message})
-                }
-              },res=>{
-                this.$Modal.error({title: '提示信息', content: res.message})
-              })
+
+            if (
+              this.form.userName == "111111" &&
+              this.form.password == "111111"
+            ) {
+              sessionStorage.setItem("token", "111111");
+              sessionStorage.setItem("userId", "111111");
+              sessionStorage.setItem("userName", "111111");
+              sessionStorage.setItem("curProjectId", "111111");
+              sessionStorage.setItem("orgId", "111111");
+              sessionStorage.setItem("orgName", "111111");
+              sessionStorage.setItem("roleName", "111111");
+              this.$router.push("/");
+              this.$Message.success("登录成功！");
             }
+            // this.$request.post('/apiHost/api/user/login',this.form,res => {
+            //   if (res.code === 200) {
+            //     sessionStorage.setItem("token", res.data.token)
+            //     sessionStorage.setItem("userId", res.data.userId)
+            //     sessionStorage.setItem("userName",res.data.userName)
+            //     sessionStorage.setItem("curProjectId", res.data.curProjectId)
+            //     sessionStorage.setItem("orgId",res.data.orgId)
+            //     sessionStorage.setItem("orgName",res.data.orgName)
+            //     sessionStorage.setItem("roleName",res.data.roleName)
+            //     this.$router.push("/")
+            //     this.$Message.success("登录成功！")
+            //   } else {
+            //     this.$Modal.error({title: '提示信息', content: res.message})
+            //   }
+            // },res=>{
+            //   this.$Modal.error({title: '提示信息', content: res.message})
+            // })
           }
-        })
-      }
+        }
+      });
     }
   }
+};
 </script>

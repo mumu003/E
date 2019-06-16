@@ -16,26 +16,27 @@
     </div>
     <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'200px'}">
       <div class="main-header">
-        <div class="navicon-con">
+        <!-- <div class="navicon-con">
           <Button :style="{transform: 'rotateZ(' + (this.shrink ? '-90' : '0') + 'deg)'}" type="text"
                   @click="toggleClick">
             <Icon type="navicon" size="32"></Icon>
           </Button>
-        </div>
-        <div class="header-middle-con">
+        </div> -->
+        <!-- <div class="header-middle-con">
           <div class="main-breadcrumb" style="padding-left:0">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
           </div>
-        </div>
+        </div> -->
         <div class="header-avator-con">
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
-  <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
-</Select>
+              <!-- <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
+                <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
+              </Select> -->
+              <button class="set-pwd">修改密码</button>
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
-                  <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">登录用户：{{username}}</span>
+                  <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">{{username}}</span>
                   <Icon type="arrow-down-b"></Icon>
                 </a>
                <!-- <DropdownMenu slot="list">
@@ -66,13 +67,13 @@
       @on-ok="handleSubmit('formValidate')">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
         <Form-item label="原密码" prop="oldPwd">
-          <Input v-model="formValidate.oldPwd" placeholder="请输入原密码" type="password"></Input>
+          <Input v-model="formValidate.oldPwd" placeholder="请输入原密码" type="password" />
         </Form-item>
         <Form-item label="新密码" prop="newPwd">
-          <Input v-model="formValidate.newPwd" placeholder="请输入新密码" type="password"></Input>
+          <Input v-model="formValidate.newPwd" placeholder="请输入新密码" type="password" />
         </Form-item>
         <Form-item label="确认密码" prop="correctPwd">
-          <Input v-model="formValidate.correctPwd" placeholder="请输入确认密码" type="password"></Input>
+          <Input v-model="formValidate.correctPwd" placeholder="请输入确认密码" type="password" />
         </Form-item>
       </Form>
     </Modal>
@@ -88,6 +89,13 @@
   .logo-img {
     background: url("../assets/img/head.jpg") center center no-repeat;
     background-size: auto 95%;
+  }
+  .set-pwd{
+    padding: 5px 10px;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+
   }
 </style>
 <script type="text/ecmascript-6">
@@ -118,13 +126,13 @@
         company: '',
         companyPId: '',
         companyList: [],
-        currentPath: [
-          {
-            name: "home_index",
-            path: "/",
-            title: "首页"
-          }
-        ],
+        // currentPath: [
+        //   {
+        //     name: "home_index",
+        //     path: "/",
+        //     title: "首页"
+        //   }
+        // ],
         head: "",
         username: "",
         loading: true,
@@ -156,56 +164,75 @@
 
 
       this.menuList = [
-        {
-          "id": 1,
-          "name": "工作流程",
-          "url": "/",
-          "icon": "navicon-round",
-          "childList": [
             {
               "id": 4,
-              "name": "合同备案",
+              "name": "问题受理",
               "url": "/contract",
-              "icon": "document"
             },
             {
               "id": 5,
-              "name": "发函",
+              "name": "工单管理",
               "url": "/sendLetter",
-              "icon": "paper-airplane"
             },
             {
               "id": 6,
-              "name": "交房通知",
+              "name": "运维设置",
               "url": "/circularNotice",
-              "icon": "unlocked"
             },
             {
               "id": 7,
-              "name": "水电过户",
+              "name": "客户管理",
               "url": "/hydropower",
-              "icon": "arrow-graph-up-right"
             },
             {
               "id": 8,
-              "name": "两书",
+              "name": "问题管理",
               "url": "/twoBooks",
-              "icon": "ios-book"
+              "childList": [
+                {
+                "id": 81,
+                "name": "问题配置",
+                "url": "/twoBooks",
+                },
+                {
+                "id": 82,
+                "name": "常见问题",
+                "url": "/hydropower",
+                },
+              ]
             },
             {
               "id": 9,
-              "name": "产权办理",
+              "name": "数据报表",
               "url": "/propertyRight",
-              "icon": "cube"
             },
             {
               "id": 10,
-              "name": "协议书申请",
+              "name": "评价列表",
               "url": "/agreement",
-              "icon": "document-text"
+            },
+            {
+              "id": 11,
+              "name": "登录历史",
+              "url": "/agreement",
+            },
+            {
+              "id": 12,
+              "name": "系统管理",
+              "url": "/agreement",
+              "childList": [
+                {
+                "id": 121,
+                "name": "用户管理",
+                "url": "/hydropower",
+                },
+                {
+                "id": 122,
+                "name": "角色管理",
+                "url": "/hydropower",
+                },
+              ]
             }
-          ]
-        }
       ]
       if("销售总/副总经理" == sessionStorage.roleName){
         this.menuList.push({
