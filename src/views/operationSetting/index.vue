@@ -4,7 +4,6 @@
       <Col span="24">
       <Card class="search-card">
         <p slot="title">
-          <Icon type="levels"></Icon>
           {{$route.meta.title}}
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
