@@ -11,18 +11,26 @@
               <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="6">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.status" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="-1">待发起</Option>
-                      <Option value="1">进行中</Option>
-                      <Option value="2">已归档</Option>
-                      <Option value="0">终止</Option>
-                    </Select>
-                  </FormItem>
+                    <FormItem label="工单号">
+                      <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入工单号"/>
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span="6">
+                    <FormItem label="执行人">
+                      <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入执行人"/>
+                    </FormItem>
                   </Col>
                   <Col span="6">
-                    <FormItem label="时间">
+                    <FormItem label="评价人">
+                      <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入评价人"/>
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span="6">
+                    <FormItem label="更新时间">
                       <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
                     </FormItem>
                   </Col>
@@ -44,31 +52,13 @@
         </div>
       </Card>
       </Col>
-    </Row>
 
-    <Row :gutter="10" class="mt10">
-      <Col span="24">
-        <Card>
-          <div class="search-row">
-            <Row>
-              <Col>
-                <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="edit" @click="viewProject">办理</Button>
-                <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <Button type="error" icon="close"　@click="endProject">终止</Button>
-                <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
-              </Col>
-              <Col>
-              </Col>
-            </Row>
-        </div>
-          <Row class="searchable-table-con">
-            <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table>
-          </Row>
-      </Card>
-      </Col>
     </Row>
-
+    <Card class="search-card">
+      <!-- <Row class="searchable-table-con"> -->
+          <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table>
+      <!-- </Row> -->
+    </Card>
     <Modal v-model="addModal" title="新增协议书申请"
       @on-cancel="addCancel">
       <Form  ref="addForm" :model="addForm" :label-width="90" :rules="ruleAdd">
@@ -272,84 +262,73 @@
           url:"/apiHost/api/contractApplication/list",
               columns:[
                 {
-                  type:"selection",
-                  key:'_checked',
-                  width:60
-                },
-                {
-                  title: '状态',
+                  title: '操作',
                   key: 'status',
                   width:100,
+                  align:"center",
                   render:(h,params)=>{
-                    switch(params.row.status){
-                      case '-1':
                         return h('div',{
                           style:{
                               width: '80px',
                               color: '#b725ed'
                           }
-                        },"待发起")
-                      case '0':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#ED3F14'
-                          }
-                        },"终止")
-                      case '1':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#2D8CF0'
-                          }
-                        },"进行中")
-                      case '2':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#19BE6B'
-                          }
-                        },"已归档")
-                    }
+                        },"查看更多")
                   }
                 },
                 {
-                  title: '节点',
+                  title: '执行人',
                   key: 'currentNodeName',
-                  width:120
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '办理角色 ',
+                  title: '星级',
                   key: 'currentName',
-                  width:120
+                  width:150,
+                  align:"center",
+                  render:(h,params)=>{
+                        return h('Rate',{
+                          props:{
+                            value:2
+                          },
+                          on:{
+                            click: () => {
+                                    
+                            }
+                          }
+                        })
+                  }
+                  // <Rate v-model="value"></Rate>
                 },
                 {
-                  title: '协议书名称',
+                  title: '关联工单号码',
                   key: 'name',
-                  width:250
+                  width:150,
+                  align:"center"
                 },
                 {
-                  title: '申请份数',
+                  title: '姓名',
                   key: 'applyNum',
-                  width:150
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '实发份数',
+                  title: '手机号',
                   key: 'actualNum',
-                  width:150
+                  width:130,
+                  align:"center"
                 },
                 {
-                  title: '差异份数',
+                  title: '评价标签',
                   key: '',
                   width:150,
-                  render:(h,params)=>{
-                    return h('div',params.row.actualNum  - params.row.applyNum)
-                  }
+                  align:"center"
                 },
                 {
                   title: '更新时间',
                   key: 'updatedAt',
-                  width:250
+                  width:250,
+                  align:"center"
                 }
               ],
         },
