@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Row :gutter="10">
+    <!-- <Row :gutter="10">
       <Col span="24">
         <Card class="search-card">
           <p slot="title">
@@ -10,32 +10,6 @@
           <div id="search-body">
             <Form  :model="formItem" :label-width="80">
               <Row>
-                <!-- <Col span="6">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.status" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="-1">待发起</Option>
-                      <Option value="1">进行中</Option>
-                      <Option value="2">已归档</Option>
-                      <Option value="0">终止</Option>
-                    </Select>
-                   </FormItem>
-                </Col> -->
-                <!-- <Col span="6">
-                  <FormItem label="业主姓名">
-                    <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
-                  </FormItem>
-                </Col>
-                <Col span="6">
-                  <FormItem label="楼栋">
-                    <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋"></Input>
-                  </FormItem>
-                </Col>
-                <Col span="6">
-                  <FormItem label="房间号">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
-                  </FormItem>
-                </Col> -->
                 <Col span="6">
                   <FormItem label="时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
@@ -59,7 +33,7 @@
         </div>
       </Card>
       </Col>
-    </Row>
+    </Row> -->
 
     <Row :gutter="10" class="mt10">
       <Col span="24">
@@ -465,23 +439,10 @@
           url:"/apiHost/api/ownershipBill/list",
               columns:[
                 {
-                  title: '操作',
+                  title: '日期',
                   key: 'status',
-                  width:70,
+                  width:100,
                   align:"center",
-                  render:(h,params)=>{
-                        return h('div',{
-                          style:{
-                              width: '50px',
-                              color: '#999'
-                          },
-                          on: {
-                              click: () => {
-                                    this.$router.push({path:"/reportDetail"})
-                              }
-                          }
-                        },"详情")
-                  }
                 },
                 {
                   title: '公司',
@@ -490,45 +451,33 @@
                   align:"center"
                 },
                 {
-                  title: '硬件单数',
+                  title: '类型',
                   key: 'currentName',
                   width:100,
                   align:"center"
                 },
                 {
-                  title: '软件单数',
+                  title: '处理人',
                   key: 'customerName',
                   width:100,
                   align:"center"
                 },
                 {
-                  title: '其他',
+                  title: '报修内容',
                   key: 'buildingName',
                   width:100,
                   align:"center"
                 },
                 {
-                  title: '总数',
+                  title: '状态',
                   key: 'roomNum',
                   width:100,
                   align:"center"
                 },
                 {
-                  title: '已完成单数',
+                  title: '是否评价',
                   key: 'updatedAt',
                   width:100,
-                  align:"center"
-                },
-                {
-                  title: '待维修单数',
-                  key: 'updatedAt',
-                  width:100,
-                  align:"center"
-                },
-                {
-                  title: '备注',
-                  key: 'updatedAt',
-                  width:250,
                   align:"center"
                 }
               ],

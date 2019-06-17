@@ -85,6 +85,14 @@ export default new Router({
           component: resolve => require(['@/views/dataReport/index.vue'], resolve),
         },
         {
+          path: '/reportDetail',
+          name: 'reportDetail',
+          meta: {
+            title: '报表明细'
+          },
+          component: resolve => require(['@/views/reportDetail/index.vue'], resolve),
+        },
+        {
           path: '/evaluationList',
           name: 'evaluationList',
           meta: {
