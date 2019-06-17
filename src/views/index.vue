@@ -29,7 +29,8 @@
         </div> -->
         <div class="header-avator-con">
           <button class="set-pwd">修改密码</button>
-          <Icon size="20" color="red" type="md-notifications" />
+          <Icon size="20" color="red" type="android-notifications"></Icon>
+          <!-- <Icon size="20" color="red" type="md-notifications" /> -->
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
               <!-- <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
