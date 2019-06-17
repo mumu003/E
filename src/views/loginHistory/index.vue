@@ -4,25 +4,38 @@
       <Col span="24">
         <Card class="search-card">
           <p slot="title">
-              {{$route.meta.title}}
+              <!-- {{$route.meta.title}} -->
+              客户管理
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
               <Form  :model="formItem" :label-width="80">
                 <Row>
                   <Col span="6">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.status" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="-1">待发起</Option>
-                      <Option value="1">进行中</Option>
-                      <Option value="2">已归档</Option>
-                      <Option value="0">终止</Option>
+                    <FormItem label="姓名">
+                      <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入姓名"/>
+                    </FormItem>
+                  </Col>
+                  <Col span="6">
+                    <FormItem label="电话">
+                      <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入电话"/>
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span="6">
+                  <FormItem label="登录渠道">
+                    <Select v-model="formItem.status" placeholder="报修小程序">
+                      <Option value="">报修小程序</Option>
+                      <Option value="-1">运维小程序</Option>
+                      <Option value="1">管理后台</Option>
                     </Select>
                   </FormItem>
                   </Col>
+                </Row>
+                <Row>
                   <Col span="6">
-                    <FormItem label="时间">
+                    <FormItem label="登录时间">
                       <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
                     </FormItem>
                   </Col>
@@ -37,7 +50,7 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit" icon="search">搜索</Button>
+            <Button type="primary" @click="searchSubmit" icon="search">检索</Button>
             <Button type="ghost" @click="searchCancel" icon="refresh">重置</Button>
             </Col>
           </div>
@@ -49,19 +62,6 @@
     <Row :gutter="10" class="mt10">
       <Col span="24">
         <Card>
-          <div class="search-row">
-            <Row>
-              <Col>
-                <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="edit" @click="viewProject">办理</Button>
-                <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <Button type="error" icon="close"　@click="endProject">终止</Button>
-                <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
-              </Col>
-              <Col>
-              </Col>
-            </Row>
-        </div>
           <Row class="searchable-table-con">
             <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table>
           </Row>
@@ -272,84 +272,28 @@
           url:"/apiHost/api/contractApplication/list",
               columns:[
                 {
-                  type:"selection",
-                  key:'_checked',
-                  width:60
-                },
-                {
-                  title: '状态',
+                  title: '登录渠道',
                   key: 'status',
                   width:100,
-                  render:(h,params)=>{
-                    switch(params.row.status){
-                      case '-1':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#b725ed'
-                          }
-                        },"待发起")
-                      case '0':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#ED3F14'
-                          }
-                        },"终止")
-                      case '1':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#2D8CF0'
-                          }
-                        },"进行中")
-                      case '2':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#19BE6B'
-                          }
-                        },"已归档")
-                    }
-                  }
+                  align:"center"
                 },
                 {
-                  title: '节点',
+                  title: '用户姓名',
                   key: 'currentNodeName',
-                  width:120
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '办理角色 ',
+                  title: '用户手机号',
                   key: 'currentName',
-                  width:120
+                  width:200,
+                  align:"center"
                 },
                 {
-                  title: '协议书名称',
+                  title: '登录时间',
                   key: 'name',
-                  width:250
-                },
-                {
-                  title: '申请份数',
-                  key: 'applyNum',
-                  width:150
-                },
-                {
-                  title: '实发份数',
-                  key: 'actualNum',
-                  width:150
-                },
-                {
-                  title: '差异份数',
-                  key: '',
-                  width:150,
-                  render:(h,params)=>{
-                    return h('div',params.row.actualNum  - params.row.applyNum)
-                  }
-                },
-                {
-                  title: '更新时间',
-                  key: 'updatedAt',
-                  width:250
+                  width:250,
+                  align:"center"
                 }
               ],
         },

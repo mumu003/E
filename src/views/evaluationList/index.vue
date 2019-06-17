@@ -45,7 +45,7 @@
             <Col>
             </Col>
             <Col>
-            <Button type="primary" @click="searchSubmit" icon="search">搜索</Button>
+            <Button type="primary" @click="searchSubmit" icon="search">检索</Button>
             <Button type="ghost" @click="searchCancel" icon="refresh">重置</Button>
             </Col>
           </div>
