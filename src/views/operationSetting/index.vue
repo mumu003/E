@@ -1,4 +1,5 @@
 <template>
+<!-- 运维设置 -->
   <div>
     <Row :gutter="10">
       <Col span="24">
@@ -8,248 +9,76 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80">
-            <Row type="flex" justify="start">
-              <Col span="6">
-              <FormItem label="状态">
-                <Select v-model="formItem.status" placeholder="全部">
-                  <Option value="">全部</Option>
-                  <Option value="-1">待发起</Option>
-                  <Option value="1">进行中</Option>
-                  <Option value="2">已归档</Option>
-                  <Option value="0">终止</Option>
-                </Select>
-              </FormItem>
+          <Form  :model="formItem" >
+            <Row type="flex" style="margin-top:20px;" justify="start">
+
+              <Col span="8">
+                <FormItem label="接单逾期时间" :label-width="120">
+                  <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入接单逾期时间"/>
+                </FormItem>
               </Col>
-             <!-- <Col span="6">
-              <FormItem label="地块">
-                <Input v-model="formItem.areaId" placeholder="请输入地块名称"/>
-              </FormItem>
-              </Col>-->
-              <Col span="6">
-              <FormItem label="楼栋">
-                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号"/>
-              </FormItem>
+              <Col span="4">
+                <FormItem>
+                  <Select v-model="formItem.status" placeholder="时">
+                    <Option value="">时</Option>
+                    <Option value="-1">天</Option>
+                    <Option value="1">月</Option>
+                    <Option value="2">年</Option>
+                  </Select>
+                </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="房间号">
-                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
-              </FormItem>
+
+              <Col span="8">
+                <FormItem label="通知角色" :label-width="120">
+                  <Select v-model="formItem.status" placeholder="超级管理员">
+                    <Option value="">超级管理员</Option>
+                    <Option value="-1">接单员</Option>
+                  </Select>
+                </FormItem>
               </Col>
+
             </Row>
-              <Row>
-              <Col span="6">
-              <FormItem label="时间">
-                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
-              </FormItem>
+
+             <Row type="flex"  style="margin-top:20px;margin-bottom:20px;" justify="start">
+              <Col span="8">
+                <FormItem label="报修逾期时间" :label-width="120">
+                  <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入报修逾期时间"/>
+                </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem>
-                <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
-              </FormItem>
+              <Col span="4">
+                <FormItem>
+                  <Select v-model="formItem.status" placeholder="时">
+                    <Option value="">时</Option>
+                    <Option value="-1">天</Option>
+                    <Option value="1">月</Option>
+                    <Option value="2">年</Option>
+                  </Select>
+                </FormItem>
               </Col>
+
+              <Col span="8">
+                <FormItem label="通知角色" :label-width="120">
+                  <Select v-model="formItem.status" placeholder="超级管理员">
+                    <Option value="">超级管理员</Option>
+                    <Option value="-1">接单员</Option>
+                  </Select>
+                </FormItem>
+              </Col>
+
             </Row>
           </Form>
-          <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-            <Button type="primary" icon="search" @click="searchSubmit">搜索</Button>
-            <Button type="ghost" icon="refresh" @click="searchCancel">重置</Button>
-            </Col>
-          </div>
+         
+            <Row type="flex" justify="center" class="code-row-bg">
+              <Col span="12">
+                <Button type="primary" icon="close-round" @click="searchSubmit">取消</Button>
+                <Button type="ghost" icon="checkmark-round" @click="searchCancel">确定</Button>
+              </Col>
+            </Row>
+          
         </div>
       </Card>
       </Col>
     </Row>
-
-    <Row :gutter="10" class="mt10">
-      <Col span="24">
-      <Card>
-        <div class="search-row">
-          <Row>
-            <Col>
-            <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-            <Button type="primary" icon="edit" @click="viewProject">办理</Button>
-            <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-            <Button type="error" icon="close"　@click="endProject">终止</Button>
-            <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
-            </Col>
-            <Col>
-            </Col>
-          </Row>
-        </div>
-        <Row class="searchable-table-con">
-          <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime" :isFirst="isFirst"></m-table>
-        </Row>
-      </Card>
-      </Col>
-    </Row>
-
-    <Modal v-model="addModal" title="新增交房通知" width="800" :loading="loading"
-      @on-cancel="cancel" >
-      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
-        <Row>
-          <Col span="8">
-          <FormItem label="楼栋" prop="buildingId">
-            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-              <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-            </Select>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="单元" prop="unitId">
-            <div v-if="addUnitNameIsNo !== ''">
-              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-              </Select>
-            </div>
-            <div v-if="addUnitNameIsNo === ''">
-              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-              </Select>
-            </div>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="房间号" prop="roomId">
-            <Select v-model="addForm.roomId" placeholder="请选择房间号"  @on-change="clearAddData">
-              <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-            </Select>
-          </FormItem>
-          </Col>
-          <Col span="24">
-          资料
-          </Col>
-          <Col span="24">
-          <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select" v-show="isShow"></Table>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align: right;">
-        <Button type="primary" @click="addPullData" :disabled="addForm.roomId ? false : true">抓取数据</Button>
-        <Button @click="cancel">取消</Button>
-        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
-      </div>
-    </Modal>
-
-    <Modal v-model="viewModal" width="800" @on-cancel="viewCancel" >
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="交房通知审核" name="name1">
-          <Form  :model="viewForm" :label-width="100">
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Input v-model="viewForm.buildingName" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="单元">
-                <Input v-model="viewForm.unitName" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="房间号">
-                <Input v-model="viewForm.roomNum" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="24">
-              资料
-              </Col>
-              <Col span="24">
-                <Table stripe border :columns="viewContract" :data="viewData"></Table>
-              </Col>
-            </Row>
-          </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-            <Steps :current="Number(currentNodeId)">
-              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-            </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-            <Timeline>
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                <p>{{item.createdAt}}</p>
-                <!--<p v-if="index === 0">发起</p>-->
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                <p v-if="index === 0">{{item.nodeName}}</p>
-                <span v-else>
-                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                </span>
-                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>
-            </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
-      <div slot="footer" style="text-align: right;" v-model="viewForm.id">
-        <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-            <span v-else-if="buttons.check" >
-              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
-          </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-          </Col>
-        </Row>
-      </div>
-    </Modal>
-
-    <Modal v-model="endModal" title="终止交房通知"
-      :loading="modal_loading"
-      @on-ok="endSubmit"
-      @on-cancel="endCancel" >
-      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
-    </Modal>
-
-    <!--<Modal v-model="statusModal" title="状态详情"
-           width="800"
-           :loading="loading"
-           @on-ok="statuSubmit"
-           @on-cancel="cancel"
-    >
-      <Row>
-        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-        <Col span="24">
-        <Steps :current="1">
-          <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
-        </Steps>
-        </Col>
-        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-        <Col span="24">
-        <Timeline>
-          <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
-            <p>{{item.createdAt}}</p>
-            <p v-if="index === 0">发起</p>
-            <p v-else-if="index === historysList.length-1">归档节点:完结</p>
-            <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
-            <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-          </TimelineItem>
-        </Timeline>
-        </Col>
-      </Row>
-    </Modal>-->
-
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
-      </div>
-    </Modal>
-
   </div>
 </template>
 <script>
@@ -1061,4 +890,5 @@
     }
   }
 </script>
+
 

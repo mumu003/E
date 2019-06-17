@@ -45,6 +45,23 @@ export default new Router({
           component: resolve => require(['@/views/workOrder/index.vue'], resolve),
         },
         {
+          path: '/workOrderManage',
+          name: 'workOrderManage',
+          meta: {
+            title: '新增工单'
+          },
+          component: resolve => require(['@/views/workOrderManage/index.vue'], resolve),
+        },
+        {
+          path: '/dispatch',
+          name: 'dispatch',
+          meta: {
+            title: '派单'
+          },
+          component: resolve => require(['@/views/dispatch/index.vue'], resolve),
+        },
+
+        {
           path: '/operationSetting',
           name: 'operationSetting',
           meta: {

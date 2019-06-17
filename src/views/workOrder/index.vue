@@ -1,4 +1,5 @@
 <template>
+<!-- 工单管理 -->
   <div>
     <Row :gutter="10">
       <Col span="24">
@@ -10,25 +11,26 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80">
             <Row type="flex" justify="start">
+
+              <Col span="6">
+              <FormItem label="工单号">
+                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入工单号"></Input>
+              </FormItem>
+              </Col>              
               <Col span="6">
               <FormItem label="状态">
-                <Select v-model="formItem.status" placeholder="全部">
-                  <Option value="">全部</Option>
-                  <Option value="-1">待发起</Option>
-                  <Option value="1">进行中</Option>
-                  <Option value="2">已归档</Option>
-                  <Option value="0">终止</Option>
-                </Select>
+                 <Select v-model="formItem.status" placeholder="待派单">
+                      <Option value="">待派单</Option>
+                      <Option value="-1">待维修</Option>
+                      <Option value="1">待评价</Option>
+                      <Option value="2">已评价</Option>
+                    </Select>
               </FormItem>
               </Col>
+              
               <Col span="6">
-              <FormItem label="业主姓名">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="楼栋">
-                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" />
+              <FormItem label="姓名">
+                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入姓名" />
               </FormItem>
               </Col>
              <!-- <Col span="6">
@@ -37,8 +39,26 @@
               </FormItem>
               </Col>-->
               <Col span="6">
-              <FormItem label="房间号">
-                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
+              <FormItem label="手机号">
+                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入手机号"/>
+              </FormItem>
+              </Col>
+              <Col span="6">
+              <FormItem label="是否变更">
+                 <Select v-model="formItem.change_status" placeholder="全部">
+                      <Option value="">全部</Option>
+                      <Option value="-1">已变更</Option>
+                      <Option value="1">未变更</Option>
+                    </Select>
+              </FormItem>
+              </Col>
+              <Col span="6">
+              <FormItem label="执行人">
+                 <Select v-model="formItem.manger" placeholder="全部">
+                      <Option value="">全部</Option>
+                      <Option value="-1">张三</Option>
+                      <Option value="1">李四</Option>
+                    </Select>
               </FormItem>
               </Col>
               <Col span="6">
@@ -48,7 +68,7 @@
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
             </Row>
@@ -72,10 +92,12 @@
         <div class="search-row">
           <Row>
             <Col>
+            <!-- <Icon type="ios-redo"></Icon> -->
             <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-            <Button type="primary" icon="edit" @click="viewProject">办理</Button>
+            <Button type="primary" icon="ios-redo" @click="exportProject">导出</Button>
+            <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button> -->
             <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-            <Button type="error" icon="close"　@click="endProject">终止</Button>
+            <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
             <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
@@ -94,7 +116,7 @@
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-            <FormItem label="楼栋" prop="buildingId">
+            <FormItem label="姓名" prop="buildingId">
               <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
                 <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
               </Select>
@@ -115,14 +137,14 @@
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="房间号" prop="roomId">
+            <FormItem label="手机号" prop="roomId">
               <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
                 <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="业主姓名">
+            <FormItem label="工单号">
               <Input v-model="addForm.customerName" readonly></Input>
             </FormItem>
           </Col>
@@ -154,7 +176,7 @@
           <Form :model="viewForm" :label-width="100" >
             <Row>
               <Col span="8">
-              <FormItem label="楼栋">
+              <FormItem label="姓名">
                 <Input v-model="viewForm.buildingName" readonly></Input>
               </FormItem>
               </Col>
@@ -164,12 +186,12 @@
               </FormItem>
               </Col>
               <Col span="8">
-              <FormItem label="房间号">
+              <FormItem label="手机号">
                 <Input v-model="viewForm.roomNum" readonly></Input>
               </FormItem>
               </Col>
               <Col span="8">
-              <FormItem label="业主姓名">
+              <FormItem label="工单号">
                 <Input v-model="viewForm.customerName" readonly></Input>
               </FormItem>
               </Col>
@@ -293,7 +315,7 @@
         statusModal: false, //状态模态框
         endModal:false,//终止模态框
         noteModal: false, //弹窗
-        buildingList: [],  //楼栋
+        buildingList: [],  //姓名
         unitList: [],   //单元
         roomsList: [],  //房间
         addData: [],   //新增模态框表格数据
@@ -333,7 +355,15 @@
           unitName:'',
           startUpdateTime:'',
           endUpdateTime:'',
-          page:'1'
+          page:'1',
+          change_status:"",
+          manger:""
+        },
+         // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
         },
         //表格
         tableConfig:{
@@ -344,88 +374,145 @@
               key:'_checked',
               width:60
             },
+            // {
+            //   title: '状态',
+            //   key: 'status',
+            //   width:100,
+            //   render:(h,params)=>{
+            //     switch(params.row.status){
+            //       case '-1':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#b725ed'
+            //           }
+            //         },"待发起")
+            //       case '0':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#ED3F14'
+            //           }
+            //         },"终止")
+            //       case '1':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#2D8CF0'
+            //           }
+            //         },"进行中")
+            //       case '2':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#19BE6B'
+            //           }
+            //         },"已归档")
+            //     }
+            //   }
+            // },
             {
-              title: '状态',
-              key: 'status',
-              width:100,
-              render:(h,params)=>{
-                switch(params.row.status){
-                  case '-1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#b725ed'
-                      }
-                    },"待发起")
-                  case '0':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#ED3F14'
-                      }
-                    },"终止")
-                  case '1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#2D8CF0'
-                      }
-                    },"进行中")
-                  case '2':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#19BE6B'
-                      }
-                    },"已归档")
-                }
-              }
-            },
-            {
-              title: '节点',
+              title: '操作',
               key: 'currentNodeName',
-              width:120
+              width:130,
+              align: 'center',
+                  render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({
+                                              name:"dispatch"
+                                            })
+                                        }
+                                    }
+                                }, '派单'),
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.show_msg=true
+                                        }
+                                    }
+                                }, '备注'),
+                            ]);
+                        }
             },
             {
-              title: '办理角色 ',
+              title: '工单号码 ',
               key: 'currentName',
-              width:120
+              width:180
             },
+            // {
+            //   title: '发函类型',
+            //   key: 'fileType',
+            //   width:100,
+            //   render:(h,params)=>{
+            //     switch(params.row.fileType){
+            //       case 'Contract':
+            //         return h('div',"未按时转签约")
+            //       case 'Payment':
+            //         return h('div',"未按时付款")
+            //       case 'Mortgage':
+            //         return h('div',"未按时按揭")
+            //     }
+            //   }
+            // },
             {
-              title: '发函类型',
-              key: 'fileType',
-              width:100,
-              render:(h,params)=>{
-                switch(params.row.fileType){
-                  case 'Contract':
-                    return h('div',"未按时转签约")
-                  case 'Payment':
-                    return h('div',"未按时付款")
-                  case 'Mortgage':
-                    return h('div',"未按时按揭")
-                }
-              }
-            },
-            {
-              title: '业主名字',
+              title: '优先级',
               key: 'customerName',
               width:200
             },
             {
-              title: '楼栋',
+              title: '状态',
               key: 'buildingName',
-              width:200
+              width:120
             },
             {
-              title: '房间号',
+              title: '变更状态',
+              key: 'roomNum',
+              width:120
+            },
+            {
+              title: '办公位',
+              key: 'updatedAt',
+              width:120
+            },
+            {
+              title: '姓名',
+              key: 'buildingName',
+              width:120
+            },
+            {
+              title: '手机号',
               key: 'roomNum',
               width:150
             },
             {
-              title: '更新时间',
+              title: '执行人',
               key: 'updatedAt',
-              width:250
-            }
+              width:120
+            },
+            {
+              title: '来源',
+              key: 'buildingName',
+              width:150
+            },
+            {
+              title: '更新时间',
+              key: 'roomNum',
+              width:200
+            },
           ],
         },
         //新增表单
@@ -778,8 +865,11 @@
       },
       //新增
       addProject(){
-        this.addModal = true
-        this.getIndex()
+        // this.addModal = true
+        // this.getIndex()
+        this.$router.push({
+          name:"workOrderManage"
+        })
       },
       //新增表格选项
       select(selection){
@@ -859,62 +949,66 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      //审核
-      viewProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-          id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
-          this.viewForm.id = res.data.id
-          this.viewForm.buildingName = res.data.buildingName
-          this.viewForm.unitName = res.data.unitName
-          this.viewForm.roomNum = res.data.roomNum
-          this.viewForm.customerName = res.data.customerName
-          if(res.data.fileType ==='Contract' ){
-            this.viewForm.fileType = '未按时转签约'
-          }else if(res.data.fileType ==='Payment' ){
-            this.viewForm.fileType = '未按时付款'
-          }else if(res.data.fileType ==='Mortgage' ){
-            this.viewForm.fileType = '未按时按揭'
-          }
-          this.buttons.start = res.data.buttons.start
-          this.buttons.stop = res.data.buttons.stop
-          this.buttons.check = res.data.buttons.check
-          this.viewData = res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            restQuantity: item.restQuantity,
-            archive: item.archive,
-            archiveQuantity: item.archiveQuantity,
-            id:item.id
-          }))
-          var dataIdArray = new Array();
-          for (var i = 0; i < this.viewData.length; i++) {
-            if(this.viewData[i].required === '1'){
-              dataIdArray.push(this.viewData[i].id);
-            }
-          }
-          this.viewForm.dataId = dataIdArray.toString()
-          this.viewTabs = 'name1'
-          this.viewModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+      // 导出
+      exportProject(){
+
       },
+      //审核
+      // viewProject (){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   let params = {
+      //     id: this.selection[0].id
+      //   }
+      //   this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
+      //     this.viewForm.id = res.data.id
+      //     this.viewForm.buildingName = res.data.buildingName
+      //     this.viewForm.unitName = res.data.unitName
+      //     this.viewForm.roomNum = res.data.roomNum
+      //     this.viewForm.customerName = res.data.customerName
+      //     if(res.data.fileType ==='Contract' ){
+      //       this.viewForm.fileType = '未按时转签约'
+      //     }else if(res.data.fileType ==='Payment' ){
+      //       this.viewForm.fileType = '未按时付款'
+      //     }else if(res.data.fileType ==='Mortgage' ){
+      //       this.viewForm.fileType = '未按时按揭'
+      //     }
+      //     this.buttons.start = res.data.buttons.start
+      //     this.buttons.stop = res.data.buttons.stop
+      //     this.buttons.check = res.data.buttons.check
+      //     this.viewData = res.data.details.map(item=>({
+      //       _disabled: item.required === '1' ?  true : false,
+      //       _checked: item.required === '1' ?  true : false,
+      //       sort: item.sort,
+      //       required: item.required,
+      //       name: item.name,
+      //       quantity: item.quantity,
+      //       restQuantity: item.restQuantity,
+      //       archive: item.archive,
+      //       archiveQuantity: item.archiveQuantity,
+      //       id:item.id
+      //     }))
+      //     var dataIdArray = new Array();
+      //     for (var i = 0; i < this.viewData.length; i++) {
+      //       if(this.viewData[i].required === '1'){
+      //         dataIdArray.push(this.viewData[i].id);
+      //       }
+      //     }
+      //     this.viewForm.dataId = dataIdArray.toString()
+      //     this.viewTabs = 'name1'
+      //     this.viewModal = true
+      //   },res=>{
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
       //发起
       start(){
         this.modal_loading = true
@@ -1043,40 +1137,40 @@
         }, 2000);
       },
       //终止
-      endProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.endModal=true
-        this.modal_loading=true
-       /* this.$Modal.confirm({
-          title: '操作提示',
-          content: '是否确认终止该流程，终止后将无法继续该流程?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-              id
-            }
-            this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
-              this.$Message.success("终止成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.$Modal.remove()
-              this.$refs.table.init()
-            })
-          }
-        })*/
-      },
+      // endProject (){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   this.endModal=true
+      //   this.modal_loading=true
+      //  /* this.$Modal.confirm({
+      //     title: '操作提示',
+      //     content: '是否确认终止该流程，终止后将无法继续该流程?',
+      //     loading: true,
+      //     onOk: () => {
+      //       let id = this.selection.map(item=>item.id).toString()
+      //       let params = {
+      //         id
+      //       }
+      //       this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+      //         this.$Message.success("终止成功")
+      //         this.$Modal.remove()
+      //         this.$refs.table.init()
+      //       },res=>{
+      //         this.$Message.error(res.message)
+      //         this.$Modal.remove()
+      //         this.$refs.table.init()
+      //       })
+      //     }
+      //   })*/
+      // },
       //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()

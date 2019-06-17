@@ -11,39 +11,39 @@
             <Form  :model="formItem" :label-width="80">
               <Row type="flex" justify="start">
                 <Col span="6">
+                  <FormItem label="工单号">
+                    <Input v-model="formItem.gongdanhao" :maxlength=30 placeholder="请输入工单号" /></Input>
+                  </FormItem>
+                </Col>
+                <Col span="6">
                   <FormItem label="状态">
-                    <Select v-model="formItem.status" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="-1">待发起</Option>
-                      <Option value="1">进行中</Option>
-                      <Option value="2">已归档</Option>
-                      <Option value="0">终止</Option>
+                    <Select v-model="formItem.status" placeholder="待派单">
+                      <Option value="">待派单</Option>
+                      <Option value="-1">待维修</Option>
+                      <Option value="1">待评价</Option>
+                      <Option value="2">已评价</Option>
                     </Select>
                   </FormItem>
                 </Col>
+                
                 <Col span="6">
-                  <FormItem label="楼栋">
-                    <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" ></Input>
+                  <FormItem label="姓名">
+                    <Input v-model="formItem.xingming" :maxlength=20 placeholder="请输入姓名"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
-                  <FormItem label="房间号">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
+                  <FormItem label="手机号">
+                    <Input v-model="formItem.shoujihao" :maxlength=20 placeholder="请输入手机号"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
-                  <FormItem label="业主姓名">
-                    <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
-                  </FormItem>
-                </Col>
-                <Col span="6">
-                  <FormItem label="时间">
+                  <FormItem label="更新时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -68,9 +68,9 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <Button type="primary" icon="edit" @click="viewProject">办理</Button><!--warning-->
+                <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button>warning -->
                 <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <Button type="error" icon="close"　@click="endProject">终止</Button>
+                <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
                 <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
               </Col>
               <Col>
@@ -89,8 +89,8 @@
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-            <FormItem label="楼栋" prop="buildingId">
-              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+            <FormItem label="工单号" prop="buildingId">
+              <Select v-model="addForm.buildingId" placeholder="请选择工单号号"  @on-change="getUnits(addForm.buildingId)">
                 <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
               </Select>
             </FormItem>
@@ -110,15 +110,15 @@
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="房间号" prop="roomId">
-              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
+            <FormItem label="姓名" prop="roomId">
+              <Select v-model="addForm.roomId" placeholder="请选择姓名" @on-change="getModalName(addForm.roomId)">
                 <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
               </Select>
             </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="addForm.customerName" readonly></Input>
+            <FormItem label="手机号">
+              <Input v-model="addForm.shoujihao" readonly></Input>
             </FormItem>
           </Col>
           <Col span="24">
@@ -142,8 +142,8 @@
           <Form  :model="viewForm" :label-width="100">
             <Row>
               <Col span="8">
-              <FormItem label="楼栋">
-                <Input v-model="viewForm.buildingName" readonly></Input>
+              <FormItem label="工单号">
+                <Input v-model="viewForm.gongdanhao" readonly></Input>
               </FormItem>
               </Col>
               <Col span="8">
@@ -152,13 +152,13 @@
               </FormItem>
               </Col>
               <Col span="8">
-              <FormItem label="房间号">
-                <Input v-model="viewForm.roomNum" readonly></Input>
+              <FormItem label="姓名">
+                <Input v-model="viewForm.xingming" readonly></Input>
               </FormItem>
               </Col>
               <Col span="8">
-              <FormItem label="业主姓名">
-                <Input v-model="viewForm.customerName" readonly></Input>
+              <FormItem label="手机号">
+                <Input v-model="viewForm.shoujihao" readonly></Input>
               </FormItem>
               </Col>
               <Col span="24">
@@ -219,8 +219,7 @@
     <Modal v-model="endModal" title="终止合同备案"
            :loading="modal_loading"
            @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
+           @on-cancel="endCancel">
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
@@ -275,7 +274,7 @@
         statusModal: false, //状态模态框
         endModal: false,//终止模态框
         noteModal: false, //弹窗
-        buildingList: [], //楼栋
+        buildingList: [], //工单号
         unitList: [], //单元
         roomsList: [], //房间
         addData: [], //新增模态框表格数据
@@ -296,13 +295,19 @@
         //表单
         formItem: {
           status:'',
-          buildingName:'',
+          gongdanhao:'',
           unitName:'',
           roomName:'',
-          customerName:'',
+          shoujihao:'',
           startUpdateTime:'',
           endUpdateTime:'',
           page:'1'
+        },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
         },
         //表格
         tableConfig:{
@@ -313,84 +318,122 @@
                   key:'_checked',
                   width:60
                 },
+                // {
+                //   title: '状态',
+                //   key: 'status',
+                //   width:100,
+                //   render:(h,params)=>{
+                //     switch(params.row.status){
+                //       case '-1':
+                //         return h('div',{
+                //           style:{
+                //               width: '80px',
+                //               color: '#b725ed'
+                //           }
+                //         },"待发起")
+                //       case '0':
+                //         return h('div',{
+                //           style:{
+                //               width: '80px',
+                //               color: '#ED3F14'
+                //           }
+                //         },"终止")
+                //       case '1':
+                //         return h('div',{
+                //           style:{
+                //             width: '80px',
+                //             color: '#2D8CF0'
+                //           }
+                //         },"进行中")
+                //       case '2':
+                //         return h('div',{
+                //           style:{
+                //             width: '80px',
+                //             color: '#19BE6B'
+                //           }
+                //         },"已归档")
+                //     }
+                //   }
+                // },
+                {
+                  title: '操作',
+                  key: 'options', 
+                  width:100,
+                  align: 'center',
+                  render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({
+                                              name:"dispatch"
+                                            })
+                                        }
+                                    }
+                                }, '派单'),
+                            ]);
+                        }
+                },
+                {
+                  title: '工单号码 ',
+                  key: 'gongdanhao',
+                  width:180
+                },
+                {
+                  title: '优先级',
+                  key: 'shoujihao',
+                  width:120
+                },
                 {
                   title: '状态',
-                  key: 'status',
-                  width:100,
-                  render:(h,params)=>{
-                    switch(params.row.status){
-                      case '-1':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#b725ed'
-                          }
-                        },"待发起")
-                      case '0':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#ED3F14'
-                          }
-                        },"终止")
-                      case '1':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#2D8CF0'
-                          }
-                        },"进行中")
-                      case '2':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#19BE6B'
-                          }
-                        },"已归档")
-                    }
-                  }
-                },
-                {
-                  title: '节点',
-                  key: 'currentNodeName',
+                  key: 'gongdanhao',
                   width:120
                 },
                 {
-                  title: '办理角色 ',
-                  key: 'currentName',
+                  title: '办公位',
+                  key: 'xingming',
                   width:120
                 },
                 {
-                  title: '业主名字',
-                  key: 'customerName',
-                  width:250
+                  title: '姓名',
+                  key: 'updatedAt',
+                  width:120
                 },
                 {
-                  title: '楼栋',
-                  key: 'buildingName',
-                  width:250
+                  title: '手机号',
+                  key: 'updatedAt',
+                  width:150
                 },
                 {
-                  title: '房间号',
-                  key: 'roomNum',
-                  width:250
+                  title: '组织',
+                  key: 'updatedAt',
+                  width:200
+                },
+                {
+                  title: '来源',
+                  key: 'updatedAt',
+                  width:150
                 },
                 {
                   title: '更新时间',
                   key: 'updatedAt',
-                  width:250
+                  width:200
                 }
               ],
         },
         //新增表单
         addForm:{
           buildingId:'',
-          buildingName:'',
+          gongdanhao:'',
           unitId:'',
           unitName:'',
-          roomNum:'',
+          xingming:'',
           roomId:'',
-          customerName:'',
+          shoujihao:'',
           dataId:[],
           orgId:'',
           projectId: '',
@@ -398,13 +441,13 @@
         //新增模态框验证
         ruleAdd:{
           buildingId: [
-              { required: true, message: '请选择楼栋号', trigger: 'change' }
+              { required: true, message: '请选择工单号号', trigger: 'change' }
           ],
           unitId: [
               { required: true, message: '请选择单元号', trigger: 'change' }
           ],
           roomId: [
-              { required: true, message: '请选择房间号', trigger: 'change' }
+              { required: true, message: '请选择姓名', trigger: 'change' }
           ]
         },
         //新增模态框资料
@@ -469,10 +512,10 @@
         //审核表单
         viewForm:{
           id:'',
-          buildingName:'',
+          gongdanhao:'',
           unitName:'',
-          roomNum:'',
-          customerName:'',
+          xingming:'',
+          shoujihao:'',
           dataId:[]
         },
         //审核模态框资料
@@ -596,7 +639,7 @@
       }
     },
     mounted(){
-      //获取楼栋
+      //获取工单号
       this.getBuildings()
     },
     methods: {
@@ -612,12 +655,14 @@
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
+        // this.end.disabledDate(startDate)
       },
       //结束时间
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
+        
       },
-      //获取楼栋列表
+      //获取工单号列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
         if(token === null){
@@ -631,7 +676,7 @@
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
-              name: item.buildingName
+              name: item.gongdanhao
             }))
           }, res => {
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -645,7 +690,7 @@
         }
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
-            this.addForm.buildingName = item.name
+            this.addForm.gongdanhao = item.name
           }
         })
         this.unitList=[];
@@ -665,8 +710,8 @@
             rooms:item.rooms
           }))
           if(this.unitList[0].name === ''){
-            if(this.addForm.buildingName !== ""){
-              this.addUnitNameIsNo = this.addForm.buildingName
+            if(this.addForm.gongdanhao !== ""){
+              this.addUnitNameIsNo = this.addForm.gongdanhao
             }
           }
         }, res => {
@@ -675,8 +720,8 @@
         this.addForm.unitId = ""
         this.addForm.unitName = ""
         this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
+        this.addForm.xingming = ""
+        this.addForm.shoujihao = ""
       },
       //获取房间列表
       getRooms(unitId) {
@@ -689,40 +734,43 @@
           if (item.id===unitId) {
             this.roomsList = item.rooms.map(item => ({
               id: item.roomId,
-              num: item.roomNum
+              num: item.xingming
             }))
           }
         })
         this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
+        this.addForm.xingming = ""
+        this.addForm.shoujihao = ""
       },
-      //模态框的业主姓名
+      //模态框的手机号
       getModalName(roomId) {
         if(typeof(roomId) === "undefined"){
             return ;
         }
         this.roomsList.forEach(item=>{
           if(roomId===item.id){
-            this.addForm.roomNum = item.num
+            this.addForm.xingming = item.num
           }
         })
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
           roomId
         }, res => {
-          this.addForm.customerName=""
+          this.addForm.shoujihao=""
           res.data.data.map(item =>{
-            this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
+            this.addForm.shoujihao =this.addForm.shoujihao+ item.shoujihao+'/'
           })
-          this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
+          this.addForm.shoujihao=this.addForm.shoujihao.substr(0,this.addForm.shoujihao .length-1)//排除最后一个
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      //新增
+      //
       addProject(){
-        this.addModal = true
-        this.getIndex()
+        // this.addModal = true
+        // this.getIndex()
+        this.$router.push({
+          name:'workOrderManage'
+        })
       },
       //新增表格选项
       select(selection){
@@ -759,7 +807,7 @@
               this.modal_loading = false
             })
           } else {
-            this.$Modal.error({title: '提示信息', content: "请选择房间号"})
+            this.$Modal.error({title: '提示信息', content: "请选择姓名"})
             this.modal_loading = false
           }
         })
@@ -804,54 +852,54 @@
         })
       },
       //审核
-      viewProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-            id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/contractBill/view",params,res=>{
-          this.viewForm.id = res.data.id
-          this.viewForm.buildingName = res.data.buildingName
-          this.viewForm.unitName = res.data.unitName
-          this.viewForm.roomNum = res.data.roomNum
-          this.viewForm.customerName = res.data.customerName
-          this.buttons.start = res.data.buttons.start
-          this.buttons.stop = res.data.buttons.stop
-          this.buttons.check = res.data.buttons.check
-          this.viewData = res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            archive: item.archive,
-            restQuantity: item.restQuantity,
-            archiveQuantity: item.archiveQuantity,
-            id:item.id
-          }))
-          var dataIdArray = new Array();
-          for (var i = 0; i < this.viewData.length; i++) {
-            if(this.viewData[i].required === '1'){
-              dataIdArray.push(this.viewData[i].id);
-            }
-          }
-          this.viewForm.dataId = dataIdArray.toString()
-          this.viewTabs = 'name1'
-          this.viewModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
+      // viewProject (){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   let params = {
+      //       id: this.selection[0].id
+      //   }
+      //   this.$request.post("/apiHost/api/contractBill/view",params,res=>{
+      //     this.viewForm.id = res.data.id
+      //     this.viewForm.gongdanhao = res.data.gongdanhao
+      //     this.viewForm.unitName = res.data.unitName
+      //     this.viewForm.xingming = res.data.xingming
+      //     this.viewForm.shoujihao = res.data.shoujihao
+      //     this.buttons.start = res.data.buttons.start
+      //     this.buttons.stop = res.data.buttons.stop
+      //     this.buttons.check = res.data.buttons.check
+      //     this.viewData = res.data.details.map(item=>({
+      //       _disabled: item.required === '1' ?  true : false,
+      //       _checked: item.required === '1' ?  true : false,
+      //       sort: item.sort,
+      //       required: item.required,
+      //       name: item.name,
+      //       quantity: item.quantity,
+      //       archive: item.archive,
+      //       restQuantity: item.restQuantity,
+      //       archiveQuantity: item.archiveQuantity,
+      //       id:item.id
+      //     }))
+      //     var dataIdArray = new Array();
+      //     for (var i = 0; i < this.viewData.length; i++) {
+      //       if(this.viewData[i].required === '1'){
+      //         dataIdArray.push(this.viewData[i].id);
+      //       }
+      //     }
+      //     this.viewForm.dataId = dataIdArray.toString()
+      //     this.viewTabs = 'name1'
+      //     this.viewModal = true
+      //   },res=>{
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
       //通过
       viewPass(){
         this.modal_loading = true;
@@ -976,39 +1024,39 @@
         }, 2000);
       },
       //终止
-      endProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.endModal=true
-        this.modal_loading=true
-        /*this.$Modal.confirm({
-          title: '操作提示',
-          content: '是否确认终止该流程，终止后将无法继续该流程?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-                id
-            }
-            this.$request.post("/apiHost/api/contractBill/cutOut",params,res=>{
-              this.$Message.success("终止成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.$Modal.remove()
-            })
-          }
-        })*/
-      },
+      // endProject (){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   this.endModal=true
+      //   this.modal_loading=true
+      //   /*this.$Modal.confirm({
+      //     title: '操作提示',
+      //     content: '是否确认终止该流程，终止后将无法继续该流程?',
+      //     loading: true,
+      //     onOk: () => {
+      //       let id = this.selection.map(item=>item.id).toString()
+      //       let params = {
+      //           id
+      //       }
+      //       this.$request.post("/apiHost/api/contractBill/cutOut",params,res=>{
+      //         this.$Message.success("终止成功")
+      //         this.$Modal.remove()
+      //         this.$refs.table.init()
+      //       },res=>{
+      //         this.$Message.error(res.message)
+      //         this.$Modal.remove()
+      //       })
+      //     }
+      //   })*/
+      // },
       //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
@@ -1079,7 +1127,7 @@
       searchCancel () {
         this.formItem={
           status: '',
-          customerName: '',
+          shoujihao: '',
           buildingId: '',
           roomId: '',
           unitId: '',
