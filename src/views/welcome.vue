@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="content">
       
-      <Row :gutter="10" class="mt10">
+      <!-- <Row :gutter="10" class="mt10">
           <Col span="24" class="demo-tabs-style1" style="padding-left:6px;">
               <Tabs type="card" @on-click="changs"  v-model="viewTabs">
                 <TabPane name="contract" :label="contractLabel" >
@@ -33,8 +33,30 @@
                 </TabPane>
               </Tabs>
             </Col>
-      </Row>
-
+      </Row> -->
+      <Card class="rows">
+        <div class="col">
+          <h1>10</h1>
+          <p>待派单</p>
+        </div>
+        <div class="col">
+          <h1>10</h1>
+          <p>待维修</p>
+        </div>
+      </Card>
+      <Card >
+          <p slot="title">消息提醒</p>
+          <div class="msg-list">
+              <Card class="msg-row" v-for="(item,index) in 7" :key="index">
+                <div class="msg-content">
+                    您有一条待派单数据，请您尽快派单，单号：201906050010
+                </div>
+                <div class="msg-time">
+                    20190605 12:00
+                </div>
+              </Card>
+          </div>
+      </Card>
 
       <Modal v-model="editContractModal"  width="800">
         <Tabs type="card"  @on-click="viewTabChangs" style="margin-top: 12px" v-model="viewTabs_contract">
@@ -616,1549 +638,1743 @@
     </div>
 </template>
 <style>
-  .page-tool{
-    height: 30px;
-    margin-top: 20px;
-    /*margin-left: 80%;*/
-    text-align: right;
-  }
+.demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-content {
+  margin-top: -16px;
+}
+.demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-content > .ivu-tabs-tabpane {
+  background: #fff;
+  padding: 16px;
+}
+.demo-tabs-style1 > .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
+  border-color: transparent;
+}
+.demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
+  border-color: #fff;
+}
+.page-tool {
+  height: 30px;
+  margin-top: 20px;
+  /*margin-left: 80%;*/
+  text-align: right;
+}
+.rows,.msg-row{
+  margin-bottom: 10px;
+}
+.rows .ivu-card-body{
+  padding: 20px 0px;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  border-radius: 3px;
+}
+.col {
+  cursor: pointer;
+  width: 40%;
+  height: 150px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.col h1 {
+  font-size: 50px;
+}
+.col p {
+  font-size: 22px;
+}
+.msg-row .ivu-card-body{
+  display: flex;
+  justify-content: space-between;
+  /* border: 1px solid #999; */
+}
 </style>
 
 <script type="text/ecmascript-6">
 export default {
-  data () {
-        const validateActualNum = (rule, value, callback) => {
-          let aNum= this.viewForm.applyNum
-          if (value>10) {
-            return callback(new Error('份数不能大于10'));
-          }else {
-            callback()
+  data() {
+    const validateActualNum = (rule, value, callback) => {
+      let aNum = this.viewForm.applyNum;
+      if (value > 10) {
+        return callback(new Error("份数不能大于10"));
+      } else {
+        callback();
+      }
+    };
+    const validateNumber = (rule, value, callback) => {
+      let dot = value.indexOf(".");
+      if (!value) {
+        return callback(new Error("不能为空"));
+      }
+      if (!Number.isInteger(Number(value)) || Number(value) < 0 || dot > 0) {
+        callback(new Error("只能为正整数"));
+      } else {
+        callback();
+      }
+    };
+    return {
+      passDisable: false, //防止通过双击事件
+      isDisable: false, //防止驳回双击事件
+      viewTabs: "contract", //Tabs
+      viewTabs_sendLeter: "name1",
+      viewTabs_contract: "name1",
+      currentNodeId: "",
+      viewTabs_deliveryNotice: "name1",
+      viewTabs_transfer: "name1",
+      viewTabs_twoFile: "name1",
+      viewTabs_ownership: "name1",
+      viewTabs_ordercontract: "name1",
+      buttons: {}, //按钮
+      buttonsSend: {}, //按钮发函
+      buttonsDelivery: {}, //按钮交房通知
+      buttonsTransfer: {}, //按钮水电过户
+      buttonsTwoFile: {}, //按钮两书
+      buttonsOwnership: {}, //按钮产权办理
+      buttonsOrderContract: {}, //按钮协议书
+      agreementNameList: [
+        { name: "集团本部《商品房定购协议书》" },
+        { name: "银溪墅府C1地块商品房定购协议书" },
+        { name: "银溪墅府C2/C3地块商品房定购协议书" },
+        { name: "银溪墅府C4地块商品房定购协议书" },
+        { name: "银溪墅府C5地块商品房定购协议书" },
+        { name: "银溪墅府C6地块商品房定购协议书" }
+      ],
+      //提示标签
+      badge: {
+        contract: "",
+        sendFile: "",
+        deliveryNotice: "",
+        transfer: "",
+        twoFile: "",
+        ownership: "",
+        orderContract: ""
+      },
+      //合同备案角标
+      contractLabel: h => {
+        return h("div", [
+          h("span", "合同备案"),
+          h("Badge", {
+            props: {
+              count: this.badge.contract,
+              showZero: true
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //发函
+      sendFileLabel: h => {
+        return h("div", [
+          h("span", "发函"),
+          h("Badge", {
+            props: {
+              count: this.badge.sendFile,
+              showZero: true
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //交房通知
+      deliveryNoticeLabel: h => {
+        return h("div", [
+          h("span", "交房通知"),
+          h("Badge", {
+            props: {
+              count: this.badge.deliveryNotice,
+              showZero: true
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //水电过户
+      transferLabel: h => {
+        return h("div", [
+          h("span", "水电过户"),
+          h("Badge", {
+            props: {
+              count: this.badge.transfer
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //两书
+      twoFileLabel: h => {
+        return h("div", [
+          h("span", "两书"),
+          h("Badge", {
+            props: {
+              count: this.badge.twoFile
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //产权办理
+      ownershipLabel: h => {
+        return h("div", [
+          h("span", "产权办理"),
+          h("Badge", {
+            props: {
+              count: this.badge.ownership
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+      //协议书申请
+      orderContractLabel: h => {
+        return h("div", [
+          h("span", "协议书申请"),
+          h("Badge", {
+            props: {
+              count: this.badge.orderContract
+            },
+            style: {
+              marginLeft: "5px"
+            }
+          })
+        ]);
+      },
+
+      //合同备案表格数据
+      tableConfig: {
+        url: "/apiHost/api/contractBill/todoList",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editContractId = params.row.id;
+                      this.editContractList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
           }
-        }
-        const validateNumber = (rule, value, callback) => {
-          let dot=value.indexOf(".")
-          if (!value) {
-            return callback(new Error('不能为空'));
+        ]
+      },
+      //发函表格数据
+      tableConfig2: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editSendFileId = params.row.id;
+                      this.editSendFileList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "发函类型",
+            key: "fileType",
+            width: 100,
+            render: (h, params) => {
+              switch (params.row.fileType) {
+                case "Contract":
+                  return h("div", "未按时转签约");
+                case "Payment":
+                  return h("div", "未按时付款");
+                case "Mortgage":
+                  return h("div", "未按时按揭");
+              }
+            }
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
           }
-          if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
-            callback(new Error('只能为正整数'));
-          } else {
-            callback()
+        ]
+      },
+      //交房表格数据
+      tableConfig3: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editDeliveryNoticeId = params.row.id;
+                      this.editDeliveryNoticeList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
           }
+        ]
+      },
+      //水电过户表格数据
+      tableConfig4: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editTransferId = params.row.id;
+                      this.editTransferList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
+          }
+        ]
+      },
+      //两书表格数据
+      tableConfig5: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editTwoFileId = params.row.id;
+                      this.editTwoFileList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
+          }
+        ]
+      },
+      //产权办理表格数据
+      tableConfig6: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editOwnershipId = params.row.id;
+                      this.editOwnershipList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "业主姓名",
+            key: "customerName",
+            width: 150
+          },
+          {
+            title: "楼栋",
+            key: "buildingName",
+            width: 150
+          },
+          {
+            title: "房间号",
+            key: "roomNum",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
+          }
+        ]
+      },
+      //协议书申请表格数据
+      tableConfig7: {
+        url: "",
+        limit: 10,
+        columns: [
+          {
+            title: "操作",
+            width: 100,
+            render: (h, params) => {
+              return h(
+                "Button",
+                {
+                  on: {
+                    click: () => {
+                      this.editOrderContractId = params.row.id;
+                      this.editOrderContractList();
+                    }
+                  }
+                },
+                "编辑"
+              );
+            }
+          },
+          {
+            title: "状态",
+            key: "operationStatus",
+            width: 150,
+            render: (h, params) => {
+              switch (params.row.operationStatus) {
+                case "-1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#b725ed"
+                      }
+                    },
+                    "待发起"
+                  );
+                case "0":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#ED3F14"
+                      }
+                    },
+                    "驳回"
+                  );
+                case "1":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#2D8CF0"
+                      }
+                    },
+                    "待审核"
+                  );
+                case "2":
+                  return h(
+                    "div",
+                    {
+                      style: {
+                        width: "80px",
+                        color: "#19BE6B"
+                      }
+                    },
+                    "待发起"
+                  );
+              }
+            }
+          },
+          {
+            title: "节点",
+            key: "currentNodeName",
+            width: 120
+          },
+          {
+            title: "办理角色 ",
+            key: "currentName",
+            width: 120
+          },
+          {
+            title: "协议书名称",
+            key: "name",
+            width: 250
+          },
+          {
+            title: "申请份数",
+            key: "applyNum",
+            width: 150
+          },
+          {
+            title: "实发份数",
+            key: "actualNum",
+            width: 150
+          },
+          {
+            title: "差异份数",
+            key: "",
+            width: 150,
+            render: (h, params) => {
+              return h("div", params.row.actualNum - params.row.applyNum);
+            }
+          },
+          {
+            title: "更新时间",
+            key: "updatedAt",
+            width: 150
+          }
+        ]
+      },
+
+      isFirst: false, //是否是第一页
+      modal_loading: false, //延迟
+      reject_loading: false, //驳回延迟
+      //合同备案ID
+      editContractId: "",
+      //发函ID
+      editSendFileId: "",
+      //交房通知ID
+      editDeliveryNoticeId: "",
+      //水电过户
+      editTransferId: "",
+      //两书
+      editTwoFileId: "",
+      //产权办理
+      editOwnershipId: "",
+      //协议书ID
+      editOrderContractId: "",
+
+      nodesList: [], //处理进度
+      historysList: [], //进度详情
+
+      //合同备案模态框
+      editContractModal: false,
+      //发函模态框
+      editSendFileModal: false,
+      //交房模态框
+      editDeliveryNoticeModal: false,
+      //水电模态框
+      editTransferModal: false,
+      //两书模态框
+      editTwoFileModal: false,
+      //产权模态框
+      editOwnershipModal: false,
+      //协议书模态框
+      editOrderContractModal: false,
+
+      //合同备案模态框表单
+      contractForm: {
+        id: "",
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        customerName: "",
+        dataId: []
+      },
+      //合同备案模态框表格
+      viewStartContract: [
+        {
+          type: "selection",
+          key: "_disabled",
+          width: 0
+        },
+        {
+          type: "selection",
+          key: "_checked",
+          width: 100
+        },
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
+            }
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
+            }
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
         }
-        return {
-          passDisable:false,//防止通过双击事件
-          isDisable:false,//防止驳回双击事件
-          viewTabs:'contract',//Tabs
-          viewTabs_sendLeter:'name1',
-          viewTabs_contract:'name1',
-          currentNodeId:"",
-          viewTabs_deliveryNotice:'name1',
-          viewTabs_transfer:'name1',
-          viewTabs_twoFile:'name1',
-          viewTabs_ownership:'name1',
-          viewTabs_ordercontract:'name1',
-          buttons:{ },//按钮
-          buttonsSend:{ },//按钮发函
-          buttonsDelivery:{ },//按钮交房通知
-          buttonsTransfer:{ },//按钮水电过户
-          buttonsTwoFile:{ },//按钮两书
-          buttonsOwnership:{ },//按钮产权办理
-          buttonsOrderContract:{ },//按钮协议书
-          agreementNameList:[
-            {name:"集团本部《商品房定购协议书》"},
-            {name:"银溪墅府C1地块商品房定购协议书"},
-            {name:"银溪墅府C2/C3地块商品房定购协议书"},
-            {name:"银溪墅府C4地块商品房定购协议书"},
-            {name:"银溪墅府C5地块商品房定购协议书"},
-            {name:"银溪墅府C6地块商品房定购协议书"}
-          ],
-          //提示标签
-          badge:{
-            contract:'',
-            sendFile:'',
-            deliveryNotice:'',
-            transfer:'',
-            twoFile:'',
-            ownership:'',
-            orderContract:'',
-          },
-          //合同备案角标
-          contractLabel: (h) => {
-            return h('div', [
-              h('span', '合同备案'),
-              h('Badge', {
-                props: {
-                  count: this.badge.contract,
-                  showZero:true
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //发函
-          sendFileLabel: (h) => {
-            return h('div', [
-              h('span', '发函'),
-              h('Badge', {
-                props: {
-                  count: this.badge.sendFile,
-                  showZero:true
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //交房通知
-          deliveryNoticeLabel: (h) => {
-            return h('div', [
-              h('span', '交房通知'),
-              h('Badge', {
-                props: {
-                  count: this.badge.deliveryNotice,
-                  showZero:true
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //水电过户
-          transferLabel: (h) => {
-            return h('div', [
-              h('span', '水电过户'),
-              h('Badge', {
-                props: {
-                  count: this.badge.transfer,
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //两书
-          twoFileLabel: (h) => {
-            return h('div', [
-              h('span', '两书'),
-              h('Badge', {
-                props: {
-                  count: this.badge.twoFile,
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //产权办理
-          ownershipLabel: (h) => {
-            return h('div', [
-              h('span', '产权办理'),
-              h('Badge', {
-                props: {
-                  count: this.badge.ownership,
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-          //协议书申请
-          orderContractLabel: (h) => {
-            return h('div', [
-              h('span', '协议书申请'),
-              h('Badge', {
-                props: {
-                  count: this.badge.orderContract,
-                },
-                style:{
-                  marginLeft:'5px'
-                }
-              })
-            ])
-          },
-
-          //合同备案表格数据
-          tableConfig:{
-            url:"/apiHost/api/contractBill/todoList",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this.editContractId=params.row.id;
-                        this.editContractList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //发函表格数据
-          tableConfig2:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this.editSendFileId=params.row.id;
-                        this.editSendFileList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '发函类型',
-                key: 'fileType',
-                width:100,
-                render:(h,params)=>{
-                  switch(params.row.fileType){
-                    case 'Contract':
-                      return h('div',"未按时转签约")
-                    case 'Payment':
-                      return h('div',"未按时付款")
-                    case 'Mortgage':
-                      return h('div',"未按时按揭")
-                  }
-                }
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //交房表格数据
-          tableConfig3:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this. editDeliveryNoticeId=params.row.id;
-                        this.editDeliveryNoticeList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //水电过户表格数据
-          tableConfig4:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this. editTransferId=params.row.id;
-                        this.editTransferList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //两书表格数据
-          tableConfig5:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this.editTwoFileId=params.row.id;
-                        this.editTwoFileList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //产权办理表格数据
-          tableConfig6:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this.editOwnershipId=params.row.id;
-                        this.editOwnershipList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '业主姓名',
-                key: 'customerName',
-                width:150
-              },
-              {
-                title: '楼栋',
-                key:'buildingName',
-                width:150,
-              },
-              {
-                title: '房间号',
-                key: 'roomNum',
-                width:150
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-          //协议书申请表格数据
-          tableConfig7:{
-            url:"",
-            limit:10,
-            columns:[
-              {
-                title: '操作',
-                width:100,
-                render:(h,params)=>{
-                  return h('Button',{
-                    on: {
-                      click: () => {
-                        this.editOrderContractId=params.row.id;
-                        this.editOrderContractList();
-                      }
-                    }
-                  },'编辑')
-                }
-              },
-              {
-                title: '状态',
-                key: 'operationStatus',
-                width:150,
-                render:(h,params)=>{
-                  switch(params.row.operationStatus){
-                    case '-1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#b725ed'
-                        }
-                      },"待发起")
-                    case '0':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#ED3F14'
-                        }
-                      },"驳回")
-                    case '1':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#2D8CF0'
-                        }
-                      },"待审核")
-                    case '2':
-                      return h('div',{
-                        style:{
-                          width: '80px',
-                          color: '#19BE6B'
-                        }
-                      },"待发起")
-                  }
-                }
-              },
-              {
-                title: '节点',
-                key: 'currentNodeName',
-                width:120
-              },
-              {
-                title: '办理角色 ',
-                key: 'currentName',
-                width:120
-              },
-              {
-                title: '协议书名称',
-                key: 'name',
-                width:250
-              },
-              {
-                title: '申请份数',
-                key: 'applyNum',
-                width:150
-              },
-              {
-                title: '实发份数',
-                key:'actualNum',
-                width:150,
-              },
-              {
-                title: '差异份数',
-                key: '',
-                width:150,
-                render:(h,params)=>{
-                  return h('div',params.row.actualNum  - params.row.applyNum)
-                }
-              },
-              {
-                title: '更新时间',
-                key: 'updatedAt',
-                width:150
-              }
-            ]
-          },
-
-          isFirst: false, //是否是第一页
-          modal_loading: false, //延迟
-          reject_loading:false,//驳回延迟
-          //合同备案ID
-          editContractId:"",
-          //发函ID
-          editSendFileId:"",
-          //交房通知ID
-          editDeliveryNoticeId:"",
-          //水电过户
-          editTransferId:"",
-          //两书
-          editTwoFileId:"",
-          //产权办理
-          editOwnershipId:"",
-          //协议书ID
-          editOrderContractId:"",
-
-
-          nodesList: [], //处理进度
-          historysList: [], //进度详情
-
-          //合同备案模态框
-          editContractModal:false,
-          //发函模态框
-          editSendFileModal:false,
-          //交房模态框
-          editDeliveryNoticeModal:false,
-          //水电模态框
-          editTransferModal:false,
-          //两书模态框
-          editTwoFileModal:false,
-          //产权模态框
-          editOwnershipModal:false,
-          //协议书模态框
-          editOrderContractModal:false,
-
-          //合同备案模态框表单
-          contractForm:{
-            id:'',
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            customerName:'',
-            dataId:[ ]
-          },
-          //合同备案模态框表格
-          viewStartContract: [
-            {
-              type:"selection",
-              key:'_disabled',
-              width:0
-            },
-            {
-              type:"selection",
-              key:'_checked',
-              width:100
-            },
-            {
-              title: '序号',
-              key: 'sort',
-              width:80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width:100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width:250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width:80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width:80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width:80
+      ],
+      //合同备案审核表格
+      viewContract: [
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
             }
-          ],
-          //合同备案审核表格
-          viewContract: [
-            {
-              title: '序号',
-              key: 'sort',
-              width:80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width:100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width:250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width:80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width:80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width:80
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
             }
-          ],
-          contractData: [],  //合同备案审核模态框表格数据
-
-          //发函模态框表单
-          sendFileForm:{
-            id:'',
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            customerName:'',
-            fileType:'',
-            dataId:[ ]
-          },
-          //审核发起发函
-          viewStartSendFile: [
-            {
-              type:"selection",
-              key:'_disabled',
-              width:0
-            },
-            {
-              type:"selection",
-              key:'_checked',
-              width:100
-            },
-            {
-              title: '序号',
-              key: 'sort',
-              width:80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width:100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width:250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width:80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width:80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width:80
-            }
-          ],
-          //审核发函
-          viewSendFile: [
-            {
-              title: '序号',
-              key: 'sort',
-              width:80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width:100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width:250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width:80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width:80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width:80
-            }
-          ],
-          sendFileData:[],//发函审核模态框表格数据
-
-          //交房通知
-          deliveryNoticeForm:{
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            status:'',
-            id:'',
-            dataId:[ ]
-          },
-          //交房通知审核表格
-          viewDeliveryNotice: [
-            {
-              title: '序号',
-              key: 'id',
-              width:100
-            },
-            {
-              title: '地块',
-              key: 'areaName',
-              width:150
-            },
-            {
-              title: '楼栋号',
-              key: 'buildingName',
-              width:150
-            },
-            {
-              title: '房间号',
-              key: 'roomNum',
-              width:150
-            },
-            {
-              title: '门牌号',
-              key: 'unitName',
-              width:150
-            },
-            {
-              title: '匹配车位',
-              key: 'carParking',
-              width:150
-            },
-            {
-              title: '面积',
-              key: 'area',
-              width:150
-            },
-            {
-              title: '业主名字',
-              key: 'customerName',
-              width:150
-            },
-            {
-              title: '身份证号',
-              key: 'idCard',
-              width:150
-            },
-            {
-              title: '合同编码',
-              key: 'customerName',
-              width:150
-            },
-            {
-              title: '合同上联系电话',
-              key: 'phone',
-              width:150
-            },
-            {
-              title: '联系地址',
-              key: 'carParking',
-              width:150
-            },
-            {
-              title: '合同约定交房日期',
-              key: 'deliveryDate',
-              width:150
-            },
-            {
-              title: '最后到款日期',
-              key: 'payExpireDate',
-              width:150
-            }
-          ],
-          deliveryNoticeData: [],//交房通知审核模态框表格数据
-
-          //水电过户
-          transferForm:{
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            customerName:'',
-            status:'',
-            id:'',
-            dataId:[ ]
-          },
-          transferData: [],//水电过户审核模态框表格数据
-          //水电过户审核表格
-          viewTransfer: [
-            {
-              title: '楼栋号',
-              key: 'buildingName',
-              width:150,
-            },
-            {
-              title: '房间号',
-              key: 'roomNum',
-              width:150
-            },
-            {
-              title: '门牌号',
-              key: 'addressNum',
-              width:150
-            },
-            {
-              title: '购买用途',
-              key: 'purpose',
-              width:150
-            },
-            {
-              title: '业主名字',
-              key: 'customerName',
-              width:150
-            },
-            {
-              title: '身份证号',
-              key: 'idCard',
-              width:150
-            },
-            {
-              title: '联系电话',
-              key: 'phone',
-              width:150
-            },
-            {
-              title: '联系地址',
-              key: 'address',
-              width:150
-            },
-            {
-              title: '备注',
-              key: 'remark',
-              width:150
-            }
-          ],
-
-          //两书过户
-          twoFileForm:{
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            customerName:'',
-            status:'',
-            id:'',
-            dataId:[ ]
-          },
-          twoFileData: [],//两书审核模态框表格数据
-          //两书审核表格
-          viewTwoFile: [
-            {
-              title: '地块',
-              key: 'areaName',
-              width:150,
-              align: 'center'
-            },
-            {
-              title: '房间号',
-              key: 'roomNum',
-              width:100,
-              align: 'center'
-            },
-            {
-              title: '商品买卖合同号/拆迁协议号',
-              key: 'contract',
-              width:200,
-              align: 'center'
-            },
-            {
-              title: '合同交互期限',
-              key: 'deliveryDate',
-              width:180,
-              align: 'center'
-            },
-            {
-              title: '建筑面积',
-              key: 'area',
-              width:100,
-              align: 'center'
-            },
-            {
-              title: '业主姓名',
-              key: 'customerName',
-              width:100,
-              align: 'center'
-            },
-            {
-              title: '业主身份证号',
-              key: 'idCard',
-              width:160,
-              align: 'center'
-            },
-            {
-              title: '联系电话',
-              key: 'phone',
-              width:120,
-              align: 'center'
-            },
-            {
-              title: '联系地址',
-              key: 'address',
-              width:200,
-              align: 'center'
-            },
-            {
-              title: '用途',
-              key: 'purpose',
-              width:100,
-              align: 'center'
-            },
-            {
-              title: '备注',
-              key: 'remark',
-              width:150,
-              align: 'center'
-            }
-          ],
-
-          //产权办理
-          ownershipForm:{
-            buildingName:'',
-            unitName:'',
-            roomNum:'',
-            customerName:'',
-            status:'',
-            id:'',
-            dataId:[ ]
-          },
-          ownershipData: [],//产权办理模态框表格数据
-          //产权办理审核发起表格数据
-          viewStartOwnership: [
-            {
-              type:"selection",
-              key:'_disabled',
-              width:0
-            },
-            {
-              type:"selection",
-              key:'_checked',
-              width:100
-            },
-            {
-              title: '序号',
-              key: 'sort',
-              width: 80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width: 100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width: 250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width: 80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width: 80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width: 80
-            }
-          ],
-          //产权办理审核表格数据
-          viewOwnership: [
-            {
-              title: '序号',
-              key: 'sort',
-              width: 80
-            },
-            {
-              title: '状态',
-              key: 'required',
-              width: 100,
-              render:(h,params)=>{
-                switch(parseInt(params.row.required)){
-                  case 0:
-                    return h('div',"非必填")
-                  case 1:
-                    return h('div',"必填")
-                }
-              }
-            },
-            {
-              title: '资料名称',
-              key: 'name',
-              width: 250
-            },
-            {
-              title: '资料数量',
-              key: 'restQuantity',
-              width: 80
-            },
-            {
-              title: '存档',
-              key: 'archive',
-              width: 80,
-              render:(h,params)=>{
-                switch(parseInt(params.row.archive)){
-                  case 0:
-                    return h('div',"不存档")
-                  case 1:
-                    return h('div',"存档")
-                }
-              }
-            },
-            {
-              title: '存档份数',
-              key: 'archiveQuantity',
-              width: 80
-            }
-          ],
-
-          //协议书申请
-          viewForm: {
-            id:'',
-            name:'',
-            applyNum:'',
-            actualNum:'',
-            differenceNum:'',
-            remark:''
-          },
-          ruleView : {
-            actualNum: [
-              { validator:validateNumber, trigger: 'blur' },
-              { validator:validateActualNum, trigger: 'blur' }
-            ]
-          },
-
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
         }
+      ],
+      contractData: [], //合同备案审核模态框表格数据
+
+      //发函模态框表单
+      sendFileForm: {
+        id: "",
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        customerName: "",
+        fileType: "",
+        dataId: []
+      },
+      //审核发起发函
+      viewStartSendFile: [
+        {
+          type: "selection",
+          key: "_disabled",
+          width: 0
+        },
+        {
+          type: "selection",
+          key: "_checked",
+          width: 100
+        },
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
+            }
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
+            }
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
+        }
+      ],
+      //审核发函
+      viewSendFile: [
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
+            }
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
+            }
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
+        }
+      ],
+      sendFileData: [], //发函审核模态框表格数据
+
+      //交房通知
+      deliveryNoticeForm: {
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        status: "",
+        id: "",
+        dataId: []
+      },
+      //交房通知审核表格
+      viewDeliveryNotice: [
+        {
+          title: "序号",
+          key: "id",
+          width: 100
+        },
+        {
+          title: "地块",
+          key: "areaName",
+          width: 150
+        },
+        {
+          title: "楼栋号",
+          key: "buildingName",
+          width: 150
+        },
+        {
+          title: "房间号",
+          key: "roomNum",
+          width: 150
+        },
+        {
+          title: "门牌号",
+          key: "unitName",
+          width: 150
+        },
+        {
+          title: "匹配车位",
+          key: "carParking",
+          width: 150
+        },
+        {
+          title: "面积",
+          key: "area",
+          width: 150
+        },
+        {
+          title: "业主名字",
+          key: "customerName",
+          width: 150
+        },
+        {
+          title: "身份证号",
+          key: "idCard",
+          width: 150
+        },
+        {
+          title: "合同编码",
+          key: "customerName",
+          width: 150
+        },
+        {
+          title: "合同上联系电话",
+          key: "phone",
+          width: 150
+        },
+        {
+          title: "联系地址",
+          key: "carParking",
+          width: 150
+        },
+        {
+          title: "合同约定交房日期",
+          key: "deliveryDate",
+          width: 150
+        },
+        {
+          title: "最后到款日期",
+          key: "payExpireDate",
+          width: 150
+        }
+      ],
+      deliveryNoticeData: [], //交房通知审核模态框表格数据
+
+      //水电过户
+      transferForm: {
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        customerName: "",
+        status: "",
+        id: "",
+        dataId: []
+      },
+      transferData: [], //水电过户审核模态框表格数据
+      //水电过户审核表格
+      viewTransfer: [
+        {
+          title: "楼栋号",
+          key: "buildingName",
+          width: 150
+        },
+        {
+          title: "房间号",
+          key: "roomNum",
+          width: 150
+        },
+        {
+          title: "门牌号",
+          key: "addressNum",
+          width: 150
+        },
+        {
+          title: "购买用途",
+          key: "purpose",
+          width: 150
+        },
+        {
+          title: "业主名字",
+          key: "customerName",
+          width: 150
+        },
+        {
+          title: "身份证号",
+          key: "idCard",
+          width: 150
+        },
+        {
+          title: "联系电话",
+          key: "phone",
+          width: 150
+        },
+        {
+          title: "联系地址",
+          key: "address",
+          width: 150
+        },
+        {
+          title: "备注",
+          key: "remark",
+          width: 150
+        }
+      ],
+
+      //两书过户
+      twoFileForm: {
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        customerName: "",
+        status: "",
+        id: "",
+        dataId: []
+      },
+      twoFileData: [], //两书审核模态框表格数据
+      //两书审核表格
+      viewTwoFile: [
+        {
+          title: "地块",
+          key: "areaName",
+          width: 150,
+          align: "center"
+        },
+        {
+          title: "房间号",
+          key: "roomNum",
+          width: 100,
+          align: "center"
+        },
+        {
+          title: "商品买卖合同号/拆迁协议号",
+          key: "contract",
+          width: 200,
+          align: "center"
+        },
+        {
+          title: "合同交互期限",
+          key: "deliveryDate",
+          width: 180,
+          align: "center"
+        },
+        {
+          title: "建筑面积",
+          key: "area",
+          width: 100,
+          align: "center"
+        },
+        {
+          title: "业主姓名",
+          key: "customerName",
+          width: 100,
+          align: "center"
+        },
+        {
+          title: "业主身份证号",
+          key: "idCard",
+          width: 160,
+          align: "center"
+        },
+        {
+          title: "联系电话",
+          key: "phone",
+          width: 120,
+          align: "center"
+        },
+        {
+          title: "联系地址",
+          key: "address",
+          width: 200,
+          align: "center"
+        },
+        {
+          title: "用途",
+          key: "purpose",
+          width: 100,
+          align: "center"
+        },
+        {
+          title: "备注",
+          key: "remark",
+          width: 150,
+          align: "center"
+        }
+      ],
+
+      //产权办理
+      ownershipForm: {
+        buildingName: "",
+        unitName: "",
+        roomNum: "",
+        customerName: "",
+        status: "",
+        id: "",
+        dataId: []
+      },
+      ownershipData: [], //产权办理模态框表格数据
+      //产权办理审核发起表格数据
+      viewStartOwnership: [
+        {
+          type: "selection",
+          key: "_disabled",
+          width: 0
+        },
+        {
+          type: "selection",
+          key: "_checked",
+          width: 100
+        },
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
+            }
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
+            }
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
+        }
+      ],
+      //产权办理审核表格数据
+      viewOwnership: [
+        {
+          title: "序号",
+          key: "sort",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "required",
+          width: 100,
+          render: (h, params) => {
+            switch (parseInt(params.row.required)) {
+              case 0:
+                return h("div", "非必填");
+              case 1:
+                return h("div", "必填");
+            }
+          }
+        },
+        {
+          title: "资料名称",
+          key: "name",
+          width: 250
+        },
+        {
+          title: "资料数量",
+          key: "restQuantity",
+          width: 80
+        },
+        {
+          title: "存档",
+          key: "archive",
+          width: 80,
+          render: (h, params) => {
+            switch (parseInt(params.row.archive)) {
+              case 0:
+                return h("div", "不存档");
+              case 1:
+                return h("div", "存档");
+            }
+          }
+        },
+        {
+          title: "存档份数",
+          key: "archiveQuantity",
+          width: 80
+        }
+      ],
+
+      //协议书申请
+      viewForm: {
+        id: "",
+        name: "",
+        applyNum: "",
+        actualNum: "",
+        differenceNum: "",
+        remark: ""
+      },
+      ruleView: {
+        actualNum: [
+          { validator: validateNumber, trigger: "blur" },
+          { validator: validateActualNum, trigger: "blur" }
+        ]
+      }
+    };
+  },
+  mounted() {
+    this.getAgency(); //获取角标
+  },
+  methods: {
+    //取消
+    cancel() {
+      this.editContractModal = false;
+      this.editDeliveryNoticeModal = false;
+      this.editOrderContractModal = false;
+      this.editOwnershipModal = false;
+      this.editSendFileModal = false;
+      this.editTransferModal = false;
+      this.editTwoFileModal = false;
+      this.$refs.contracttable.init();
+      this.$refs.sendFiletable.init();
+      this.$refs.deliveryNoticetable.init();
+      this.$refs.transfertable.init();
+      this.$refs.twoFiletable.init();
+      this.$refs.ownershiptable.init();
+      this.$refs.orderContracttable.init();
     },
-    mounted(){
-      this.getAgency()//获取角标
+    //合同备案审核表单选项
+    viewselect(selection) {
+      this.contractForm.dataId = selection
+        .map(item => item.id)
+        .toString(); /*JSON.stringify(selection)*/
     },
-    methods: {
-      //取消
-      cancel(){
-        this.editContractModal = false
-        this.editDeliveryNoticeModal=false
-        this.editOrderContractModal=false
-        this.editOwnershipModal=false
-        this.editSendFileModal=false
-        this.editTransferModal=false
-        this.editTwoFileModal=false
-        this.$refs.contracttable.init()
-        this.$refs.sendFiletable.init()
-        this.$refs.deliveryNoticetable.init()
-        this.$refs.transfertable.init()
-        this.$refs.twoFiletable.init()
-        this.$refs.ownershiptable.init()
-        this.$refs.orderContracttable.init()
-      },
-      //合同备案审核表单选项
-      viewselect(selection){
-        this.contractForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-      },
-      //发函审核表单选项
-      viewselect2(selection){
-        this.sendFileForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-      },
-      //产权办理审核表单选项
-      viewselect3(selection){
-        this.ownershipForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-      },
-      //Tabs切换
-      changs(){
-        this.getAgency()
-        if(this.viewTabs === 'contract'){
-          this.$refs.contracttable.init()
-        }else if (this.viewTabs === 'sendFile') {
-          this.$refs.sendFiletable.init()
-        }else if (this.viewTabs === 'deliveryNotice') {
-          this.$refs.deliveryNoticetable.init()
-        }else if (this.viewTabs === 'transfer') {
-          this.$refs.transfertable.init()
-        }else if (this.viewTabs === 'twoFile') {
-          this.$refs.twoFiletable.init()
-        }else if (this.viewTabs === 'ownership') {
-          this.$refs.ownershiptable.init()
-        }else if (this.viewTabs === 'orderContract') {
-          this.$refs.orderContracttable.init()
-        }
-       /* this.$refs.contracttable.init()
+    //发函审核表单选项
+    viewselect2(selection) {
+      this.sendFileForm.dataId = selection
+        .map(item => item.id)
+        .toString(); /*JSON.stringify(selection)*/
+    },
+    //产权办理审核表单选项
+    viewselect3(selection) {
+      this.ownershipForm.dataId = selection
+        .map(item => item.id)
+        .toString(); /*JSON.stringify(selection)*/
+    },
+    //Tabs切换
+    changs() {
+      this.getAgency();
+      if (this.viewTabs === "contract") {
+        this.$refs.contracttable.init();
+      } else if (this.viewTabs === "sendFile") {
+        this.$refs.sendFiletable.init();
+      } else if (this.viewTabs === "deliveryNotice") {
+        this.$refs.deliveryNoticetable.init();
+      } else if (this.viewTabs === "transfer") {
+        this.$refs.transfertable.init();
+      } else if (this.viewTabs === "twoFile") {
+        this.$refs.twoFiletable.init();
+      } else if (this.viewTabs === "ownership") {
+        this.$refs.ownershiptable.init();
+      } else if (this.viewTabs === "orderContract") {
+        this.$refs.orderContracttable.init();
+      }
+      /* this.$refs.contracttable.init()
         this.$refs.sendFiletable.init()
         this.$refs.deliveryNoticetable.init()
         this.$refs.transfertable.init()
         this.$refs.twoFiletable.init()
         this.$refs.ownershiptable.init()
         this.$refs.orderContracttable.init()*/
-      },
-      //待办事项计数统计
-      getAgency(){
-        let token = sessionStorage.getItem("token")
-        if(token === null){
-          window.location.href = '/#/login'
-          window.location.reload()
-        }else{
-          this.$request.post("/apiHost/api/index/todoList",'',res=>{
-            this.badge.contract=res.data.contract
-            this.badge.sendFile=res.data.sendFile
-            this.badge.orderContract=res.data.orderContract
-            this.badge.transfer=res.data.transfer
-            this.badge.ownership=res.data.ownership
-            this.badge.twoFile=res.data.twoFile
-            this.badge.deliveryNotice=res.data.deliveryNotice
-            this.tableConfig2.url="/apiHost/api/sendFileBill/todoList"
-            this.tableConfig3.url="/apiHost/api/deliveryNotice/todoList"
-            this.tableConfig4.url="/apiHost/api/transfer/todoList"
-            this.tableConfig5.url="/apiHost/api/twoFileBill/todoList"
-            this.tableConfig6.url="/apiHost/api/ownershipBill/todoList"
-            this.tableConfig7.url="/apiHost/api/contractApplication/todoList"
-          },res=>{
-            this.$Modal.error({ title: '提示信息',content: res.message})
-          })
-        }
-      },
-      //编辑合同备案
-      editContractList(){
-        let params = {
-          id: this.editContractId
-        }
-        this.$request.post("/apiHost/api/contractBill/view",params,res=>{
-          this.contractForm.id = res.data.id
-          this.contractForm.buildingName = res.data.buildingName
-          this.contractForm.unitName = res.data.unitName
-          this.contractForm.roomNum = res.data.roomNum
-          this.contractForm.customerName = res.data.customerName
-          this.buttons.start = res.data.buttons.start
-          this.buttons.stop = res.data.buttons.stop
-          this.buttons.check = res.data.buttons.check
-          this.contractData = res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
+    },
+    //待办事项计数统计
+    getAgency() {
+      let token = sessionStorage.getItem("token");
+      if (token === null) {
+        window.location.href = "/#/login";
+        window.location.reload();
+      } else {
+        this.$request.post(
+          "/apiHost/api/index/todoList",
+          "",
+          res => {
+            this.badge.contract = res.data.contract;
+            this.badge.sendFile = res.data.sendFile;
+            this.badge.orderContract = res.data.orderContract;
+            this.badge.transfer = res.data.transfer;
+            this.badge.ownership = res.data.ownership;
+            this.badge.twoFile = res.data.twoFile;
+            this.badge.deliveryNotice = res.data.deliveryNotice;
+            this.tableConfig2.url = "/apiHost/api/sendFileBill/todoList";
+            this.tableConfig3.url = "/apiHost/api/deliveryNotice/todoList";
+            this.tableConfig4.url = "/apiHost/api/transfer/todoList";
+            this.tableConfig5.url = "/apiHost/api/twoFileBill/todoList";
+            this.tableConfig6.url = "/apiHost/api/ownershipBill/todoList";
+            this.tableConfig7.url = "/apiHost/api/contractApplication/todoList";
+          },
+          res => {
+            this.$Modal.error({ title: "提示信息", content: res.message });
+          }
+        );
+      }
+    },
+    //编辑合同备案
+    editContractList() {
+      let params = {
+        id: this.editContractId
+      };
+      this.$request.post(
+        "/apiHost/api/contractBill/view",
+        params,
+        res => {
+          this.contractForm.id = res.data.id;
+          this.contractForm.buildingName = res.data.buildingName;
+          this.contractForm.unitName = res.data.unitName;
+          this.contractForm.roomNum = res.data.roomNum;
+          this.contractForm.customerName = res.data.customerName;
+          this.buttons.start = res.data.buttons.start;
+          this.buttons.stop = res.data.buttons.stop;
+          this.buttons.check = res.data.buttons.check;
+          this.contractData = res.data.details.map(item => ({
+            _disabled: item.required === "1" ? true : false,
+            _checked: item.required === "1" ? true : false,
             sort: item.sort,
             required: item.required,
             name: item.name,
@@ -2166,136 +2382,156 @@ export default {
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
             restQuantity: item.restQuantity,
-            id:item.id
-          }))
+            id: item.id
+          }));
           var dataIdArray = new Array();
           for (var i = 0; i < this.contractData.length; i++) {
-            if(this.contractData[i].required === '1'){
+            if (this.contractData[i].required === "1") {
               dataIdArray.push(this.contractData[i].id);
             }
           }
           this.contractForm.dataId = dataIdArray.toString();
-          this.viewTabs_contract = 'name1'
-          this.editContractModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editContractModal=true
-      },
-      //发起
-      ContractStart(){
-        this.modal_loading = true
-        let params = {
-          id: this.contractForm.id,
-          dataId: this.contractForm.dataId
+          this.viewTabs_contract = "name1";
+          this.editContractModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractBill/start",params,res=>{
+      );
+      this.editContractModal = true;
+    },
+    //发起
+    ContractStart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.contractForm.id,
+        dataId: this.contractForm.dataId
+      };
+      this.$request.post(
+        "/apiHost/api/contractBill/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editContractModal = false
-              this.contractForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.contracttable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editContractModal = false;
+              this.contractForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.contracttable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
+            this.modal_loading = false;
             /*this.editContractModal = false
             this.$refs.contracttable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
-         /* this.editContractModal = false
+        },
+        res => {
+          this.modal_loading = false;
+          /* this.editContractModal = false
           this.$refs.contracttable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      contractPass(){
-        this.modal_loading = true
-        let params = {
-          id: this.contractForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractBill/check",params,res=>{
+      );
+    },
+    //通过
+    contractPass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.contractForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/contractBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editContractModal = false
-              this.$Message.success("审核通过!")
-              this.passDisable = false
-              this.getAgency()
-              this.$refs.contracttable.init()
-            }, 2000)
-            this.passDisable = true
+              this.modal_loading = false;
+              this.editContractModal = false;
+              this.$Message.success("审核通过!");
+              this.passDisable = false;
+              this.getAgency();
+              this.$refs.contracttable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.modal_loading = false
-           /* this.editContractModal = false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.modal_loading = false;
+            /* this.editContractModal = false
             this.$refs.contracttable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
+        },
+        res => {
+          this.modal_loading = false;
           // this.editContractModal = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      contractReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.contractForm.id,
-          status:'0'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractBill/check",params,res=>{
+      );
+    },
+    //驳回
+    contractReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.contractForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/contractBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-            this.editContractModal = false
-            this.isDisable = false
-            this.$Message.success("审核驳回!")
-            this.reject_loading=false
-            this.getAgency()
-            this.$refs.contracttable.init()
-            }, 2000)
-            this.isDisable = true
+              this.editContractModal = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.reject_loading = false;
+              this.getAgency();
+              this.$refs.contracttable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
             /*this.editContractModal = false
             this.$refs.contracttable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
-
-      //编辑发函
-      editSendFileList(){
-        let params = {
-          id: this.editSendFileId
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
         }
-        this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
-          this.sendFileForm.id = res.data.id
-          this.sendFileForm.buildingName = res.data.buildingName
-          this.sendFileForm.unitName = res.data.unitName
-          this.sendFileForm.roomNum = res.data.roomNum
-          this.sendFileForm.customerName = res.data.customerName
-          if(res.data.fileType ==='Contract' ){
-            this.sendFileForm.fileType = '未按时转签约'
-          }else if(res.data.fileType ==='Payment' ){
-            this.sendFileForm.fileType = '未按时付款'
-          }else if(res.data.fileType ==='Mortgage' ){
-            this.sendFileForm.fileType = '未按时按揭'
+      );
+    },
+
+    //编辑发函
+    editSendFileList() {
+      let params = {
+        id: this.editSendFileId
+      };
+      this.$request.post(
+        "/apiHost/api/sendFileBill/view",
+        params,
+        res => {
+          this.sendFileForm.id = res.data.id;
+          this.sendFileForm.buildingName = res.data.buildingName;
+          this.sendFileForm.unitName = res.data.unitName;
+          this.sendFileForm.roomNum = res.data.roomNum;
+          this.sendFileForm.customerName = res.data.customerName;
+          if (res.data.fileType === "Contract") {
+            this.sendFileForm.fileType = "未按时转签约";
+          } else if (res.data.fileType === "Payment") {
+            this.sendFileForm.fileType = "未按时付款";
+          } else if (res.data.fileType === "Mortgage") {
+            this.sendFileForm.fileType = "未按时按揭";
           }
-          this.buttonsSend.start = res.data.buttons.start
-          this.buttonsSend.stop = res.data.buttons.stop
-          this.buttonsSend.check = res.data.buttons.check
-          this.sendFileData = res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
+          this.buttonsSend.start = res.data.buttons.start;
+          this.buttonsSend.stop = res.data.buttons.stop;
+          this.buttonsSend.check = res.data.buttons.check;
+          this.sendFileData = res.data.details.map(item => ({
+            _disabled: item.required === "1" ? true : false,
+            _checked: item.required === "1" ? true : false,
             sort: item.sort,
             required: item.required,
             name: item.name,
@@ -2303,461 +2539,541 @@ export default {
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
             restQuantity: item.restQuantity,
-            id:item.id
-          }))
+            id: item.id
+          }));
           var dataIdArray = new Array();
           for (var i = 0; i < this.sendFileData.length; i++) {
-            if(this.sendFileData[i].required === '1'){
+            if (this.sendFileData[i].required === "1") {
               dataIdArray.push(this.sendFileData[i].id);
             }
           }
-          this.sendFileForm.dataId = dataIdArray.toString()
-          this.viewTabs_sendLeter = 'name1'
-          this.editSendFileModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editSendFileModal=true;
-      },
-      //发起
-      sendFileStart(){
-        this.modal_loading = true
-        let params = {
-          id: this.sendFileForm.id,
-          dataId: this.sendFileForm.dataId
+          this.sendFileForm.dataId = dataIdArray.toString();
+          this.viewTabs_sendLeter = "name1";
+          this.editSendFileModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+      );
+      this.editSendFileModal = true;
+    },
+    //发起
+    sendFileStart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.sendFileForm.id,
+        dataId: this.sendFileForm.dataId
+      };
+      this.$request.post(
+        "/apiHost/api/sendFileBill/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.sendFileForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.editSendFileModal = false
-              this.$refs.sendFiletable.init()
-              this.getAgency()
-            }, 2000)
+              this.modal_loading = false;
+              this.sendFileForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.editSendFileModal = false;
+              this.$refs.sendFiletable.init();
+              this.getAgency();
+            }, 2000);
           } else {
-            this.modal_loading = false
+            this.modal_loading = false;
             /*this.editSendFileModal = false
             this.$refs.sendFiletable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
-         /* this.editSendFileModal = false
+        },
+        res => {
+          this.modal_loading = false;
+          /* this.editSendFileModal = false
           this.$refs.sendFiletable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      sendFilePass(){
-        this.modal_loading = true
-        let params = {
-          id: this.sendFileForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+      );
+    },
+    //通过
+    sendFilePass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.sendFileForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/sendFileBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editSendFileModal = false
-              this.modal_loading = false
-              this.passDisable = false
-              this.$Message.success("审核通过!")
-              this.getAgency()
-              this.$refs.sendFiletable.init()
-            }, 2000)
-            this.passDisable = true
+              this.editSendFileModal = false;
+              this.modal_loading = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过!");
+              this.getAgency();
+              this.$refs.sendFiletable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-           /* this.editSendFileModal = false
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            /* this.editSendFileModal = false
             this.$refs.sendFiletable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      sendFileReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.sendFileForm.id,
-          status:'0'
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+      );
+    },
+    //驳回
+    sendFileReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.sendFileForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/sendFileBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editSendFileModal = false
-              this.reject_loading = false
-              this.isDisable = false
-              this.$Message.success("审核驳回!")
-              this.getAgency()
-              this.$refs.sendFiletable.init()
-            },2000)
-            this.isDisable = true
+              this.editSendFileModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.getAgency();
+              this.$refs.sendFiletable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
             /*this.editSendFileModal = false
             this.$refs.sendFiletable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
+        }
+      );
+    },
 
-      //编辑交房通知
-      editDeliveryNoticeList(){
-        this.deliveryNoticeData=[ ]
-        let params = {
-          id: this.editDeliveryNoticeId
+    //编辑交房通知
+    editDeliveryNoticeList() {
+      this.deliveryNoticeData = [];
+      let params = {
+        id: this.editDeliveryNoticeId
+      };
+      this.$request.post(
+        "/apiHost/api/deliveryNotice/view",
+        params,
+        res => {
+          this.deliveryNoticeForm.buildingName = res.data.buildingName;
+          this.deliveryNoticeForm.unitName = res.data.unitName;
+          this.deliveryNoticeForm.roomNum = res.data.roomNum;
+          this.deliveryNoticeForm.id = res.data.id;
+          this.deliveryNoticeForm.status = res.status;
+          this.buttonsDelivery.start = res.data.buttons.start;
+          this.buttonsDelivery.stop = res.data.buttons.stop;
+          this.buttonsDelivery.check = res.data.buttons.check;
+          this.deliveryNoticeData.push(res.data);
+          this.editDeliveryNoticeModal = true;
+          this.viewTabs_deliveryNotice = "name1";
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/deliveryNotice/view",params,res=>{
-          this.deliveryNoticeForm.buildingName = res.data.buildingName
-          this.deliveryNoticeForm.unitName = res.data.unitName
-          this.deliveryNoticeForm.roomNum = res.data.roomNum
-          this.deliveryNoticeForm.id=res.data.id
-          this.deliveryNoticeForm.status=res.status
-          this.buttonsDelivery.start = res.data.buttons.start
-          this.buttonsDelivery.stop = res.data.buttons.stop
-          this.buttonsDelivery.check = res.data.buttons.check
-          this.deliveryNoticeData.push(res.data)
-          this.editDeliveryNoticeModal = true
-          this.viewTabs_deliveryNotice = 'name1'
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editDeliveryNoticeModal=true
-      },
-      //发起
-      deliveryNoticestart(){
-        this.modal_loading = true
-        let params = {
-          id: this.deliveryNoticeForm.id
-        }
-        this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
+      );
+      this.editDeliveryNoticeModal = true;
+    },
+    //发起
+    deliveryNoticestart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.deliveryNoticeForm.id
+      };
+      this.$request.post(
+        "/apiHost/api/deliveryNotice/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editDeliveryNoticeModal = false
-              this.deliveryNoticeForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.deliveryNoticetable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editDeliveryNoticeModal = false;
+              this.deliveryNoticeForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.deliveryNoticetable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
+            this.modal_loading = false;
             /*this.editDeliveryNoticeModal = false
             this.$refs.deliveryNoticetable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
+        },
+        res => {
+          this.modal_loading = false;
           /*this.editDeliveryNoticeModal = false
           this.$refs.deliveryNoticetable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      deliveryNoticePass(){
-        this.modal_loading = true
-        let params = {
-          id: this.deliveryNoticeForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+      );
+    },
+    //通过
+    deliveryNoticePass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.deliveryNoticeForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/deliveryNotice/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editDeliveryNoticeModal = false
-              this.modal_loading = false
-              this.passDisable = false
-              this.$Message.success("审核通过!")
-              this.getAgency()
-              this.$refs.deliveryNoticetable.init()
-            }, 2000)
-            this.passDisable = true
+              this.editDeliveryNoticeModal = false;
+              this.modal_loading = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过!");
+              this.getAgency();
+              this.$refs.deliveryNoticetable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
             /*this.editDeliveryNoticeModal = false
             this.$refs.deliveryNoticetable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      deliveryNoticeReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.deliveryNoticeForm.id,
-          status:'0'
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+      );
+    },
+    //驳回
+    deliveryNoticeReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.deliveryNoticeForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/deliveryNotice/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-            this.editDeliveryNoticeModal = false
-            this.reject_loading=false
-              this.isDisable = false
-            this.$Message.success("审核驳回!")
-            this.getAgency()
-            this.$refs.deliveryNoticetable.init()
-            }, 2000)
-            this.isDisable = true
+              this.editDeliveryNoticeModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.getAgency();
+              this.$refs.deliveryNoticetable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
             /*this.editDeliveryNoticeModal = false
             this.$refs.deliveryNoticetable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
+        }
+      );
+    },
 
-      //编辑水电过户
-      editTransferList(){
-        this.transferData=[ ]
-        let params = {
-          id: this.editTransferId
+    //编辑水电过户
+    editTransferList() {
+      this.transferData = [];
+      let params = {
+        id: this.editTransferId
+      };
+      this.$request.post(
+        "/apiHost/api/transfer/view",
+        params,
+        res => {
+          this.transferForm.buildingName = res.data.buildingName;
+          this.transferForm.unitName = res.data.unitName;
+          this.transferForm.roomNum = res.data.roomNum;
+          this.transferForm.id = res.data.id;
+          this.transferForm.status = res.status;
+          this.buttonsTransfer.start = res.data.buttons.start;
+          this.buttonsTransfer.stop = res.data.buttons.stop;
+          this.buttonsTransfer.check = res.data.buttons.check;
+          this.transferData.push(res.data);
+          this.viewTabs_transfer = "name1";
+          this.editTransferModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/transfer/view",params,res=>{
-          this.transferForm.buildingName = res.data.buildingName
-          this.transferForm.unitName = res.data.unitName
-          this.transferForm.roomNum = res.data.roomNum
-          this.transferForm.id=res.data.id
-          this.transferForm.status=res.status
-          this.buttonsTransfer.start = res.data.buttons.start
-          this.buttonsTransfer.stop = res.data.buttons.stop
-          this.buttonsTransfer.check = res.data.buttons.check
-          this.transferData.push(res.data)
-          this.viewTabs_transfer = 'name1'
-          this.editTransferModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editTransferModal=true
-      },
-      //发起
-      transferStart(){
-        this.modal_loading = true
-        let params = {
-          id: this.transferForm.id
-        }
-        this.$request.post("/apiHost/api/transfer/start",params,res=>{
+      );
+      this.editTransferModal = true;
+    },
+    //发起
+    transferStart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.transferForm.id
+      };
+      this.$request.post(
+        "/apiHost/api/transfer/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editTransferModal = false
-              this.transferForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.transfertable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editTransferModal = false;
+              this.transferForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.transfertable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
-           /* this.editTransferModal = false
+            this.modal_loading = false;
+            /* this.editTransferModal = false
             this.$refs.transfertable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
-         /* this.editTransferModal = false
+        },
+        res => {
+          this.modal_loading = false;
+          /* this.editTransferModal = false
           this.$refs.transfertable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      transferPass(){
-        this.modal_loading = true
-        let params = {
-          id: this.transferForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/transfer/check",params,res=>{
+      );
+    },
+    //通过
+    transferPass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.transferForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/transfer/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editTransferModal = false
-              this.modal_loading = false
-              this.passDisable = false
-              this.$Message.success("审核通过!")
-              this.getAgency()
-              this.$refs.transfertable.init()
-            }, 2000)
-            this.passDisable = true
+              this.editTransferModal = false;
+              this.modal_loading = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过!");
+              this.getAgency();
+              this.$refs.transfertable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
             /*this.editTransferModal = false
             this.$refs.transfertable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      transferReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.transferForm.id,
-          status:'0'
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/transfer/check",params,res=>{
+      );
+    },
+    //驳回
+    transferReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.transferForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/transfer/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editTransferModal = false
-              this.reject_loading = false
-              this.isDisable = false
-              this.$Message.success("审核驳回!")
-              this.getAgency()
-              this.$refs.transfertable.init()
-            },2000)
-            this.isDisable = true
+              this.editTransferModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.getAgency();
+              this.$refs.transfertable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
-           /* this.editTransferModal = false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
+            /* this.editTransferModal = false
             this.$refs.transfertable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
+        }
+      );
+    },
 
-      //编辑两书
-      editTwoFileList(){
-        this.twoFileData=[ ]
-        let params = {
-          id: this.editTwoFileId
+    //编辑两书
+    editTwoFileList() {
+      this.twoFileData = [];
+      let params = {
+        id: this.editTwoFileId
+      };
+      this.$request.post(
+        "/apiHost/api/twoFileBill/view",
+        params,
+        res => {
+          this.twoFileForm.buildingName = res.data.buildingName;
+          this.twoFileForm.unitName = res.data.unitName;
+          this.twoFileForm.roomNum = res.data.roomNum;
+          this.twoFileForm.id = res.data.id;
+          this.twoFileForm.status = res.status;
+          this.buttonsTwoFile.start = res.data.buttons.start;
+          this.buttonsTwoFile.stop = res.data.buttons.stop;
+          this.buttonsTwoFile.check = res.data.buttons.check;
+          this.twoFileData.push(res.data);
+          this.viewTabs_twoFile = "name1";
+          this.editTwoFileModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/twoFileBill/view",params,res=>{
-          this.twoFileForm.buildingName = res.data.buildingName
-          this.twoFileForm.unitName = res.data.unitName
-          this.twoFileForm.roomNum = res.data.roomNum
-          this.twoFileForm.id=res.data.id
-          this.twoFileForm.status=res.status
-          this.buttonsTwoFile.start = res.data.buttons.start
-          this.buttonsTwoFile.stop = res.data.buttons.stop
-          this.buttonsTwoFile.check = res.data.buttons.check
-          this.twoFileData.push(res.data)
-          this.viewTabs_twoFile = 'name1'
-          this.editTwoFileModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editTwoFileModal=true
-      },
-      //发起
-      twoFilestart(){
-        this.modal_loading = true
-        let params = {
-          id: this.twoFileForm.id
-        }
-        this.$request.post("/apiHost/api/twoFileBill/start",params,res=>{
+      );
+      this.editTwoFileModal = true;
+    },
+    //发起
+    twoFilestart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.twoFileForm.id
+      };
+      this.$request.post(
+        "/apiHost/api/twoFileBill/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editTwoFileModal = false
-              this.twoFileForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.twoFiletable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editTwoFileModal = false;
+              this.twoFileForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.twoFiletable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
+            this.modal_loading = false;
             /*this.editTwoFileModal = false
             this.$refs.twoFiletable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
+        },
+        res => {
+          this.modal_loading = false;
           /*this.editTwoFileModal = false
           this.$refs.twoFiletable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      twoFilePass(){
-        this.modal_loading = true
-        let params = {
-          id: this.twoFileForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
+      );
+    },
+    //通过
+    twoFilePass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.twoFileForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/twoFileBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editTwoFileModal = false
-              this.modal_loading = false
-              this.passDisable = false
-              this.$Message.success("审核通过!")
-              this.getAgency()
-              this.$refs.twoFiletable.init()
-            }, 2000)
-            this.passDisable = true
+              this.editTwoFileModal = false;
+              this.modal_loading = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过!");
+              this.getAgency();
+              this.$refs.twoFiletable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
             /*this.editTwoFileModal = false
             this.$refs.twoFiletable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      twoFileReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.twoFileForm.id,
-          status:'0'
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/twoFileBill/check",params,res=>{
+      );
+    },
+    //驳回
+    twoFileReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.twoFileForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/twoFileBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editTwoFileModal = false
-              this.reject_loading = false
-              this.isDisable = false
-              this.$Message.success("审核驳回!")
-              this.getAgency()
-              this.$refs.twoFiletable.init()
-            },2000)
-            this.isDisable = true
+              this.editTwoFileModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.getAgency();
+              this.$refs.twoFiletable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
-           /* this.editTwoFileModal = false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
+            /* this.editTwoFileModal = false
             this.$refs.twoFiletable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
-
-      //编辑产权办理
-      editOwnershipList(){
-        let params = {
-          id: this.editOwnershipId
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
         }
-        this.$request.post("/apiHost/api/ownershipBill/view",params,res=>{
-          this.ownershipForm.buildingName = res.data.buildingName
-          this.ownershipForm.unitName = res.data.unitName
-          this.ownershipForm.roomNum = res.data.roomNum
-          this.ownershipForm.id=res.data.id
-          this.ownershipForm.status=res.status
-          this.buttonsOwnership.start = res.data.buttons.start
-          this.buttonsOwnership.stop = res.data.buttons.stop
-          this.buttonsOwnership.check = res.data.buttons.check
-          this.ownershipData= res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
+      );
+    },
+
+    //编辑产权办理
+    editOwnershipList() {
+      let params = {
+        id: this.editOwnershipId
+      };
+      this.$request.post(
+        "/apiHost/api/ownershipBill/view",
+        params,
+        res => {
+          this.ownershipForm.buildingName = res.data.buildingName;
+          this.ownershipForm.unitName = res.data.unitName;
+          this.ownershipForm.roomNum = res.data.roomNum;
+          this.ownershipForm.id = res.data.id;
+          this.ownershipForm.status = res.status;
+          this.buttonsOwnership.start = res.data.buttons.start;
+          this.buttonsOwnership.stop = res.data.buttons.stop;
+          this.buttonsOwnership.check = res.data.buttons.check;
+          this.ownershipData = res.data.details.map(item => ({
+            _disabled: item.required === "1" ? true : false,
+            _checked: item.required === "1" ? true : false,
             sort: item.sort,
             required: item.required,
             name: item.name,
@@ -2765,489 +3081,546 @@ export default {
             archive: item.archive,
             archiveQuantity: item.archiveQuantity,
             restQuantity: item.restQuantity,
-            id:item.id
-          }))
+            id: item.id
+          }));
           var dataIdArray = new Array();
           for (var i = 0; i < this.ownershipData.length; i++) {
-            if(this.ownershipData[i].required === '1'){
+            if (this.ownershipData[i].required === "1") {
               dataIdArray.push(this.ownershipData[i].id);
             }
           }
-          this.ownershipForm.dataId = dataIdArray.toString()
-          this.viewTabs_ownership = 'name1'
-          this.editOwnershipModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.editOwnershipModal=true
-      },
-      //发起
-      ownershipStart(){
-        this.modal_loading = true
-        let params = {
-          id: this.ownershipForm.id,
-          dataId: this.ownershipForm.dataId
+          this.ownershipForm.dataId = dataIdArray.toString();
+          this.viewTabs_ownership = "name1";
+          this.editOwnershipModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/ownershipBill/start",params,res=>{
+      );
+      this.editOwnershipModal = true;
+    },
+    //发起
+    ownershipStart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.ownershipForm.id,
+        dataId: this.ownershipForm.dataId
+      };
+      this.$request.post(
+        "/apiHost/api/ownershipBill/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editOwnershipModal = false
-              this.ownershipForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.ownershiptable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editOwnershipModal = false;
+              this.ownershipForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.ownershiptable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
+            this.modal_loading = false;
             /*this.editOwnershipModal = false
             this.$refs.ownershiptable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
+        },
+        res => {
+          this.modal_loading = false;
           /*this.editOwnershipModal = false
           this.$refs.ownershiptable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      ownershipPass(){
-        this.modal_loading = true
-        let params = {
-          id: this.ownershipForm.id,
-          status:'1'
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
+      );
+    },
+    //通过
+    ownershipPass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.ownershipForm.id,
+        status: "1"
+      };
+      this.$request.post(
+        "/apiHost/api/ownershipBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editOwnershipModal = false
-              this.modal_loading = false
-              this.passDisable = false
-              this.$Message.success("审核通过!")
-              this.getAgency()
-              this.$refs.ownershiptable.init()
-            }, 2000)
-            this.passDisable = true
+              this.editOwnershipModal = false;
+              this.modal_loading = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过!");
+              this.getAgency();
+              this.$refs.ownershiptable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-           /* this.editOwnershipModal = false
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            /* this.editOwnershipModal = false
             this.$refs.ownershiptable.init()*/
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      ownershipReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.ownershipForm.id,
-          status:'0'
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/ownershipBill/check",params,res=>{
+      );
+    },
+    //驳回
+    ownershipReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.ownershipForm.id,
+        status: "0"
+      };
+      this.$request.post(
+        "/apiHost/api/ownershipBill/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editOwnershipModal = false
-              this.reject_loading = false
-              this.isDisable = false
-              this.$Message.success("审核驳回!")
-              this.getAgency()
-              this.$refs.ownershiptable.init()
-            },2000)
-            this.isDisable = true
+              this.editOwnershipModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回!");
+              this.getAgency();
+              this.$refs.ownershiptable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-          this.$Modal.error({title: '提示信息', content: res.message})
-            this.reject_loading=false
-           /* this.editOwnershipModal = false
+            this.$Modal.error({ title: "提示信息", content: res.message });
+            this.reject_loading = false;
+            /* this.editOwnershipModal = false
             this.$refs.ownershiptable.init()*/
           }
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.reject_loading=false
-        })
-      },
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+          this.reject_loading = false;
+        }
+      );
+    },
 
-      //编辑协议书
-      editOrderContractList(){
-        let params = {
-          id: this.editOrderContractId
+    //编辑协议书
+    editOrderContractList() {
+      let params = {
+        id: this.editOrderContractId
+      };
+      this.$request.post(
+        "/apiHost/api/contractApplication/view",
+        params,
+        res => {
+          this.viewForm = {
+            id: res.data.id,
+            name: res.data.name,
+            applyNum: res.data.applyNum,
+            actualNum: res.data.actualNum.toString(),
+            differenceNum: res.data.actualNum - res.data.applyNum,
+            remark: res.data.remark
+          };
+          this.buttonsOrderContract.start = res.data.buttons.start;
+          this.buttonsOrderContract.stop = res.data.buttons.stop;
+          this.buttonsOrderContract.check = res.data.buttons.check;
+          this.viewForm.remark = res.data.remark;
+          this.editOrderContractModal = true;
+          this.viewTabs_ordercontract = "name1";
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractApplication/view",params,res=>{
-          this.viewForm={
-            id : res.data.id,
-            name : res.data.name,
-            applyNum : res.data.applyNum,
-            actualNum : res.data.actualNum.toString(),
-            differenceNum : res.data.actualNum - res.data.applyNum,
-            remark : res.data.remark
-          }
-          this.buttonsOrderContract.start = res.data.buttons.start
-          this.buttonsOrderContract.stop = res.data.buttons.stop
-          this.buttonsOrderContract.check = res.data.buttons.check
-          this.viewForm.remark = res.data.remark
-          this.editOrderContractModal = true
-          this.viewTabs_ordercontract = 'name1'
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //发起
-      viewstart(){
-        this.modal_loading = true
-        let params = {
-          id: this.viewForm.id,
-          name: this.viewForm.name,
-          actualNum:this.viewForm.actualNum,
-          remark:this.viewForm.remark,
-          applyNum:this.viewForm.applyNum,
-        }
-        this.$request.post("/apiHost/api/contractApplication/start",params,res=>{
+      );
+    },
+    //发起
+    viewstart() {
+      this.modal_loading = true;
+      let params = {
+        id: this.viewForm.id,
+        name: this.viewForm.name,
+        actualNum: this.viewForm.actualNum,
+        remark: this.viewForm.remark,
+        applyNum: this.viewForm.applyNum
+      };
+      this.$request.post(
+        "/apiHost/api/contractApplication/start",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editOrderContractModal = false
-              this.viewForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.getAgency()
-              this.$refs.orderContracttable.init()
-            }, 2000)
+              this.modal_loading = false;
+              this.editOrderContractModal = false;
+              this.viewForm.dataId = [];
+              this.$Message.success("发起成功!");
+              this.getAgency();
+              this.$refs.orderContracttable.init();
+            }, 2000);
           } else {
-            this.modal_loading = false
-           /* this.editOrderContractModal = false
+            this.modal_loading = false;
+            /* this.editOrderContractModal = false
             this.$refs.orderContracttable.init()*/
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
+        },
+        res => {
+          this.modal_loading = false;
           /*this.editOrderContractModal = false
           this.$refs.orderContracttable.init()*/
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      viewPass(){
-        this.modal_loading = true;
-        let params = {
-          id: this.viewForm.id,
-          actualNum: this.viewForm.actualNum,
-          remark:this.viewForm.remark,
-          status:1
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+      );
+    },
+    //通过
+    viewPass() {
+      this.modal_loading = true;
+      let params = {
+        id: this.viewForm.id,
+        actualNum: this.viewForm.actualNum,
+        remark: this.viewForm.remark,
+        status: 1
+      };
+      this.$request.post(
+        "/apiHost/api/contractApplication/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false
-              this.editOrderContractModal = false
-              this.passDisable = false
-              this.$Message.success("审核通过")
-              this.getAgency()
-              this.$refs.orderContracttable.init()
-            }, 2000)
-            this.passDisable = true
+              this.modal_loading = false;
+              this.editOrderContractModal = false;
+              this.passDisable = false;
+              this.$Message.success("审核通过");
+              this.getAgency();
+              this.$refs.orderContracttable.init();
+            }, 2000);
+            this.passDisable = true;
           } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      viewReject(){
-        this.reject_loading=true
-        let params = {
-          id: this.viewForm.id,
-          actualNum: this.viewForm.actualNum,
-          remark:this.viewForm.remark,
-          status:0
+        },
+        res => {
+          this.modal_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
         }
-        this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
+      );
+    },
+    //驳回
+    viewReject() {
+      this.reject_loading = true;
+      let params = {
+        id: this.viewForm.id,
+        actualNum: this.viewForm.actualNum,
+        remark: this.viewForm.remark,
+        status: 0
+      };
+      this.$request.post(
+        "/apiHost/api/contractApplication/check",
+        params,
+        res => {
           if (res.code === 200) {
             setTimeout(() => {
-              this.editOrderContractModal = false
-              this.reject_loading=false
-              this.isDisable = false
-              this.$Message.success("审核驳回")
-              this.getAgency()
-              this.$refs.orderContracttable.init()
-            }, 2000)
-            this.isDisable = true
+              this.editOrderContractModal = false;
+              this.reject_loading = false;
+              this.isDisable = false;
+              this.$Message.success("审核驳回");
+              this.getAgency();
+              this.$refs.orderContracttable.init();
+            }, 2000);
+            this.isDisable = true;
           } else {
-            this.reject_loading=false
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.reject_loading = false;
+            this.$Modal.error({ title: "提示信息", content: res.message });
           }
-        },res=>{
-          this.reject_loading=false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //差异份数
-      actualNumChange(){
-        this.viewForm.differenceNum = this.viewForm.actualNum - this.viewForm.applyNum
-      },
+        },
+        res => {
+          this.reject_loading = false;
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    //差异份数
+    actualNumChange() {
+      this.viewForm.differenceNum =
+        this.viewForm.actualNum - this.viewForm.applyNum;
+    },
 
-      viewTabChangs(){
-        if(this.viewTabs_contract === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusContractProject ()
-        }
-      },
-      //状态详情
-      statusContractProject (){
-        let params = {
-          id: this.editContractId
-        }
-        this.$request.post("/apiHost/api/contractBill/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              this.currentNodeId = i
-            }
-          })
-          // this.statusModal = true
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      sendFileViewChangs(){
-        if(this.viewTabs_sendLeter === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusSendFileProject ()
-        }
-      },
-      statusSendFileProject (){
-        let params = {
-          id: this.editSendFileId
-        }
-        this.$request.post("/apiHost/api/sendFileBill/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              // this.currentNodeId = i
-              this.currentNodeId= i
-            }
-          })
-          // this.statusModal = true
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      deliveryNoticeViewChangs(){
-        if(this.viewTabs_deliveryNotice === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusDeliveryNoticeProject()
-        }
-      },
-      statusDeliveryNoticeProject(){
-        let params = {
-          id: this.editDeliveryNoticeId
-        }
-        this.$request.post("/apiHost/api/deliveryNotice/status",params,res=>{
-            this.nodesList = res.data.nodes.map(item => ({
-              roleName: item.roleName,
-              name: item.name,
-              id:item.id
-            }))
-            this.historysList =res.data.historys.map(item=> ({
-              createdAt:item.createdAt,
-              status:item.status,
-              nodeName:item.nodeName,
-              userName:item.userName
-            }))
-            this.nodesList.map((item,i)=> {
-              if(item.id === res.data.currentNodeId){
-                this.currentNodeId = i
-              }
-            })
-            this.statusModal = true
-          }, res=>{
-            this.$Modal.error({title: '提示信息', content: res.message})
-          },
-        )
-      },
-      editTwoFileViewChangs(){
-        if(this.viewTabs_twoFile === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusTwoFileProject()
-        }
-      },
-      statusTwoFileProject(){
-        let params = {
-          id: this.editTwoFileId
-        }
-        this.$request.post("/apiHost/api/twoFileBill/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              this.currentNodeId = i
-            }
-          })
-          // this.statusModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      editOwnershipViewChangs(){
-        if(this.viewTabs_ownership === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusOwnershipProject()
-        }
-      },
-      statusOwnershipProject(){
-        let params = {
-          id: this.editOwnershipId
-        }
-        this.$request.post("/apiHost/api/ownershipBill/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              this.currentNodeId = i
-            }
-          })
-          // this.statusModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      editTransferViewChangs(){
-        if(this.viewTabs_transfer === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusTransferViewProject()
-        }
-      },
-      statusTransferViewProject(){
-        let params = {
-          id: this.editTransferId
-        }
-        this.$request.post("/apiHost/api/transfer/status",params,res=>{
-            this.nodesList = res.data.nodes.map(item => ({
-              roleName: item.roleName,
-              name: item.name,
-              id:item.id
-            }))
-            this.historysList =res.data.historys.map(item=> ({
-              createdAt:item.createdAt,
-              status:item.status,
-              nodeName:item.nodeName,
-              userName:item.userName
-            }))
-            this.nodesList.map((item,i)=> {
-              if(item.id === res.data.currentNodeId){
-                this.currentNodeId = i
-              }
-            })
-            // this.statusModal = true
-          }, res=>{
-            this.$Modal.error({title: '提示信息', content: res.message})
-          },
-        )
-      },
-      editOrderContractViewChangs(){
-        if(this.viewTabs_ordercontract === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusOrderContractProject()
-        }
-      },
-      statusOrderContractProject(){
-        let params = {
-          id: this.editOrderContractId
-        }
-        this.$request.post("/apiHost/api/contractApplication/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              this.currentNodeId = i
-            }
-          })
-          // this.statusModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+    viewTabChangs() {
+      if (this.viewTabs_contract === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusContractProject();
       }
+    },
+    //状态详情
+    statusContractProject() {
+      let params = {
+        id: this.editContractId
+      };
+      this.$request.post(
+        "/apiHost/api/contractBill/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    sendFileViewChangs() {
+      if (this.viewTabs_sendLeter === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusSendFileProject();
+      }
+    },
+    statusSendFileProject() {
+      let params = {
+        id: this.editSendFileId
+      };
+      this.$request.post(
+        "/apiHost/api/sendFileBill/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              // this.currentNodeId = i
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    deliveryNoticeViewChangs() {
+      if (this.viewTabs_deliveryNotice === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusDeliveryNoticeProject();
+      }
+    },
+    statusDeliveryNoticeProject() {
+      let params = {
+        id: this.editDeliveryNoticeId
+      };
+      this.$request.post(
+        "/apiHost/api/deliveryNotice/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          this.statusModal = true;
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    editTwoFileViewChangs() {
+      if (this.viewTabs_twoFile === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusTwoFileProject();
+      }
+    },
+    statusTwoFileProject() {
+      let params = {
+        id: this.editTwoFileId
+      };
+      this.$request.post(
+        "/apiHost/api/twoFileBill/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    editOwnershipViewChangs() {
+      if (this.viewTabs_ownership === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusOwnershipProject();
+      }
+    },
+    statusOwnershipProject() {
+      let params = {
+        id: this.editOwnershipId
+      };
+      this.$request.post(
+        "/apiHost/api/ownershipBill/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    editTransferViewChangs() {
+      if (this.viewTabs_transfer === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusTransferViewProject();
+      }
+    },
+    statusTransferViewProject() {
+      let params = {
+        id: this.editTransferId
+      };
+      this.$request.post(
+        "/apiHost/api/transfer/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
+    },
+    editOrderContractViewChangs() {
+      if (this.viewTabs_ordercontract === "name1") {
+        this.historysList = [];
+        this.nodesList = [];
+      } else {
+        this.statusOrderContractProject();
+      }
+    },
+    statusOrderContractProject() {
+      let params = {
+        id: this.editOrderContractId
+      };
+      this.$request.post(
+        "/apiHost/api/contractApplication/status",
+        params,
+        res => {
+          this.nodesList = res.data.nodes.map(item => ({
+            roleName: item.roleName,
+            name: item.name,
+            id: item.id
+          }));
+          this.historysList = res.data.historys.map(item => ({
+            createdAt: item.createdAt,
+            status: item.status,
+            nodeName: item.nodeName,
+            userName: item.userName
+          }));
+          this.nodesList.map((item, i) => {
+            if (item.id === res.data.currentNodeId) {
+              this.currentNodeId = i;
+            }
+          });
+          // this.statusModal = true
+        },
+        res => {
+          this.$Modal.error({ title: "提示信息", content: res.message });
+        }
+      );
     }
-}
+  }
+};
 </script>
-<style>
-  .demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-content {
-    margin-top: -16px;
-  }
-  .demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-content > .ivu-tabs-tabpane {
-    background: #fff;
-    padding: 16px;
-  }
-  .demo-tabs-style1 > .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
-    border-color: transparent;
-  }
-  .demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
-    border-color: #fff;
-  }
-</style>
+
 

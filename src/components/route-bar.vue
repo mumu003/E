@@ -2,9 +2,9 @@
   <div class="layout-nav layout-bread">
     <div class="bar-content">
       <Tag type="dot" v-if="isCurrent('/')" color="blue" name="首页" @click.native="routeTo('/')">首页</Tag>
-      <Tag type="dot" v-else="isCurrent('/')" name="首页" @click.native="routeTo('/')">首页</Tag>
+      <Tag type="dot" v-else name="首页" @click.native="routeTo('/')">首页</Tag>
 
-      <div :to="item.link" v-for="(item,index) in items">
+      <div :to="item.link" v-for="(item,index) in items" :key="index">
         <Tag type="dot" v-if="isCurrent(item.link)" color="blue" :name="item.title" closable
              @click.native="routeTo(item.link)"
              @on-close="removeItem">{{item.title}}
