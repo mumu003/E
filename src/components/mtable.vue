@@ -1,6 +1,7 @@
 <template>
   <div style="height: 100%;padding: 15px;border: 1px solid #dddee1;box-shadow: 0 2px 3px 2px rgba(0,0,0,.03);">
-    <Table border stripe :loading="loading" :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
+    <!-- :loading="loading" -->
+    <Table border stripe  :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
     <div class="page-tool">
       <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
     </div>

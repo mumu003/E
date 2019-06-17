@@ -16,36 +16,30 @@
     </div>
     <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'200px'}">
       <div class="main-header">
-        <!-- <div class="navicon-con">
+        <div class="navicon-con">
           <Button :style="{transform: 'rotateZ(' + (this.shrink ? '-90' : '0') + 'deg)'}" type="text"
                   @click="toggleClick">
             <Icon type="navicon" size="32"></Icon>
           </Button>
-        </div> -->
-        <!-- <div class="header-middle-con">
+        </div>
+        <div class="header-middle-con">
           <div class="main-breadcrumb" style="padding-left:0">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
           </div>
-        </div> -->
+        </div>
         <div class="header-avator-con">
-          <button class="set-pwd">修改密码</button>
-          <Icon size="20" color="red" type="android-notifications"></Icon>
-          <!-- <Icon size="20" color="red" type="md-notifications" /> -->
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <!-- <Select v-model="companyPId" style="width:200px;margin-right: 15px" placeholder="请选择项目" @on-change="changeOrg">
-                <Option v-for="(item,index) in companyList" :value="item.proId" :key="index" >{{ item.label }}</Option>
-              </Select> -->
-              
-
+              <button class="set-pwd" @click="modal1 = true">修改密码</button>
+              <Badge count="3" class="msg-badge">
+                <Icon size="23" type="android-notifications" color="#999"></Icon>
+              </Badge>
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
                   <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">{{username}}</span>
                   <Icon type="arrow-down-b"></Icon>
+                  
                 </a>
-               <!-- <DropdownMenu slot="list">
-                  <DropdownItem name="loginout" @click.native="modal1 = true">修改密码</DropdownItem>
-                </DropdownMenu>-->
                 <DropdownMenu slot="list">
                   <DropdownItem name="loginout" @click.native="modal2 = true">退出登录</DropdownItem>
                 </DropdownMenu>
@@ -99,8 +93,13 @@
     border: none;
     color: #fff;
     border-radius: 3px;
-
+    margin-right: 30px;
+    background-color: #999;
   }
+  .msg-badge{
+    margin-right: 30px;
+  }
+
 </style>
 <script type="text/ecmascript-6">
   import './../assets/css/mainCus.css'    // 使用 CSS
@@ -130,6 +129,13 @@
         company: '',
         companyPId: '',
         companyList: [],
+        currentPath: [
+          {
+            name: "home_index",
+            path: "/",
+            title: "首页"
+          }
+        ],
         head: "",
         username: "",
         loading: true,
@@ -164,69 +170,69 @@
             {
               "id": 4,
               "name": "问题受理",
-              "url": "/contract",
+              "url": "/questionAcceptance",
             },
             {
               "id": 5,
               "name": "工单管理",
-              "url": "/sendLetter",
+              "url": "/workOrder",
             },
             {
               "id": 6,
               "name": "运维设置",
-              "url": "/circularNotice",
+              "url": "/operationSetting",
             },
             {
               "id": 7,
               "name": "客户管理",
-              "url": "/hydropower",
+              "url": "/customerManagement",
             },
             {
               "id": 8,
               "name": "问题管理",
-              "url": "/twoBooks",
+              // "url": "/twoBooks",
               "childList": [
                 {
                 "id": 81,
                 "name": "问题配置",
-                "url": "/twoBooks",
+                "url": "/problemConfiguration",
                 },
                 {
                 "id": 82,
                 "name": "常见问题",
-                "url": "/hydropower",
+                "url": "/commonProblem",
                 },
               ]
             },
             {
               "id": 9,
               "name": "数据报表",
-              "url": "/propertyRight",
+              "url": "/dataReport",
             },
             {
               "id": 10,
               "name": "评价列表",
-              "url": "/agreement",
+              "url": "evaluationList",
             },
             {
               "id": 11,
               "name": "登录历史",
-              "url": "/agreement",
+              "url": "/loginHistory",
             },
             {
               "id": 12,
               "name": "系统管理",
-              "url": "/agreement",
+              // "url": "/agreement",
               "childList": [
                 {
                 "id": 121,
                 "name": "用户管理",
-                "url": "/hydropower",
+                "url": "/userManagement",
                 },
                 {
                 "id": 122,
                 "name": "角色管理",
-                "url": "/hydropower",
+                "url": "/roleManagement",
                 },
               ]
             }

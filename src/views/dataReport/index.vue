@@ -4,14 +4,13 @@
       <Col span="24">
         <Card class="search-card">
           <p slot="title">
-            <Icon type="levels"></Icon>
               {{$route.meta.title}}
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
             <Form  :model="formItem" :label-width="80">
               <Row>
-                <Col span="6">
+                <!-- <Col span="6">
                   <FormItem label="状态">
                     <Select v-model="formItem.status" placeholder="全部">
                       <Option value="">全部</Option>
@@ -21,8 +20,8 @@
                       <Option value="0">终止</Option>
                     </Select>
                    </FormItem>
-                </Col>
-                <Col span="6">
+                </Col> -->
+                <!-- <Col span="6">
                   <FormItem label="业主姓名">
                     <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
                   </FormItem>
@@ -36,7 +35,7 @@
                   <FormItem label="房间号">
                     <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
                   </FormItem>
-                </Col>
+                </Col> -->
                 <Col span="6">
                   <FormItem label="时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
@@ -53,7 +52,7 @@
             <Col>
             </Col>
             <Col>
-              <Button type="primary" @click="searchSubmit" icon="search">搜索</Button>
+              <Button type="primary" @click="searchSubmit" icon="search">检索</Button>
               <Button type="ghost" @click="searchCancel" icon="refresh">重置</Button>
             </Col>
           </div>
@@ -68,11 +67,12 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
+                <Button type="primary" >导出</Button>
+                <!-- <Button type="primary" icon="plus-round" @click="addProject">新增</Button> -->
                 <!--<Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>-->
-                <Button type="primary" icon="edit" @click="viewProject">办理</Button>
+                <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button> -->
                 <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <Button type="error" icon="close"　@click="endProject">终止</Button>
+                <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
                 <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
               </Col>
               <Col>
@@ -465,76 +465,71 @@
           url:"/apiHost/api/ownershipBill/list",
               columns:[
                 {
-                  type:"selection",
-                  key:'_checked',
-                  width:60
-                },
-                {
-                  title: '状态',
+                  title: '操作',
                   key: 'status',
-                  width:100,
+                  width:70,
+                  align:"center",
                   render:(h,params)=>{
-                    switch(params.row.status){
-                      case '-1':
                         return h('div',{
                           style:{
-                              width: '80px',
-                              color: '#b725ed'
+                              width: '50px',
+                              color: '#999'
+                          },
+                          on: {
+                              click: () => {
+                                    this.$router.push({path:"/reportDetail"})
+                              }
                           }
-                        },"待发起")
-                      case '0':
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#ED3F14'
-                          }
-                        },"终止")
-                      case '1':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#2D8CF0'
-                          }
-                        },"进行中")
-                      case '2':
-                        return h('div',{
-                          style:{
-                            width: '80px',
-                            color: '#19BE6B'
-                          }
-                        },"已归档")
-                    }
+                        },"详情")
                   }
                 },
                 {
-                  title: '节点',
+                  title: '公司',
                   key: 'currentNodeName',
-                  width:120
+                  width:150,
+                  align:"center"
                 },
                 {
-                  title: '办理角色 ',
+                  title: '硬件单数',
                   key: 'currentName',
-                  width:120
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '业主姓名',
+                  title: '软件单数',
                   key: 'customerName',
-                  width:250
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '楼栋',
+                  title: '其他',
                   key: 'buildingName',
-                  width:250
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '房间号',
+                  title: '总数',
                   key: 'roomNum',
-                  width:250
+                  width:100,
+                  align:"center"
                 },
                 {
-                  title: '更新时间',
+                  title: '已完成单数',
                   key: 'updatedAt',
-                  width:250
+                  width:100,
+                  align:"center"
+                },
+                {
+                  title: '待维修单数',
+                  key: 'updatedAt',
+                  width:100,
+                  align:"center"
+                },
+                {
+                  title: '备注',
+                  key: 'updatedAt',
+                  width:250,
+                  align:"center"
                 }
               ],
         },
@@ -776,7 +771,7 @@
       }
     },
     mounted(){//方法
-      this.getBuildings()//获取楼栋
+      // this.getBuildings()//获取楼栋
     },
     methods: {
       //Tabs切换

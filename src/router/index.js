@@ -24,82 +24,111 @@ export default new Router({
           path: '/',
           name: '',
           meta: {
-            title: '工作台'
+            title: '首页'
           },
           component: resolve => require(['@/views/welcome.vue'], resolve),
         },
         {
-          path: '/contract',
-          name: 'contract',
+          path: '/questionAcceptance',
+          name: 'questionAcceptance',
           meta: {
-            title: '合同备案'
+            title: '问题受理'
           },
-          component: resolve => require(['@/views/contract/index.vue'], resolve),
+          component: resolve => require(['@/views/questionAcceptance/index.vue'], resolve),
         },
         {
-          path: '/procedure',
-          name: 'procedure',
+          path: '/workOrder',
+          name: 'workOrder',
           meta: {
-            title: '流程配置'
+            title: '工单管理'
           },
-          component: resolve => require(['@/views/procedure/index.vue'], resolve),
+          component: resolve => require(['@/views/workOrder/index.vue'], resolve),
         },
         {
-          path: '/basics',
-          name: 'basics',
+          path: '/operationSetting',
+          name: 'operationSetting',
           meta: {
-            title: '基础设置'
+            title: '运维设置'
           },
-          component: resolve => require(['@/views/basics/index.vue'], resolve),
+          component: resolve => require(['@/views/operationSetting/index.vue'], resolve),
         },
         {
-          path: '/sendLetter',
-          name: 'sendLetter',
+          path: '/customerManagement',
+          name: 'customerManagement',
           meta: {
-            title: '发函'
+            title: '客户管理'
           },
-          component: resolve => require(['@/views/sendLetter/index.vue'], resolve),
+          component: resolve => require(['@/views/customerManagement/index.vue'], resolve),
         },
         {
-          path: '/circularNotice',
-          name: 'circularNotice',
+          path: '/problemConfiguration',
+          name: 'problemConfiguration',
           meta: {
-            title: '交房通知'
+            title: '问题配置'
           },
-          component: resolve => require(['@/views/circularNotice/index.vue'], resolve),
+          component: resolve => require(['@/views/problemConfiguration/index.vue'], resolve),
         },
         {
-          path: '/hydropower',
-          name: 'hydropower',
+          path: '/commonProblem',
+          name: 'commonProblem',
           meta: {
-            title: '水电过户'
+            title: '常见问题'
           },
-          component: resolve => require(['@/views/hydropower/index.vue'], resolve),
+          component: resolve => require(['@/views/commonProblem/index.vue'], resolve),
         },
         {
-          path: '/twoBooks',
-          name: 'twoBooks',
+          path: '/dataReport',
+          name: 'dataReport',
           meta: {
-            title: '两书'
+            title: '数据报表'
           },
-          component: resolve => require(['@/views/twoBooks/index.vue'], resolve),
+          component: resolve => require(['@/views/dataReport/index.vue'], resolve),
         },
         {
-          path: '/propertyRight',
-          name: 'propertyRight',
+          path: '/reportDetail',
+          name: 'reportDetail',
           meta: {
-            title: '产权办理'
+            title: '报表明细'
           },
-          component: resolve => require(['@/views/propertyRight/index.vue'], resolve),
+          component: resolve => require(['@/views/reportDetail/index.vue'], resolve),
         },
         {
-          path: '/agreement',
-          name: 'agreement',
+          path: '/evaluationList',
+          name: 'evaluationList',
           meta: {
-            title: '协议书申请'
+            title: '评价列表'
           },
-          component: resolve => require(['@/views/agreement/index.vue'], resolve),
+          component: resolve => require(['@/views/evaluationList/index.vue'], resolve),
         },
+        {
+          path: '/loginHistory',
+          name: 'loginHistory',
+          meta: {
+            title: '登录历史'
+          },
+          component: resolve => require(['@/views/loginHistory/index.vue'], resolve),
+        },
+        {
+          path: '/userManagement',
+          name: 'userManagement',
+          meta: {
+            title: '用户管理'
+          },
+          component: resolve => require(['@/views/userManagement/index.vue'], resolve),
+        },
+        {
+          path: '/roleManagement',
+          name: 'roleManagement',
+          meta: {
+            title: '角色管理'
+          },
+          component: resolve => require(['@/views/roleManagement/index.vue'], resolve),
+        },
+        
+        
+        
+        
+        
       ]
     }
   ]

@@ -4,8 +4,7 @@
       <Col span="24">
       <Card class="search-card">
         <p slot="title">
-          <Icon type="levels"></Icon>
-            {{$route.meta.title}}
+          {{$route.meta.title}}
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
@@ -22,26 +21,23 @@
                 </Select>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="业主姓名">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="楼栋">
-                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号" />
-              </FormItem>
-              </Col>
              <!-- <Col span="6">
-              <FormItem label="单元">
-                <Input v-model="formItem.unitName" :maxlength=20 placeholder="请输入单元号"/>
+              <FormItem label="地块">
+                <Input v-model="formItem.areaId" placeholder="请输入地块名称"/>
               </FormItem>
               </Col>-->
+              <Col span="6">
+              <FormItem label="楼栋">
+                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号"/>
+              </FormItem>
+              </Col>
               <Col span="6">
               <FormItem label="房间号">
                 <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"/>
               </FormItem>
               </Col>
+            </Row>
+              <Row>
               <Col span="6">
               <FormItem label="时间">
                 <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
@@ -90,101 +86,78 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增发函流程" width="800"
-      @on-cancel="addCancel">
+    <Modal v-model="addModal" title="新增交房通知" width="800" :loading="loading"
+      @on-cancel="cancel" >
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
-            <FormItem label="楼栋" prop="buildingId">
-              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+          <FormItem label="楼栋" prop="buildingId">
+            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
+              <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
+            </Select>
+          </FormItem>
+          </Col>
+          <Col span="8">
+          <FormItem label="单元" prop="unitId">
+            <div v-if="addUnitNameIsNo !== ''">
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
               </Select>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="单元" prop="unitId">
-              <div v-if="addUnitNameIsNo !== ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-                </Select>
-              </div>
-              <div v-if="addUnitNameIsNo === ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                </Select>
-              </div>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="房间号" prop="roomId">
-              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
+            </div>
+            <div v-if="addUnitNameIsNo === ''">
+              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
+                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
               </Select>
-            </FormItem>
+            </div>
+          </FormItem>
           </Col>
           <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="addForm.customerName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="发函类型" prop="fileType">
-              <Select v-model="addForm.fileType" placeholder="请选择发函类型" >
-                <Option :value="item.fileType" v-for="(item,index) in fileTypeList" :key="index">{{item.fileName}}</Option>
-              </Select>
-            </FormItem>
+          <FormItem label="房间号" prop="roomId">
+            <Select v-model="addForm.roomId" placeholder="请选择房间号"  @on-change="clearAddData">
+              <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
+            </Select>
+          </FormItem>
           </Col>
           <Col span="24">
-            资料
+          资料
           </Col>
           <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
+          <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select" v-show="isShow"></Table>
           </Col>
         </Row>
       </Form>
       <div slot="footer" style="text-align: right;">
-        <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
+        <Button type="primary" @click="addPullData" :disabled="addForm.roomId ? false : true">抓取数据</Button>
+        <Button @click="cancel">取消</Button>
+        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
-    <Modal v-model="viewModal" width="800"
-      @on-cancel="viewCancel">
+    <Modal v-model="viewModal" width="800" @on-cancel="viewCancel" >
       <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="发函审核" name="name1">
-          <Form :model="viewForm" :label-width="100" >
+        <TabPane label="交房通知审核" name="name1">
+          <Form  :model="viewForm" :label-width="100">
             <Row>
               <Col span="8">
               <FormItem label="楼栋">
-                <Input v-model="viewForm.buildingName" readonly></Input>
+                <Input v-model="viewForm.buildingName" readonly/>
               </FormItem>
               </Col>
               <Col span="8">
               <FormItem label="单元">
-                <Input v-model="viewForm.unitName" readonly></Input>
+                <Input v-model="viewForm.unitName" readonly/>
               </FormItem>
               </Col>
               <Col span="8">
               <FormItem label="房间号">
-                <Input v-model="viewForm.roomNum" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="业主姓名">
-                <Input v-model="viewForm.customerName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="发函类型">
-                <Input v-model="viewForm.fileType" readonly></Input>
+                <Input v-model="viewForm.roomNum" readonly/>
               </FormItem>
               </Col>
               <Col span="24">
               资料
               </Col>
               <Col span="24">
-                <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-                <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
+                <Table stripe border :columns="viewContract" :data="viewData"></Table>
               </Col>
             </Row>
           </Form>
@@ -218,14 +191,14 @@
           </Row>
         </TabPane>
       </Tabs>
-      <div slot="footer" style="text-align:right;">
+      <div slot="footer" style="text-align: right;" v-model="viewForm.id">
         <Row>
           <Col span="24" v-if="viewTabs === 'name1'">
-          <Button size="default" @click="viewCancel" >取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-          <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
+            <Button size="default" @click="viewCancel" >取消</Button>
+            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
+            <span v-else-if="buttons.check" >
+              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
+              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading" :disabled="passDisable">通过</Button>
             </span>
           </Col>
           <Col span="24" v-if="viewTabs === 'name2'">
@@ -235,19 +208,19 @@
       </div>
     </Modal>
 
-    <Modal v-model="endModal" title="终止发函"
-           :loading="modal_loading"
-           @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
+    <Modal v-model="endModal" title="终止交房通知"
+      :loading="modal_loading"
+      @on-ok="endSubmit"
+      @on-cancel="endCancel" >
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
-   <!-- <Modal v-model="statusModal" title="状态详情"
+    <!--<Modal v-model="statusModal" title="状态详情"
            width="800"
            :loading="loading"
            @on-ok="statuSubmit"
-           @on-cancel="cancel">
+           @on-cancel="cancel"
+    >
       <Row>
         <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
         <Col span="24">
@@ -283,62 +256,57 @@
   export default {
     data () {
       return {
-        passDisable:false,//防止通过双击事件
-        isDisable:false,//防止驳回双击事件
-        loading: true, //延迟
+        passDisable: false, //防止通过双击事件
+        isDisable: false, //防止驳回双击事件
+        isFirst: false,  //模态框延迟
         modal_loading: false, //延迟
-        reject_loading: false, //驳回
-        isFirst: false, //是否是第一页
+        reject_loading: false, //驳回延迟
         addModal: false, //新增模态框
-        viewModal: false, //查看模态框
+        viewModal: false, //审核模态框
         statusModal: false, //状态模态框
-        endModal:false,//终止模态框
-        noteModal: false, //弹窗
-        buildingList: [],  //楼栋
-        unitList: [],   //单元
-        roomsList: [],  //房间
-        addData: [],   //新增模态框表格数据
-        viewData: [],  //审核模态框表格数据
-        nodesList: [],  //处理进度
-        historysList: [],  //进度详情
-        currentNodeId:'', //状态详情节点
+        endModal: false, //终止模态框
+        noteModal: false, //提示模态框
+        isShow: false, //新增-资料显示
+        loading: true, //加载
+        viewTabs: 'name1',//Tabs默认
+        currentNodeId: '',//审核节点
         addUnitNameIsNo:'',//新增名字空的
-        viewTabs:'name1', //Tabs
-        buttons:{ }, //按钮
-        //发函类型
-        fileTypeList:[
-          {
-            fileType:'Contract',
-            fileName:'未按时转签约'
-          },
-          {
-            fileType:'Payment',
-            fileName:'未按时付款'
-          },
-          {
-            fileType:'Mortgage',
-            fileName:'未按时按揭'
-          }
-        ],
-        //搜索时间
+        buildingList: [],//楼栋
+        unitList: [],//单元
+        roomsList: [],//房间
+        nodesList: [],//处理进度
+        historysList: [],//进度详情
+        addData: [],//新增表格数据
+        viewData: [],//审核表格数据
+        buttons:{ },//按钮数组
         searchTime:{
           tStartTime:"",
           tEndTime:"",
         },
+        //新增模态框验证
+        ruleAdd:{
+          buildingId: [
+            { required: true, message: '请选择楼栋号', trigger: 'change' }
+          ],
+          unitId: [
+            { required: true, message: '请选择单元号', trigger: 'change' }
+          ],
+          roomId: [
+            { required: true, message: '请选择房间号', trigger: 'change' }
+          ]
+        },
         //表单
         formItem: {
           status:'',
-          customerName:'',
-          buildingName:'',
+          areaId:'',
+          buildingId:'',
           roomNum:'',
-          unitName:'',
           startUpdateTime:'',
-          endUpdateTime:'',
-          page:'1'
+          endUpdateTime:''
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/sendFileBill/list",
+          url:"/apiHost/api/deliveryNotice/list",
           columns:[
             {
               type:"selection",
@@ -393,29 +361,14 @@
               width:120
             },
             {
-              title: '发函类型',
-              key: 'fileType',
-              width:100,
-              render:(h,params)=>{
-                switch(params.row.fileType){
-                  case 'Contract':
-                    return h('div',"未按时转签约")
-                  case 'Payment':
-                    return h('div',"未按时付款")
-                  case 'Mortgage':
-                    return h('div',"未按时按揭")
-                }
-              }
-            },
-            {
-              title: '业主名字',
-              key: 'customerName',
-              width:200
+              title: '地块',
+              key: 'areaName',
+              width:150
             },
             {
               title: '楼栋',
               key: 'buildingName',
-              width:200
+              width:150
             },
             {
               title: '房间号',
@@ -423,220 +376,195 @@
               width:150
             },
             {
+              title: '门牌号',
+              key: 'addressNum',
+              width:150
+            },
+            {
+              title: '面积',
+              key: 'area',
+              width:150
+            },
+            {
+              title: '创建人',
+              key: 'createdName',
+              width:150
+            },
+            {
               title: '更新时间',
               key: 'updatedAt',
-              width:250
+              width:150
             }
           ],
         },
-        //新增表单
+        //模态框表单数据
         addForm:{
-          customerName:'',
+          areaId:'',
+          areaName:'',
           buildingId:'',
           buildingName:'',
           unitId:'',
           unitName:'',
-          roomNum:'',
           roomId:'',
-          fileType:'',
-          selection:[],
-          dataId:[],
+          roomNum:'',
+          customerName:'',
+          addressNum:'',
+          carParking:'',
+          area:'',
+          idCard:'',
+          contract:'',
+          signDate:'',
+          phone:'',
+          address:'',
+          payExpireDate:'',
+          deliveryDate:'',
           orgId:'',
           projectId: '',
         },
-        //新增模态框验证
-        ruleAdd:{
-          buildingId: [
-            { required: true, message: '请选择楼栋号', trigger: 'change' }
-          ],
-          unitId: [
-            { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-            { required: true, message: '请选择房间号', trigger: 'change' }
-          ],
-          customerName:[
-            { required: true, message: '请填写客户姓名', trigger: 'blur' }
-          ],
-          fileType: [
-            { required: true, message: '请选择发函类型', trigger: 'change' }
-          ]
-        },
-        //新增模态框资料
+        //模态框表格数据
         addContract: [
           {
-            type:"selection",
-            key:'_disabled',
-            width:0
-          },
-          {
-            type:"selection",
-            key:'_checked',
-            width:60
-          },
-          {
-            title: '序号',
-            key: 'sort',
-            width:100
-          },
-          {
-            title: '状态',
-            key: 'required',
+            title: '地块',
+            key: 'areaName',
             width:150,
-            render:(h,params)=>{
-              switch(parseInt(params.row.required)){
-                case 0:
-                  return h('div',"非必填")
-                case 1:
-                  return h('div',"必填")
-              }
-            }
           },
           {
-            title: '资料名称',
-            key: 'name',
+            title: '楼栋号',
+            key: 'buildingName',
+            width:150,
+
+          },
+          {
+            title: '房间号',
+            key: 'rommNum',
             width:150
           },
           {
-            title: '资料数量',
-            key: 'quantity',
+            title: '门牌号',
+            key: 'addressNum',
             width:150
           },
           {
-            title: '存档',
-            key: 'archive',
-            width:150,
-            render:(h,params)=>{
-              switch(parseInt(params.row.archive)){
-                case 0:
-                  return h('div',"不存档")
-                case 1:
-                  return h('div',"存档")
-              }
-            }
+            title: '匹配车位',
+            key: 'parking',
+            width:150
           },
           {
-            title: '存档份数',
-            key: 'archiveQuantity',
+            title: '面积',
+            key: 'area',
+            width:150
+          },
+          {
+            title: '业主名字',
+            key: 'customerName',
+            width:150
+          },
+          {
+            title: '身份证号',
+            key: 'idNumber',
+            width:150
+          },
+          {
+            title: '合同编码',
+            key: 'contractNumber',
+            width:150
+          },
+          {
+            title: '合同上联系电话',
+            key: 'phone',
+            width:150
+          },
+          {
+            title: '联系地址',
+            key: 'address',
+            width:150
+          },
+          {
+            title: '合同约定交房日期',
+            key: 'deliveryDate',
             width:150
           }
         ],
-        //审核表单
+        //模态框表单,表格数据
         viewForm:{
-          id:'',
           buildingName:'',
           unitName:'',
           roomNum:'',
           customerName:'',
-          fileType:'',
-          dataId:[]
+          status:'',
+          id:''
         },
-        //审核模态框资料
+        //表格数据
         viewContract: [
           {
             title: '序号',
-            key: 'sort',
-            width:80
-          },
-          {
-            title: '状态',
-            key: 'required',
-            width:100,
-            render:(h,params)=>{
-              switch(parseInt(params.row.required)){
-                case 0:
-                  return h('div',"非必填")
-                case 1:
-                  return h('div',"必填")
-              }
-            }
-          },
-          {
-            title: '资料名称',
-            key: 'name',
-            width:250
-          },
-          {
-            title: '资料数量',
-            key: 'restQuantity',
-            width:80
-          },
-          {
-            title: '存档',
-            key: 'archive',
-            width:80,
-            render:(h,params)=>{
-              switch(parseInt(params.row.archive)){
-                case 0:
-                  return h('div',"不存档")
-                case 1:
-                  return h('div',"存档")
-              }
-            }
-          },
-          {
-            title: '存档份数',
-            key: 'archiveQuantity',
-            width:80
-          }
-        ],
-        //审核发起表格
-        viewStartContract: [
-          {
-            type:"selection",
-            key:'_disabled',
-            width:0
-          },
-          {
-            type:"selection",
-            key:'_checked',
-            width:80
-          },
-          {
-            title: '序号',
-            key: 'sort',
+            key: 'id',
             width:100
           },
           {
-            title: '状态',
-            key: 'required',
-            width:100,
-            render:(h,params)=>{
-              switch(parseInt(params.row.required)){
-                case 0:
-                  return h('div',"非必填")
-                case 1:
-                  return h('div',"必填")
-              }
-            }
+            title: '地块',
+            key: 'areaName',
+            width:150
           },
           {
-            title: '资料名称',
-            key: 'name',
-            width:250
+            title: '楼栋号',
+            key: 'buildingName',
+            width:150
           },
           {
-            title: '资料数量',
-            key: 'restQuantity',
-            width:80
+            title: '房间号',
+            key: 'roomNum',
+            width:150
           },
           {
-            title: '存档',
-            key: 'archive',
-            width:80,
-            render:(h,params)=>{
-              switch(parseInt(params.row.archive)){
-                case 0:
-                  return h('div',"不存档")
-                case 1:
-                  return h('div',"存档")
-              }
-            }
+            title: '门牌号',
+            key: 'unitName',
+            width:150
           },
           {
-            title: '存档份数',
-            key: 'archiveQuantity',
-            width:80
+            title: '匹配车位',
+            key: 'carParking',
+            width:150
+          },
+          {
+            title: '面积',
+            key: 'area',
+            width:150
+          },
+          {
+            title: '业主名字',
+            key: 'customerName',
+            width:150
+          },
+          {
+            title: '身份证号',
+            key: 'idCard',
+            width:150
+          },
+          {
+            title: '合同编码',
+            key: 'customerName',
+            width:150
+          },
+          {
+            title: '合同上联系电话',
+            key: 'phone',
+            width:150
+          },
+          {
+            title: '联系地址',
+            key: 'carParking',
+            width:150
+          },
+          {
+            title: '合同约定交房日期',
+            key: 'deliveryDate',
+            width:150
+          },
+          {
+            title: '最后到款日期',
+            key: 'payExpireDate',
+            width:150
           }
         ]
       }
@@ -651,11 +579,12 @@
         return this.$refs.table.selection
       }
     },
-    mounted(){
-      //获取楼栋
+    mounted(){//方法
       this.getBuildings()
+      // this.addArea()
+      /*this.getIndex()*/
     },
-    methods: {
+    methods: {//对象
       //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
@@ -664,14 +593,6 @@
         }else{
           this.statusProject()
         }
-      },
-      //开始时间
-      getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
-      },
-      //结束时间
-      getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
       },
       //获取楼栋列表
       getBuildings() {
@@ -707,10 +628,10 @@
         this.unitList=[];
         this.roomsList=[];
         this.$request.post("/apiHost/api/room/getBuildingRoom",{
-          orgId: sessionStorage.getItem("orgId"),
-          projectId: sessionStorage.getItem("curProjectId"),
+          orgId:sessionStorage.orgId,
+          projectId:sessionStorage.curProjectId,
           userId: sessionStorage.getItem("userId"),
-          type:5,
+          type:6,
           fileType:1,
           buildingId
         }, res => {
@@ -733,7 +654,6 @@
         this.addForm.roomId = ""
         this.addForm.roomNum = ""
         this.addForm.customerName = ""
-        this.addForm.fileType = ""
       },
       //获取房间列表
       getRooms(unitId) {
@@ -753,61 +673,77 @@
         this.addForm.roomId = ""
         this.addForm.roomNum = ""
         this.addForm.customerName = ""
-        this.addForm.fileType = ""
       },
-      //模态框的业主姓名
-      getModalName(roomId) {
-        if(typeof(roomId) === "undefined"){
-          return ;
-        }
-        this.roomsList.forEach(item=>{
-          if(roomId===item.id){
-            this.addForm.roomNum = item.num
-          }
-        })
-        this.$request.post("/apiHost/api/room/getRoomCustomer",{
-          roomId
-        }, res => {
-          this.addForm.customerName=""
-          res.data.data.map(item =>{
-            this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
-          })
-          this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+      //获取地块名称  (接口在哪)
+      addArea(areaId){
       },
-      //新增
+      //开始时间
+      getStartDate(startDate){
+        this.formItem.startUpdateTime=startDate
+      },
+      //结束时间
+      getEndDate(endDate){
+        this.formItem.endUpdateTime=endDate
+      },
+      //模态框
+      //新增接口
       addProject(){
         this.addModal = true
-        this.getIndex()
       },
-      //新增表格选项
-      select(selection){
-        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      //获取模态框表格数据
+      addPullData(){
+        if(this.addForm.roomId !== ''){
+          this.isShow=true
+          let params = {
+            roomId:this.addForm.roomId
+          }
+          this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
+            this.addForm.customerName = res.data.customerName
+            this.addForm.roomNum = res.data.rommNum
+            this.addForm.addressNum = res.data.addressNum
+            this.addForm.purpose = res.data.purpose
+            this.addForm.idCard = res.data.idNumber
+            this.addForm.phone = res.data.phone
+            this.addForm.address = res.data.address
+            this.addForm.area = res.data.area
+            this.addForm.contract = res.data.contractNumber
+            this.addForm.signDate = res.data.signDate
+            this.addForm.payExpireDate = res.data.payExpire
+            this.addForm.deliveryDate = res.data.deliveryDate
+            this.addData = []
+            this.addData.push(res.data)
+          }, res => {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          })
+        }else{
+          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
+        }
       },
-      //审核表单选项
-      viewselect(selection){
-        this.viewForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      //清除抓取数据
+      clearAddData(){
+        this.isShow = false
+        this.addData = []
       },
-      //新增确定
-      addSubmit () {
+      //新增提交
+      addSubmit(){
         this.modal_loading = true
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
+        if(this.addForm.roomId){
+          if(this.addData.length !== 0){
             this.addForm.orgId = sessionStorage.getItem("orgId")
             this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("/apiHost/api/sendFileBill/add",this.addForm, res => {
+            this.$request.post("/apiHost/api/deliveryNotice/add",this.addForm, res => {
               if (res.code === 200) {
                 setTimeout(() => {
+                  this.addModal = false
                   this.modal_loading = false;
-                  this.addModal = false;
+                  this.addData = []
+                  this.isShow = false
                   this.$Message.success("新增成功！")
                   this.unitList=[ ]
                   this.roomsList=[ ]
                   this.$refs.addForm.resetFields()
                   this.$refs.table.init()
-                }, 2000);
+                }, 2000)
               } else {
                 this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.message})
@@ -817,51 +753,16 @@
               this.$Modal.error({title: '提示信息', content: res.message})
             })
           }else{
+            this.$Modal.error({title: '提示信息', content: '请抓取数据'})
             this.modal_loading = false
           }
-        })
-      },
-      //新增取消
-      addCancel (){
-        this.addModal = false
-        this.modal_loading = false,
-        this.$Message.info('你取消了操作')
-        this.unitList=[ ]
-        this.roomsList=[ ]
-        this.$refs.addForm.resetFields()
-      },
-      //获取模态框表格数据
-      getIndex () {
-        let params = {
-          type: '5',
-          orgId: sessionStorage.getItem("orgId"),
-          projectId: sessionStorage.getItem("curProjectId")
+        }else{
+          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
+          this.modal_loading = false
         }
-        this.$request.post("/apiHost/api/processSetting/data",params, res => {
-          this.addData = res.data.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            archive: item.archive,
-            archiveQuantity: item.archiveQuantity,
-            id:item.id
-          }))
-          var dataIdArray = new Array();
-          for (var i = 0; i < this.addData.length; i++) {
-            if(this.addData[i].required === '1'){
-              dataIdArray.push(this.addData[i].id);
-            }
-          }
-          this.addForm.dataId = dataIdArray.toString();
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
       },
       //审核
-      viewProject (){
+      viewProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -875,55 +776,41 @@
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
-          this.viewForm.id = res.data.id
+        this.$request.post("/apiHost/api/deliveryNotice/view",params,res=>{
+          this.viewData=[]
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
           this.viewForm.roomNum = res.data.roomNum
-          this.viewForm.customerName = res.data.customerName
-          if(res.data.fileType ==='Contract' ){
-            this.viewForm.fileType = '未按时转签约'
-          }else if(res.data.fileType ==='Payment' ){
-            this.viewForm.fileType = '未按时付款'
-          }else if(res.data.fileType ==='Mortgage' ){
-            this.viewForm.fileType = '未按时按揭'
-          }
+          this.viewForm.id=res.data.id
+          this.viewForm.status=res.status
           this.buttons.start = res.data.buttons.start
           this.buttons.stop = res.data.buttons.stop
           this.buttons.check = res.data.buttons.check
-          this.viewData = res.data.details.map(item=>({
-            _disabled: item.required === '1' ?  true : false,
-            _checked: item.required === '1' ?  true : false,
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            restQuantity: item.restQuantity,
-            archive: item.archive,
-            archiveQuantity: item.archiveQuantity,
-            id:item.id
-          }))
-          var dataIdArray = new Array();
-          for (var i = 0; i < this.viewData.length; i++) {
-            if(this.viewData[i].required === '1'){
-              dataIdArray.push(this.viewData[i].id);
-            }
-          }
-          this.viewForm.dataId = dataIdArray.toString()
+          this.viewData.push(res.data)
           this.viewTabs = 'name1'
           this.viewModal = true
         },res=>{
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      //取消
+      viewCancel(){
+        this.$refs.table.init()
+        this.viewModal = false
+        this.$Message.info('你取消了操作')
+        setTimeout(() => {
+          this.viewTabs = 'name1'
+          this.historysList = []
+          this.nodesList = []
+        }, 1000)
+      },
       //发起
       start(){
         this.modal_loading = true
         let params = {
-          id: this.viewForm.id,
-          dataId: this.viewForm.dataId
+          id: this.viewForm.id
         }
-        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+        this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -934,31 +821,53 @@
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
-            this.$refs.table.init()
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
-          this.$refs.table.init()
+          this.$Modal.error({title: '提示信息', content: res.message})
+        })
+      },
+      //驳回
+      viewReject(id){
+        this.reject_loading = true
+        let params = {
+          id,
+          status:0
+        }
+        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+          if (res.code === 200) {
+            setTimeout(() => {
+              this.reject_loading = false
+              this.viewModal = false
+              this.isDisable=false
+              this.$Message.success("审核驳回!")
+              this.$refs.table.init()
+            }, 2000)
+            this.isDisable=true
+          } else {
+            this.reject_loading = false
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
+        },res=>{
+          this.reject_loading = false
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //通过
-      viewPass(){
-        this.modal_loading = true;
+      viewPass(id){
+        this.modal_loading = true
         let params = {
-          id: this.viewForm.id,
-          status:'1'
+          id,
+          status:1
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
-              this.modal_loading = false;
+              this.modal_loading = false
               this.viewModal = false
-              this.passDisable=false
               this.$Message.success("审核通过!")
+              this.passDisable=false
               this.$refs.table.init()
             }, 2000)
             this.passDisable=true
@@ -971,80 +880,8 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      //驳回
-      viewReject(){
-        this.reject_loading = true
-        let params = {
-          id: this.viewForm.id,
-          status:'0'
-        }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
-          if (res.code === 200) {
-            setTimeout(() => {
-              this.viewModal = false
-              this.reject_loading = false
-              this.isDisable=true
-              this.$Message.success("审核驳回!")
-              this.$refs.table.init()
-            },2000)
-            this.isDisable=true
-          } else {
-            this.reject_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        },res=>{
-          this.reject_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //状态详情
-      statusProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-
-        let params = {
-          id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/sendFileBill/status",params,res=>{
-          this.nodesList = res.data.nodes.map(item => ({
-            roleName: item.roleName,
-            name: item.name,
-            id:item.id
-          }))
-          this.historysList =res.data.historys.map(item=> ({
-            createdAt:item.createdAt,
-            status:item.status,
-            nodeName:item.nodeName,
-            userName:item.userName
-          }))
-          this.nodesList.map((item,i)=>{
-            if(item.id===res.data.currentNodeId){
-              // this.currentNodeId = i
-              this.currentNodeId= i
-            }
-          })
-          this.statusModal = true
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      statuSubmit () {
-        setTimeout(() => {
-          this.statusModal = false;
-          this.loading = false
-          this.$refs.table.init()
-        }, 2000);
-      },
       //终止
-      endProject (){
+      endProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -1066,12 +903,12 @@
             let params = {
               id
             }
-            this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+            this.$request.post("/apiHost/api/deliveryNotice/cutOut",params,res=>{
               this.$Message.success("终止成功")
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error(res.message)
+              this.$Message.error( res.message)
               this.$Modal.remove()
               this.$refs.table.init()
             })
@@ -1084,7 +921,7 @@
         let params = {
           id
         }
-        this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+        this.$request.post("/apiHost/api/deliveryNotice/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -1103,7 +940,7 @@
         this.$refs.table.init()
       },
       //删除
-      deleteProject (){
+      deleteProject(){
         if (this.selected_count === 0) {
           document.getElementById('note-info').innerHTML = '请选择一条数据！'
           this.noteModal = true
@@ -1118,21 +955,78 @@
             let params = {
               id
             }
-            this.$request.post("/apiHost/api/sendFileBill/delete",params,res=>{
+            this.$request.post("/apiHost/api/deliveryNotice/delete",params,res=>{
               this.$Message.success("删除成功")
               this.$Modal.remove()
               this.$refs.table.init()
             },res=>{
-              this.$Message.error(res.message)
+              this.$Message.error( res.message)
               this.$Modal.remove()
+              this.$refs.table.init()
             })
           }
         })
       },
-      //搜索
+      //状态详情
+      statusProject(){
+        if (this.selected_count === 0) {
+          document.getElementById('note-info').innerHTML = '请选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        if (this.selected_count > 1) {
+          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+          this.noteModal = true
+          return false
+        }
+        let params = {
+          id: this.selection[0].id
+        }
+        this.$request.post("/apiHost/api/deliveryNotice/status",params,res=>{
+            this.nodesList = res.data.nodes.map(item => ({
+              roleName: item.roleName,
+              name: item.name,
+              id:item.id
+            }))
+            this.historysList =res.data.historys.map(item=> ({
+              createdAt:item.createdAt,
+              status:item.status,
+              nodeName:item.nodeName,
+              userName:item.userName
+            }))
+            this.nodesList.map((item,i)=> {
+              if(item.id === res.data.currentNodeId){
+                this.currentNodeId = i
+              }
+            })
+            this.statusModal = true
+          }, res=>{
+            this.$Modal.error({title: '提示信息', content: res.message})
+          },
+        )
+      },
+      statuSubmit(){
+        this.statusModal = false
+        this.loading = false
+        this.$refs.table.init()
+      },
+      //新增-表格选项
+      select(selection){
+        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
+      },
+      cancel() {
+        this.addModal=false
+        this.isShow = false
+        this.$Message.info('你取消了操作')
+        this.unitList=[ ]
+        this.roomsList=[ ]
+        this.$refs.addForm.resetFields()
+        this.$refs.table.init()
+      },
+      //搜索提交
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/sendFileBill/list",this.formItem, res => {
+        this.$request.post("/apiHost/api/deliveryNotice/list",this.formItem, res => {
           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -1144,14 +1038,13 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      //重置
-      searchCancel () {
+      //搜索取消
+      searchCancel() {
         this.formItem={
           status: '',
-          customerName: '',
           buildingId: '',
           roomId: '',
-          unitId: '',
+          areaId: '',
           startUpdateTime: '',
           endUpdateTime: ''
         }
@@ -1161,18 +1054,7 @@
           this.isFirst = false
         },200)
       },
-      //取消操作
-      viewCancel () {
-        this.viewModal = false
-        this.$Message.info('你取消了操作')
-        this.$refs.table.init()
-        setTimeout(() => {
-          this.viewTabs = 'name1'
-          this.historysList = []
-          this.nodesList = []
-        }, 1000)
-      },
-      //提示窗关闭
+      // 提示窗关闭
       closes () {
         this.noteModal = false
       }
