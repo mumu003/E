@@ -40,9 +40,6 @@
                   <Icon type="arrow-down-b"></Icon>
                   
                 </a>
-               <!-- <DropdownMenu slot="list">
-                  <DropdownItem name="loginout" @click.native="modal1 = true">修改密码</DropdownItem>
-                </DropdownMenu>-->
                 <DropdownMenu slot="list">
                   <DropdownItem name="loginout" @click.native="modal2 = true">退出登录</DropdownItem>
                 </DropdownMenu>
