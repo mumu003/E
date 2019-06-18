@@ -36,14 +36,14 @@
                     <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
                   </FormItem>
                 </Col> -->
-                <Col span="6">
-                  <FormItem label="时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
+               <Col span="6">
+                  <FormItem label="更新时间">
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -67,7 +67,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" >导出</Button>
+                <Button type="primary" icon="ios-redo">导出</Button>
                 <!-- <Button type="primary" icon="plus-round" @click="addProject">新增</Button> -->
                 <!--<Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>-->
                 <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button> -->
@@ -405,6 +405,7 @@
     background-color: #1cad1f;
     padding: 5px;
     color: #ffffff;
+    justify-content: center;
   }
   .batch-house-gray{
     background-color: #808080;
@@ -450,6 +451,11 @@
         viewData: [], //审核-表格数据
         editData: [], //编辑-表格数据
         buttons:{ }, //按钮
+        //搜索时间
+        searchTime:{
+          tStartTime:"",
+          tEndTime:"",
+        },
         //表单
         formItem: {
           status:'',
@@ -460,6 +466,12 @@
           endUpdateTime: '',
           page:1
         },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
+        },
         //表格
         tableConfig:{
           url:"/apiHost/api/ownershipBill/list",
@@ -467,14 +479,14 @@
                 {
                   title: '操作',
                   key: 'status',
-                  width:70,
+                  width:90,
                   align:"center",
                   render:(h,params)=>{
-                        return h('div',{
-                          style:{
-                              width: '50px',
-                              color: '#999'
-                          },
+                        return h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
                           on: {
                               click: () => {
                                     this.$router.push({path:"/reportDetail"})

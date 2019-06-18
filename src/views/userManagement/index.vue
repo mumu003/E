@@ -11,28 +11,26 @@
             <Form :model="formItem" :label-width="100" class="search-form">
               <Row>
                 <Col span="6">
-                  <FormItem label="流程类型" prop="type">
-                    <Select v-model="formItem.type" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="1">合同备案</Option>
-                      <Option value="5">发函</Option>
-                      <Option value="6">交房通知</Option>
-                      <Option value="2">水电过户</Option>
-                      <Option value="3">两书</Option>
-                      <Option value="4">产权办理</Option>
-                      <Option value="7">协议书申请</Option>
-                    </Select>
+                  <FormItem label="用户名">
+                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入用户名"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
-                <FormItem label="开始时间">
-                  <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
-                </FormItem>
+                  <FormItem label="手机号">
+                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入手机号"></Input>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="6">
+                  <FormItem label="创建时间">
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
                 </Col>
                 <Col span="6">
-                <FormItem label="结束时间">
-                  <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
-                </FormItem>
+                  <FormItem>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
                 </Col>
               </Row>
           </Form>
@@ -55,10 +53,9 @@
           <div class="search-row">
             <Row>
               <Col>
-              <Button type="primary" @click="editProject" icon="edit">编辑</Button>
-              <Button type="primary" @click="editArchiveProject" icon="gear-b">存档设置</Button>
-              <Button type="primary" @click="viewProject" icon="eye">详情</Button>
-              <Button type="primary" @click="syncProject" icon="android-sync" :disabled="syncDisable">同步房屋</Button>
+              <Button type="primary" @click="addMaterialModal=true" icon="plus-round">新增</Button>
+              <Button type="error" icon="close" >删除</Button>
+              
               </Col>
               <Col>
               </Col>
@@ -71,13 +68,32 @@
       </Col>
     </Row>
 
-    <Modal title="编辑流程设置" v-model="editModal" width="800" :loading="loading"
-      @on-cancel="editCancel">
-      <Form :label-width="100" class="modal-form" :model="editForm" ref="editForm">
+    <Modal title="用户新增" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
+      <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
-          <Col span="12">
-            <FormItem label="流程名称" prop="type">
-              <Select v-model="editForm.type" disabled>
+          <Col span="22" >
+            <FormItem label="用户名"  prop="name">
+              <Input v-model="addMaterialForm.name" placeholder="请输入用户名" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+          <FormItem label="手机号" prop="quantity">
+            <Input v-model="addMaterialForm.quantity" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
+          </FormItem>
+          </Col>
+          <Col span="22" >
+          <FormItem label="密码" prop="pwd">
+            <Input v-model="addMaterialForm.pwd" type="password" style="width: 100%" placeholder="请输入6-20为至少为数字的密码" :maxlength=11></Input>
+          </FormItem>
+          </Col>
+          <Col span="22" >
+          <FormItem label="重复密码" prop="pwdTwo">
+            <Input v-model="addMaterialForm.pwdTwo" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
+          </FormItem>
+          </Col>
+          <Col span="22">
+            <FormItem label="所属角色" prop="type">
+              <Select v-model="editForm.type" placeholder="请选择角色">
                 <Option value="1">合同备案</Option>
                 <Option value="5">发函</Option>
                 <Option value="6">交房通知</Option>
@@ -88,92 +104,10 @@
               </Select>
             </FormItem>
           </Col>
-          <Col span="12" v-if="editForm.type === '6'">
-            <FormItem label="房款交齐">
-              <Checkbox label="true" v-model="editForm.requirePurchase">是</Checkbox>
-            </FormItem>
-          </Col>
-          <div v-if="editForm.type === '1' || editForm.type === '4' || editForm.type === '5'">
-            <Col span="24">
-              <FormItem label="资料">
-                <Button type="primary" icon="plus-round" @click="addMaterial">新增</Button>
-                <Button type="primary" icon="edit" @click="editMaterial">编辑</Button>
-                <Button type="error" icon="close" @click="deleteMaterial">删除</Button>
-              </FormItem>
-            </Col>
-            <Col span="24">
-              <Table border stripe :columns="editConfig" :data="settingDatas" ref="editTable" @on-selection-change="selection_edit"></Table>
-            </Col>
-          </div>
-        </Row>
-        <Row>
-          <Col span="12" style="margin-top: 10px">
-            <FormItem label="流程终止角色" >
-              <Select  placeholder="请选择角色" style="width: 100%" v-model="editForm.overId" @on-change="getOverName(editForm.overId)">
-                <Option :value="item.roleId" v-for="(item,index) in roleList" :key="index">{{item.roleName}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="12">
-            <FormItem label="流程参与角色">
-              <Button type="primary" icon="plus-round" @click="addNode">新建角色</Button>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row v-for="(item,index) in settingNodes" :key="index">
-          <Col span="12">
-            <FormItem :label="item.name" >
-              <Select  placeholder="请选择角色" style="width: 100%" v-model="item.roleId" @on-change="getRoleName(item.roleId,index)">
-                <Option :value="it.roleId" v-for="(it,ind) in roleList" :key="ind">{{it.roleName}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="6" style="margin-left: 10px" v-if="index === 0">
-          </Col>
-          <Col span="6" style="margin-left: 10px" v-else-if="index === settingNodes.length-1">
-          </Col>
-          <Col span="6" style="margin-left: 10px" v-else>
-            <Button type="error" icon="close" @click="deleteNode(index)">删除角色</Button>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="ghost" size="default" @click="editCancel">取消</Button>
-        <Button type="primary" size="default" @click="editSubmit" :loading="modal_loading">确定</Button>
-      </div>
-    </Modal>
 
-    <Modal title="新增材料" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
-      <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
-        <Row>
-          <Col span="22" >
-            <FormItem label="资料名称"  prop="name">
-              <Input v-model="addMaterialForm.name" placeholder="请输入资料名称" :maxlength=50 style="width: 100%" ></Input>
-            </FormItem>
-          </Col>
-          <Col span="22" >
-          <FormItem label="资料数量" prop="quantity">
-            <Input v-model="addMaterialForm.quantity" style="width: 100%" placeholder="请输入资料数量" :maxlength=2></Input>
-          </FormItem>
-          </Col>
-          <Col span="22" >
-          <FormItem label="资料状态" prop="required">
-            <RadioGroup v-model="addMaterialForm.required">
-              <Radio label="1">必填</Radio>
-              <Radio label="0">选填</Radio>
-            </RadioGroup>
-          </FormItem>
-          </Col>
-          <Col span="22" >
-          <FormItem label="存档状态" prop="archive">
-            <RadioGroup v-model="addMaterialForm.archive">
-              <Radio label="1">是</Radio>
-              <Radio label="0">否</Radio>
-            </RadioGroup>
-          </FormItem>
-          </Col>
+
+
+
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
@@ -182,36 +116,26 @@
       </div>
     </Modal>
 
-    <Modal title="编辑材料" v-model="editMaterialModal" :closable="false" width="400px"
+    <Modal title="用户修改" v-model="editMaterialModal" :closable="false" width="400px"
       @on-cancel="editMaterialCancel">
       <Form  ref="editMaterialForm" :model="editMaterialForm" :label-width="100" :rules="ruleEditMaterial" >
         <Row>
           <Col span="22" >
-          <FormItem label="资料名称"  prop="name">
-            <Input v-model="editMaterialForm.name" placeholder="请输入资料名称" :maxlength=50 style="width: 100%"></Input>
+          <FormItem label="用户名"  prop="name">
+            <Input v-model="editMaterialForm.name" placeholder="请输入用户名" :maxlength=50 style="width: 100%"></Input>
           </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="资料数量" prop="quantity">
-            <Input v-model="editMaterialForm.quantity" style="width: 100%" placeholder="请输入资料数量" :maxlength=2></Input>
+          <FormItem label="手机号" prop="phone">
+            <Input v-model="editMaterialForm.quantity" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
           </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="资料状态" prop="required">
-            <RadioGroup v-model="editMaterialForm.required">
-              <Radio label="1">必填</Radio>
-              <Radio label="0">选填</Radio>
-            </RadioGroup>
+          <FormItem label="所属角色" prop="type">
+            <Input v-model="editMaterialForm.type" style="width: 100%" placeholder="请选择角色" :maxlength=11></Input>
           </FormItem>
           </Col>
-          <Col span="22" >
-          <FormItem label="存档状态" prop="archive">
-            <RadioGroup v-model="editMaterialForm.archive">
-              <Radio label="1">是</Radio>
-              <Radio label="0">否</Radio>
-            </RadioGroup>
-          </FormItem>
-          </Col>
+  
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
@@ -219,179 +143,39 @@
         <Button type="primary" size="default" @click="editMaterialSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-
-    <Modal title="编辑存档设置" v-model="editArchiveModal" width="800" :loading="loading"
-      @on-cancel="editArchiveCancel">
-      <Form :label-width="100" class="modal-form" :model="editArchiveForm">
+    <Modal title="修改密码" v-model="updatePwdModal" :closable="false" width="400px"
+      @on-cancel="updatePwdlCancel">
+      <Form  ref="updatePwdForm" :model="updatePwdForm" :label-width="100" :rules="ruleupdatePwd" >
         <Row>
-          <Col span="8">
-            <FormItem label="流程名称" prop="type">
-              <Select v-model="editArchiveForm.type" disabled>
-                <Option value="1">合同备案</Option>
-                <Option value="5">发函</Option>
-                <Option value="6">交房通知</Option>
-                <Option value="2">水电过户</Option>
-                <Option value="3">两书</Option>
-                <Option value="4">产权办理</Option>
-                <Option value="7">协议书申请</Option>
-              </Select>
-            </FormItem>
+          <Col span="22" >
+          <FormItem label="密码"  prop="pwd">
+            <Input v-model="updatePwdForm.pwd" type="password" placeholder="请输入密码" :maxlength=50 style="width: 100%"></Input>
+          </FormItem>
           </Col>
-          <Col span="16" v-if="noteArchiveList.length === 0">
-            <FormItem label="没有存档资料！" >
-            </FormItem>
+          <Col span="22" >
+          <FormItem label="重复密码" prop="pwdTwo">
+            <Input v-model="updatePwdForm.pwdTwo" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
+          </FormItem>
           </Col>
-        </Row>
-        <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length !== 0">
-          <Col span="8">
-            <FormItem :label="item.labelName" >
-              <Input v-model="item.roleName"  disabled />
-            </FormItem>
-          </Col>
-          <Col span="16" v-if="index !== archiveSettingNodes.length-1 && index !== 0">
-            <FormItem label="存档资料" >
-              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
-                  v-if="archiveSettingNodes[index].data[0].dataId === null">
-              </div>
-              <div style="background-color: white;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px"  v-on:click="noteArchive(index)" 
-                  v-else-if="archiveSettingNodes[index].data[0].quantity === 0">
-              </div>
-              <ivu-row style="background-color: white;padding: 4px 1px 20px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1"  v-on:click="noteArchive(index)" 
-                  v-else="archiveSettingNodes[index].data[0].dataId !== null">
-                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind" closable @on-close="handleClose(index,ind)" v-if="it.quantity !== 0" class="div-tag">{{it.dataName}}({{it.quantity}}份)</Tag>
-              </ivu-row>
-            </FormItem>
-          </Col>
-          <!-- <Col span="16" v-if="index === archiveSettingNodes.length-1">
-            <FormItem label="存档资料" >
-              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px"  >
-                <Tag v-for="(it,ind) in archiveSettingNodes[index].data" :key="ind">{{it.dataName}}{{it.quantity}}份</Tag>
-              </div>
-            </FormItem>
-          </Col> -->
-        </Row>
-        <Row v-for="(item,index) in archiveSettingNodes" :key="index" v-if="noteArchiveList.length === 0">
-          <Col span="8">
-            <FormItem :label="item.labelName" >
-              <Input v-model="item.roleName"  disabled />
-            </FormItem>
-          </Col>
+
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="ghost" size="default" @click="editArchiveCancel">取消</Button>
-        <Button type="primary" size="default" @click="editArchiveSubmit" :loading="modal_loading" v-if="noteArchiveList.length !== 0">确定</Button>
+        <Button type="ghost" size="default" @click="updatePwdCancel">取消</Button>
+        <Button type="primary" size="default" @click="updatePwdSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-
-    <Modal title="选择存档资料" v-model="selectMaterialModal" :closable="false" width="400px">
-      <Form :label-width="10" class="modal-form" :model="selectMaterialForm" >
-        <CheckboxGroup v-model="selectMaterialForm.dataIds">
-          <Row v-for="(item,index) in selectMaterialList" :key="index">
-            <Col span="24" v-if="item.surplusQuantity !== 0">
-              <FormItem label="" >
-                <Checkbox :label="item.id" >{{item.name}}</Checkbox>
-                <Select placeholder="请选择存档份数" style="width: 150px" v-model="item.indexQuantity" @on-change="getQuantity(item.indexQuantity,index)" >
-                  <Option :value="ind" v-for="(it,ind) in item.surplusQuantity" :key="ind" >{{ind+1}}份</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="24" v-if="item.surplusQuantity === 0">
-              <FormItem label="">
-                <Checkbox disabled >{{item.name}} 资料已经被选择完</Checkbox>
-              </FormItem>
-            </Col>
-          </Row>
-        </CheckboxGroup>
-      </Form>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="ghost" size="default" @click="selectMaterialCancel">取消</Button>
-        <Button type="primary" size="default" @click="selectMaterialSubmit" v-if="isNo === 'false'">确定</Button>
-      </div>
-    </Modal>
-
-    <Modal title="流程设置详情" v-model="viewModal" width="800" 
-      @on-cancel="viewCancel">
-      <Form :label-width="100" class="modal-form" :model="viewForm">
-        <Row>
-          <Col span="8">
-            <FormItem label="流程名称" >
-              <Select v-model="viewForm.type" disabled>
-                <Option value="1">合同备案</Option>
-                <Option value="5">发函</Option>
-                <Option value="6">交房通知</Option>
-                <Option value="2">水电过户</Option>
-                <Option value="3">两书</Option>
-                <Option value="4">产权办理</Option>
-                <Option value="7">协议书申请</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="16" v-if="editForm.type === '6'">
-            <FormItem label="房款交齐">
-                <Checkbox v-model="viewForm.requirePurchase" label="1" disabled>是</Checkbox>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row v-if="viewForm.type === '1' || viewForm.type === '4' || viewForm.type === '5'">
-          <Col span="24">
-            <FormItem label="资料">
-              <Table border stripe :columns="viewConfig" :data="viewSettingDatas" ></Table>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row>
-          <Col span="8">
-            <FormItem label="流程终止角色" >
-              <Input v-model="viewForm.overName"  disabled />
-            </FormItem>
-          </Col>
-        </Row>
-        <Row v-for="(item,index) in viewSettingNodes" :key="index" v-if="viewForm.type === '1' || viewForm.type === '4' || viewForm.type === '5'">
-          <Col span="8">
-            <FormItem :label="item.labelName" >
-              <Input v-model="item.roleName"  disabled />
-            </FormItem>
-          </Col>
-          <Col span="16" v-if="index !== viewSettingNodes.length-1 && index !== 0">
-            <FormItem label="存档资料" >
-              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px"  
-                  v-if="viewSettingNodes[index].data[0].dataId === null">
-              </div>
-              <div style="background-color: #f3f3f3;padding: 1px 1px 1px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1;height: 36px" 
-                  v-else-if="viewSettingNodes[index].data[0].quantity === 0">
-              </div>
-              <div style="background-color: #f3f3f3;padding: 4px 1px 4px 5px;border-radius: 4px;
-                  border: 1px solid #dddee1" 
-                  v-else="viewSettingNodes[index].data[0].dataId !== null">
-                <div class="div-tag-view" v-for="(it,ind) in viewSettingNodes[index].data" :key="ind" v-if="it.quantity !== 0" disabled>{{it.dataName}}({{it.quantity}}份)</div>
-              </div>
-            </FormItem>
-          </Col>
-        </Row>
-        <Row v-for="(item,index) in viewSettingNodes" :key="index" v-if="viewForm.type === '2' || viewForm.type === '3' || viewForm.type === '6' || viewForm.type === '7'">
-          <Col span="8">
-            <FormItem :label="item.labelName" >
-              <Input v-model="item.roleName"  disabled />
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="ghost" size="default" @click="viewCancel">取消</Button>
-      </div>
-    </Modal>
-
-    <Modal v-model="noteModal" width="300" title="提示信息">
+    <Modal v-model="noteModal" width="300" title="提示">
       <p id="note-info">请选择至少一条数据！</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
         <Button type="primary" size="default" @click="closes">确定</Button>
+      </div>
+    </Modal>
+    <Modal v-model="deleteModal" width="300" title="提示">
+      <p id="note-info">是否确认删除该数据？</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
+        <Button type="primary" size="default" @click="deleteModal=false">确定</Button>
       </div>
     </Modal>
   </div>
@@ -473,6 +257,8 @@
         selectMaterialModal: false,//选择资料模态框
         addMaterialModal: false,//新增资料模态框
         editMaterialModal: false,//编辑资料模态框
+        updatePwdModal: false,
+        deleteModal:false,
         editArchiveModal: false,//编辑流程存档资料模态框
         viewModal : false,//流程设置详情模态框
         isNo: 'false', //选择存档资料中资料全部被选完了
@@ -511,7 +297,13 @@
           startUpdateTime: '',
           endUpdateTime:'',
           page:1
-        },//搜索模块数据
+        },
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
+        },
+        //搜索模块数据
         editForm:{
           projectId: '',
           orgId: '',
@@ -535,8 +327,9 @@
           id : 0,
           name:'',
           quantity:'',
-          required:'1',
-          archive:'1'
+          pwd:'',
+          pwdTwo:'',
+          type:''
         },//新增资料数据
         ruleAddMaterial:{
           name: [
@@ -544,27 +337,59 @@
             { validator:validatorMaterialName , trigger: 'change'}
           ],
           quantity: [
-            { validator:validateNumber, trigger: 'blur' },
+            { required: true, validator:validateNumber, trigger: 'blur' },
+            { validator:validateSource, trigger: 'blur' }
+          ],
+          pwd:[
+            { required: true, validator:validateNumber, trigger: 'blur' },
+            { validator:validateSource, trigger: 'blur' }
+          ],
+          pwdTwo:[
+            { required: true, validator:validateNumber, trigger: 'blur' },
+            { validator:validateSource, trigger: 'blur' }
+          ],
+          type:[
+            { required: true, validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
           ]
-        },//检测新增资料数据
+        },
+        //用户修改
         editMaterialForm:{
           id : '',
           name:'',
-          quantity:'',
-          required:'',
-          archive:''
-        },//编辑资料数据
+          phone:'',
+          type:''
+        },
         ruleEditMaterial:{
           name: [
-            { required: true, message: '请输入资料名称', trigger: 'blur' },
+            { required: true, trigger: 'blur' },
             { validator:validatorMaterialNameEdit , trigger: 'change'}
           ],
-          quantity: [
-            { validator:validateNumber, trigger: 'blur' },
+          phone: [
+            { required: true,validator:validateNumber, trigger: 'blur' },
+            { validator:validateSource, trigger: 'blur' }
+          ],
+          type: [
+            { required: true,validator:validateNumber, trigger: 'blur' },
             { validator:validateSource, trigger: 'blur' }
           ]
-        },//检测编辑资料数据
+        },
+        //修改密码
+        updatePwdForm:{
+          id : '',
+          pwd:'',
+          pwdTwo:''
+        },
+        ruleupdatePwd:{
+          pwd: [
+            { required: true, trigger: 'blur' },
+            { validator:validatorMaterialNameEdit , trigger: 'change'}
+          ],
+          pwdTwo: [
+            { required: true,validator:validateNumber, trigger: 'blur' },
+            { validator:validateSource, trigger: 'blur' }
+          ]
+        },
         selectMaterialForm:{
           index: '',
           dataIds:[]
@@ -578,12 +403,72 @@
                   width:60
                 },
                 {
-                  title: '名称',
+                  title: '操作',
+                  key: 'name',
+                  width:200,
+                  align:'center',
+                  render:(h,params)=>{
+                        return h('div',{
+                          style:{
+                            display:"flex",
+                            justifyContent:"space-between",
+                            flexWrap:"wrap"
+                          }
+                        },
+                          [
+                            h('Button',{
+                                props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                          this.editMaterialModal=true
+                                    }
+                                }
+                            },"修改"),
+                            h('Button',{
+                                props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                          this.updatePwdModal=true
+                                    }
+                                }
+                            },"修改密码"),
+                            h('Button',{
+                                props: {
+                                        type: 'error',
+                                        size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                          this.deleteModal=true
+                                    }
+                                }
+                            },"删除"),
+                          ])
+                  }
+                },
+                {
+                  title: '用户名',
                   key: 'name',
                   align:'center'
                 },
                 {
-                  title: '更新时间',
+                  title: '手机号',
+                  key: 'name',
+                  align:'center'
+                },
+                {
+                  title: '角色',
+                  key: 'name',
+                  align:'center'
+                },
+                {
+                  title: '创建时间',
                   key: 'updatedAt',
                   align:'center'
                 }
@@ -1044,6 +929,11 @@
       editMaterialCancel (){
         this.editMaterialModal = false
         this.$refs.editMaterialForm.resetFields()
+      },
+      //编辑资料取消
+      updatePwdCancel (){
+        this.updatePwdModal = false
+        this.$refs.updatePwdForm.resetFields()
       },
       //删除资料
       deleteMaterial () {

@@ -689,6 +689,9 @@
   justify-content: space-between;
   /* border: 1px solid #999; */
 }
+.msg-row{
+  cursor: pointer;
+}
 </style>
 
 <script type="text/ecmascript-6">
