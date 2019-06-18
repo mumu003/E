@@ -11,49 +11,37 @@
           <Form  :model="formItem" :label-width="80">
             <Row type="flex" justify="start">
               <Col span="6">
-              <FormItem label="状态">
-                <Select v-model="formItem.status" placeholder="全部">
-                  <Option value="">全部</Option>
-                  <Option value="-1">待发起</Option>
-                  <Option value="1">进行中</Option>
-                  <Option value="2">已归档</Option>
-                  <Option value="0">终止</Option>
+              <FormItem label="姓名">
+                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入姓名"></Input>
+              </FormItem>
+              </Col>
+              <Col span="6">
+              <FormItem label="电话">
+                <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入电话"></Input>
+              </FormItem>
+              </Col>
+              </Row>
+
+              <Row>
+              <Col span="6">
+              <FormItem label="优先级">
+                <Select v-model="formItem.status" placeholder="高">
+                  <Option value="">高</Option>
+                  <Option value="-1">中</Option>
+                  <Option value="1">一般</Option>
                 </Select>
               </FormItem>
               </Col>
+              </Row>
+              <Row>
               <Col span="6">
-              <FormItem label="业主姓名">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入业主姓名"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="联系电话">
-                <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入联系电话"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="楼栋">
-                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入楼栋号"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="房间号">
-                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入房间号"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="门牌号">
-                <Input v-model="formItem.addressNum" :maxlength=20 placeholder="请输入门牌号"></Input>
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="时间">
+              <FormItem label="创建时间">
                 <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
             </Row>
@@ -70,6 +58,7 @@
       </Card>
       </Col>
     </Row>
+
     <Row :gutter="10" class="mt10">
       <Col span="24">
       <Card>
@@ -77,9 +66,9 @@
           <Row>
             <Col>
             <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-            <Button type="primary" icon="edit" @click="viewProject">办理</Button>
+            <Button type="primary" icon="ios-loop-strong" @click="viewProject">同步客户</Button>
             <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-            <Button type="error" icon="close"　@click="endProject">终止</Button>
+            <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
             <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
@@ -95,8 +84,7 @@
 
     <Modal v-model="addModal" title="新增水电过户"
            width="800"
-           @on-cancel="cancel"
-    >
+           @on-cancel="cancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
           <Col span="8">
@@ -227,8 +215,7 @@
     <Modal v-model="endModal" title="终止水电过户"
            :loading="modal_loading"
            @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
+           @on-cancel="endCancel">
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
@@ -313,52 +300,118 @@
           endUpdateTime:'',
           page:'1'
         },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
+        },
         //表格
         tableConfig:{
           url:"/apiHost/api/transfer/list",
           columns:[
+            // {
+            //   type:"selection",
+            //   key:'_checked',
+            //   width:60
+            // },
+            // {
+            //   title: '状态',
+            //   key: 'status',
+            //   width:100,
+            //   render:(h,params)=>{
+            //     switch(params.row.status){
+            //       case '-1':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#b725ed'
+            //           }
+            //         },"待发起")
+            //       case '0':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#ED3F14'
+            //           }
+            //         },"终止")
+            //       case '1':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#2D8CF0'
+            //           }
+            //         },"进行中")
+            //       case '2':
+            //         return h('div',{
+            //           style:{
+            //             width: '80px',
+            //             color: '#19BE6B'
+            //           }
+            //         },"已归档")
+            //     }
+            //   }
+            // },
             {
-              type:"selection",
-              key:'_checked',
-              width:60
-            },
-            {
-              title: '状态',
-              key: 'status',
-              width:100,
-              render:(h,params)=>{
-                switch(params.row.status){
-                  case '-1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#b725ed'
-                      }
-                    },"待发起")
-                  case '0':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#ED3F14'
-                      }
-                    },"终止")
-                  case '1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#2D8CF0'
-                      }
-                    },"进行中")
-                  case '2':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#19BE6B'
-                      }
-                    },"已归档")
-                }
-              }
-            },
+                  title: '操作',
+                  key: 'options', 
+                  width:200,
+                  align: 'center',
+                  render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style:{
+                                      marginRight: '5px',
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({
+                                              name:"dispatch"
+                                            })
+                                        }
+                                    }
+                                }, '报修数据'),
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style:{
+                                      marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({
+                                              name:"dispatch"
+                                            })
+                                        }
+                                    }
+                                }, '修改'),
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style:{
+                                      marginRight: '5px',
+                                      backgroundColor:"#ed3f14",
+                                      borderColor:"#ed3f14"
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.$router.push({
+                                              name:"dispatch"
+                                            })
+                                        }
+                                    }
+                                }, '禁用'),
+                            ]);
+                        }
+                },
             {
               title: '节点',
               key: 'currentNodeName',
@@ -370,7 +423,7 @@
               width:120
             },
             {
-              title: '业主姓名',
+              title: '姓名',
               key: 'customerName',
               width:150
             },
@@ -749,37 +802,37 @@
         this.$refs.table.init()
       },
       //审核
-      viewProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-          id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/transfer/view",params,res=>{
-          this.viewData=[]
-          this.viewForm.buildingName = res.data.buildingName
-          this.viewForm.unitName = res.data.unitName
-          this.viewForm.roomNum = res.data.roomNum
-          this.viewForm.id=res.data.id
-          this.viewForm.status=res.status
-          this.buttons.start = res.data.buttons.start
-          this.buttons.stop = res.data.buttons.stop
-          this.buttons.check = res.data.buttons.check
-          this.viewData.push(res.data)
-          this.viewTabs = 'name1'
-          this.viewModal = true
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
+      // viewProject(){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   let params = {
+      //     id: this.selection[0].id
+      //   }
+      //   this.$request.post("/apiHost/api/transfer/view",params,res=>{
+      //     this.viewData=[]
+      //     this.viewForm.buildingName = res.data.buildingName
+      //     this.viewForm.unitName = res.data.unitName
+      //     this.viewForm.roomNum = res.data.roomNum
+      //     this.viewForm.id=res.data.id
+      //     this.viewForm.status=res.status
+      //     this.buttons.start = res.data.buttons.start
+      //     this.buttons.stop = res.data.buttons.stop
+      //     this.buttons.check = res.data.buttons.check
+      //     this.viewData.push(res.data)
+      //     this.viewTabs = 'name1'
+      //     this.viewModal = true
+      //   },res=>{
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
       //审核取消
       viewCancel(){
         this.$refs.table.init()
@@ -868,40 +921,40 @@
         })
       },
       //终止
-      endProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.endModal=true
-        this.modal_loading=true
-       /* this.$Modal.confirm({
-          title: '操作提示',
-          content: '是否确认终止该流程，终止后将无法继续该流程?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-              id
-            }
-            this.$request.post("/apiHost/api/transfer/cutOut",params,res=>{
-              this.$Message.success("终止成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.$Modal.remove()
-              this.$refs.table.init()
-            })
-          }
-        })*/
-      },
+      // endProject(){
+      //   if (this.selected_count === 0) {
+      //     document.getElementById('note-info').innerHTML = '请选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   if (this.selected_count > 1) {
+      //     document.getElementById('note-info').innerHTML = '只能选择一条数据！'
+      //     this.noteModal = true
+      //     return false
+      //   }
+      //   this.endModal=true
+      //   this.modal_loading=true
+      //  /* this.$Modal.confirm({
+      //     title: '操作提示',
+      //     content: '是否确认终止该流程，终止后将无法继续该流程?',
+      //     loading: true,
+      //     onOk: () => {
+      //       let id = this.selection.map(item=>item.id).toString()
+      //       let params = {
+      //         id
+      //       }
+      //       this.$request.post("/apiHost/api/transfer/cutOut",params,res=>{
+      //         this.$Message.success("终止成功")
+      //         this.$Modal.remove()
+      //         this.$refs.table.init()
+      //       },res=>{
+      //         this.$Message.error(res.message)
+      //         this.$Modal.remove()
+      //         this.$refs.table.init()
+      //       })
+      //     }
+      //   })*/
+      // },
       //终止提交
       endSubmit(){
         let id = this.selection.map(item=>item.id).toString()
