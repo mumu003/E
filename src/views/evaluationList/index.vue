@@ -15,8 +15,6 @@
                       <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入工单号"/>
                     </FormItem>
                   </Col>
-                </Row>
-                <Row>
                   <Col span="6">
                     <FormItem label="执行人">
                       <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入执行人"/>
@@ -30,15 +28,15 @@
                 </Row>
                 <Row>
                   <Col span="6">
-                    <FormItem label="更新时间">
-                      <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
-                    </FormItem>
-                  </Col>
-                  <Col span="6">
-                    <FormItem>
-                      <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
-                    </FormItem>
-                  </Col>
+                  <FormItem label="更新时间">
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col>
+                <Col span="6">
+                  <FormItem>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col>
                 </Row>
               </Form>
             <div class="search-row">
@@ -59,137 +57,44 @@
           <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table>
       <!-- </Row> -->
     </Card>
-    <Modal v-model="addModal" title="新增协议书申请"
+    <Modal  width="300" v-model="isShowEvaluation" :title="evaluationTitle"
       @on-cancel="addCancel">
-      <Form  ref="addForm" :model="addForm" :label-width="90" :rules="ruleAdd">
-        <Row>
-          <Col span="24">
-            <FormItem label="协议书名称" prop="name">
-              <Select placeholder="请选择协议书名称" v-model="addForm.name">
-                <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="申请份数" prop="applyNum">
-              <Input v-model="addForm.applyNum" :maxlength=2></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            <FormItem label="备注说明">
-              <Input v-model="addForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :maxlength=50></Input>
-            </FormItem>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Button type="ghost"  @click="addCancel">取消</Button>
-        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
+      <div class="evaluationRate">
+        <Rate disabled value="2"></Rate>
       </div>
-    </Modal>
-
-    <Modal v-model="viewModal" :loading="loading"
-      @on-cancel="viewCancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="协议书申请审核" name="name1">
-          <Form  ref="viewForm"  :model="viewForm" :label-width="90" :rules="ruleView">
-            <Row>
-              <Col span="24">
-                <FormItem label="协议书名称">
-                  <Select placeholder="请选择协议书名称" v-model="viewForm.name" :disabled="!buttons.start">
-                    <Option :value="item.name" v-for="(item,index) in agreementNameList" :key="index" >{{item.name}}</Option>
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem label="申请份数">
-                  <Input v-model="viewForm.applyNum" readonly ></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem label="实发份数" prop="actualNum">
-                  <Input v-model="viewForm.actualNum" @on-change="actualNumChange" :maxlength=2 :readonly="!buttons.start && !buttons.check"></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem label="差异数量">
-                  <Input v-model="viewForm.differenceNum" readonly></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem label="备注说明">
-                  <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 5}" :readonly="!buttons.start && !buttons.check" :maxlength=50></Input>
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-              <Steps :current="Number(currentNodeId)">
-                <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-              </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-              <Timeline>
-                <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
-                  <p>{{item.createdAt}}</p>
-                  <p v-if="index === 0">发起</p>
-                  &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
-                  <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
-                  <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                </TimelineItem>-->
-                <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                  <p>{{item.createdAt}}</p>
-                  <!--<p v-if="index === 0">发起</p>-->
-                  <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                  <p v-if="index === 0">{{item.nodeName}}</p>
-                  <span v-else>
-                    <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                    <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                    <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                  </span>
-                  <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                  <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-                </TimelineItem>
-              </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-            <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
-          </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-          </Col>
-        </Row>
-      </div>
-    </Modal>
-
-    <Modal v-model="endModal" title="终止协议书申请" :loading="modal_loading" @on-ok="endSubmit"
-      @on-cancel="endCancel" >
-      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
-    </Modal>
-
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
-      </div>
+     <div class="evaluationList">
+       <span class="tag" v-for="(item,index) in 4" :key="index">
+         态度好服务棒
+       </span>
+     </div>
     </Modal>
   </div>
 </template>
+<style scoped>
+.evaluationRate{
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.evaluationList{
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  
+}
+.tag{
+  padding: 10px 20px;
+  background-color: #2d8cf0;
+  color: #fff;
+  margin: 5px 0px;
+  border-radius: 3px;
+  cursor: default;
+}
+.ivu-modal-footer{
+  display: none;
+}
+</style>
 <script type="text/ecmascript-6">
   export default {
     data () {
@@ -224,18 +129,14 @@
         }
       };
       return {
+        isShowEvaluation:false,//是否显示评价
+        evaluationTitle:"",//评价标题
         passDisable: false, //防止通过双击事件
         isDisable: false, //防止驳回双击事件
         isFirst: false, //是否是首页
         loading: true, //
         modal_loading: false, //延迟
         reject_loading: false, //驳回
-        addModal: false, //新增模态框
-        viewModal: false, //审核模态框
-        editModal: false, //编辑模态框
-        statusModal: false, //状态模态框
-        endModal: false, //终止模态框
-        noteModal: false, //弹窗
         currentNodeId: '', //处理进度节点
         viewTabs: 'name1', //Tabs
         roleList: [], //角色
@@ -257,6 +158,12 @@
           startUpdateTime:'',
           endUpdateTime:'',
         },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
+        },
         //表格
         tableConfig:{
           url:"/apiHost/api/contractApplication/list",
@@ -267,10 +174,16 @@
                   width:100,
                   align:"center",
                   render:(h,params)=>{
-                        return h('div',{
-                          style:{
-                              width: '80px',
-                              color: '#b725ed'
+                        return h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                          on:{
+                            click:()=>{
+                              this.isShowEvaluation=true
+                              this.evaluationTitle="给张三的评价"
+                            }
                           }
                         },"查看更多")
                   }
@@ -284,12 +197,13 @@
                 {
                   title: '星级',
                   key: 'currentName',
-                  width:150,
+                  width:170,
                   align:"center",
                   render:(h,params)=>{
                         return h('Rate',{
                           props:{
-                            value:2
+                            value:2,
+                            disabled:true
                           },
                           on:{
                             click: () => {

@@ -21,8 +21,6 @@
                       <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入电话"/>
                     </FormItem>
                   </Col>
-                </Row>
-                <Row>
                   <Col span="6">
                   <FormItem label="登录渠道">
                     <Select v-model="formItem.status" placeholder="报修小程序">
@@ -33,17 +31,18 @@
                   </FormItem>
                   </Col>
                 </Row>
+                  
                 <Row>
                   <Col span="6">
-                    <FormItem label="登录时间">
-                      <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
-                    </FormItem>
-                  </Col>
-                  <Col span="6">
-                    <FormItem>
-                      <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
-                    </FormItem>
-                  </Col>
+                  <FormItem label="更新时间">
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col>
+                <Col span="6">
+                  <FormItem>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col>
                 </Row>
               </Form>
             <div class="search-row">
@@ -266,6 +265,12 @@
           status:'',
           startUpdateTime:'',
           endUpdateTime:'',
+        },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+            }).bind(this)
         },
         //表格
         tableConfig:{
