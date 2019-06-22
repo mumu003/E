@@ -15,7 +15,7 @@ module.exports = {
          // target: 'http://rap2api.taobao.org/app/mock/20325',
         //target: 'http://128.21.2.4:8080',
         // target: 'http://128.9.1.71:8080',
-        target: 'http://localhost:8080',
+        target: 'https://emaint.ahjarzeng.com/api',
         changeOrigin: true,
         pathRewrite: {
           '^/apiHost': ''

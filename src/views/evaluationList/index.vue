@@ -481,6 +481,8 @@
                 remark:this.viewForm.remark,
                 status:0
             }
+            // this.$request.post("/apiHost/dictionary/optionByValue",params,res=>{}
+
             this.$request.post("/apiHost/api/contractApplication/check",params,res=>{
               if (res.code === 200) {
                 setTimeout(() => {
