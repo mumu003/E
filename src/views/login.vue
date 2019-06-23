@@ -99,13 +99,7 @@ export default {
               this.form.userName == "111111" &&
               this.form.password == "111111"
             ) {
-              sessionStorage.setItem("token", "111111");
-              sessionStorage.setItem("userId", "111111");
-              sessionStorage.setItem("userName", "111111");
-              sessionStorage.setItem("curProjectId", "111111");
-              sessionStorage.setItem("orgId", "111111");
-              sessionStorage.setItem("orgName", "111111");
-              sessionStorage.setItem("roleName", "111111");
+              sessionStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjIwMzQ2ODQsInVzZXIiOiJhZG1pbiIsImlhdCI6MTU2MTE3MDY4NH0.O6KBRGIxjZ6sRYYHiQroQPaB4T-ZkuT5_yaaxGpR3PA");
               this.$router.push("/");
               this.$Message.success("登录成功！");
             }

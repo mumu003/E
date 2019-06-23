@@ -426,51 +426,47 @@
         buttons:{ }, //按钮
         //表单
         formItem: {
-          status:'',
-          customerName:'',
-          buildingName: '',
-          roomNum: '',
-          startUpdateTime: '',
-          endUpdateTime: '',
-          page:1
+          year:2019,
+          month:6,
+          companyName:this.$route.query.companyName
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/ownershipBill/list",
+          url:"/apiHost/api/emaint/repairProblem/repairProblemListListByCompany",
               columns:[
                 {
                   title: '日期',
-                  key: 'status',
-                  width:100,
+                  key: 'gmtCreate',
+                  width:120,
                   align:"center",
                 },
                 {
                   title: '公司',
-                  key: 'currentNodeName',
+                  key: 'companyName',
                   width:150,
                   align:"center"
                 },
                 {
                   title: '类型',
-                  key: 'currentName',
+                  key: 'problemClass',
                   width:100,
                   align:"center"
                 },
                 {
                   title: '处理人',
-                  key: 'customerName',
+                  key: 'name',
                   width:100,
                   align:"center"
                 },
                 {
                   title: '报修内容',
-                  key: 'buildingName',
+                  key: 'problem',
                   width:100,
                   align:"center"
                 },
                 {
                   title: '状态',
-                  key: 'roomNum',
+                  key: 'state',
                   width:100,
                   align:"center"
                 },
