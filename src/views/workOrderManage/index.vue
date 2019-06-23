@@ -120,7 +120,7 @@
                 </Col>
                 <Col span="6">
                 <FormItem label="备注">
-                        <Input type='textarea' :rows='3' v-model="formItem.phone" placeholder="300字以内"></Input>
+                    <Input type='textarea' :rows='3' v-model="formItem.phone" placeholder="300字以内"></Input>
                 </FormItem>
                 </Col>
               </Row>
@@ -160,142 +160,15 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增水电过户"
-           width="800"
-           @on-cancel="cancel">
-      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
-        <Row>
-          <Col span="8">
-          <FormItem label="楼栋"  prop="buildingId">
-            <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-              <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-            </Select>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="单元"  prop="unitId">
-            <div v-if="addUnitNameIsNo !== ''">
-              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-              </Select>
-            </div>
-            <div v-if="addUnitNameIsNo === ''">
-              <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-              </Select>
-            </div>
-          </FormItem>
-          </Col>
-          <Col span="8">
-          <FormItem label="房间号" prop="roomId">
-            <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="clearAddData">
-              <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-            </Select>
-          </FormItem>
-          </Col>
-          <Col span="24">
-          资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select" v-show="isShow"></Table>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align: right;">
-        <Button type="primary" @click="addPullData" :disabled="addForm.roomId ? false : true">抓取数据</Button>
-        <Button @click="cancel">取消</Button>
-        <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
-      </div>
-    </Modal>
+    <div slot="footer" style="text-align:center;">
+      <Row>
+        <Col span="24">
+          <Button size="default" @click="goback" >上一步</Button>
+          <Button type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button>
+         </Col>
+      </Row>
+    </div>
 
-    <Modal v-model="viewModal" width="800" @on-cancel="viewCancel" >
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="水电过户审核" name="name1">
-          <Form  :model="viewForm" :label-width="100">
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Input v-model="viewForm.buildingName" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="单元">
-                <Input v-model="viewForm.unitName" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="房间号">
-                <Input v-model="viewForm.roomNum" readonly/>
-              </FormItem>
-              </Col>
-              <Col span="24">
-              资料
-              </Col>
-              <Col span="24">
-                <Table stripe border :columns="viewContract" :data="viewData"></Table>
-              </Col>
-            </Row>
-          </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-            <Steps :current="Number(currentNodeId)">
-              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-            </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-            <Timeline>
-              <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
-                <p>{{item.createdAt}}</p>
-                <p v-if="index === 0">发起</p>
-                &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
-                <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
-                <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>-->
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                <p>{{item.createdAt}}</p>
-                <!--<p v-if="index === 0">发起</p>-->
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                <p v-if="index === 0">{{item.nodeName}}</p>
-                <span v-else>
-                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                </span>
-                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>
-            </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
-      <div slot="footer" style="text-align: right;" v-model="viewForm.id">
-        <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-            <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-            <span v-else-if="buttons.check" >
-              <Button type="error" @click="viewReject(viewForm.id)" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="success" @click="viewPass(viewForm.id)" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
-          </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-          </Col>
-        </Row>
-      </div>
-    </Modal>
-
-    <Modal v-model="endModal" title="终止水电过户"
-           :loading="modal_loading"
-           @on-ok="endSubmit"
-           @on-cancel="endCancel">
-      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
-    </Modal>
 
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
@@ -558,25 +431,13 @@
         ]
       }
     },
-    computed: {
-      // 被选择的列表数据条数
-      selected_count(){
-        return this.$refs.table.selected_count
-      },
-      // 被选择的列表数据
-      selection(){
-        return this.$refs.table.selection
-      }
-    },
     mounted(){//方法
         this.getBuildings()
         
         // this.addarea()
         /*this.getIndex()*/
     },
-    methods: {//对象
-      //Tabs切换
-      
+    methods: {//对象      
       changefile(e){
           var file=e.target.files[0]
          
@@ -592,16 +453,23 @@
               that.imglist.pop();
                 // that.imglist.push(this.result);
           }
-          
+        },
+        imgcancel(){
+          this.imglist[this.showimg]='';
+          this.files.splice(this.showimg,1);    
+          this.imglist.push('');
+          this.imglist.pop('');
       },
-      changs() {
-        if(this.viewTabs === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusProject()
-        }
+
+      // 报修提交
+      repairSubmit(){
+          console.log("报修提交")
       },
+      // 上一步
+      goback(){
+          window.history.go(-1)
+      },
+
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
@@ -623,75 +491,7 @@
           })
         }
       },
-      //获取单元列表
-      getUnits(buildingId) {
-        if(typeof(buildingId) === "undefined"){
-          return ;
-        }
-        this.buildingList.forEach(item=>{
-          if(buildingId===item.id){
-            this.addForm.buildingName = item.name
-          }
-        })
-        this.unitList=[];
-        this.roomsList=[];
-        this.$request.post("/apiHost/api/room/getBuildingRoom",{
-          orgId:sessionStorage.orgId,
-          projectId:sessionStorage.curProjectId,
-          userId: sessionStorage.getItem("userId"),
-          type:2,
-          fileType:1,
-          buildingId
-        }, res => {
-          this.addUnitNameIsNo = ''
-          this.unitList = res.data.units.map(item => ({
-            id: item.unitId,
-            name: item.unitName,
-            rooms:item.rooms
-          }))
-          if(this.unitList[0].name === ''){
-            if(this.addForm.buildingName !== ""){
-              this.addUnitNameIsNo = this.addForm.buildingName
-            }
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.addForm.unitId = ""
-        this.addForm.unitName = ""
-        this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
-      },
-      //获取房间列表
-      getRooms(unitId) {
-        this.unitList.forEach(item=>{
-          if(unitId===item.id){
-            this.addForm.unitName = item.name
-          }
-        })
-        this.unitList.map((item,i)=>{
-          if (item.id===unitId) {
-            this.roomsList = item.rooms.map(item => ({
-              id: item.roomId,
-              num: item.roomNum
-            }))
-          }
-        })
-        this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
-      },
-      //获取地块名称  (接口在哪)
-      addarea(areaId){
-      },
-      imgcancel(){
-          this.imglist[this.showimg]='';
-          this.files.splice(this.showimg,1);
-          
-          this.imglist.push('');
-          this.imglist.pop('');
-      },
+      
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -704,100 +504,14 @@
       addProject(){
         this.addModal = true
       },
-      //获取模态框表格数据
-      addPullData(){
-        if(this.addForm.roomId !== ''){
-          this.isShow=true
-          let params = {
-            roomId:this.addForm.roomId
-          }
-          this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
-            this.addForm.customerName = res.data.customerName
-            this.addForm.roomNum = res.data.rommNum
-            this.addForm.addressNum = res.data.addressNum
-            this.addForm.purpose = res.data.purpose
-            this.addForm.idCard = res.data.idNumber
-            this.addForm.phone = res.data.phone
-            this.addForm.address = res.data.address
-            this.addForm.area = res.data.area
-            this.addForm.contract = res.data.contractNumber
-            this.addForm.signDate = res.data.signDate
-            this.addForm.payExpireDate = res.data.payExpire
-            this.addForm.deliveryDate = res.data.deliveryDate
-            this.addData = []
-            this.addData.push(res.data)
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }else{
-          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
-        }
-      },
-      //清除抓取数据
-      clearAddData(){
-        this.isShow = false
-        this.addData = []
-      },
-      //新增模态框提交
-      addSubmit(){
-        this.modal_loading = true
-        if(this.addForm.roomId){
-          if(this.addData.length !== 0){
-            this.addForm.orgId = sessionStorage.getItem("orgId")
-            this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("/apiHost/api/transfer/add",this.addForm, res => {
-              if (res.code === 200) {
-                setTimeout(() => {
-                  this.addModal = false
-                  this.modal_loading = false
-                  this.addData = []
-                  this.isShow = false
-                  this.$Message.success("新增成功！")
-                  this.unitList=[ ]
-                  this.roomsList=[ ]
-                  this.$refs.addForm.resetFields()
-                  this.$refs.table.init()
-                }, 2000)
-              } else {
-                this.modal_loading = false
-                this.$Modal.error({title: '提示信息', content: res.message})
-              }
-            }, res => {
-              this.modal_loading = false
-              this.$Modal.error({title: '提示信息', content: res.message})
-            })
-          }else{
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: '请抓取数据'})
-          }
-        }else{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: '房间号不能为空'})
-        }
-      },
-      //新增-表格选项
-      select(selection){
-        this.addForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
-      },
       //取消
       cancel() {
         this.addModal = false
         this.$Message.info('你取消了操作')
-        this.unitList=[ ]
-        this.roomsList=[ ]
-        this.$refs.addForm.resetFields()
-        this.$refs.table.init()
-      },
-      //审核取消
-      viewCancel(){
-        this.$refs.table.init()
-        this.viewModal = false
-        this.$Message.info('你取消了操作')
-        setTimeout(() => {
-          this.viewTabs = 'name1'
-          this.historysList = []
-          this.nodesList = []
-        }, 1000)
+        // this.unitList=[ ]
+        // this.roomsList=[ ]
+        // this.$refs.addForm.resetFields()
+        // this.$refs.table.init()
       },
       //发起
       start(){

@@ -2,14 +2,14 @@ import axios from 'axios'
 import qs from 'qs';
 
 export function qsdata(data) {
-  return qs.stringify(data);
+  return qs.parse(qs.stringify(data));
 }
 
 export default {
 
   post(url, data, success_call, fail_callback) {
     // data.token = sessionStorage.token;
-    return axios.post(url, qsdata(data))
+    return axios.post(url, data)
       .then(function (response) {
         if (response.data.code != 200) {
           if (fail_callback) {

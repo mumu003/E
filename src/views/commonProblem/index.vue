@@ -10,12 +10,11 @@
                
               </Col>
               <Col>
-              <div class="first" v-for="(item,index) in questionlis" :key="index">
-                <div @click="activeid=item.id" :style="{color:activeid==item.id?'#2b85e4':''}">{{item.questionname}}</div> 
-                <div class="two" @click="activeid=v.id" :style="{color:activeid==v.id?'#2b85e4':''}"  v-for="(v,i) in item.children" :key="i">{{v.questionname}}</div>
+               <div class="first" v-for="(item,index) in questionlis" :key="index">
+                <div >{{item.parentProblem}}</div> 
                 
+                <div class="two"  v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
               </div>
-             
               </Col>
             </Row>
           </div>
@@ -79,57 +78,39 @@
       </Card>
       </Col>
     </Row>
+
 </div>
-    <Modal v-model="addModal" title="新增发函流程" width="800"
+    <Modal v-model="addModal" title="常见问题新增" width="800"
       @on-cancel="addCancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
-          <Col span="8">
-            <FormItem label="楼栋" prop="buildingId">
-              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-              </Select>
+          <Col span="20" >
+            <FormItem label="常见问题" prop="problem">
+              <Input v-model="addForm.problem" placeholder="请输入常见问题"></Input>
             </FormItem>
           </Col>
-          <Col span="8">
-            <FormItem label="单元" prop="unitId">
-              <div v-if="addUnitNameIsNo !== ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
+          <Col span="20">
+            <FormItem label="优先级" >
+              <div >
+                <Select v-model="addForm.priority" placeholder="请选择优先级" >
+                  <Option :value="item" v-for="(item,index) in ['低','中','高']" :key="index" >{{item}}</Option>
                 </Select>
               </div>
-              <div v-if="addUnitNameIsNo === ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                </Select>
-              </div>
+              
             </FormItem>
           </Col>
-          <Col span="8">
-            <FormItem label="房间号" prop="roomId">
-              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-              </Select>
-            </FormItem>
+          <Col span="20">
+            <Form-item label="父级类目" >
+            <i-select  placeholder="请选择父级" v-model="addForm.parentId">
+                <i-option value="">无</i-option>
+                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
+               
+            </i-select>
+        </Form-item>   
           </Col>
-          <Col span="8">
-            <FormItem label="业主姓名">
-              <Input v-model="addForm.customerName" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="发函类型" prop="fileType">
-              <Select v-model="addForm.fileType" placeholder="请选择发函类型" >
-                <Option :value="item.fileType" v-for="(item,index) in fileTypeList" :key="index">{{item.fileName}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
-          </Col>
+         
+         
+          
         </Row>
       </Form>
       <div slot="footer" style="text-align: right;">
@@ -138,90 +119,42 @@
       </div>
     </Modal>
 
-    <Modal v-model="viewModal" width="800"
-      @on-cancel="viewCancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="发函审核" name="name1">
-          <Form :model="viewForm" :label-width="100" >
-            <Row>
-              <Col span="8">
-              <FormItem label="楼栋">
-                <Input v-model="viewForm.buildingName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="单元">
-                <Input v-model="viewForm.unitName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="房间号">
-                <Input v-model="viewForm.roomNum" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="业主姓名">
-                <Input v-model="viewForm.customerName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="发函类型">
-                <Input v-model="viewForm.fileType" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="24">
-              资料
-              </Col>
-              <Col span="24">
-                <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-                <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-              </Col>
-            </Row>
-          </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-            <Steps :current="Number(currentNodeId)">
-              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-            </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-            <Timeline>
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                <p>{{item.createdAt}}</p>
-                <!--<p v-if="index === 0">发起</p>-->
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                <p v-if="index === 0">{{item.nodeName}}</p>
-                <span v-else>
-                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                </span>
-                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>
-            </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
-      <div slot="footer" style="text-align:right;">
+   <Modal v-model="updateModel" title="常见问题编辑" width="800"
+      @on-cancel="addCancel">
+      <Form ref="updateForm" :model="updateForm"  :label-width="100" :rules="ruleAdd">
         <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-          <Button size="default" @click="viewCancel" >取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-          <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
+          <Col span="20" >
+            <FormItem label="常见问题" prop="problem">
+              <Input v-model="updateForm.problem" placeholder="请输入常见问题"></Input>
+            </FormItem>
           </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
+          <Col span="20">
+            <FormItem label="优先级" >
+              <div >
+                <Select v-model="updateForm.priority" placeholder="请选择优先级" >
+                  <Option :value="item" v-for="(item,index) in ['低','中','高']" :key="index" >{{item}}</Option>
+                </Select>
+              </div>
+              
+            </FormItem>
           </Col>
+          <Col span="20">
+            <Form-item label="父级类目" >
+            <i-select  placeholder="请选择父级" v-model="updateForm.parentId">
+                <i-option value="">无</i-option>
+                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
+               
+            </i-select>
+        </Form-item>   
+          </Col>
+         
+         
+          
         </Row>
+      </Form>
+      <div slot="footer" style="text-align: right;">
+        <Button type="ghost" size="default" @click="addCancel">取消</Button>
+        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
@@ -244,9 +177,12 @@
   </div>
 </template>
 <script>
+import qs from 'qs';
   export default {
     data () {
       return {
+        updateModel:false,
+        modal1:false,
         passDisable:false,//防止通过双击事件
         isDisable:false,//防止驳回双击事件
         loading: true, //延迟
@@ -291,18 +227,12 @@
         },
         //表单
         formItem: {
-          status:'',
-          customerName:'',
-          buildingName:'',
-          roomNum:'',
-          unitName:'',
-          startUpdateTime:'',
-          endUpdateTime:'',
-          page:'1'
+          parentId:'',
+          
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/sendFileBill/list",
+          url:"/apiHost/api/emaint/problem-base/list",
           columns:[
             {
                   title: '操作',
@@ -321,9 +251,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.$router.push({
-                                              name:"dispatch"
-                                            })
+                                          this.updateModel=true;
+                                            console.log(params.row.id);
                                         }
                                     }
                                 }, '编辑'),
@@ -337,9 +266,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.$router.push({
-                                              name:"dispatch"
-                                            })
+                                            this.deleteProject(params.row.id)
+                                           console.log(params.index.id);
                                         }
                                     }
                                 }, '删除'),
@@ -349,78 +277,36 @@
                 
             {
               title: '优先级 ',
-              key: 'currentName',
+              key: 'priority',
               width:120,
               align: 'center',
             },        
             {
               title: '常见问题',
-              key: 'customerName',
+              key: 'problem',
               width:200,
               align: 'center',
             },
           ],
         },
-        activeid:'',
-          questionlis:[{
-            questionname:'硬件问题',
-            questionlevel:'一级',
-           id:11,
-           children:[{
-              questionname:'计算机',
-              questionlevel:'二级',
-            id:111,
-           },{
-              questionname:'打印机',
-              questionlevel:'二级',
-              id:112,
-           }],
-          },{
-            questionname:'软件问题',
-            questionlevel:'一级',
-           id:12,
-           children:[{
-              questionname:'系统中毒',
-              questionlevel:'二级',
-            id:121,
-           },{
-              questionname:'系统蓝屏',
-              questionlevel:'二级',
-              id:122,
-           }],
-          }],
+        activeli:{
+           parentId:'',
+           id:'',
+         },
+          questionlis:[],
         //新增表单
         addForm:{
-          customerName:'',
-          buildingId:'',
-          buildingName:'',
-          unitId:'',
-          unitName:'',
-          roomNum:'',
-          roomId:'',
-          fileType:'',
-          selection:[],
-          dataId:[],
-          orgId:'',
-          projectId: '',
+          problem:'',
+          priority:'',
+          parentId:''
         },
+        updateForm:{},
         //新增模态框验证
         ruleAdd:{
-          buildingId: [
-            { required: true, message: '请选择楼栋号', trigger: 'change' }
-          ],
-          unitId: [
-            { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-            { required: true, message: '请选择房间号', trigger: 'change' }
-          ],
-          customerName:[
-            { required: true, message: '请填写客户姓名', trigger: 'blur' }
-          ],
-          fileType: [
-            { required: true, message: '请选择发函类型', trigger: 'change' }
-          ]
+         problem: [
+                        { required: true, message: '请输入常见问题', trigger: 'blur' }
+                    ],
+         
         },
         //新增模态框资料
         addContract: [
@@ -755,10 +641,9 @@
         this.modal_loading = true
         this.$refs.addForm.validate((valid) => {
           if (valid) {
-            this.addForm.orgId = sessionStorage.getItem("orgId")
-            this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("/apiHost/api/sendFileBill/add",this.addForm, res => {
-              if (res.code === 200) {
+            this.addForm.id=8;
+            this.$request.post("/apiHost/api/emaint/problem-base/save",this.addForm, res => {
+              if (res.statusCode === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
                   this.addModal = false;
@@ -773,8 +658,20 @@
                 this.$Modal.error({title: '提示信息', content: res.message})
               }
             }, res => {
-              this.modal_loading = false
-              this.$Modal.error({title: '提示信息', content: res.message})
+             if (res.statusCode === 200) {
+                setTimeout(() => {
+                  this.modal_loading = false;
+                  this.addModal = false;
+                  this.$Message.success("新增成功！")
+                  this.unitList=[ ]
+                  this.roomsList=[ ]
+                  this.$refs.addForm.resetFields()
+                  this.$refs.table.init()
+                }, 2000);
+              } else {
+                this.modal_loading = false
+                this.$Modal.error({title: '提示信息', content: res.message})
+              }
             })
           }else{
             this.modal_loading = false
@@ -784,6 +681,7 @@
       //新增取消
       addCancel (){
         this.addModal = false
+        this.updateModel=false;
         this.modal_loading = false,
         this.$Message.info('你取消了操作')
         this.unitList=[ ]
@@ -974,28 +872,25 @@
         this.$refs.table.init()
       },
       //删除
-      deleteProject (){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
+      deleteProject (id){
+      
         this.$Modal.confirm({
           title: '操作提示',
           content: '确认删除?',
           loading: true,
           onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
+            
             let params = {
               id
             }
-            this.$request.post("/apiHost/api/sendFileBill/delete",params,res=>{
+            this.$request.post("/apiHost/api/emaint/problem-base/remove",qs.stringify({params}),res=>{
               this.$Message.success("删除成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
+             
             },res=>{
-              this.$Message.error(res.message)
-              this.$Modal.remove()
+              if(res.statusCode==200)
+              this.$Message.success("删除成功")
+               this.$Modal.remove()
+              this.$refs.table.init()
             })
           }
         })
@@ -1046,7 +941,24 @@
       //提示窗关闭
       closes () {
         this.noteModal = false
-      }
+      },
+       getlist(){
+//  查询一级问题
+     this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},data=>{
+      
+     },data=>{
+        if(data.statusCode==200){
+        
+            this.questionlis=data.responseResult;
+        
+
+        }
+     })
+     }
+      
+    },
+    created(){
+      this.getlist();
     }
   }
 </script>

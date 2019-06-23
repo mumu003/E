@@ -14,24 +14,24 @@
 
               <Col span="8">
                 <FormItem label="接单逾期时间" :label-width="120">
-                  <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入接单逾期时间"/>
+                  <Input  v-model="formItem.assignCycle"  :maxlength=30 placeholder="请输入接单逾期时间"/>
                 </FormItem>
               </Col>
               <Col span="4">
                 <FormItem>
-                  <Select v-model="formItem.status" placeholder="时">
-                    <Option value="">时</Option>
-                    <Option value="-1">天</Option>
-                    <Option value="1">月</Option>
-                    <Option value="2">年</Option>
+                  <Select v-model="formItem.assignCycleUnit" placeholder="时">
+                    <Option value="hour">时</Option>
+                    <Option value="day">天</Option>
+                    <Option value="month">月</Option>
+                    <Option value="year">年</Option>
                   </Select>
                 </FormItem>
               </Col>
 
               <Col span="8">
                 <FormItem label="通知角色" :label-width="120">
-                  <Select v-model="formItem.status" placeholder="超级管理员">
-                    <Option value="">超级管理员</Option>
+                  <Select v-model="formItem.assignNoticeRole" placeholder="超级管理员">
+                    <Option value="0">超级管理员</Option>
                     <Option value="-1">接单员</Option>
                   </Select>
                 </FormItem>
@@ -42,24 +42,24 @@
              <Row type="flex"  style="margin-top:20px;margin-bottom:20px;" justify="start">
               <Col span="8">
                 <FormItem label="报修逾期时间" :label-width="120">
-                  <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入报修逾期时间"/>
+                  <Input  v-model="formItem.maintainCycle"  :maxlength=30 placeholder="请输入报修逾期时间"/>
                 </FormItem>
               </Col>
               <Col span="4">
                 <FormItem>
-                  <Select v-model="formItem.status" placeholder="时">
-                    <Option value="">时</Option>
-                    <Option value="-1">天</Option>
-                    <Option value="1">月</Option>
-                    <Option value="2">年</Option>
+                  <Select v-model="formItem.maintainCycleType" placeholder="时">
+                    <Option value="hour">时</Option>
+                    <Option value="day">天</Option>
+                    <Option value="month">月</Option>
+                    <Option value="year">年</Option>
                   </Select>
                 </FormItem>
               </Col>
 
               <Col span="8">
                 <FormItem label="通知角色" :label-width="120">
-                  <Select v-model="formItem.status" placeholder="超级管理员">
-                    <Option value="">超级管理员</Option>
+                  <Select v-model="formItem.maintainNoticeRole" placeholder="超级管理员">
+                    <Option value="0">超级管理员</Option>
                     <Option value="-1">接单员</Option>
                   </Select>
                 </FormItem>
@@ -70,8 +70,8 @@
          
             <Row type="flex" justify="center" class="code-row-bg">
               <Col span="12">
-                <Button type="primary" icon="close-round" @click="searchSubmit">取消</Button>
-                <Button type="ghost" icon="checkmark-round" @click="searchCancel">确定</Button>
+                <Button type="primary" icon="close-round" @click="searchCancel">取消</Button>
+                <Button type="ghost" icon="checkmark-round" @click="settingSubmit">确定</Button>
               </Col>
             </Row>
           
@@ -82,6 +82,7 @@
   </div>
 </template>
 <script>
+import qs from "qs";
   export default {
     data () {
       return {
@@ -126,105 +127,12 @@
         },
         //表单
         formItem: {
-          status:'',
-          areaId:'',
-          buildingId:'',
-          roomNum:'',
-          startUpdateTime:'',
-          endUpdateTime:''
-        },
-        //表格
-        tableConfig:{
-          url:"/apiHost/api/deliveryNotice/list",
-          columns:[
-            {
-              type:"selection",
-              key:'_checked',
-              width:60
-            },
-            {
-              title: '状态',
-              key: 'status',
-              width:100,
-              render:(h,params)=>{
-                switch(params.row.status){
-                  case '-1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#b725ed'
-                      }
-                    },"待发起")
-                  case '0':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#ED3F14'
-                      }
-                    },"终止")
-                  case '1':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#2D8CF0'
-                      }
-                    },"进行中")
-                  case '2':
-                    return h('div',{
-                      style:{
-                        width: '80px',
-                        color: '#19BE6B'
-                      }
-                    },"已归档")
-                }
-              }
-            },
-            {
-              title: '节点',
-              key: 'currentNodeName',
-              width:120
-            },
-            {
-              title: '办理角色 ',
-              key: 'currentName',
-              width:120
-            },
-            {
-              title: '地块',
-              key: 'areaName',
-              width:150
-            },
-            {
-              title: '楼栋',
-              key: 'buildingName',
-              width:150
-            },
-            {
-              title: '房间号',
-              key: 'roomNum',
-              width:150
-            },
-            {
-              title: '门牌号',
-              key: 'addressNum',
-              width:150
-            },
-            {
-              title: '面积',
-              key: 'area',
-              width:150
-            },
-            {
-              title: '创建人',
-              key: 'createdName',
-              width:150
-            },
-            {
-              title: '更新时间',
-              key: 'updatedAt',
-              width:150
-            }
-          ],
+            assignCycle:1,
+            assignCycleUnit:'hour',
+            assignNoticeRole:'',
+            maintainCycle:1,
+            maintainCycleType:'day',
+            maintainNoticeRole:''
         },
         //模态框表单数据
         addForm:{
@@ -250,70 +158,6 @@
           orgId:'',
           projectId: '',
         },
-        //模态框表格数据
-        addContract: [
-          {
-            title: '地块',
-            key: 'areaName',
-            width:150,
-          },
-          {
-            title: '楼栋号',
-            key: 'buildingName',
-            width:150,
-
-          },
-          {
-            title: '房间号',
-            key: 'rommNum',
-            width:150
-          },
-          {
-            title: '门牌号',
-            key: 'addressNum',
-            width:150
-          },
-          {
-            title: '匹配车位',
-            key: 'parking',
-            width:150
-          },
-          {
-            title: '面积',
-            key: 'area',
-            width:150
-          },
-          {
-            title: '业主名字',
-            key: 'customerName',
-            width:150
-          },
-          {
-            title: '身份证号',
-            key: 'idNumber',
-            width:150
-          },
-          {
-            title: '合同编码',
-            key: 'contractNumber',
-            width:150
-          },
-          {
-            title: '合同上联系电话',
-            key: 'phone',
-            width:150
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:150
-          },
-          {
-            title: '合同约定交房日期',
-            key: 'deliveryDate',
-            width:150
-          }
-        ],
         //模态框表单,表格数据
         viewForm:{
           buildingName:'',
@@ -409,40 +253,24 @@
       }
     },
     mounted(){//方法
-      this.getBuildings()
+      // this.getSetting()
       // this.addArea()
       /*this.getIndex()*/
     },
-    methods: {//对象
-      //Tabs切换
-      changs(){
-        if(this.viewTabs === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusProject()
-        }
-      },
-      //获取楼栋列表
-      getBuildings() {
-        let token = sessionStorage.getItem("token")
-        if(token === null){
-          window.location.href = '/#/login'
-          window.location.reload()
-        }else{
-          let params = {
-            orgId: sessionStorage.getItem("orgId"),
-            projectId: sessionStorage.getItem("curProjectId")
-          }
-          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            this.buildingList = res.data.buildings.map(item => ({
-              id: item.buildingId,
-              name: item.buildingName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
+    methods: {
+      // 获取初始数据
+      getSetting() {
+        // this.$request.post("/apiHost/api/emaint/system-setting/data", res => {
+        //     this.$Modal.error({title: '提示信息', content:res.resMessage})
+        // }, res => {
+        //   if (res.statusCode == 200) {
+        //     let data=res.responseResult
+        //     this.formItem.assignNoticeRole=data.assignNoticeRole
+        //     this.formItem.maintainNoticeRole=data.maintainNoticeRole
+        //   } else {
+        //     this.$Modal.error('网络出错,请重试')
+        //   }
+        // })
       },
       //获取单元列表
       getUnits(buildingId) {
@@ -723,26 +551,6 @@
         }
         this.endModal=true
         this.modal_loading=true
-       /* this.$Modal.confirm({
-          title: '操作提示',
-          content: '是否确认终止该流程，终止后将无法继续该流程?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-              id
-            }
-            this.$request.post("/apiHost/api/deliveryNotice/cutOut",params,res=>{
-              this.$Message.success("终止成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error( res.message)
-              this.$Modal.remove()
-              this.$refs.table.init()
-            })
-          }
-        })*/
       },
       //终止提交
       endSubmit(){
@@ -853,29 +661,29 @@
         this.$refs.table.init()
       },
       //搜索提交
-      searchSubmit () {
-        this.isFirst = true
-        this.$request.post("/apiHost/api/deliveryNotice/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
+      settingSubmit () {
+        // this.isFirst = true
+        this.$request.post("/apiHost/api/emaint/system-setting/save",qs.stringify(this.formItem), res => {
+            this.$Modal.error({title: '提示信息', content:res.responseResult})
         }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
+          if (res.statusCode == 200) {
+              this.$Message.success({title: '提示信息', content:res.resMessage})
+            // this.isFirst = false
+            // this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content:res.resMessage})
+          }
         })
       },
       //搜索取消
       searchCancel() {
         this.formItem={
-          status: '',
-          buildingId: '',
-          roomId: '',
-          areaId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          assignCycle:1,
+          assignCycleUnit:'hour',
+          assignNoticeRole:1,
+         maintainCycleType:'day',
+         maintainCycle:'',
+         maintainNoticeRole:''
         }
         this.isFirst = true
         setTimeout(()=>{

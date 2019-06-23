@@ -9,8 +9,10 @@ axios.interceptors.request.use(
         return false
       } else {
         sessionStorage.setItem('startTime', new Date().getTime())
-        config.headers.token = `${sessionStorage.token}`
+     
+        config.headers.accessToken= `${sessionStorage.token}`
         config.headers.storeId = `${sessionStorage.storeId}`
+        
       }
     } else {
       window.location.href = '/#/login'
@@ -36,5 +38,5 @@ axios.interceptors.response.use(
     }
     return Promise.reject(error.response.data)   // 返回接口返回的错误信息
   })
-
+  // axios.defaults.headers.post['Content-Type'] = 'application/json'
 export default axios

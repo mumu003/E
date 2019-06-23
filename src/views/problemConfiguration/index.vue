@@ -10,14 +10,16 @@
                   <div v-if="controlmodal"  class="controlbutton">
                       <div><Button  @click="addquestion" >新增下一级</Button></div> 
                       <div>  <Button   @click="updatequestion" >编辑</Button></div> 
-                      <div> <Button   @click="modal1 = true">删除</Button></div> 
+                      <div> <Button   @click="modal1 = true;controlmodal=false;">删除</Button></div> 
                   </div>
               
             </Row>
               <Col>
-              <div class="first" v-for="(item,index) in questionlis" :key="index">
-                <div @click="activeid=item.id" :style="{color:activeid==item.id?'#2b85e4':''}">{{item.questionname}}</div> 
-                <div class="two" @click="activeid=v.id" :style="{color:activeid==v.id?'#2b85e4':''}"  v-for="(v,i) in item.children" :key="i">{{v.questionname}}</div>
+              <Spin v-if="this.loadOver==true" size="large"></Spin>
+              <div v-else class="first" v-for="(item,index) in questionlis" :key="index">
+                <div @click="activeli.id=item.id;activeli.parentId=item.parentId" :style="{color:activeli.id==item.id?'#2b85e4':''}">{{item.problem}}</div> 
+                
+                <div class="two" @click="activeli.id=v.id;activeli.parentId=v.parentId" :style="{color:activeli.id==v.id?'#2b85e4':''}"  v-for="(v,i) in item.children" :key="i">{{v.problem}}</div>
               </div>
              
               </Col>
@@ -34,20 +36,20 @@
               问题新增
           </p>
         <i-form  :model="addformdata" :rules="ruleValidate"  :label-width="90" class="addform" >
-        <Form-item label="类型名称" prop="questionname">
-            <i-input  placeholder="请输入类型名称"></i-input>
+        <Form-item label="类型名称" prop="problem">
+            <i-input  placeholder="请输入类型名称" v-model="addformdata.problem"></i-input>
         </Form-item>
         
         <Form-item label="父级类目" >
-            <i-select  placeholder="请选择父级">
+            <i-select  placeholder="请选择父级" v-model="addformdata.parentId">
                 <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.questionlis}}</i-option>
+                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
                
             </i-select>
         </Form-item>   
         <Form-item>
-            <i-button type="primary">取消</i-button>
-            <i-button type="ghost"  style="margin-left: 8px">确定</i-button>
+            <i-button type="primary" @click="cancel('add')">取消</i-button>
+            <i-button type="ghost"  style="margin-left: 8px" @click="save('add')">确定</i-button>
         </Form-item>
     </i-form>
    
@@ -61,21 +63,21 @@
               问题编辑
            
           </p>
-        <i-form  :model="addformdata" :rules="ruleValidate"  :label-width="90" class="addform" >
-        <Form-item label="类型名称" prop="questionname">
-            <i-input  placeholder="请输入类型名称"></i-input>
+        <i-form  :model="updatedata" :rules="ruleValidate"  :label-width="90" class="addform" >
+        <Form-item label="类型名称" prop="problem">
+            <i-input  placeholder="请输入类型名称" v-model="updatedata.problem"></i-input>
         </Form-item>
         
         <Form-item label="父级类目" >
-            <i-select  placeholder="请选择父级">
+            <i-select  placeholder="请选择父级" v-model="updatedata.parentId">
                 <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.questionlis}}</i-option>
+                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
                
             </i-select>
         </Form-item>   
         <Form-item>
-            <i-button type="primary">取消</i-button>
-            <i-button type="ghost"  style="margin-left: 8px">确定</i-button>
+            <i-button type="primary" @click="cancel('update')">取消</i-button>
+            <i-button type="ghost"  style="margin-left: 8px" @click="save('update')">确定</i-button>
         </Form-item>
     </i-form>
    
@@ -99,51 +101,32 @@ class="model"
   </div>
 </template>
 <script type="text/ecmascript-6">
+import qs from 'qs';
   export default {
     data () {
       return {
+        loadOver:true,
         addmodel:true,
         updatemodel:false,
         modal1:false,
         controlmodal:false,
         addformdata: {
-                    questionname: '',
-                    city: '',
+                    problem: '',
+                    parentId: '',
                   
                 },
                  ruleValidate: {
-                    questionname: [
+                    problem: [
                         { required: true, message: '类型名称不能为空', trigger: 'blur' }
                     ],
                  },
-         activeid:'',
-          questionlis:[{
-            questionname:'硬件问题',
-            questionlevel:'一级',
-           id:11,
-           children:[{
-              questionname:'计算机',
-              questionlevel:'二级',
-            id:111,
-           },{
-              questionname:'打印机',
-              questionlevel:'二级',
-              id:112,
-           }],
-          },{
-            questionname:'软件问题',
-            questionlevel:'一级',
-           id:12,
-           children:[{
-              questionname:'系统中毒',
-              questionlevel:'二级',
-            id:121,
-           },{
-              questionname:'系统蓝屏',
-              questionlevel:'二级',
-              id:122,
-           }],
-          }],
+         activeli:{
+           parentId:'',
+           id:'',
+         },
+         updatedata:{},
+          questionlis:[
+          ],
        
                 
        
@@ -341,19 +324,114 @@ class="model"
       }
     },
    methods:{
+     cancel(type){
+        if(type=='add'){
+        this.addformdata={
+                    problem: '',
+                    parentId: '',
+                  
+                }
+        }
+        else{
+          this.updatedata={};
+        }
+     },
+     save(type){
      
+        if(type=='add'){
+           //  PS('此处为何要写ID才可成功','这里与原型有出入')
+           var id=4
+           
+           this.addformdata.id=id;
+          this.$request.post('/apiHost/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
+            if(data.statusCode!=200)
+            this.$Modal.error({title: '提示信息', content: data.responseResult})
+            else{
+              this.$Message.success('添加成功')
+            }
+            this.getlist();
+          })
+        }
+        else{
+         this.$request.post('/apiHost/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
+           if(data.statusCode==200)
+            this.$Message.success('修改成功')
+            this.getlist()
+          })
+        }
+     },
      addquestion(){
        this.addmodel=true;
        this.updatemodel=false;
+       this.controlmodal=false;
      },
      updatequestion(){
+       if(this.activeli.id=='')
+       {
+          this.$Message.info('选择一条记录')
+        return;
+        
+       }
       this.addmodel=false;
        this.updatemodel=true;
+         this.controlmodal=false;
+      
+        if(this.activeli.parentId==null){
+          this.questionlis.forEach((v)=>{
+              if(v.id==this.activeli.id)
+              this.updatedata=JSON.parse(JSON.stringify(v));
+          })
+       
+        }
+        else{
+          this.questionlis.forEach(v=>{
+            if(v.id==this.activeli.parentId){
+                  v.children.forEach((v1)=>{
+                    if(v1.id==this.activeli.id)
+                    this.updatedata=JSON.parse(JSON.stringify(v1));
+                  })
+            }
+          })
+        }
+        
      },
      ok(){
-       console.log('删除了')
+         this.$request.post('/apiHost/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
+                if(data.statusCode==200)
+                   this.$Message.success('删除成功')
+         })
+
+     },
+     getlist(){
+//  查询一级问题 api/emaint/problem-base/treeList接口中父级没有id。冲突了
+     this.$request.post('/apiHost/api/emaint/problem-base/list',{},data=>{
+      
+     },data=>{
+        if(data.statusCode==200){
+         data.responseResult.forEach((v)=>{
+            
+           this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:v.id}),data1=>{
+
+           },data1=>{
+             if(data1.statusCode==200)
+             v.children=data1.responseResult
+           })
+         })
+          
+          setTimeout(()=>{
+            this.loadOver=false
+            this.questionlis=data.responseResult;
+          },1000)
+
+        }
+     })
      }
-   }
+     
+   },
+   created(){
+    
+     this.getlist();
+   },
   }
 </script>
 <style scoped>
@@ -414,8 +492,8 @@ div.controlbutton button{
  width:100%;
  border:none;
  border-radius: 0px;
-
 }
+
 </style>
 
 

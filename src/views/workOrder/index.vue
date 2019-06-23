@@ -33,11 +33,6 @@
                 <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入姓名" />
               </FormItem>
               </Col>
-             <!-- <Col span="6">
-              <FormItem label="单元">
-                <Input v-model="formItem.unitName" :maxlength=20 placeholder="请输入单元号"/>
-              </FormItem>
-              </Col>-->
               <Col span="6">
               <FormItem label="手机号">
                 <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入手机号"/>
@@ -92,13 +87,8 @@
         <div class="search-row">
           <Row>
             <Col>
-            <!-- <Icon type="ios-redo"></Icon> -->
             <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
             <Button type="primary" icon="ios-redo" @click="exportProject">导出</Button>
-            <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button> -->
-            <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-            <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
-            <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
             </Col>
             <Col>
             </Col>
@@ -169,88 +159,24 @@
       </div>
     </Modal>
 
-    <Modal v-model="viewModal" width="800"
-      @on-cancel="viewCancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="发函审核" name="name1">
-          <Form :model="viewForm" :label-width="100" >
+    <Modal v-model="msgModal" width="800"
+      title="备注"
+      @on-ok="msgOk"
+      @on-cancel="viewCancel('remark')">
+          <Form  :model="viewForm" :label-width="80">
             <Row>
-              <Col span="8">
-              <FormItem label="姓名">
-                <Input v-model="viewForm.buildingName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="单元">
-                <Input v-model="viewForm.unitName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="手机号">
-                <Input v-model="viewForm.roomNum" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="工单号">
-                <Input v-model="viewForm.customerName" readonly></Input>
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="发函类型">
-                <Input v-model="viewForm.fileType" readonly></Input>
-              </FormItem>
-              </Col>
               <Col span="24">
-              资料
-              </Col>
-              <Col span="24">
-                <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-                <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
+                <FormItem label="备注">
+                    <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
+                </FormItem>
               </Col>
             </Row>
           </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-            <Steps :current="Number(currentNodeId)">
-              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-            </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-            <Timeline>
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                <p>{{item.createdAt}}</p>
-                <!--<p v-if="index === 0">发起</p>-->
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                <p v-if="index === 0">{{item.nodeName}}</p>
-                <span v-else>
-                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                </span>
-                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>
-            </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
       <div slot="footer" style="text-align:right;">
         <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-          <Button size="default" @click="viewCancel" >取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-          <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
-          </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
+          <Col span="24" v-if="this.viewTabs === 'remark'">
+            <Button size="default" @click="viewCancel('remark')" >取消</Button>
+            <Button type="primary" size="default" @click="msgOk" :loading="modal_loading">确定</Button>
           </Col>
         </Row>
       </div>
@@ -264,33 +190,6 @@
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
-   <!-- <Modal v-model="statusModal" title="状态详情"
-           width="800"
-           :loading="loading"
-           @on-ok="statuSubmit"
-           @on-cancel="cancel">
-      <Row>
-        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-        <Col span="24">
-        <Steps :current="1">
-          <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
-        </Steps>
-        </Col>
-        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-        <Col span="24">
-        <Timeline>
-          <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
-            <p>{{item.createdAt}}</p>
-            <p v-if="index === 0">发起</p>
-            <p v-else-if="index === historysList.length-1">归档节点:完结</p>
-            <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
-            <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-          </TimelineItem>
-        </Timeline>
-        </Col>
-      </Row>
-    </Modal>-->
-
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
@@ -301,6 +200,7 @@
   </div>
 </template>
 <script>
+  import qs from 'qs'
   export default {
     data () {
       return {
@@ -311,7 +211,7 @@
         reject_loading: false, //驳回
         isFirst: false, //是否是第一页
         addModal: false, //新增模态框
-        viewModal: false, //查看模态框
+        msgModal: false, //查看模态框
         statusModal: false, //状态模态框
         endModal:false,//终止模态框
         noteModal: false, //弹窗
@@ -324,7 +224,7 @@
         historysList: [],  //进度详情
         currentNodeId:'', //状态详情节点
         addUnitNameIsNo:'',//新增名字空的
-        viewTabs:'name1', //Tabs
+        viewTabs:'remark', //Tabs
         buttons:{ }, //按钮
         //发函类型
         fileTypeList:[
@@ -367,50 +267,13 @@
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/sendFileBill/list",
+          url:"/apiHost/api/emaint/repairProblem/repairProblemList",
           columns:[
             {
               type:"selection",
               key:'_checked',
               width:60
             },
-            // {
-            //   title: '状态',
-            //   key: 'status',
-            //   width:100,
-            //   render:(h,params)=>{
-            //     switch(params.row.status){
-            //       case '-1':
-            //         return h('div',{
-            //           style:{
-            //             width: '80px',
-            //             color: '#b725ed'
-            //           }
-            //         },"待发起")
-            //       case '0':
-            //         return h('div',{
-            //           style:{
-            //             width: '80px',
-            //             color: '#ED3F14'
-            //           }
-            //         },"终止")
-            //       case '1':
-            //         return h('div',{
-            //           style:{
-            //             width: '80px',
-            //             color: '#2D8CF0'
-            //           }
-            //         },"进行中")
-            //       case '2':
-            //         return h('div',{
-            //           style:{
-            //             width: '80px',
-            //             color: '#19BE6B'
-            //           }
-            //         },"已归档")
-            //     }
-            //   }
-            // },
             {
               title: '操作',
               key: 'currentNodeName',
@@ -441,7 +304,8 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show_msg=true
+                                            this.msgModal=true
+                                            this.viewForm.id=params.row.id
                                         }
                                     }
                                 }, '备注'),
@@ -450,67 +314,53 @@
             },
             {
               title: '工单号码 ',
-              key: 'currentName',
+              key: 'workOrderNo',
               width:180
             },
-            // {
-            //   title: '发函类型',
-            //   key: 'fileType',
-            //   width:100,
-            //   render:(h,params)=>{
-            //     switch(params.row.fileType){
-            //       case 'Contract':
-            //         return h('div',"未按时转签约")
-            //       case 'Payment':
-            //         return h('div',"未按时付款")
-            //       case 'Mortgage':
-            //         return h('div',"未按时按揭")
-            //     }
-            //   }
-            // },
             {
               title: '优先级',
-              key: 'customerName',
+              key: 'priority',
               width:200
             },
             {
               title: '状态',
-              key: 'buildingName',
+              key: 'state',
               width:120
             },
             {
+              // PS:暂无该字段
               title: '变更状态',
               key: 'roomNum',
               width:120
             },
             {
               title: '办公位',
-              key: 'updatedAt',
+              key: 'officeLocation',
               width:120
             },
             {
               title: '姓名',
-              key: 'buildingName',
+              key: 'name',
               width:120
             },
             {
               title: '手机号',
-              key: 'roomNum',
+              key: 'phone',
               width:150
             },
             {
               title: '执行人',
-              key: 'updatedAt',
+              key: 'userName',
               width:120
             },
             {
               title: '来源',
-              key: 'buildingName',
+              key: 'repairSource',
               width:150
             },
             {
               title: '更新时间',
-              key: 'roomNum',
+              key: 'gmtCreate',
               width:200
             },
           ],
@@ -607,15 +457,10 @@
             width:150
           }
         ],
-        //审核表单
+        //备注表单
         viewForm:{
           id:'',
-          buildingName:'',
-          unitName:'',
-          roomNum:'',
-          customerName:'',
-          fileType:'',
-          dataId:[]
+          remark:"",
         },
         //审核模态框资料
         viewContract: [
@@ -742,15 +587,6 @@
       this.getBuildings()
     },
     methods: {
-      //Tabs切换
-      changs(){
-        if(this.viewTabs === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusProject()
-        }
-      },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -949,10 +785,22 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
+      
       // 导出
+      // PS：跨域问题
       exportProject(){
-
+          this.$request.get("/apiHost/api/emaint/repairProblem/exportRepairProblemData", res => {
+            this.$Modal.error('导出失败！')
+        }, res => {
+          if (res.code === 200) {
+            this.$Message.success("导出成功！")
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error('网络错误,请重试！')
+          }
+        })
       },
+
       //审核
       // viewProject (){
       //   if (this.selected_count === 0) {
@@ -1004,7 +852,7 @@
       //     }
       //     this.viewForm.dataId = dataIdArray.toString()
       //     this.viewTabs = 'name1'
-      //     this.viewModal = true
+      //     this.msgModal = true
       //   },res=>{
       //     this.$Modal.error({title: '提示信息', content: res.message})
       //   })
@@ -1020,20 +868,20 @@
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
-              this.viewModal = false
+              this.msgModal = false
               this.viewForm.dataId=[ ]
               this.$Message.success("发起成功!")
               this.$refs.table.init()
             }, 2000)
           } else {
             this.modal_loading = false
-            this.viewModal = false
+            this.msgModal = false
             this.$refs.table.init()
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         },res=>{
           this.modal_loading = false
-          this.viewModal = false
+          this.msgModal = false
           this.$refs.table.init()
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -1049,7 +897,7 @@
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
-              this.viewModal = false
+              this.msgModal = false
               this.passDisable=false
               this.$Message.success("审核通过!")
               this.$refs.table.init()
@@ -1074,7 +922,7 @@
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
-              this.viewModal = false
+              this.msgModal = false
               this.reject_loading = false
               this.isDisable=true
               this.$Message.success("审核驳回!")
@@ -1254,13 +1102,30 @@
           this.isFirst = false
         },200)
       },
+
+      // 备注提交
+      msgOk(){
+        this.msgModal=false
+        this.$request.post("/apiHost/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
+          if (res.code === 200) {
+            this.$Message.success("搜索成功！")
+            this.msgModal = false
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+          }
+        }, res => {
+          this.$Modal.success({title: '提示信息', content: res.responseResult})
+        })
+
+      },
       //取消操作
-      viewCancel () {
-        this.viewModal = false
+      viewCancel (arg) {
+        this.msgModal = false
         this.$Message.info('你取消了操作')
         this.$refs.table.init()
         setTimeout(() => {
-          this.viewTabs = 'name1'
+          this.viewTabs = arg
           this.historysList = []
           this.nodesList = []
         }, 1000)

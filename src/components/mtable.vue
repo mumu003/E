@@ -8,6 +8,7 @@
   </div>
 </template>
 <script>
+import qs from "qs";
 export default {
   props: ['config', 'searchParams', 'isFirst'],
   created () {
@@ -53,7 +54,7 @@ export default {
       currentPage: 1,
       limit: 10,
       allChecked: false,
-      loading: true
+      loading: true,
     }
   },
   computed: {
@@ -69,6 +70,7 @@ export default {
   },
   methods: {
     init () {
+      console.log(this.currentPage)
       let params = this.searchParams ? this.searchParams : {}
       let arr = {}
       for (var key of Object.keys(params)) {
@@ -78,17 +80,20 @@ export default {
         arr[key] = params[key]
       }
       params = arr
-      //params.currPage = this.isFirst === true ? 1 : this.currentPage
+      // params.currPage = this.isFirst === true ? 1 : this.currentPage
       params.page = this.isFirst === true ? 1 : this.currentPage
       params.limit = this.config.limit != undefined?this.config.limit :this.limit
       this.limit = params.limit;
-      params.projectId = sessionStorage.getItem("curProjectId")
-      params.orgId = sessionStorage.getItem("orgId")
-      params.t = Math.random()
-      this.$request.get(this.config.url, params, data => {
+      // params.projectId = sessionStorage.getItem("curProjectId")
+      // params.orgId = sessionStorage.getItem("orgId")
+      // params.t = Math.random()
+
+
+      
+      this.$request.post(this.config.url, qs.stringify(params), data => {
+        // 失败的回调
         this.loading = false
-//        let list = data
-        let list = data.list
+        let list = data.responseResult.list
         list.forEach((item) => {
           item._checked = this.allChecked
         })
@@ -96,8 +101,22 @@ export default {
           list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
         })
         this.tableData = list
-        this.total = data.total
-        this.currentPage = data.pageNum === 0 ? 1 : data.pageNum
+        this.total = data.responseResult.total
+        this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
+      },data=>{
+
+        // 成功的回调
+        let list = data.responseResult.list
+        console.log(list)
+        list.forEach((item) => {
+          item._checked = this.allChecked
+        })
+        list.map((item, index) => {
+          list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
+        })
+        this.tableData = list
+        this.total = data.responseResult.total
+        this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
       })
     },
     select (selection) {
