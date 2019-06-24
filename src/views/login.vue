@@ -9,8 +9,8 @@
           </p>
           <div class="form-con">
             <Form ref="loginForm" :model="form" :rules="rules">
-              <FormItem prop="userName">
-                <Input v-model="form.userName" placeholder="请输入用户名">
+              <FormItem prop="loginName">
+                <Input v-model="form.loginName" placeholder="请输入用户名">
                 <span slot="prepend">
                   <Icon :size="16" type="person"></Icon>
                 </span>
@@ -36,15 +36,16 @@
 <script>
 import "../assets/css/login.css"; // 使用 CSS
 import axios from "axios";
+import qs from "qs";
 export default {
   data() {
     return {
       form: {
-        userName: "",
+        loginName: "",
         password: ""
       },
       rules: {
-        userName: [
+        loginName: [
           { required: true, message: "账号不能为空", trigger: "blur" }
         ],
         password: [{ required: true, message: "密码不能为空", trigger: "blur" }]
@@ -69,57 +70,29 @@ export default {
           if (!window.sessionStorage) {
             alert("浏览器不支持sessionStorage");
           } else {
-            /*   let fd = new FormData()
-              fd.append("username", this.form.userName === '' ? null : this.form.userName)
-              fd.append("password", this.form.password === '' ? null : this.form.password)
-              axios.post('/apiHost/api/user/login', fd)
-                .then(res => {
-                  console.log(res.data)
-                  if (res.data.code === 200) {
-                    sessionStorage.setItem("token", res.data.data.token)
-                    sessionStorage.setItem("userId", res.data.data.userId)
-                    sessionStorage.setItem("userName",res.data.data.userName)
-                    sessionStorage.setItem("curProjectId", res.data.data.curProjectId)
-                    sessionStorage.setItem("orgId",res.data.data.orgId)
-                    this.$router.push("/")
-                    this.$Message.success("登录成功！")
-                  } else {
-                    this.$Message.error(res.data.message)
-                  }
-                })
-                .catch(error => {
-                  this.$Message.error({
-                    content: "登录失败！",
-                    duration: 5,
-                    closeable: true
-                  })
-                })*/
-
-            if (
-              this.form.userName == "111111" &&
-              this.form.password == "111111"
-            ) {
-              sessionStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NjIwMzQ2ODQsInVzZXIiOiJhZG1pbiIsImlhdCI6MTU2MTE3MDY4NH0.O6KBRGIxjZ6sRYYHiQroQPaB4T-ZkuT5_yaaxGpR3PA");
-              this.$router.push("/");
-              this.$Message.success("登录成功！");
-            }
-            // this.$request.post('/apiHost/api/user/login',this.form,res => {
-            //   if (res.code === 200) {
-            //     sessionStorage.setItem("token", res.data.token)
-            //     sessionStorage.setItem("userId", res.data.userId)
-            //     sessionStorage.setItem("userName",res.data.userName)
-            //     sessionStorage.setItem("curProjectId", res.data.curProjectId)
-            //     sessionStorage.setItem("orgId",res.data.orgId)
-            //     sessionStorage.setItem("orgName",res.data.orgName)
-            //     sessionStorage.setItem("roleName",res.data.roleName)
-            //     this.$router.push("/")
-            //     this.$Message.success("登录成功！")
-            //   } else {
-            //     this.$Modal.error({title: '提示信息', content: res.message})
-            //   }
-            // },res=>{
-            //   this.$Modal.error({title: '提示信息', content: res.message})
-            // })
+            this.$request.post('/apiHost/api/user/a/login',qs.stringify(this.form),res => {
+              if (res.statusCode === 200) {
+                sessionStorage.setItem("token", res.responseResult.token)
+                sessionStorage.setItem("userID", res.responseResult.userID)
+                sessionStorage.setItem("loginName",res.responseResult.loginName)
+                sessionStorage.setItem("roleName",res.responseResult.name)
+                this.$router.push("/")
+                this.$Message.success("登录成功！")
+              } else {
+                this.$Modal.error({title: '提示信息', content: res.message})
+              }
+            },res=>{
+              if (res.statusCode === 200) {
+                sessionStorage.setItem("token", res.responseResult.token)
+                sessionStorage.setItem("userID", res.responseResult.userID)
+                sessionStorage.setItem("loginName",res.responseResult.loginName)
+                sessionStorage.setItem("roleName",res.responseResult.name)
+                this.$router.push("/")
+                this.$Message.success("登录成功！")
+              } else {
+                this.$Modal.error({title: '提示信息', content: res.message})
+              }
+            })
           }
         }
       });

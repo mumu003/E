@@ -163,9 +163,7 @@
     },
     created(){
       this.head = headImg
-      this.username=sessionStorage.userName
-
-
+      this.username=sessionStorage.loginName
       this.menuList = [
             {
               "id": 4,
