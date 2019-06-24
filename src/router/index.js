@@ -141,6 +141,14 @@ export default new Router({
           },
           component: resolve => require(['@/views/roleManagement/index.vue'], resolve),
         },
+        {
+        path: '/distributeUser',
+          name: 'distributeUser',
+          meta: {
+            title: '分配用户'
+          },
+          component: resolve => require(['@/views/distributeUser/index.vue'], resolve),
+        },
         
         
         

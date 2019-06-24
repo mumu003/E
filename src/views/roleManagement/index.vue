@@ -105,8 +105,7 @@
         <Button type="primary" size="default" @click="editMaterialSubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-    <Modal title="修改密码" v-model="updatePwdModal" :closable="false" width="400px"
-      @on-cancel="updatePwdlCancel">
+    <Modal title="修改密码" v-model="updatePwdModal" :closable="false" width="400px">
       <Form  ref="updatePwdForm" :model="updatePwdForm" :label-width="100" :rules="ruleupdatePwd" >
         <Row>
           <Col span="22" >
@@ -124,7 +123,7 @@
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="ghost" size="default" @click="updatePwdCancel">取消</Button>
-        <Button type="primary" size="default" @click="updatePwdSubmit" :loading="modal_loading">确定</Button>
+        <Button type="primary" size="default"  :loading="modal_loading">确定</Button>
       </div>
     </Modal>
     <Modal v-model="noteModal" width="300" title="提示">
@@ -255,10 +254,10 @@
           quantity:''
         },//回传资料tag显示
         formItem: {
-          type: '',
-          startUpdateTime: '',
-          endUpdateTime:'',
-          page:1
+          // type: '',
+          // startUpdateTime: '',
+          // endUpdateTime:'',
+          // page:1
         },
         end:{
             disabledDate :(function(date){
@@ -337,7 +336,8 @@
           dataIds:[]
         },//选择资料数据
         tableConfig:{
-            url:"/apiHost/api/processSetting/list",
+            url:"/apiHost/api/emaint/role/list",
+            unParam:true,
               columns:[
                 {
                   type:"selection",
@@ -382,7 +382,7 @@
                                 },
                                 on: {
                                     click: () => {
-                                          this.updatePwdModal=true
+                                          this.$router.push({path:"/distributeUser"})
                                     }
                                 }
                             },"配置权限"),
@@ -410,7 +410,7 @@
                                 },
                                 on: {
                                     click: () => {
-                                          this.updatePwdModal=true
+                                          this.$router.push({path:"/distributeUser"})
                                     }
                                 }
                             },"分配用户")
@@ -418,23 +418,18 @@
                   }
                 },
                 {
-                  title: '用户名',
+                  title: '角色名称',
                   key: 'name',
                   align:'center'
                 },
                 {
-                  title: '手机号',
-                  key: 'name',
-                  align:'center'
-                },
-                {
-                  title: '角色',
-                  key: 'name',
+                  title: '角色说明',
+                  key: 'explain',
                   align:'center'
                 },
                 {
                   title: '创建时间',
-                  key: 'updatedAt',
+                  key: 'gmtCreate',
                   align:'center'
                 }
               ]

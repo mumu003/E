@@ -293,10 +293,7 @@
           quantity:''
         },//回传资料tag显示
         formItem: {
-          type: '',
-          startUpdateTime: '',
-          endUpdateTime:'',
-          page:1
+          
         },
         end:{
             disabledDate :(function(date){
@@ -395,7 +392,7 @@
           dataIds:[]
         },//选择资料数据
         tableConfig:{
-            url:"/apiHost/api/processSetting/list",
+            url:"/apiHost/api/user/data",
               columns:[
                 {
                   type:"selection",
@@ -454,12 +451,12 @@
                 },
                 {
                   title: '用户名',
-                  key: 'name',
+                  key: 'loginName',
                   align:'center'
                 },
                 {
                   title: '手机号',
-                  key: 'name',
+                  key: 'phone',
                   align:'center'
                 },
                 {
@@ -469,7 +466,7 @@
                 },
                 {
                   title: '创建时间',
-                  key: 'updatedAt',
+                  key: 'gmtCreate',
                   align:'center'
                 }
               ]
