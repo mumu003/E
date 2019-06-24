@@ -1,53 +1,13 @@
 <template>
   <div>
-    <!-- <Row :gutter="10">
-      <Col span="24">
-        <Card class="search-card">
-          <p slot="title">
-              {{$route.meta.title}}
-            <collapse-icon foldPart="search-body"></collapse-icon>
-          </p>
-          <div id="search-body">
-            <Form  :model="formItem" :label-width="80">
-              <Row>
-                <Col span="6">
-                  <FormItem label="时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" style="width: 100%;"></DatePicker>
-                  </FormItem>
-                </Col>
-                <Col span="6">
-                  <FormItem>
-                    <DatePicker type="date" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" style="width: 100%;"></DatePicker>
-                  </FormItem>
-                </Col>
-              </Row>
-            </Form>
-          <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-              <Button type="primary" @click="searchSubmit" icon="search">检索</Button>
-              <Button type="ghost" @click="searchCancel" icon="refresh">重置</Button>
-            </Col>
-          </div>
-        </div>
-      </Card>
-      </Col>
-    </Row> -->
-
     <Row :gutter="10" class="mt10">
       <Col span="24">
         <Card>
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo">导出</Button>
-                <!-- <Button type="primary" icon="plus-round" @click="addProject">新增</Button> -->
-                <!--<Button type="primary" icon="plus-round" @click="batchProject">批量发起</Button>-->
-                <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button> -->
-                <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
-                <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
+                <Button type="primary" icon="ios-redo" @click="exportTabel()">导出</Button>
+              
               </Col>
               <Col>
               </Col>
@@ -60,225 +20,6 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增产权办理"
-        width="800"
-        @on-cancel="addCancel">
-        <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAdd">
-          <Row>
-            <Col span="8">
-              <FormItem label="楼栋" prop="buildingId">
-                <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-                  <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="8">
-              <FormItem label="单元" prop="unitId">
-                  <div v-if="addUnitNameIsNo !== ''">
-                    <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                      <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-                    </Select>
-                  </div>
-                  <div v-if="addUnitNameIsNo === ''">
-                    <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                      <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                    </Select>
-                  </div>
-              </FormItem>
-            </Col>
-            <Col span="8">
-              <FormItem label="房间号" prop="roomId">
-                <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-                  <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="8">
-              <FormItem label="业主姓名" prop="customerName">
-                <Input v-model="addForm.customerName" readonly></Input>
-              </FormItem>
-            </Col>
-            <Col span="24">
-              资料
-            </Col>
-            <Col span="24">
-              <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
-            </Col>
-          </Row>
-        </Form>
-        <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="ghost" size="default" @click="addCancel">取消</Button>
-          <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
-        </div>
-    </Modal>
-
-    <Modal v-model="batchModal" title="批量产权办理"
-        width="800"
-        :loading="loading"
-        @on-cancel="batchCancel">
-        <Form  :model="batchForm" :label-width="36">
-          <Row>
-            <Col span="24">
-              <FormItem label="楼栋">
-                <Input v-model="batchForm.buildingName" type="textarea" :autosize="true"  placeholder="请选择楼栋" @on-focus="batchHouse"></Input>
-              </FormItem>
-            </Col>
-            <Col span="24">
-              资料
-            </Col>
-            <Col span="24">
-              <Table stripe border :columns="addContract" :data="batchData" ref="batchTable" @on-selection-change="batchSelect"></Table>
-            </Col>
-          </Row>
-        </Form>
-        <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="ghost" size="default" @click="batchCancel">取消</Button>
-          <Button type="primary" size="default" @click="batchSubmit" :loading="modal_loading">确定</Button>
-        </div>
-    </Modal>
-
-    <Modal v-model="batchHouseModal" title="房屋选择"
-        width="700"
-        :loading="loading"
-        @on-cancel="batchHouseCancel">
-        <Form  :model="batchForm" :label-width="36">
-          <Row>
-            <Col span="24">
-              <FormItem label="楼栋">
-                <Select v-model="batchForm.buildingId" placeholder="请选择楼栋号"  @on-change="getBatchUnits(batchForm.buildingId),getRooms(batchForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="24">
-              <div class="batch-house-tips"><span class="batch-house-red">红色</span>-已售出</div>
-              <div class="batch-house-tips"><span class="batch-house-green">绿色</span>-已办理</div>
-              <div class="batch-house-tips"><span class="batch-house-gray">灰色</span>-不可办理</div>
-            </Col>
-            <div v-if="batchFloorsListIsNo !== ''">
-              <Col span="24" style="margin-bottom: 10px">
-                <!-- <Tag type="border" v-for="(item,index) in unitList" style="width:100px;height: 35px;line-height: 35px;" >{{item.name}}</Tag> -->
-                <!-- <Input v-for="(item,index) in unitList" style="width:110px;height: 35px;line-height: 35px;margin-right: 10px" disabled :value="item.name"></Input> -->
-                  <div v-if="unitNameIsNo !== ''">
-                  </div>
-                  <div v-if="unitNameIsNo === ''">
-                    <Button :type="batchButtonFocus === index ? 'primary' : 'ghost'" size="default" v-for="(item,index) in unitList" :key="index" style="margin-right: 10px" @click="getFloorsList(index)">{{item.name}}</Button>
-                  </div>
-              </Col>
-              <Col span="24" v-for="(item,index) in floorsList" :key="index">
-                  <Col span="2">
-                    <div class="house bg-gray">{{item.floor}}层</div>
-                  </Col>
-                   <Col span="22">
-                     <div class="test"  @click="toggle(item.floor,it.roomId)" :class="{'bg-green':it.status=='Doing','bg-gray':it.status=='Init','bg-red':it.status=='ToDo'}"    v-for="(it,index) in item.rooms">
-                       {{it.roomNum}}
-                       <Icon type="ios-checkmark-outline" v-show="it.show" class="img-position"></Icon><!--v-show="i.isShow"-->
-                     </div>
-                    </Col>
-              </Col>
-            </div>
-            <div v-if="batchFloorsListIsNo === '0'">
-              <Col span="24">
-                该楼栋没有房间！
-              </Col>
-            </div>
-          </Row>
-        </Form>
-        <div slot="footer" style="text-align:right;margin:0 auto;">
-          <Button type="ghost" size="default" @click="batchHouseCancel">取消</Button>
-          <Button type="primary" size="default" @click="batchHouseSubmit" :loading="modal_loading">确定</Button>
-        </div>
-    </Modal>
-
-    <Modal v-model="viewModal"
-      width="800"
-      @on-cancel="viewCancel">
-      <Tabs type="card"  @on-click="changs" style="margin-top: 12px" v-model="viewTabs">
-        <TabPane label="产权办理审核" name="name1">
-          <Form  :model="viewForm" :label-width="80">
-            <Row>
-              <Col span="8">
-                <FormItem label="楼栋">
-                  <Input v-model="viewForm.buildingName" readonly></Input>
-                </FormItem>
-              </Col>
-              <Col span="8">
-                <FormItem label="单元">
-                  <Input v-model="viewForm.unitName" readonly></Input>
-                </FormItem>
-              </Col>
-              <Col span="8">
-                <FormItem label="房间号">
-                  <Input v-model="viewForm.roomNum" readonly></Input>
-                </FormItem>
-              </Col>
-              <Col span="8">
-                <FormItem label="业主姓名">
-                  <Input v-model="viewForm.customerName" readonly></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                资料
-              </Col>
-              <Col span="24">
-              <Table stripe border v-if="buttons.start" :columns="viewStartContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-              <Table stripe border v-else :columns="viewContract" :data="viewData" ref="ref" @on-selection-change="viewselect"></Table>
-              </Col>
-            </Row>
-          </Form>
-        </TabPane>
-        <TabPane label="状态详情" name="name2">
-          <Row>
-            <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-            <Col span="24">
-            <Steps :current="Number(currentNodeId)">
-              <Step v-for="(item,index) in nodesList" :title="item.name" :content="item.roleName" :key="index"></Step>
-            </Steps>
-            </Col>
-            <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-            <Col span="24">
-            <Timeline>
-              <!--<TimelineItem v-for="(item,index) in historysList" :color="item.status === '0' ? 'red' : 'green'">
-                <p>{{item.createdAt}}</p>
-                <p v-if="index === 0">发起</p>
-                &lt;!&ndash; <p v-else-if="index === historysList.length-1">归档节点:完结</p> &ndash;&gt;
-                <p v-else>{{item.nodeName}}:{{item.status === '1' ? '通过' : '驳回'}}</p>
-                <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>-->
-              <TimelineItem v-for="(item,index) in historysList" :color="item.status === '1' ? 'green' : 'red'" :key="index">
-                <p>{{item.createdAt}}</p>
-                <!--<p v-if="index === 0">发起</p>-->
-                <!-- <p v-else-if="index === historysList.length-1">归档节点:完结</p> -->
-                <p v-if="index === 0">{{item.nodeName}}</p>
-                <span v-else>
-                  <p v-if="item.status === '1'">{{item.nodeName}}: 通过</p>
-                  <p v-else-if="item.status === '0'">{{item.nodeName}}: 驳回</p>
-                  <p v-else-if="item.status === '3'">{{item.nodeName}}</p>
-                </span>
-                <p v-if="item.nodeName==='发起'">{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-                <p v-else>{{index===0 ? '终止人' : '操作人'}}:{{item.userName}}</p>
-              </TimelineItem>
-            </Timeline>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
-      <div slot="footer" style="text-align:right;margin:0 auto;">
-        <Row>
-          <Col span="24" v-if="viewTabs === 'name1'">
-          <Button size="default" @click="viewCancel" >取消</Button>
-          <Button type="primary" size="default" @click="start" v-if="buttons.start" :loading="modal_loading" style="margin-left: 10px">发起</Button>
-          <span v-else-if="buttons.check" >
-              <Button type="error" size="default" @click="viewReject" :loading="reject_loading" :disabled="isDisable" style="margin-left: 10px">驳回</Button>
-              <Button type="primary" size="default" @click="viewPass" :loading="modal_loading" :disabled="passDisable">通过</Button>
-            </span>
-          </Col>
-          <Col span="24" v-if="viewTabs === 'name2'">
-            <Button size="default" @click="viewCancel" >取消</Button>
-          </Col>
-        </Row>
-      </div>
-    </Modal>
 
     <Modal v-model="endModal" title="终止产权办理"
       :loading="modal_loading"
@@ -287,33 +28,6 @@
     >
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
-
-   <!-- <Modal v-model="statusModal" title="状态详情"
-      width="800"
-      :loading="loading"
-      @on-ok="statusOk"
-      @on-cancel="cancel">
-      <Row>
-        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-        <Col span="24">
-          <Steps :current="currentNodeId">
-            <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
-          </Steps>
-        </Col>
-        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-        <Col span="24">
-          <Timeline>
-            <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
-              <p>{{item.createdAt}}</p>
-              <p v-if="index === 0">发起</p>
-              <p v-else-if="index === historysList.length-1">归档节点:完结</p>
-              <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
-              <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-            </TimelineItem>
-          </Timeline>
-        </Col>
-      </Row>
-    </Modal>-->
 
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
@@ -428,7 +142,7 @@
         formItem: {
           year:2019,
           month:6,
-          companyName:this.$route.query.companyName
+          companyName:this.$route.params.companyName
         },
         //表格
         tableConfig:{
@@ -717,16 +431,17 @@
     },
     mounted(){//方法
       // this.getBuildings()//获取楼栋
+      console.log(this)
     },
     methods: {
-      //Tabs切换
-      changs(){
-        if(this.viewTabs === 'name1'){
-          this.historysList = []
-          this.nodesList = []
-        }else{
-          this.statusProject ()
-        }
+      // 导出
+      exportTabel(){
+        this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemDetailsData?year=2019&month=6&companyName="+this.$route.query.companyName, data => {
+        },data=>{
+        // 成功的回调
+        console.log(111)
+        })
+
       },
       //顺序
       numSort: function (a,b) {

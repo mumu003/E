@@ -173,7 +173,7 @@ import qs from "qs";
                                     },
                           on: {
                               click: () => {
-                                    this.$router.push({path:"/reportDetail?companyName="+params.row.companyName})
+                                    this.$router.push({name:"reportDetail",params:{companyName:params.row.companyName}})
                               }
                           }
                         },"详情")
@@ -246,7 +246,7 @@ import qs from "qs";
     methods: {
       // 导出
       exportTabel(){
-        this.$request.post("/api/emaint/repairProblem/exportCompanyProblemData",qs.stringify({year:2019,month:6}), data => {
+        this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
         },data=>{
         // 成功的回调
         console.log(111)

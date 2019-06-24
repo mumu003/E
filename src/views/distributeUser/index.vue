@@ -8,7 +8,7 @@
               角色新增
           </p>
         <i-form  :model="addformdata" :rules="ruleValidate"  :label-width="90" class="addform" >
-          <Form-item label="角色名称" >
+          <Form-item label="角色名称" prop="name">
               <Input  placeholder="请输入角色名称" :maxlength=50 style="width: 100%"></Input>
           </Form-item>
           
@@ -50,7 +50,6 @@ class="model"
   </div>
 </template>
 <script type="text/ecmascript-6">
-// import expandRow from '../../components/table-expand.vue';
 export default {
   data() {
     return {
@@ -63,7 +62,7 @@ export default {
         city: ""
       },
       ruleValidate: {
-        questionname: [
+        name: [
           { required: true, message: "类型名称不能为空", trigger: "blur" }
         ]
       },
@@ -80,50 +79,44 @@ export default {
           {
             title: "权限名称",
             key: "name",
-            // width: 200,
-            align: "center",
-            // type: 'expand',
-            // render: (h, params) => {
-            //                 return h(expandRow)
-            //             }
+            align: "center"
           }
-        ],
-       
+        ]
       },
-      tableData:[
+      tableData: [
         {
-          name:"用户管理列表"
-        },
-        // {
-        //   name:"用户新增"
-        // },
-        // {
-        //   name:"用户修改"
-        // },
-        // {
-        //   name:"用户修改密码"
-        // },
-        // {
-        //   name:"用户删除"
-        // },
-        {
-          name:"角色管理列表"
+          name: "用户管理列表"
         },
         {
-          name:"角色新增"
+          name: "用户新增"
         },
         {
-          name:"角色修改"
+          name: "用户修改"
         },
         {
-          name:"配置权限"
+          name: "用户修改密码"
         },
         {
-          name:"角色删除"
+          name: "用户删除"
         },
         {
-          name:"其他权限···"
+          name: "角色管理列表"
         },
+        {
+          name: "角色新增"
+        },
+        {
+          name: "角色修改"
+        },
+        {
+          name: "配置权限"
+        },
+        {
+          name: "角色删除"
+        },
+        {
+          name: "其他权限···"
+        }
       ],
       //新增-表单
       addForm: {

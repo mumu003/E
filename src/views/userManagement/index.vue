@@ -451,12 +451,12 @@
                 },
                 {
                   title: '用户名',
-                  key: 'name',
+                  key: 'loginName',
                   align:'center'
                 },
                 {
                   title: '手机号',
-                  key: 'name',
+                  key: 'phone',
                   align:'center'
                 },
                 {
@@ -466,7 +466,7 @@
                 },
                 {
                   title: '创建时间',
-                  key: 'updatedAt',
+                  key: 'gmtCreate',
                   align:'center'
                 }
               ]

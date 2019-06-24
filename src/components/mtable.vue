@@ -107,7 +107,8 @@ export default {
         })
         this.tableData = list
         console.log(this.tableData)
-        this.total = data.responseResult.total
+
+        this.total = data.responseResult.total || data.responseResult.length
         this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
       },data=>{
         // 成功的回调
@@ -126,7 +127,7 @@ export default {
         })
         this.tableData = list
         console.log(this.tableData)
-        this.total = data.responseResult.total
+        this.total = data.responseResult.total || data.responseResult.length
         this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
       })
     },

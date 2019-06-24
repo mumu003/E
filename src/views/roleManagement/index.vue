@@ -382,7 +382,7 @@
                                 },
                                 on: {
                                     click: () => {
-                                          this.updatePwdModal=true
+                                          this.$router.push({path:"/distributeUser"})
                                     }
                                 }
                             },"配置权限"),
@@ -410,7 +410,7 @@
                                 },
                                 on: {
                                     click: () => {
-                                          this.updatePwdModal=true
+                                          this.$router.push({path:"/distributeUser"})
                                     }
                                 }
                             },"分配用户")
@@ -418,18 +418,13 @@
                   }
                 },
                 {
-                  title: '用户名',
+                  title: '角色名称',
                   key: 'name',
                   align:'center'
                 },
                 {
-                  title: '手机号',
-                  key: 'name',
-                  align:'center'
-                },
-                {
-                  title: '角色',
-                  key: 'name',
+                  title: '角色说明',
+                  key: 'explain',
                   align:'center'
                 },
                 {
