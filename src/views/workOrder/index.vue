@@ -14,56 +14,56 @@
 
               <Col span="6">
               <FormItem label="工单号">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入工单号"></Input>
+                <Input v-model="formItem.workOrderNo" :maxlength=20 placeholder="请输入工单号"></Input>
               </FormItem>
               </Col>              
               <Col span="6">
               <FormItem label="状态">
-                 <Select v-model="formItem.status" placeholder="待派单">
-                      <Option value="">待派单</Option>
-                      <Option value="-1">待维修</Option>
-                      <Option value="1">待评价</Option>
-                      <Option value="2">已评价</Option>
+                 <Select v-model="formItem.state" placeholder="待派单">
+                      <Option value="待派单">待派单</Option>
+                      <Option value="待维修">待维修</Option>
+                      <Option value="待评价">待评价</Option>
+                      <Option value="已评价">已评价</Option>
                     </Select>
               </FormItem>
               </Col>
               
               <Col span="6">
               <FormItem label="姓名">
-                <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入姓名" />
+                <Input v-model="formItem.name" :maxlength=30 placeholder="请输入姓名" />
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="手机号">
-                <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入手机号"/>
+                <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"/>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="是否变更">
-                 <Select v-model="formItem.change_status" placeholder="全部">
+                 <Select v-model="formItem.isChange" placeholder="全部">
                       <Option value="">全部</Option>
-                      <Option value="-1">已变更</Option>
-                      <Option value="1">未变更</Option>
+                      <Option value="是">已变更</Option>
+                      <Option value="否">未变更</Option>
                     </Select>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="执行人">
-                 <Select v-model="formItem.manger" placeholder="全部">
+                 <Select v-model="formItem.userName" placeholder="全部">
                       <Option value="">全部</Option>
-                      <Option value="-1">张三</Option>
-                      <Option value="1">李四</Option>
+                      <Option value="张三">张三</Option>
+                      <Option value="李四">李四</Option>
                     </Select>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="时间">
-                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
             </Row>
@@ -135,7 +135,7 @@
           </Col>
           <Col span="8">
             <FormItem label="工单号">
-              <Input v-model="addForm.customerName" readonly></Input>
+              <Input v-model="addForm.workOrderNo" readonly></Input>
             </FormItem>
           </Col>
           <Col span="8">
@@ -248,21 +248,21 @@
         },
         //表单
         formItem: {
-          status:'',
-          customerName:'',
-          buildingName:'',
-          roomNum:'',
+          state:'',
+          workOrderNo:'',
+          name:'',
+           phone:'',
           unitName:'',
-          startUpdateTime:'',
-          endUpdateTime:'',
+          beginTime:'',
+          endTime:'',
           page:'1',
-          change_status:"",
-          manger:""
+          isChange:"",
+          userName:""
         },
          // 设置结束时间大于开始时间
         end:{
             disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+              return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
         //表格
@@ -292,7 +292,10 @@
                                     on: {
                                         click: () => {
                                             this.$router.push({
-                                              name:"dispatch"
+                                              name:"workOrderManage",
+                                              params:{
+                                                id:params.row.id
+                                              }
                                             })
                                         }
                                     }
@@ -330,7 +333,7 @@
             {
               // PS:暂无该字段
               title: '变更状态',
-              key: 'roomNum',
+              key: ' phone',
               width:120
             },
             {
@@ -350,7 +353,7 @@
             },
             {
               title: '执行人',
-              key: 'userName',
+              key: 'name',
               width:120
             },
             {
@@ -367,12 +370,12 @@
         },
         //新增表单
         addForm:{
-          customerName:'',
+          workOrderNo:'',
           buildingId:'',
-          buildingName:'',
+          name:'',
           unitId:'',
           unitName:'',
-          roomNum:'',
+           phone:'',
           roomId:'',
           fileType:'',
           selection:[],
@@ -391,7 +394,7 @@
           roomId: [
             { required: true, message: '请选择房间号', trigger: 'change' }
           ],
-          customerName:[
+          workOrderNo:[
             { required: true, message: '请填写客户姓名', trigger: 'blur' }
           ],
           fileType: [
@@ -589,11 +592,11 @@
     methods: {
       //开始时间
       getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
+        this.formItem.beginTime=startDate
       },
       //结束时间
       getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+        this.formItem.endTime=endDate
       },
       //获取楼栋列表
       getBuildings() {
@@ -609,7 +612,7 @@
           this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
-              name: item.buildingName
+              name: item.name
             }))
           }, res => {
             this.$Modal.error({title: '提示信息', content: res.message})
@@ -623,7 +626,7 @@
         }
         this.buildingList.forEach(item=>{
           if(buildingId===item.id){
-            this.addForm.buildingName = item.name
+            this.addForm.name = item.name
           }
         })
         this.unitList=[];
@@ -643,8 +646,8 @@
             rooms:item.rooms
           }))
           if(this.unitList[0].name === ''){
-            if(this.addForm.buildingName !== ""){
-              this.addUnitNameIsNo = this.addForm.buildingName
+            if(this.addForm.name !== ""){
+              this.addUnitNameIsNo = this.addForm.name
             }
           }
         }, res => {
@@ -653,8 +656,8 @@
         this.addForm.unitId = ""
         this.addForm.unitName = ""
         this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
+        this.addForm. phone = ""
+        this.addForm.workOrderNo = ""
         this.addForm.fileType = ""
       },
       //获取房间列表
@@ -668,13 +671,13 @@
           if (item.id===unitId) {
             this.roomsList = item.rooms.map(item => ({
               id: item.roomId,
-              num: item.roomNum
+              num: item. phone
             }))
           }
         })
         this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
+        this.addForm. phone = ""
+        this.addForm.workOrderNo = ""
         this.addForm.fileType = ""
       },
       //模态框的业主姓名
@@ -684,17 +687,17 @@
         }
         this.roomsList.forEach(item=>{
           if(roomId===item.id){
-            this.addForm.roomNum = item.num
+            this.addForm. phone = item.num
           }
         })
         this.$request.post("/apiHost/api/room/getRoomCustomer",{
           roomId
         }, res => {
-          this.addForm.customerName=""
+          this.addForm.workOrderNo=""
           res.data.data.map(item =>{
-            this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
+            this.addForm.workOrderNo =this.addForm.workOrderNo+ item.workOrderNo+'/'
           })
-          this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
+          this.addForm.workOrderNo=this.addForm.workOrderNo.substr(0,this.addForm.workOrderNo .length-1)//排除最后一个
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
@@ -789,7 +792,7 @@
       // 导出
       // PS：跨域问题
       exportProject(){
-          this.$request.get("/apiHost/api/emaint/repairProblem/exportRepairProblemData", res => {
+          this.$request.get("/apiHost/api/emaint/repairProblem/exportRepairProblemData",{}, res => {
             this.$Modal.error('导出失败！')
         }, res => {
           if (res.code === 200) {
@@ -818,10 +821,10 @@
       //   }
       //   this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
       //     this.viewForm.id = res.data.id
-      //     this.viewForm.buildingName = res.data.buildingName
+      //     this.viewForm.name = res.data.name
       //     this.viewForm.unitName = res.data.unitName
-      //     this.viewForm.roomNum = res.data.roomNum
-      //     this.viewForm.customerName = res.data.customerName
+      //     this.viewForm. phone = res.data. phone
+      //     this.viewForm.workOrderNo = res.data.workOrderNo
       //     if(res.data.fileType ==='Contract' ){
       //       this.viewForm.fileType = '未按时转签约'
       //     }else if(res.data.fileType ==='Payment' ){
@@ -891,7 +894,7 @@
         this.modal_loading = true;
         let params = {
           id: this.viewForm.id,
-          status:'1'
+          state:'1'
         }
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
@@ -917,7 +920,7 @@
         this.reject_loading = true
         let params = {
           id: this.viewForm.id,
-          status:'0'
+          state:'0'
         }
         this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
@@ -954,7 +957,7 @@
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/sendFileBill/status",params,res=>{
+        this.$request.post("/apiHost/api/sendFileBill/state",params,res=>{
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -962,9 +965,9 @@
           }))
           this.historysList =res.data.historys.map(item=> ({
             createdAt:item.createdAt,
-            status:item.status,
+            state:item.state,
             nodeName:item.nodeName,
-            userName:item.userName
+            name:item.name
           }))
           this.nodesList.map((item,i)=>{
             if(item.id===res.data.currentNodeId){
@@ -1073,28 +1076,28 @@
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/sendFileBill/list",this.formItem, res => {
-          if (res.code === 200) {
+        this.$request.post("/apiHost/api/emaint/repairProblem/repairProblemList",qs.stringify(this.formItem), res => {
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
+        }, res => {
+           if (res.code === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
           }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //重置
       searchCancel () {
         this.formItem={
-          status: '',
-          customerName: '',
+          state: '',
+          workOrderNo: '',
           buildingId: '',
           roomId: '',
           unitId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          beginTime: '',
+          endTime: ''
         }
         this.isFirst = true
         setTimeout(()=>{

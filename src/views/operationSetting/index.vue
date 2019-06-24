@@ -663,7 +663,7 @@ import qs from "qs";
       //搜索提交
       settingSubmit () {
         // this.isFirst = true
-        this.$request.post("/apiHost/api/emaint/system-setting/save",qs.stringify(this.formItem), res => {
+        this.$request.post("/apiHost/api/emaint/system-setting/save",this.formItem, res => {
             this.$Modal.error({title: '提示信息', content:res.responseResult})
         }, res => {
           if (res.statusCode == 200) {

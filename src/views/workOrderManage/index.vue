@@ -180,6 +180,7 @@
   </div>
 </template>
 <script>
+import qs from "qs";
   export default {
     data () {
       return {
@@ -289,9 +290,13 @@
             }
         ],
         question_ary:[],
-        imgName: '',
         visible: false,
-        uploadList: [],
+        viewForm:{
+          id:""
+        },
+
+
+/****************************** */
         
         //新增-表单数据
         addForm:{
@@ -373,14 +378,14 @@
           ]
         },
         //审核-表单数据
-        viewForm:{
-          buildingName:'',
-          unitName:'',
-          roomNum:'',
-          customerName:'',
-          status:'',
-          id:''
-        },
+        // viewForm:{
+        //   buildingName:'',
+        //   unitName:'',
+        //   roomNum:'',
+        //   customerName:'',
+        //   status:'',
+        //   id:''
+        // },
         //审核-表格数据
         viewContract: [
           {
@@ -432,12 +437,15 @@
       }
     },
     mounted(){//方法
-        this.getBuildings()
+        this.viewForm.id=this.$route.params.id
+        // console.log(this.$route.params.id)
+        
+        this.getinfo()
         
         // this.addarea()
         /*this.getIndex()*/
     },
-    methods: {//对象      
+    methods: {     
       changefile(e){
           var file=e.target.files[0]
          
@@ -470,6 +478,19 @@
           window.history.go(-1)
       },
 
+      getinfo(){
+        console.log(123)
+        this.$request.post("/apiHost/api/emaint/repairProblem/view",qs.stringify(this.viewForm), res => {
+           this.$Modal.error('网络错误')
+        }, res => {
+          if (res.code === 200) {
+            this.$Message.success("查询成功！")
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error('网络错误,请重试！')
+          }
+        })
+      },
       //获取楼栋列表
       getBuildings() {
         let token = sessionStorage.getItem("token")
