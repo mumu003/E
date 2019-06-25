@@ -12,29 +12,29 @@
                 <Row>
                   <Col span="6">
                     <FormItem label="工单号">
-                      <Input v-model="formItem.buildingName" :maxlength=30 placeholder="请输入工单号"/>
+                      <Input v-model="formItem.workOrderNo" :maxlength=30 placeholder="请输入工单号"/>
                     </FormItem>
                   </Col>
                   <Col span="6">
                     <FormItem label="执行人">
-                      <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入执行人"/>
+                      <Input v-model="formItem.fromClientName" :maxlength=20 placeholder="请输入执行人"/>
                     </FormItem>
                   </Col>
                   <Col span="6">
                     <FormItem label="评价人">
-                      <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入评价人"/>
+                      <Input v-model="formItem.toUserName" :maxlength=20 placeholder="请输入评价人"/>
                     </FormItem>
                   </Col>
                 </Row>
                 <Row>
                   <Col span="6">
                   <FormItem label="更新时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 </Row>
@@ -101,7 +101,7 @@
       return {
         isShowEvaluation:false,//是否显示评价
         evaluationTitle:"",//评价标题
-        modalStar:"0",
+        modalStar:0,
         modalLabel:"",
         passDisable: false, //防止通过双击事件
         isDisable: false, //防止驳回双击事件
@@ -111,19 +111,22 @@
         reject_loading: false, //驳回
         //表单
         formItem: {
-          
-          // startUpdateTime:'',
-          // endUpdateTime:'',
+          pageNo:"1",
+          workOrderNo:"",
+          toUserName:"",
+          fromClientName:"",
+          beginTime:"",
+          endTime:""
         },
         // 设置结束时间大于开始时间
         end:{
             disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+              return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
         //表格
         tableConfig:{
-          url:"/apiHostapi/emaint/repair-estimate/page",
+          url:"/apiHost/api/emaint/repair-estimate/page",
               columns:[
                 {
                   title: '操作',
@@ -241,15 +244,12 @@
       },
       // 开始时间
       getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
+        this.formItem.beginTime=startDate
       },
       // 结束时间
       getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+        this.formItem.endTime=endDate
       },
-     
-
-
       // 删除
       deleteProject(){
         if (this.selected_count === 0) {
@@ -281,23 +281,27 @@
       // 搜索
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+        // this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
+        //   if (res.code === 200) {
+        //     this.$Message.success("搜索成功！")
+        //     this.isFirst = false
+        //     this.$refs.table.init()
+        //   } else {
+        //     this.$Modal.error({title: '提示信息', content: res.message})
+        //   }
+        // }, res => {
+        //   this.$Modal.error({title: '提示信息', content: res.message})
+        // })
+        
+        this.$refs.table.init()
       },
       // 重置
       searchCancel(){
-        this.formItem.status="";
-        this.formItem.startUpdateTime="";
-        this.formItem.endUpdateTime="";
+          this.formItem.workOrderNo="",
+          this.formItem.toUserName="",
+          this.formItem.fromClientName="",
+          this.formItem.beginTime="",
+          this.formItem.endTime=""
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()

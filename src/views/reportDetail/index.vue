@@ -140,8 +140,8 @@
         buttons:{ }, //按钮
         //表单
         formItem: {
-          year:2019,
-          month:6,
+          year:new Date().getFullYear(),
+          month:new Date().getMonth()+1,
           companyName:this.$route.params.companyName
         },
         //表格
@@ -151,7 +151,7 @@
                 {
                   title: '日期',
                   key: 'gmtCreate',
-                  width:120,
+                  width:130,
                   align:"center",
                 },
                 {
@@ -186,9 +186,15 @@
                 },
                 {
                   title: '是否评价',
-                  key: 'updatedAt',
                   width:100,
-                  align:"center"
+                  align:"center",
+                  render:(h,params)=>{
+                    if(params.row.state=="已评价"){
+                          return h('span',"是")
+                    }else{
+                          return h('span',"否")
+                    }
+                  }
                 }
               ],
         },

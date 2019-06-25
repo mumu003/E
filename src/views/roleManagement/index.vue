@@ -64,16 +64,16 @@
     </Row>
 
     <Modal title="角色新增" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
-      <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
+      <Form  ref="addMaterialForm" :model="addDataForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
           <Col span="22" >
             <FormItem label="角色名称"  prop="name">
-              <Input v-model="addMaterialForm.name" placeholder="请输入角色名称" :maxlength=50 style="width: 100%" ></Input>
+              <Input v-model="addDataForm.name" placeholder="请输入角色名称" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="角色说明" prop="quantity">
-            <Input v-model="addMaterialForm.quantity" type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
+          <FormItem label="角色说明" prop="explain">
+            <Input v-model="addDataForm.explain" type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
           </FormItem>
           </Col>
         </Row>
@@ -136,7 +136,7 @@
       <p id="note-info">是否确认删除该角色？</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
         <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
-        <Button type="primary" size="default" @click="deleteModal=false">确定</Button>
+        <Button type="primary" size="default" @click="deleteRole()">确定</Button>
       </div>
     </Modal>
   </div>
@@ -155,6 +155,7 @@
     height:auto!important;}
 </style>
 <script>
+import qs from "qs";
   export default {
     data () {
       const validateNumber = (rule, value, callback) => {
@@ -220,6 +221,7 @@
         editMaterialModal: false,//编辑资料模态框
         updatePwdModal: false,
         deleteModal:false,
+        roleID:"",
         editArchiveModal: false,//编辑流程存档资料模态框
         viewModal : false,//流程设置详情模态框
         isNo: 'false', //选择存档资料中资料全部被选完了
@@ -397,6 +399,7 @@
                                 on: {
                                     click: () => {
                                           this.deleteModal=true
+                                          this.roleID=params.row.id
                                     }
                                 }
                             },"删除"),
@@ -532,15 +535,15 @@
           id:0,
           name:'',
           type:''
-        },//新增角色数据
+        },
+        //新增角色数据
         addDataForm:{
-          id:'',
-          sort:'',
+          code:'',
           name:'',
-          quantity:'',
-          required:'',
-          archive:''
-        },//新增资料数据
+          explain:'',
+          id:''
+        },
+        //新增资料数据
         editArchiveForm:{
           type:'',
           requirePurchase:[],
@@ -567,6 +570,17 @@
       this.getRoleList()//获取角色
     },
     methods:{
+      // 删除单个角色
+      deleteRole(){
+        this.$request.post("/apiHost/api/emaint/role/remove", qs.stringify({id:this.roleID}), res => {
+	         this.$Modal.success("删除成功")
+	        }, res => {
+            this.$refs.table.init()
+            this.$Modal.success("删除成功")
+            this.deleteModal=false
+	          // this.$Modal.error({title: '提示信息', content: res.message})
+	        })
+      },
       //获取角色
       getRoleList(){
       	let token = sessionStorage.getItem("token")
@@ -816,20 +830,47 @@
       },
       //新增资料确定
       addSubmit () {
-        this.$refs.addMaterialForm.validate((valid) => {
-          if (valid) {
-            this.modal_loading = true
-            this.addDataForm={
-              id:0,
-              sort:this.settingDatas.length+1,
-              name:this.addMaterialForm.name,
-              quantity:this.addMaterialForm.quantity,
-              required:this.addMaterialForm.required,
-              archive:this.addMaterialForm.archive
-            },
-            this.settingDatas.push(this.addDataForm)
-            this.addMaterialModal = false
-            this.$refs.addMaterialForm.resetFields()
+        // this.$refs.addMaterialForm.validate((valid) => {
+        //   if (valid) {
+        //     this.modal_loading = true
+        //     this.addDataForm={
+        //       id:0,
+        //       sort:this.settingDatas.length+1,
+        //       name:this.addMaterialForm.name,
+        //       quantity:this.addMaterialForm.quantity,
+        //       required:this.addMaterialForm.required,
+        //       archive:this.addMaterialForm.archive
+        //     },
+        //     this.settingDatas.push(this.addDataForm)
+        //     this.addMaterialModal = false
+        //     this.$refs.addMaterialForm.resetFields()
+        //     this.modal_loading = false
+        //   }
+        // })
+        this.$request.post("/apiHost/api/emaint/role/save",qs.stringify(this.addDataForm),res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.editModal = false
+              this.modal_loading = false
+              this.$refs.editForm.resetFields()
+              this.$Message.success("提交成功!")
+              this.$refs.table.init()
+            // }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.editModal = false
+              this.modal_loading = false
+              this.$refs.editForm.resetFields()
+              this.$Message.success("提交成功!")
+              this.$refs.table.init()
+            // }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
           }
         })

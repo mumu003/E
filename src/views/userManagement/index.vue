@@ -69,31 +69,31 @@
     </Row>
 
     <Modal title="用户新增" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
-      <Form  ref="addMaterialForm" :model="addMaterialForm" :label-width="100" :rules="ruleAddMaterial" >
+      <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
           <Col span="22" >
             <FormItem label="用户名"  prop="name">
-              <Input v-model="addMaterialForm.name" placeholder="请输入用户名" :maxlength=50 style="width: 100%" ></Input>
+              <Input v-model="addForm.name" placeholder="请输入用户名" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="手机号" prop="quantity">
-            <Input v-model="addMaterialForm.quantity" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
+          <FormItem label="手机号" prop="phone">
+            <Input v-model="addForm.phone" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
           </FormItem>
           </Col>
           <Col span="22" >
           <FormItem label="密码" prop="pwd">
-            <Input v-model="addMaterialForm.pwd" type="password" style="width: 100%" placeholder="请输入6-20为至少为数字的密码" :maxlength=11></Input>
+            <Input v-model="addForm.pwd" type="password" style="width: 100%" placeholder="请输入6-20为至少为数字的密码" :maxlength=11></Input>
           </FormItem>
           </Col>
           <Col span="22" >
           <FormItem label="重复密码" prop="pwdTwo">
-            <Input v-model="addMaterialForm.pwdTwo" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
+            <Input v-model="addForm.pwdTwo" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
           </FormItem>
           </Col>
           <Col span="22">
             <FormItem label="所属角色" prop="type">
-              <Select v-model="editForm.type" placeholder="请选择角色">
+              <Select v-model="addForm.type" placeholder="请选择角色">
                 <Option value="1">合同备案</Option>
                 <Option value="5">发函</Option>
                 <Option value="6">交房通知</Option>
@@ -104,10 +104,6 @@
               </Select>
             </FormItem>
           </Col>
-
-
-
-
         </Row>
       </Form>
       <div slot="footer" style="text-align:right;margin:0 auto;">
@@ -194,61 +190,62 @@
     height:auto!important;}
 </style>
 <script>
+import qs from "qs";
   export default {
     data () {
-      const validateNumber = (rule, value, callback) => {
-        let dot=value.indexOf(".");
-        if (!value) {
-            return callback(new Error('资料数量不能为空'));
-        }
-        if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
-            callback(new Error('资料数量只能为正整数'));
-        } else {
-            callback();
-        }
-      };
-      const validateSource = (rule, value, callback) => {
-        if (value>10) {
-            return callback(new Error('资料数量不能大于10'));
-        }else{
-            callback();
-        }
-      };
-      const validatorMaterialName = (rule, value, callback) =>{
-        let settingDatasLength = this.settingDatas.length;
-        let isExistence = false;
-        for(var i=0; i<settingDatasLength; i++){
-          if(value === this.settingDatas[i].name){
-            isExistence = true
-          }
-        }
-        if(isExistence){
-          return callback(new Error('资料已存在'));
-        }else{
-          callback();
-        }
-      };
-      const validatorMaterialNameEdit = (rule, value, callback) =>{
-        let settingDatasLength = this.settingDatas.length;
-        let editMaterialIndex = this.editSelect[0].sort-1;
-        let editMaterialIndexJia = editMaterialIndex+1;
-        let isExistence = 1;
-        for(var i=0; i<editMaterialIndex; i++){
-          if(value === this.settingDatas[i].name){
-            isExistence = isExistence +1
-          }
-        }
-        for(var i=editMaterialIndexJia; i<settingDatasLength; i++){
-          if(value === this.settingDatas[i].name){
-            isExistence = isExistence +1
-          }
-        }
-        if(isExistence > 1){
-          return callback(new Error('资料已存在'));
-        }else{
-          callback();
-        }
-      };
+      // const validateNumber = (rule, value, callback) => {
+      //   let dot=value.indexOf(".");
+      //   if (!value) {
+      //       return callback(new Error('资料数量不能为空'));
+      //   }
+      //   if (!Number.isInteger(Number(value))||Number(value)<0||dot>0) {
+      //       callback(new Error('资料数量只能为正整数'));
+      //   } else {
+      //       callback();
+      //   }
+      // };
+      // const validateSource = (rule, value, callback) => {
+      //   if (value>10) {
+      //       return callback(new Error('资料数量不能大于10'));
+      //   }else{
+      //       callback();
+      //   }
+      // };
+      // const validatorMaterialName = (rule, value, callback) =>{
+      //   let settingDatasLength = this.settingDatas.length;
+      //   let isExistence = false;
+      //   for(var i=0; i<settingDatasLength; i++){
+      //     if(value === this.settingDatas[i].name){
+      //       isExistence = true
+      //     }
+      //   }
+      //   if(isExistence){
+      //     return callback(new Error('资料已存在'));
+      //   }else{
+      //     callback();
+      //   }
+      // };
+      // const validatorMaterialNameEdit = (rule, value, callback) =>{
+      //   let settingDatasLength = this.settingDatas.length;
+      //   let editMaterialIndex = this.editSelect[0].sort-1;
+      //   let editMaterialIndexJia = editMaterialIndex+1;
+      //   let isExistence = 1;
+      //   for(var i=0; i<editMaterialIndex; i++){
+      //     if(value === this.settingDatas[i].name){
+      //       isExistence = isExistence +1
+      //     }
+      //   }
+      //   for(var i=editMaterialIndexJia; i<settingDatasLength; i++){
+      //     if(value === this.settingDatas[i].name){
+      //       isExistence = isExistence +1
+      //     }
+      //   }
+      //   if(isExistence > 1){
+      //     return callback(new Error('资料已存在'));
+      //   }else{
+      //     callback();
+      //   }
+      // };
       return {
         syncDisable : false,//异步房屋禁用
         loading : true,//加载
@@ -320,34 +317,35 @@
             { required: true, message: '请选择流程角色', trigger: 'change' }
           ]
         },
-        addMaterialForm:{
+        // 新增用户
+        addForm:{
           id : 0,
           name:'',
-          quantity:'',
+          phone:'',
           pwd:'',
           pwdTwo:'',
           type:''
         },//新增资料数据
         ruleAddMaterial:{
           name: [
-            { required: true, message: '请输入资料名称', trigger: 'blur' },
-            { validator:validatorMaterialName , trigger: 'change'}
+            { required: true, message: '用户名不能为空', trigger: 'blur' },
+            // { validator:validatorMaterialName , trigger: 'change'}
           ],
-          quantity: [
-            { required: true, validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+          phone: [
+            { required: true, message: '手机号不能为空', trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ],
           pwd:[
-            { required: true, validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, message: '密码不能为空', trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ],
           pwdTwo:[
-            { required: true, validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, message: '请再次输入密码', trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ],
           type:[
-            { required: true, validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, message: '所属角色不能为空', trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ]
         },
         //用户修改
@@ -360,15 +358,15 @@
         ruleEditMaterial:{
           name: [
             { required: true, trigger: 'blur' },
-            { validator:validatorMaterialNameEdit , trigger: 'change'}
+            // { validator:validatorMaterialNameEdit , trigger: 'change'}
           ],
           phone: [
-            { required: true,validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ],
           type: [
-            { required: true,validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ]
         },
         //修改密码
@@ -380,11 +378,11 @@
         ruleupdatePwd:{
           pwd: [
             { required: true, trigger: 'blur' },
-            { validator:validatorMaterialNameEdit , trigger: 'change'}
+            // { validator:validatorMaterialNameEdit , trigger: 'change'}
           ],
           pwdTwo: [
-            { required: true,validator:validateNumber, trigger: 'blur' },
-            { validator:validateSource, trigger: 'blur' }
+            { required: true, trigger: 'blur' },
+            // { validator:validateSource, trigger: 'blur' }
           ]
         },
         selectMaterialForm:{
@@ -601,44 +599,42 @@
       }
     },
     mounted(){
-      this.getRoleList()//获取角色
+      // this.getRoleList()//获取角色
     },
     methods:{
+      updatePwdlCancel(){
+        this.updatePwdModal = false,
+        this.$Message.info('你取消了操作')
+        this.$refs.table.init()
+      },
+      updatePwdSubmit(){
+
+      },
       //获取角色
-      getRoleList(){
-      	let token = sessionStorage.getItem("token")
-      	if(token === null){
-      	  window.location.href = '/#/login'
-          window.location.reload()
-      	}else{
-      	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-	          this.roleList = res.data.data.map(item => ({
-	            roleId: item.roleId,
-	            roleName: item.roleName
-	          }))
-	        }, res => {
-	          this.$Modal.error({title: '提示信息', content: res.message})
-	        })
-      	}
-      },
+      // getRoleList(){
+      // 	let token = sessionStorage.getItem("token")
+      // 	if(token === null){
+      // 	  window.location.href = '/#/login'
+      //     window.location.reload()
+      // 	}else{
+      // 	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
+	    //       this.roleList = res.data.data.map(item => ({
+	    //         roleId: item.roleId,
+	    //         roleName: item.roleName
+	    //       }))
+	    //     }, res => {
+	    //       this.$Modal.error({title: '提示信息', content: res.message})
+	    //     })
+      // 	}
+      // },
       //获取角色名称
-      getRoleName(roleId,index){
-        this.roleList.forEach(item=>{
-          if(roleId === item.roleId){
-            this.settingNodes[index].roleName = item.roleName
-          }
-        })
-      },
-      //获取终止角色
-      getOverName(overId){
-        this.roleList.forEach(item=>{
-          if(overId === item.roleId){
-            this.editForm.overName = item.roleName
-            //console.log("this.editForm.overName="+this.editForm.overName)
-            //console.log("this.editForm.overId="+this.editForm.overId)
-          }
-        })
-      },
+      // getRoleName(roleId,index){
+      //   this.roleList.forEach(item=>{
+      //     if(roleId === item.roleId){
+      //       this.settingNodes[index].roleName = item.roleName
+      //     }
+      //   })
+      // },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -680,67 +676,6 @@
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
-      },
-      //流程设置详情
-      viewProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-          objId: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/processSetting/view",params,res=>{
-          this.viewForm.type = res.data.type
-          this.viewForm.overName = res.data.overName
-          //console.log("this.viewForm.overName"+JSON.stringify(res.data))
-          this.viewSettingDatas = res.data.settingDatas.map(item=>({
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            archive: item.archive,
-            id:item.id
-          }))
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
-          this.viewSettingNodesOne = res.data.map(item=>({
-            roleName : item.roleName,
-            nodeId : item.nodeId,
-            data : item.data,
-            labelName : ''
-          }))
-          this.viewSettingNodesTwo = this.viewSettingNodesOne
-          for(var i = 0; i<this.viewSettingNodesTwo.length; i++){
-            let endIndex = this.viewSettingNodesTwo.length-1
-            if(i === 0){
-              this.viewSettingNodesTwo[i].labelName = '发起人'
-            }else if(i === endIndex) {
-              this.viewSettingNodesTwo[i].labelName = '存档节点'
-            }else {
-              let indexJia = i+1
-              this.viewSettingNodesTwo[i].labelName = '节点'+indexJia
-            }
-          }
-          this.viewSettingNodes = this.viewSettingNodesTwo
-          this.viewModal = true
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //流程设置确定
-      viewOk(){
-        setTimeout(() => {
-          this.viewModal = false;
-        }, 2000);
       },
       //流程设置取消
       viewCancel(){
@@ -843,33 +778,57 @@
         this.noteModal = false
       },
       //新增资料
-      addMaterial () {
-        if(this.settingDatas.length === 20){
-          this.$Modal.info({title: '提示信息', content: "资料最多20个"})
-        }else{
-          this.addMaterialModal = true
-          this.$refs.addMaterialForm.resetFields()
-        }
-      },
-      //新增资料确定
+      // addMaterial () {
+      //   if(this.settingDatas.length === 20){
+      //     this.$Modal.info({title: '提示信息', content: "资料最多20个"})
+      //   }else{
+      //     this.addMaterialModal = true
+      //     this.$refs.addForm.resetFields()
+      //   }
+      // },
+      //新增用户
       addSubmit () {
-        this.$refs.addMaterialForm.validate((valid) => {
-          if (valid) {
-            this.modal_loading = true
-            this.addDataForm={
-              id:0,
-              sort:this.settingDatas.length+1,
-              name:this.addMaterialForm.name,
-              quantity:this.addMaterialForm.quantity,
-              required:this.addMaterialForm.required,
-              archive:this.addMaterialForm.archive
-            },
-            this.settingDatas.push(this.addDataForm)
-            this.addMaterialModal = false
-            this.$refs.addMaterialForm.resetFields()
+        this.addDataForm={
+              id:"",
+              name:this.addForm.name,
+              phone:this.addForm.phone,
+              password:this.addForm.pwd,
+              loginName:sessionStorage.loginName
+        }
+        // qs
+        this.$request.post("/apiHost/api/user/save",qs.stringify(this.addDataForm),res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("提交成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
           }
+        },res=>{
+          this.$Modal.error({title: '提示信息', content: res.message})
+          this.modal_loading = false
         })
+        // this.$refs.addForm.validate((valid) => {
+        //   if (valid) {
+        //     this.modal_loading = true
+        //     this.addDataForm={
+        //           id:"",
+        //           name:this.addForm.name,
+        //           phone:this.addForm.phone,
+        //           password:this.addForm.pwd,
+        //           loginName:sessionStorage.loginName
+        //     },
+        //     this.settingDatas.push(this.addDataForm)
+        //     this.addMaterialModal = false
+        //     this.$refs.addForm.resetFields()
+        //     this.modal_loading = false
+        //   }
+        // })
       },
       //新增资料取消
       addCancel () {
