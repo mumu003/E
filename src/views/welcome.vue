@@ -23,10 +23,17 @@
               </Card>
           </div>
       </Card>
-
+    <div class="page-tool">
+      <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
+    </div>
     </div>
 </template>
 <style>
+.page-tool{
+  height: 30px;
+  margin-top: 20px;
+  text-align: right;
+}
 .demo-tabs-style1 > .ivu-tabs-card > .ivu-tabs-content {
   margin-top: -16px;
 }
@@ -84,6 +91,7 @@
 </style>
 
 <script type="text/ecmascript-6">
+import qs from "qs";
 export default {
   data() {
     const validateActualNum = (rule, value, callback) => {
@@ -106,6 +114,10 @@ export default {
       }
     };
     return {
+      total: 0,
+      currentPage: 1,
+      limit: 10,
+      allChecked:false,
       waitingList_num:"0",
       maintain_num:"0",
       msg_list:[],
@@ -128,12 +140,16 @@ export default {
     }
   },
   mounted() {
-    this.getAgency(); //获取角标
+    this.getAgency(1); //获取角标
     this.getCount()
   },
   methods: {
     //待办事项计数统计
-    getAgency() {
+    getAgency(page) {
+      let param={
+            limit:10,
+            page:page
+          }
       let token = sessionStorage.getItem("token");
       if (token === null) {
         window.location.href = "/#/login";
@@ -141,18 +157,21 @@ export default {
       } else {
         this.$request.post(
           "/apiHost/api/repairMessage/userUnreadData",
-          {
-            limit:10,
-            page:1
-          },
+          qs.stringify(param),
           res => {
             this.msg_list=res.responseResult.list
-            console.log(111)
           },
-          res => {
+          res => {            
             // this.$Modal.error({ title: "提示信息", content: res.resMessage });
             this.msg_list=res.responseResult.list
-            console.log(111)
+            this.msg_list.map((item) => {
+                item._checked = this.allChecked
+            })
+            this.msg_list.map((item, index) => {
+              this.msg_list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
+            })
+            this.total = res.responseResult.total || res.responseResult.length
+            this.currentPage = res.responseResult.pageNum === 0 ? 1 : res.responseResult.pageNum
           }
         );
       }
@@ -169,8 +188,39 @@ export default {
                   this.maintain_num=res.responseResult["待维修"]
           }
         );
+    },
+    pageChange (page) {
+      console.log(page)
+      this.currentPage = page
+      this.getAgency(page)
     }
-  }
+  },
+  // watch:{
+  //   currentPage(){
+  //      this.$request.post(
+  //         "/apiHost/api/repairMessage/userUnreadData",
+  //         {
+  //           limit:10,
+  //           page:this.currentPage
+  //         },
+  //         res => {
+  //           this.msg_list=res.responseResult.list
+  //         },
+  //         res => {
+  //           // this.$Modal.error({ title: "提示信息", content: res.resMessage });
+  //           this.msg_list=res.responseResult.list
+  //           this.msg_list.map((item) => {
+  //               item._checked = this.allChecked
+  //           })
+  //           this.msg_list.map((item, index) => {
+  //             this.msg_list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
+  //           })
+  //           this.total = res.responseResult.total || res.responseResult.length
+  //           this.currentPage = res.responseResult.pageNum === 0 ? 1 : res.responseResult.pageNum
+  //         }
+  //       );
+  //   }
+  // }
 };
 </script>
 

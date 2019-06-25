@@ -111,9 +111,7 @@
         reject_loading: false, //驳回
         //表单
         formItem: {
-          
-          // startUpdateTime:'',
-          // endUpdateTime:'',
+          pageNo:"1"
         },
         // 设置结束时间大于开始时间
         end:{
@@ -123,7 +121,7 @@
         },
         //表格
         tableConfig:{
-          url:"/apiHostapi/emaint/repair-estimate/page",
+          url:"/apiHost/api/emaint/repair-estimate/page",
               columns:[
                 {
                   title: '操作',

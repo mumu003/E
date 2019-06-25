@@ -85,7 +85,13 @@
           document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-selected")
           document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-active")
         }
-        this.$router.push(url)
+        let str=url.slice(url.length - 12,url.length)
+        if(str=="reportDetail"){
+          this.$router.push({name:"reportDetail",params:{companyName:sessionStorage.companyName}})
+        }else{
+          this.$router.push(url)
+        }
+        
       },
       removeItem(event, name){
         if (this.initItems.length == 1) {

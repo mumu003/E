@@ -190,6 +190,7 @@
     height:auto!important;}
 </style>
 <script>
+import qs from "qs";
   export default {
     data () {
       // const validateNumber = (rule, value, callback) => {
@@ -855,10 +856,11 @@
               name:this.addForm.name,
               phone:this.addForm.phone,
               password:this.addForm.pwd,
-              loginName:this.addForm.archive
+              loginName:sessionStorage.loginName
         }
-        this.$request.post("/apiHost/api/user/save",this.addDataForm,res=>{
-          if (res.code === 200) {
+        // qs
+        this.$request.post("/apiHost/api/user/save",qs.stringify(this.addDataForm),res=>{
+          if (res.statusCode === 200) {
             setTimeout(() => {
               this.editModal = false
               this.modal_loading = false

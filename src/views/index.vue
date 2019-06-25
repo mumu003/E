@@ -30,8 +30,8 @@
         <div class="header-avator-con">
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <button class="set-pwd" @click="modal1 = true">修改密码</button>
-              <Badge count="3" class="msg-badge">
+              <Button type="primary" class="set-pwd" @click="modal1 = true">修改密码</Button>
+              <Badge :count="msg_badge" class="msg-badge">
                 <Icon size="23" type="android-notifications" color="#999"></Icon>
               </Badge>
               <Dropdown transfer trigger="click">
@@ -89,12 +89,7 @@
     background-size: auto 95%;
   }
   .set-pwd{
-    padding: 5px 10px;
-    border: none;
-    color: #fff;
-    border-radius: 3px;
     margin-right: 30px;
-    background-color: #999;
   }
   .msg-badge{
     margin-right: 30px;
@@ -120,6 +115,7 @@
       }
 
       return {
+        msg_badge:0,
         shrink: false,
         modal1: false,
         modal2: false,
@@ -235,51 +231,91 @@
               ]
             }
       ]
-      if("销售总/副总经理" == sessionStorage.roleName){
-        this.menuList.push({
-          "id": 2,
-          "name": "流程配置",
-          "url": "/procedure",
-          "icon": "network"
-        });
-      }
+      // if("销售总/副总经理" == sessionStorage.roleName){
+      //   this.menuList.push({
+      //     "id": 2,
+      //     "name": "流程配置",
+      //     "url": "/procedure",
+      //     "icon": "network"
+      //   });
+      // }
     },
     methods: {
       handleSubmit(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
+            // let param = {
+            //   id:sessionStorage.userID,
+            //   oldPassword:this.formValidate.oldPwd,
+            //   newPassword1:this.formValidate.newPwd,
+            //   newPassword2:this.formValidate.correctPwd
+            // }
+            
+            // this.$request.post('/apiHost/api/user/updatePassword',qs.stringify(param),res => {
+            //   if (res.statusCode == 200) {
+            //       this.changeLoading()
+            //       this.modal1 = false
+            //       this.formValidate.oldPwd = ""
+            //       this.formValidate.newPwd = ""
+            //       this.formValidate.correctPwd = ""
+            //       this.$Message.success('修改成功！')
+            //     } else {
+            //       this.changeLoading()
+            //       this.$Modal.error({title: '提示信息', content: res.resMessage})
+            //     }
+            // },res=>{
+            //   if (res.statusCode == 200) {
+            //       this.changeLoading()
+            //       this.modal1 = false
+            //       this.formValidate.oldPwd = ""
+            //       this.formValidate.newPwd = ""
+            //       this.formValidate.correctPwd = ""
+            //       this.$Message.success('修改成功！')
+            //     } else {
+            //       this.changeLoading()
+            //       this.$Modal.error({title: '提示信息', content: res.resMessage})
+            //     }
+            // })
             let param = new URLSearchParams()
-            param.append("userId", sessionStorage.userId)
-            param.append("oldPwd", this.formValidate.oldPwd)
-            param.append("newPwd", this.formValidate.newPwd)
+            param.append("id", sessionStorage.userID)
+            param.append("oldPassword", this.formValidate.oldPwd)
+            param.append("newPassword1", this.formValidate.newPwd)
+            param.append("newPassword2", this.formValidate.correctPwd)
             axios({
               headers: {
                 "token": sessionStorage.token,
               },
               method: "post",
-              url: "/apiHost/api/user/changePassword",
+              url: "/apiHost/api/user/updatePassword",
               data: param,
               crossDomain: true
             })
               .then(res => {
-                if (res.data.code === 200) {
+                // if (res.statusCode == "200") {
                   this.changeLoading()
                   this.modal1 = false
                   this.formValidate.oldPwd = ""
                   this.formValidate.newPwd = ""
                   this.formValidate.correctPwd = ""
                   this.$Message.success('修改成功！')
-                } else {
-                  this.changeLoading()
-                  this.$Message.error(res.data.message)
-                }
+                // } else {
+                  // this.changeLoading()
+                  // this.$Message.error(res.responseResult)
+                // }
               })
               .catch(error => {
-                this.changeLoading()
-                this.$Message.info({
-                  content: '修改失败！',
-                  closable: true
-                })
+                // this.changeLoading()
+                // if (res.statusCode == "200") {
+                  // this.changeLoading()
+                  // this.modal1 = false
+                  // this.formValidate.oldPwd = ""
+                  // this.formValidate.newPwd = ""
+                  // this.formValidate.correctPwd = ""
+                  // this.$Message.success('修改成功！')
+                // } else {
+                  this.changeLoading()
+                  this.$Message.error(res.responseResult)
+                // }
               })
           } else {
             this.changeLoading()
@@ -311,20 +347,22 @@
         this.$router.push('/login')
       },
       getCompany(){
-        let params = {
-          userId: sessionStorage.getItem("userId")
-        }
-        this.$request.post("/apiHost/api/user/getProjects", params, res => {
-            //console.log(res.data)
-            this.companyList = res.data.map(item => ({
-              value: item.orgId,
-              label: item.projectName,
-              proId: item.projectId
-            })) 
-            this.companyPId = sessionStorage.getItem("curProjectId");
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
+        this.$request.post(
+          "/apiHost/api/repairMessage/userUnreadData",
+          {
+            limit:10,
+            page:1
+          },
+          res => {
+            this.msg_badge=res.responseResult.total
+            console.log(111)
+          },
+          res => {
+            // this.$Modal.error({ title: "提示信息", content: res.resMessage });
+            this.msg_badge=res.responseResult.total
+            console.log(111)
+          }
+        );
       },
       changeOrg(){
           // console.log(""+this.companyPId)
