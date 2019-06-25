@@ -599,44 +599,42 @@ import qs from "qs";
       }
     },
     mounted(){
-      this.getRoleList()//获取角色
+      // this.getRoleList()//获取角色
     },
     methods:{
+      updatePwdlCancel(){
+        this.updatePwdModal = false,
+        this.$Message.info('你取消了操作')
+        this.$refs.table.init()
+      },
+      updatePwdSubmit(){
+
+      },
       //获取角色
-      getRoleList(){
-      	let token = sessionStorage.getItem("token")
-      	if(token === null){
-      	  window.location.href = '/#/login'
-          window.location.reload()
-      	}else{
-      	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-	          this.roleList = res.data.data.map(item => ({
-	            roleId: item.roleId,
-	            roleName: item.roleName
-	          }))
-	        }, res => {
-	          this.$Modal.error({title: '提示信息', content: res.message})
-	        })
-      	}
-      },
+      // getRoleList(){
+      // 	let token = sessionStorage.getItem("token")
+      // 	if(token === null){
+      // 	  window.location.href = '/#/login'
+      //     window.location.reload()
+      // 	}else{
+      // 	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
+	    //       this.roleList = res.data.data.map(item => ({
+	    //         roleId: item.roleId,
+	    //         roleName: item.roleName
+	    //       }))
+	    //     }, res => {
+	    //       this.$Modal.error({title: '提示信息', content: res.message})
+	    //     })
+      // 	}
+      // },
       //获取角色名称
-      getRoleName(roleId,index){
-        this.roleList.forEach(item=>{
-          if(roleId === item.roleId){
-            this.settingNodes[index].roleName = item.roleName
-          }
-        })
-      },
-      //获取终止角色
-      getOverName(overId){
-        this.roleList.forEach(item=>{
-          if(overId === item.roleId){
-            this.editForm.overName = item.roleName
-            //console.log("this.editForm.overName="+this.editForm.overName)
-            //console.log("this.editForm.overId="+this.editForm.overId)
-          }
-        })
-      },
+      // getRoleName(roleId,index){
+      //   this.roleList.forEach(item=>{
+      //     if(roleId === item.roleId){
+      //       this.settingNodes[index].roleName = item.roleName
+      //     }
+      //   })
+      // },
       //开始时间
       getStartDate(startDate){
         this.formItem.startUpdateTime=startDate
@@ -678,67 +676,6 @@ import qs from "qs";
         }, res => {
           this.$Modal.error({title: '提示信息', content: res.message})
         })
-      },
-      //流程设置详情
-      viewProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        let params = {
-          objId: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/processSetting/view",params,res=>{
-          this.viewForm.type = res.data.type
-          this.viewForm.overName = res.data.overName
-          //console.log("this.viewForm.overName"+JSON.stringify(res.data))
-          this.viewSettingDatas = res.data.settingDatas.map(item=>({
-            sort: item.sort,
-            required: item.required,
-            name: item.name,
-            quantity: item.quantity,
-            archive: item.archive,
-            id:item.id
-          }))
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.$request.post("/apiHost/api/processSetting/viewArchive",params,res=>{
-          this.viewSettingNodesOne = res.data.map(item=>({
-            roleName : item.roleName,
-            nodeId : item.nodeId,
-            data : item.data,
-            labelName : ''
-          }))
-          this.viewSettingNodesTwo = this.viewSettingNodesOne
-          for(var i = 0; i<this.viewSettingNodesTwo.length; i++){
-            let endIndex = this.viewSettingNodesTwo.length-1
-            if(i === 0){
-              this.viewSettingNodesTwo[i].labelName = '发起人'
-            }else if(i === endIndex) {
-              this.viewSettingNodesTwo[i].labelName = '存档节点'
-            }else {
-              let indexJia = i+1
-              this.viewSettingNodesTwo[i].labelName = '节点'+indexJia
-            }
-          }
-          this.viewSettingNodes = this.viewSettingNodesTwo
-          this.viewModal = true
-        }, res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //流程设置确定
-      viewOk(){
-        setTimeout(() => {
-          this.viewModal = false;
-        }, 2000);
       },
       //流程设置取消
       viewCancel(){
@@ -841,18 +778,18 @@ import qs from "qs";
         this.noteModal = false
       },
       //新增资料
-      addMaterial () {
-        if(this.settingDatas.length === 20){
-          this.$Modal.info({title: '提示信息', content: "资料最多20个"})
-        }else{
-          this.addMaterialModal = true
-          this.$refs.addForm.resetFields()
-        }
-      },
+      // addMaterial () {
+      //   if(this.settingDatas.length === 20){
+      //     this.$Modal.info({title: '提示信息', content: "资料最多20个"})
+      //   }else{
+      //     this.addMaterialModal = true
+      //     this.$refs.addForm.resetFields()
+      //   }
+      // },
       //新增用户
       addSubmit () {
         this.addDataForm={
-              id:0,
+              id:"",
               name:this.addForm.name,
               phone:this.addForm.phone,
               password:this.addForm.pwd,
@@ -862,9 +799,9 @@ import qs from "qs";
         this.$request.post("/apiHost/api/user/save",qs.stringify(this.addDataForm),res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
-              this.editModal = false
+              this.addMaterialModal = false
               this.modal_loading = false
-              this.$refs.editForm.resetFields()
+              this.$refs.addForm.resetFields()
               this.$Message.success("提交成功!")
               this.$refs.table.init()
             }, 2000)
@@ -880,11 +817,11 @@ import qs from "qs";
         //   if (valid) {
         //     this.modal_loading = true
         //     this.addDataForm={
-        //       id:0,
-        //       name:this.addForm.name,
-        //       quantity:this.addForm.quantity,
-        //       required:this.addForm.required,
-        //       archive:this.addForm.archive
+        //           id:"",
+        //           name:this.addForm.name,
+        //           phone:this.addForm.phone,
+        //           password:this.addForm.pwd,
+        //           loginName:sessionStorage.loginName
         //     },
         //     this.settingDatas.push(this.addDataForm)
         //     this.addMaterialModal = false
