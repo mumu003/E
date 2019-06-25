@@ -136,7 +136,7 @@
       <p id="note-info">是否确认删除该角色？</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
         <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
-        <Button type="primary" size="default" @click="deleteModal=false">确定</Button>
+        <Button type="primary" size="default" @click="deleteRole()">确定</Button>
       </div>
     </Modal>
   </div>
@@ -221,6 +221,7 @@ import qs from "qs";
         editMaterialModal: false,//编辑资料模态框
         updatePwdModal: false,
         deleteModal:false,
+        roleID:"",
         editArchiveModal: false,//编辑流程存档资料模态框
         viewModal : false,//流程设置详情模态框
         isNo: 'false', //选择存档资料中资料全部被选完了
@@ -398,6 +399,7 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.deleteModal=true
+                                          this.roleID=params.row.id
                                     }
                                 }
                             },"删除"),
@@ -568,6 +570,17 @@ import qs from "qs";
       this.getRoleList()//获取角色
     },
     methods:{
+      // 删除单个角色
+      deleteRole(){
+        this.$request.post("/apiHost/api/emaint/role/remove", qs.stringify({id:this.roleID}), res => {
+	         this.$Modal.success("删除成功")
+	        }, res => {
+            this.$refs.table.init()
+            this.$Modal.success("删除成功")
+            this.deleteModal=false
+	          // this.$Modal.error({title: '提示信息', content: res.message})
+	        })
+      },
       //获取角色
       getRoleList(){
       	let token = sessionStorage.getItem("token")
