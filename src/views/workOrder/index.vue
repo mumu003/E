@@ -57,13 +57,14 @@
               </FormItem>
               </Col>
               <Col span="6">
-              <FormItem label="时间">
-                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
+              <FormItem label="更新时间">
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getEndDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+              
               </FormItem>
               </Col>
             </Row>
@@ -197,13 +198,34 @@
       </div>
     </Modal>
 
+
+<Modal v-model="choosemodel" title="执行人选择" width="500"
+      @on-cancel="choosemodel=false">
+        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;" >
+        <Radio   style="clear:both;width:100%;font-size:13px;" :label="index"  v-for="(item,index) in userlist" :key="index">
+           
+            <span style="margin-left:15px;">{{item.name}}</span>
+            <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+        </Radio>
+        
+    </RadioGroup>
+      <div slot="footer" style="text-align: right;">
+      
+        <Button type="primary" size="default" @click="bgzxr" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
   import qs from 'qs'
+  
   export default {
     data () {
       return {
+        userindex:'',
+        userlist:[],
+        chooseindex:'',
+        choosemodel:false,
         passDisable:false,//防止通过双击事件
         isDisable:false,//防止驳回双击事件
         loading: true, //延迟
@@ -248,16 +270,14 @@
         },
         //表单
         formItem: {
-          state:'',
           workOrderNo:'',
+          state:'',
           name:'',
-           phone:'',
-          unitName:'',
-          beginTime:'',
+          phone:'',
+          isChange:'',
+          userName:'',
           endTime:'',
-          page:'1',
-          isChange:"",
-          userName:""
+          beginTime:'',
         },
          // 设置结束时间大于开始时间
         end:{
@@ -277,14 +297,15 @@
             {
               title: '操作',
               key: 'currentNodeName',
-              width:130,
+              width:210,
               align: 'center',
                   render: (h, params) => {
                             return h('div', [
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:params.row.state=='待派单'?false:true
                                     },
                                     style: {
                                         marginRight: '5px'
@@ -292,7 +313,7 @@
                                     on: {
                                         click: () => {
                                             this.$router.push({
-                                              name:"workOrderManage",
+                                              name:"dispatch",
                                               params:{
                                                 id:params.row.id
                                               }
@@ -303,7 +324,10 @@
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                    },
+                                    style: {
+                                        marginRight: '5px'
                                     },
                                     on: {
                                         click: () => {
@@ -312,6 +336,22 @@
                                         }
                                     }
                                 }, '备注'),
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                           this.choosemodel=true;
+                                           this.chooseindex=params.row.id;
+                                            this.userlist.forEach((v,i)=>{
+                                              if(v.id==params.row.userId)
+                                                this.userindex=i;
+                                            })
+                                        }
+                                    }
+                                }, '变更执行人'),
                             ]);
                         }
             },
@@ -353,7 +393,7 @@
             },
             {
               title: '执行人',
-              key: 'name',
+              key: 'userName',
               width:120
             },
             {
@@ -363,7 +403,7 @@
             },
             {
               title: '更新时间',
-              key: 'gmtCreate',
+              key: 'gmtModified',
               width:200
             },
           ],
@@ -371,17 +411,13 @@
         //新增表单
         addForm:{
           workOrderNo:'',
-          buildingId:'',
+          state:'',
           name:'',
-          unitId:'',
-          unitName:'',
-           phone:'',
-          roomId:'',
-          fileType:'',
-          selection:[],
-          dataId:[],
-          orgId:'',
-          projectId: '',
+          phone:'',
+          isChange:'',
+          userName:'',
+          endTime:'',
+          beginTime:'',
         },
         //新增模态框验证
         ruleAdd:{
@@ -589,7 +625,24 @@
       //获取楼栋
       this.getBuildings()
     },
+    beforeCreate(){
+      this.$request.post('/apiHost/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
+          if(res.statusCode==200){
+            this.userlist=res.responseResult.list;
+
+          }
+        })
+    },
     methods: {
+      // 变更执行人
+      bgzxr(){
+        this.choosemodel=false;
+     
+        this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.chooseindex,userId:this.userlist[this.userindex].id}),res=>{},res=>{
+          if(res.statusCode==200)
+          this.$Message.success(res.resMessage)
+        })
+      },
       //开始时间
       getStartDate(startDate){
         this.formItem.beginTime=startDate
@@ -1079,7 +1132,7 @@
         this.$request.post("/apiHost/api/emaint/repairProblem/repairProblemList",qs.stringify(this.formItem), res => {
             this.$Modal.error({title: '提示信息', content: res.resMessage})
         }, res => {
-           if (res.code === 200) {
+           if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()

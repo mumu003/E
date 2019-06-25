@@ -19,4 +19,11 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+.buttoninput input{
+      cursor: pointer!important;
+    }
+    .ivu-select-dropdown{
+      max-height: 200px;
+      overflow-y: auto;
+    }
 </style>

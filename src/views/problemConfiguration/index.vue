@@ -15,12 +15,16 @@
               
             </Row>
               <Col>
-              <Spin v-if="this.loadOver==true" size="large"></Spin>
-              <div v-else class="first" v-for="(item,index) in questionlis" :key="index">
+                 <div class="first" v-for="(item,index) in questionlis" :key="index">
+                <div @click="activeli.id==item.parentId?activeli.id='':activeli.id=item.parentId;" :style="{backgroundColor:activeli.id==item.parentId?'#2b85e4':''}">{{item.parentProblem}}</div> 
+                
+                <div class="two"  v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
+              </div>
+              <!-- <div class="first" v-for="(item,index) in questionlis" :key="index">
                 <div @click="activeli.id=item.id;activeli.parentId=item.parentId" :style="{color:activeli.id==item.id?'#2b85e4':''}">{{item.problem}}</div> 
                 
                 <div class="two" @click="activeli.id=v.id;activeli.parentId=v.parentId" :style="{color:activeli.id==v.id?'#2b85e4':''}"  v-for="(v,i) in item.children" :key="i">{{v.problem}}</div>
-              </div>
+              </div> -->
              
               </Col>
             </Row>
@@ -43,7 +47,7 @@
         <Form-item label="父级类目" >
             <i-select  placeholder="请选择父级" v-model="addformdata.parentId">
                 <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
+                <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
                
             </i-select>
         </Form-item>   
@@ -71,7 +75,7 @@
         <Form-item label="父级类目" >
             <i-select  placeholder="请选择父级" v-model="updatedata.parentId">
                 <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
+                <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
                
             </i-select>
         </Form-item>   
@@ -105,7 +109,6 @@ import qs from 'qs';
   export default {
     data () {
       return {
-        loadOver:true,
         addmodel:true,
         updatemodel:false,
         modal1:false,
@@ -339,10 +342,7 @@ import qs from 'qs';
      save(type){
      
         if(type=='add'){
-           //  PS('此处为何要写ID才可成功','这里与原型有出入')
-           var id=4
-           
-           this.addformdata.id=id;
+
           this.$request.post('/apiHost/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
             if(data.statusCode!=200)
             this.$Modal.error({title: '提示信息', content: data.responseResult})
@@ -361,9 +361,13 @@ import qs from 'qs';
         }
      },
      addquestion(){
+      
+       this.addformdata.parentId=this.activeli.id;
+     
        this.addmodel=true;
        this.updatemodel=false;
        this.controlmodal=false;
+       
      },
      updatequestion(){
        if(this.activeli.id=='')
@@ -375,53 +379,32 @@ import qs from 'qs';
       this.addmodel=false;
        this.updatemodel=true;
          this.controlmodal=false;
-      
-        if(this.activeli.parentId==null){
-          this.questionlis.forEach((v)=>{
-              if(v.id==this.activeli.id)
-              this.updatedata=JSON.parse(JSON.stringify(v));
-          })
-       
-        }
-        else{
-          this.questionlis.forEach(v=>{
-            if(v.id==this.activeli.parentId){
-                  v.children.forEach((v1)=>{
-                    if(v1.id==this.activeli.id)
-                    this.updatedata=JSON.parse(JSON.stringify(v1));
-                  })
-            }
-          })
-        }
+        this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
+          if(res.statusCode==200){
+            this.updatedata=res.responseResult;
+          
+          }
+        })
+
         
      },
      ok(){
          this.$request.post('/apiHost/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
                 if(data.statusCode==200)
                    this.$Message.success('删除成功')
+                   this.getlist();
          })
 
      },
-     getlist(){
-//  查询一级问题 api/emaint/problem-base/treeList接口中父级没有id。冲突了
-     this.$request.post('/apiHost/api/emaint/problem-base/list',{},data=>{
+      getlist(){
+//  查询一级问题
+     this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},data=>{
       
      },data=>{
         if(data.statusCode==200){
-         data.responseResult.forEach((v)=>{
-            
-           this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:v.id}),data1=>{
-
-           },data1=>{
-             if(data1.statusCode==200)
-             v.children=data1.responseResult
-           })
-         })
-          
-          setTimeout(()=>{
-            this.loadOver=false
+        
             this.questionlis=data.responseResult;
-          },1000)
+        
 
         }
      })
@@ -492,8 +475,8 @@ div.controlbutton button{
  width:100%;
  border:none;
  border-radius: 0px;
-}
 
+}
 </style>
 
 

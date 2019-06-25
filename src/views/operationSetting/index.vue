@@ -14,12 +14,12 @@
 
               <Col span="8">
                 <FormItem label="接单逾期时间" :label-width="120">
-                  <Input  v-model="formItem.assignCycle"  :maxlength=30 placeholder="请输入接单逾期时间"/>
+                  <Input  v-model="formItem.assignCycle"  :maxlength=30 placeholder="请选择"/>
                 </FormItem>
               </Col>
               <Col span="4">
                 <FormItem>
-                  <Select v-model="formItem.assignCycleUnit" placeholder="时">
+                  <Select v-model="formItem.assignCycleUnit" placeholder="请选择">
                     <Option value="hour">时</Option>
                     <Option value="day">天</Option>
                     <Option value="month">月</Option>
@@ -30,9 +30,8 @@
 
               <Col span="8">
                 <FormItem label="通知角色" :label-width="120">
-                  <Select v-model="formItem.assignNoticeRole" placeholder="超级管理员">
-                    <Option value="0">超级管理员</Option>
-                    <Option value="-1">接单员</Option>
+                  <Select v-model="formItem.assignNoticeRole" placeholder="请选择">
+                  <Option :value="item.id" v-for="(item,index) in roleList" :key="index">{{item.name}}</Option>
                   </Select>
                 </FormItem>
               </Col>
@@ -47,7 +46,7 @@
               </Col>
               <Col span="4">
                 <FormItem>
-                  <Select v-model="formItem.maintainCycleType" placeholder="时">
+                  <Select v-model="formItem.maintainCycleUnit" placeholder="请选择">
                     <Option value="hour">时</Option>
                     <Option value="day">天</Option>
                     <Option value="month">月</Option>
@@ -58,9 +57,9 @@
 
               <Col span="8">
                 <FormItem label="通知角色" :label-width="120">
-                  <Select v-model="formItem.maintainNoticeRole" placeholder="超级管理员">
-                    <Option value="0">超级管理员</Option>
-                    <Option value="-1">接单员</Option>
+                  <Select v-model="formItem.maintainNoticeRole" placeholder="请选择">
+                    <Option :value="item.id" v-for="(item,index) in roleList" :key="index">{{item.name}}</Option>
+                    
                   </Select>
                 </FormItem>
               </Col>
@@ -127,13 +126,14 @@ import qs from "qs";
         },
         //表单
         formItem: {
-            assignCycle:1,
+            assignCycle:'',
             assignCycleUnit:'hour',
             assignNoticeRole:'',
-            maintainCycle:1,
-            maintainCycleType:'day',
+            maintainCycle:'',
+            maintainCycleUnit:'day',
             maintainNoticeRole:''
         },
+        roleList:[],
         //模态框表单数据
         addForm:{
           areaId:'',
@@ -256,6 +256,17 @@ import qs from "qs";
       // this.getSetting()
       // this.addArea()
       /*this.getIndex()*/
+    },
+    beforeCreate(){
+      this.$request.post('/apiHost/api/emaint/system-setting/data',{},res=>{},res=>{
+        if(res.statusCode==200)
+          this.formItem=res.responseResult;
+      })
+      this.$request.post('/apiHost/api/emaint/role/list',{},res=>{},res=>{
+       if(res.statusCode==200)
+       this.roleList=res.responseResult;
+      })
+      
     },
     methods: {
       // 获取初始数据
@@ -678,10 +689,10 @@ import qs from "qs";
       //搜索取消
       searchCancel() {
         this.formItem={
-          assignCycle:1,
+          assignCycle:'',
           assignCycleUnit:'hour',
-          assignNoticeRole:1,
-         maintainCycleType:'day',
+          assignNoticeRole:'',
+         maintainCycleUnit:'day',
          maintainCycle:'',
          maintainNoticeRole:''
         }

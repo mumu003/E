@@ -11,9 +11,9 @@
               </Col>
               <Col>
                <div class="first" v-for="(item,index) in questionlis" :key="index">
-                <div >{{item.parentProblem}}</div> 
+                <div  >{{item.parentProblem}}</div> 
                 
-                <div class="two"  v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
+                <div class="two"  @click="activeli.id==v.id?activeli.id='':activeli.id=v.id;activeli.parentId=v.parentId;" :style="{backgroundColor:activeli.id==v.id?'#2b85e4':''}" v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
               </div>
               </Col>
             </Row>
@@ -38,7 +38,7 @@
              
               <Col span="12">
               <FormItem label="常见问题">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入常见问题"></Input>
+                <Input v-model="formItem.problem" :maxlength=20 placeholder="请输入常见问题"></Input>
               </FormItem>
               </Col>
             </Row>
@@ -93,7 +93,7 @@
             <FormItem label="优先级" >
               <div >
                 <Select v-model="addForm.priority" placeholder="请选择优先级" >
-                  <Option :value="item" v-for="(item,index) in ['低','中','高']" :key="index" >{{item}}</Option>
+                     <Option :value="item.value" v-for="(item,index) in yxj" :key="index" >{{item.name}}</Option>
                 </Select>
               </div>
               
@@ -101,11 +101,7 @@
           </Col>
           <Col span="20">
             <Form-item label="父级类目" >
-            <i-select  placeholder="请选择父级" v-model="addForm.parentId">
-                <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
-               
-            </i-select>
+            <Input v-model="parentname" readonly></Input>
         </Form-item>   
           </Col>
          
@@ -115,7 +111,7 @@
       </Form>
       <div slot="footer" style="text-align: right;">
         <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
+        <Button type="primary" size="default" @click="addSubmit('add')" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
@@ -132,7 +128,7 @@
             <FormItem label="优先级" >
               <div >
                 <Select v-model="updateForm.priority" placeholder="请选择优先级" >
-                  <Option :value="item" v-for="(item,index) in ['低','中','高']" :key="index" >{{item}}</Option>
+                  <Option :value="item.value" v-for="(item,index) in yxj" :key="index" >{{item.name}}</Option>
                 </Select>
               </div>
               
@@ -141,8 +137,8 @@
           <Col span="20">
             <Form-item label="父级类目" >
             <i-select  placeholder="请选择父级" v-model="updateForm.parentId">
-                <i-option value="">无</i-option>
-                <i-option :value="item.id" v-for="(item,index) in questionlis" :key="index">{{item.problem}}</i-option>
+               
+                <i-option :value="item.id" v-for="(item,index) in fjlm" :key="index">{{item.problem}}</i-option>
                
             </i-select>
         </Form-item>   
@@ -154,7 +150,7 @@
       </Form>
       <div slot="footer" style="text-align: right;">
         <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
+        <Button type="primary" size="default" @click="addSubmit('update')" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
@@ -183,6 +179,9 @@ import qs from 'qs';
       return {
         updateModel:false,
         modal1:false,
+        yxj:[],
+        fjlm:[],
+        parentname:'',
         passDisable:false,//防止通过双击事件
         isDisable:false,//防止驳回双击事件
         loading: true, //延迟
@@ -228,7 +227,7 @@ import qs from 'qs';
         //表单
         formItem: {
           parentId:'',
-          
+          problem:'',
         },
         //表格
         tableConfig:{
@@ -252,7 +251,24 @@ import qs from 'qs';
                                     on: {
                                         click: () => {
                                           this.updateModel=true;
-                                            console.log(params.row.id);
+                                              this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:params.row.id}),res=>{},res=>{
+                                            if(res.statusCode==200){
+                                                  this.updateForm=res.responseResult;
+                                                       this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:this.updateForm.parentId}),res1=>{},res1=>{
+                                                      if(res1.statusCode==200){
+                                                      
+                                                        
+                                                          this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:res1.responseResult.parentId}),res2=>{},res2=>{
+                                                           if(res2.statusCode==200){
+                                                                this.fjlm=res2.responseResult;
+                                                     
+                                                       }
+                                                    })
+                                                   }
+                                              })
+                                                   }
+                                              })
+                                            
                                         }
                                     }
                                 }, '编辑'),
@@ -267,7 +283,7 @@ import qs from 'qs';
                                     on: {
                                         click: () => {
                                             this.deleteProject(params.row.id)
-                                           console.log(params.index.id);
+                                          
                                         }
                                     }
                                 }, '删除'),
@@ -290,9 +306,9 @@ import qs from 'qs';
           ],
         },
         activeli:{
-           parentId:'',
-           id:'',
-         },
+          id:'',
+          parentId:'',
+        },
           questionlis:[],
         //新增表单
         addForm:{
@@ -625,8 +641,25 @@ import qs from 'qs';
       },
       //新增
       addProject(){
-        this.addModal = true
-        this.getIndex()
+        if(this.activeli.id=='')
+        {
+          this.$Message.info('请先选中一条二级记录')
+          return;
+        }
+        this.addModal = true;
+        
+        this.addForm.parentId=this.activeli.id;
+        this.questionlis.forEach((v)=>{
+          if(v.parentId==this.activeli.parentId)
+            {
+              v.childList.forEach((v1)=>{
+                if(v1.id==this.activeli.id){
+                  this.parentname=v1.problem;
+                }
+              })
+            }
+        })
+        // this.getIndex()
       },
       //新增表格选项
       select(selection){
@@ -637,21 +670,25 @@ import qs from 'qs';
         this.viewForm.dataId =selection.map(item=>item.id).toString() /*JSON.stringify(selection)*/
       },
       //新增确定
-      addSubmit () {
+      addSubmit (type) {
         this.modal_loading = true
-        this.$refs.addForm.validate((valid) => {
+        var ref=this.$refs.addForm;
+        type=='update'?ref=this.$refs.updateForm:ref=this.$refs.addForm;
+        ref.validate((valid) => {
           if (valid) {
-            this.addForm.id=8;
-            this.$request.post("/apiHost/api/emaint/problem-base/save",this.addForm, res => {
+            var data={};
+            type=='update'?data=this.updateForm:data=this.addForm;
+            this.$request.post("/apiHost/api/emaint/problem-base/save",data, res => {
               if (res.statusCode === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
                   this.addModal = false;
-                  this.$Message.success("新增成功！")
+                  this.$Message.success("操作成功！")
                   this.unitList=[ ]
                   this.roomsList=[ ]
                   this.$refs.addForm.resetFields()
                   this.$refs.table.init()
+                  this.getlist()
                 }, 2000);
               } else {
                 this.modal_loading = false
@@ -662,11 +699,13 @@ import qs from 'qs';
                 setTimeout(() => {
                   this.modal_loading = false;
                   this.addModal = false;
-                  this.$Message.success("新增成功！")
+                  this.updateModel=false;
+                  this.$Message.success("操作成功！")
                   this.unitList=[ ]
                   this.roomsList=[ ]
                   this.$refs.addForm.resetFields()
                   this.$refs.table.init()
+                  this.getlist();
                 }, 2000);
               } else {
                 this.modal_loading = false
@@ -879,11 +918,8 @@ import qs from 'qs';
           content: '确认删除?',
           loading: true,
           onOk: () => {
-            
-            let params = {
-              id
-            }
-            this.$request.post("/apiHost/api/emaint/problem-base/remove",qs.stringify({params}),res=>{
+
+            this.$request.post("/apiHost/api/emaint/problem-base/remove",qs.stringify({id}),res=>{
               this.$Message.success("删除成功")
              
             },res=>{
@@ -891,6 +927,7 @@ import qs from 'qs';
               this.$Message.success("删除成功")
                this.$Modal.remove()
               this.$refs.table.init()
+              this.getlist();
             })
           }
         })
@@ -898,8 +935,8 @@ import qs from 'qs';
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/sendFileBill/list",this.formItem, res => {
-          if (res.code === 200) {
+        this.$request.post("/apiHost/api/emaint/problem-base/list",this.formItem, res => {
+          if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
@@ -907,19 +944,24 @@ import qs from 'qs';
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
+          if (res.statusCode === 200) {
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
         })
       },
       //重置
       searchCancel () {
         this.formItem={
-          status: '',
-          customerName: '',
-          buildingId: '',
-          roomId: '',
-          unitId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          parentId:'',
+          problem:'',
+        }
+        this.activeli={
+          parentId:'',
+          id:'',
         }
         this.isFirst = true
         setTimeout(()=>{
@@ -959,6 +1001,25 @@ import qs from 'qs';
     },
     created(){
       this.getlist();
+      this.$request.post('/apiHost/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
+       if(res.statusCode==200)
+         { 
+           
+              this.yxj=res.responseResult;
+
+          } 
+      })
+    },
+    watch:{
+      activeli:{
+        　handler(newValue, oldValue) {
+            var id=newValue.id;
+　　　　　　 this.formItem.parentId=id;
+              
+　　　　},
+　　　　deep: true
+      }
+      
     }
   }
 </script>

@@ -13,44 +13,40 @@
             <Row type="flex" justify="start">
               <Col span="6">
               <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.customerName" icon="search" :maxlength=20 placeholder="请输入手机号"></Input>
+                <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入手机号"></Input>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="办公位">
-                <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入办公位"></Input>
+                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
               </Col>
               <Col span="4">
-                <Button type="primary" >历史报修数据</Button>
+                <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col>
               </Row>
 
               <Row>
               <Col span="6">
               <FormItem label="姓名">
-                  <span>张三</span>
-                    <!-- <Input v-model="formItem.phone" disabled :maxlength=11 ></Input> -->
+                    <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="公司">
-                  <span>厦门XXX有限公司</span>
-                    <!-- <Input v-model="formItem.phone" disabled :maxlength=11 ></Input> -->
+                    <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
               <Row>
               <Col span="6">
               <FormItem label="优先级">
-                  <span>高</span>
-                    <!-- <Input v-model="formItem.phone" disabled :maxlength=11 ></Input> -->
+                    <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem label="性别">
-                  <span>男</span>
-                    <!-- <Input v-model="formItem.phone" disabled :maxlength=11 ></Input> -->
+                    <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
               </Row>
@@ -68,12 +64,12 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
+          <Form  :model="formItem" :label-width="110" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="4">
+              <Col span="5">
                 <FormItem label="报修类型" prop="one_type">
-                  <Select v-model="formItem.status">
-                        <Option v-for="item in one_list" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
+                        <Option v-for="(item,index) in treeList" :value="item.parentProblem" :key="index">{{ item.parentProblem}}</Option>
                     <!-- <Option value="">硬件问题</Option>
                     <Option value="-1">软件问题</Option> -->
                   </Select>
@@ -81,8 +77,8 @@
               </Col>
               <Col span="3">
                 <FormItem  :label-width="5">
-                  <Select v-model="formItem.status">
-                        <Option v-for="item in two_list" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                  <Select v-model="formItem.problemType" :disabled="viewForm.id!=''?true:false" @on-change="findchildren2" >
+                        <Option  v-for="(item,i) in childList" :value="item.problem" :key="i">{{ item.problem}}</Option>
                     <!-- <Option value="">计算机</Option>
                     <Option value="-1">打印机</Option> -->
                   </Select>
@@ -90,7 +86,7 @@
               </Col>
 
               <Col span="6">
-                <FormItem label="图片描述" >
+                <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
                         v-model="visible"
@@ -98,8 +94,8 @@
                         <img :src="imglist[showimg]" v-if="visible" style="width: 100%">
                     </Modal>
                         <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
-                            <img :src="item" alt="" v-if="item!=''" @click="showtheimg(index)">
-                            <i class="ivu-icon ivu-icon-ios-plus-empty" style="font-size: 40px;line-height:1.5;" v-else @click="uploadfile(index)"></i>
+                            <img :src="item" alt="" v-if="item!=''" :style="{'pointer-events':viewForm.id!=''?'none':'all'}"  @click="showtheimg(index)">
+                            <i class="ivu-icon ivu-icon-ios-plus-empty" :style="{'pointer-events':viewForm.id!=''?'none':'all'}" v-else @click="uploadfile(index)"></i>
                         </div>
                         <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
                         <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
@@ -109,18 +105,15 @@
                 </Row>
 
               <Row>
-                <Col span="7">
+                <Col span="8">
                 <FormItem label="常见问题">
-                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" :key="index" @click='choose_question(item,index)'>{{item.question}}</Button>
-                    <!-- <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button> -->
+                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" :style="{'pointer-events':viewForm.id!=''?'none':'all'}"  disabled>暂无</Button>
+                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" :style="{'pointer-events':viewForm.id!=''?'none':'all'}" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
                 </FormItem>
                 </Col>
                 <Col span="6">
                 <FormItem label="备注">
-                    <Input type='textarea' :rows='3' v-model="formItem.phone" placeholder="300字以内"></Input>
+                    <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" placeholder="300字以内"></Input>
                 </FormItem>
                 </Col>
               </Row>
@@ -135,22 +128,29 @@
       <Col span="24">
       <Card class="search-card">
         <p slot="title">
-          派单信息
+        信息
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="8">
+              <Col span="8" v-if="viewForm.id!=''">
                 <FormItem label="执行人" prop="executor">
-                    <Input v-model="formItem.customerName" icon="search" :maxlength=20 placeholder="检索执行人"></Input>
+                    <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
               </Col>
              </Row>
              <Row>
               <Col span="8">
                 <FormItem label="参与者" >
-                    <Input v-model="formItem.customerName" icon="search" :maxlength=20 placeholder="检索参与者"></Input>
+                    <!-- <Input class="buttoninput" @on-click="choosemodel1=true"  v-model="formItem2.participatorids" icon="search" readonly :maxlength=20 placeholder="检索参与者"></Input> -->
+                    <Select v-model="formItem.participatorids" :disabled="viewForm.id!=''?true:false" multiple  style="width:100%;">
+                      <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index" >
+                          <span>{{item.name}}</span>
+                          <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+                      </Option>
+                      
+                  </Select>
                 </FormItem>
               </Col>
             </Row>
@@ -170,20 +170,55 @@
     </div>
 
 
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
+ <Modal v-model="choosemodel" title="执行人选择" width="500"
+      @on-cancel="choosemodel=false">
+        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;" >
+        <Radio   style="clear:both;width:100%;font-size:13px;" :label="index"  v-for="(item,index) in userlist" :key="index">
+           
+            <span style="margin-left:15px;">{{item.name}}</span>
+            <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+        </Radio>
+        
+    </RadioGroup>
+      <div slot="footer" style="text-align: right;">
+      
+        <Button type="primary" size="default" @click="formItem.userName=userlist[userindex].name;formItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
+
+
+    <!-- 历史报修数据 -->
+    <Modal v-model="RepairList_show" width="800"
+      title="历史报修数据"
+      >
+
+      <m-table :config="tableConfig" :searchParams="RepairForm"  ref="table"  :isFirst="isFirst"></m-table>    
+      <div slot="footer" style="text-align:right;">
+        <Row>
+          <Col span="24" v-if="this.viewTabs === 'remark'">
+            <Button size="default" >取消</Button>
+            <Button type="primary" size="default"  :loading="modal_loading">确定</Button>
+          </Col>
+        </Row>
+      </div>
+    </Modal>
+
 
   </div>
 </template>
 <script>
 import qs from "qs";
+ 
   export default {
     data () {
       return {
+        choosemodel:false,
+        choosemodel1:false,
+        participatorids:[],
+        userindex:'',
+        userlist:[],
+        childList:[],
+        childList1:[],
         passDisable: false,//防止通过双击事件
         isDisable: false,//防止驳回双击事件
         modal_loading: false, //延迟
@@ -222,16 +257,23 @@ import qs from "qs";
         showimg:'',
         //表单
         formItem: {
-          status:'',
-          customerName:'',
-          phone:'',
-          buildingName:'',
-          roomNum:'',
-          addressNum:'',
-          startUpdateTime:'',
-          endUpdateTime:'',
-          page:'1'
+          clientId:"",
+          phone:"",
+          officeLocation:"",
+          name:"",
+          companyName:"",
+          priority:"",
+          sex:"",
+          problemClass:'',
+          problemType:'',
+          remark:'',
+          participatorids:[],
+        
+          problem:'暂无数据',
+          problemImgs:'',
+          participators:'',
         },
+        treeList:[],
         // 设置表单验证
         ruleValidate: {
             phone: [
@@ -241,7 +283,7 @@ import qs from "qs";
                { required: true, message: '该选项不能为空', trigger: 'blur' } 
             ],
             executor:[
-               { required: true, message: '该选项不能为空', trigger: 'blur' } 
+               { required: true, message: '该选项不能为空', trigger: 'input' } 
             ]
         },
         // 设置结束时间大于开始时间
@@ -250,200 +292,112 @@ import qs from "qs";
               return date.valueOf() < new Date( this.formItem.startUpdateTime)
             }).bind(this)
         },
-        model1: '',
-        model2: '',
-        one_list: [
-                    {
-                        value: '硬件问题',
-                        label: '硬件问题'
-                    },
-                    {
-                        value: '软件问题',
-                        label: '软件问题'
-                    },
-                    
-                ],
-        two_list: [
-                    {
-                        value: '计算机',
-                        label: '计算机'
-                    },
-                    {
-                        value: '打印机',
-                        label: '打印机'
-                    },
-                    
-                ],
         // 常见问题
-        ques_list:[
-            {
-                question:'无法开机'
-            },
-            {
-                question:'无法开机'
-            },
-            {
-                question:'无法开机'
-            },
-            {
-                question:'无法开机'
-            }
-        ],
+        ques_list:[],
+        // 常见问题点击样式
         question_ary:[],
         visible: false,
         viewForm:{
+        // 通过id是否存在来决定所有选项是否可操作
           id:""
         },
-
-
-/****************************** */
-        
-        //新增-表单数据
-        addForm:{
-          areaId:'',
-          areaName:'',
-          buildingId:'',
-          buildingName:'',
-          unitId:'',
-          unitName:'',
-          roomId:'',
-          roomNum:'',
-          customerName:'',
-          addressNum:'',
-          idCard:'',
-          phone:'',
-          address:'',
-          remark:'',
-          orgId:'',
-          projectId: '',
-        },
-        //新增-表格
-        addContract: [
-          {
-            title: '楼栋号',
-            key: 'buildingName',
-            width:150,
-          },
-          {
-            title: '房间号',
-            key: 'rommNum',
-            width:150
-          },
-          {
-            title: '门牌号',
-            key: 'addressNum',
-            width:150
-          },
-          {
-            title: '购买用途',
-            key: 'purpose',
-            width:150
-          },
-          {
-            title: '业主名字',
-            key: 'customerName',
-            width:150
-          },
-          {
-            title: '身份证号',
-            key: 'idNumber',
-            width:150
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:150
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:150
-          },
-          {
-            title: '备注',
-            key: 'remark',
-            width:150
-          }
-        ],
-        //新增模态框验证
-        ruleAdd:{
-          buildingId: [
-            { required: true, message: '请选择楼栋号', trigger: 'change' }
+        // 历史报修数据模态框
+        RepairList_show:false,
+        //表格
+        tableConfig:{
+          url:"/apiHost/api/emaint/repairProblem/clientRepairProblemList",
+          columns:[
+            // {
+            //   type:"selection",
+            //   key:'_checked',
+            //   width:60
+            // },
+            {
+              title: '工单号码 ',
+              key: 'workOrderNo',
+              width:180
+            },
+            {
+              title: '优先级',
+              key: 'priority',
+              width:200
+            },
+            {
+              title: '状态',
+              key: 'state',
+              width:120
+            },
+            {
+              // PS:暂无该字段
+              title: '变更状态',
+              key: ' phone',
+              width:120
+            },
+            {
+              title: '办公位',
+              key: 'officeLocation',
+              width:120
+            },
+            {
+              title: '姓名',
+              key: 'name',
+              width:120
+            },
+            {
+              title: '手机号',
+              key: 'phone',
+              width:150
+            },
+            {
+              title: '执行人',
+              key: 'userName',
+              width:120
+            },
+            {
+              title: '来源',
+              key: 'repairSource',
+              width:150
+            },
+            {
+              title: '更新时间',
+              key: 'gmtCreate',
+              width:200
+            },
           ],
-          unitId: [
-            { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-            { required: true, message: '请选择房间号', trigger: 'change' }
-          ]
         },
-        //审核-表单数据
-        // viewForm:{
-        //   buildingName:'',
-        //   unitName:'',
-        //   roomNum:'',
-        //   customerName:'',
-        //   status:'',
-        //   id:''
-        // },
-        //审核-表格数据
-        viewContract: [
-          {
-            title: '楼栋号',
-            key: 'buildingName',
-            width:150,
-          },
-          {
-            title: '房间号',
-            key: 'roomNum',
-            width:150
-          },
-          {
-            title: '门牌号',
-            key: 'addressNum',
-            width:150
-          },
-          {
-            title: '购买用途',
-            key: 'purpose',
-            width:150
-          },
-          {
-            title: '业主名字',
-            key: 'customerName',
-            width:150
-          },
-          {
-            title: '身份证号',
-            key: 'idCard',
-            width:150
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:150
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:150
-          },
-          {
-            title: '备注',
-            key: 'remark',
-            width:150
+        RepairForm: {
+            clientId:"",
+            beginTime:"",
+            endTime:"",
+            isChange:"",
+            workOrderNo:"",
+            name:"",
+            state:"",
+            phone:"",
+            userName:"",
           }
-        ]
       }
     },
     mounted(){//方法
-        this.viewForm.id=this.$route.params.id
-        // console.log(this.$route.params.id)
-        
-        this.getinfo()
-        
-        // this.addarea()
-        /*this.getIndex()*/
+        if(this.$route.params.id){
+           this.viewForm.id=this.$route.params.id
+          this.getinfo()
+        }
+    },
+     beforeCreate(){
+        this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},res=>{},res=>{
+          if(res.statusCode==200){
+            this.treeList=res.responseResult;
+          }
+
+        })
+        this.$request.post('/apiHost/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
+          if(res.statusCode==200){
+            this.userlist=res.responseResult.list;
+
+          }
+        })
+      
     },
     methods: {     
       changefile(e){
@@ -468,10 +422,95 @@ import qs from "qs";
           this.imglist.push('');
           this.imglist.pop('');
       },
+      // 二级菜单
+      findchildren2(){
+        console.log(this.formItem.problemType)
+        this.childList.forEach((v)=>{
+          if(v.problem==this.formItem.problemType){
+              this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:v.id}),res=>{},res=>{
+                if(res.statusCode==200)
+                  this.ques_list=res.responseResult
+                })
+          }
+        })
+      },
 
+      // 一级菜单
+      findchildren(){
+        this.treeList.forEach(v=>{
+          if(v.parentProblem==this.formItem.problemClass){
+            this.childList=v.childList;
+            this.formItem.problemType=''
+            this.ques_list=[]
+            // if(this.formItem.problemType=='')
+            // this.formItem.problemType=v.childList[0].problem
+          }
+        this.findchildren2();
+        })
+      },
+
+      // 输入手机号进行检索
+      search(){
+        this.$request.post('/apiHost/api/emaint/client/phone',qs.stringify({phone:this.formItem.phone}),res=>{},res=>{
+          if(res.statusCode==200&&res.responseResult!=null){
+              var data=res.responseResult;
+              this.formItem.phone=data.phone
+              this.formItem.officeLocation=data.officeLocation
+              this.formItem.name=data.name
+              this.formItem.companyName=data.companyName;
+              this.formItem.priority=data.priority;
+              this.formItem.sex=data.sex;
+              this.formItem.clientId=data.id;
+
+
+              this.RepairForm.clientId=data.id
+              this.RepairForm.beginTime=data.beginTime || ""
+              this.RepairForm.endTime=data.endTime || ""
+              this.RepairForm.isChange=data.isChange || ""
+              this.RepairForm.workOrderNo=data.workOrderNo || ""
+              this.RepairForm.name=data.name ;
+              this.RepairForm.state=data.state;
+              this.RepairForm.phone=data.phone;
+              this.RepairForm.userName=data.userName || "";
+          }
+        })
+      },
       // 报修提交
       repairSubmit(){
-          console.log("报修提交")
+         if(this.viewForm.id!=''){
+            // console.log(this.formItem.userId)
+            // console.log(this.formItem.id)
+            this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.formItem.id,userId:this.formItem.userId}),res=>{},res=>{
+                  this.$Message.success(res.responseResult)
+                   setTimeout(()=>{
+                    this.$router.push({
+                      name:"workOrder"
+                    })
+                  },800)
+            })
+         }
+         else{
+          if(this.question_ary.length>0)
+          this.formItem.problem=this.question_ary.toString();
+          
+          this.formItem.problemImgs='123';
+         
+          this.formItem.participators=this.userlist.filter((v)=>{
+              if(this.formItem.participatorids.indexOf(v.id))
+                  {
+                    return true
+                  }
+          })
+        
+            this.formItem.participatorids=this.formItem.participatorids.toString();
+            this.formItem.participators=this.formItem.participators.toString();
+            console.log(this.formItem)
+            this.$request.post('/apiHost/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
+            if(res.statusCode==200){
+              this.$Message.success(res.resMessage)
+            }
+         })
+         }
       },
       // 上一步
       goback(){
@@ -479,289 +518,82 @@ import qs from "qs";
       },
 
       getinfo(){
-        console.log(123)
         this.$request.post("/apiHost/api/emaint/repairProblem/view",qs.stringify(this.viewForm), res => {
-           this.$Modal.error('网络错误')
+           this.$Modal.error('网络错误,请重试！')
         }, res => {
-          if (res.code === 200) {
+          if (res.statusCode === 200) {
             this.$Message.success("查询成功！")
-            this.$refs.table.init()
+
+            var data=res.responseResult
+           
+           this.formItem=data;
+           this.formItem={
+              clientId:data.clientId,
+              phone:data.phone,
+              officeLocation:data.officeLocation,
+              name:data.name,
+              companyName:data.companyName,
+              priority:data.priority,
+              sex:data.sex,
+              problemClass:data.problemClass,
+              problemType:data.problemType,
+              remark:data.remark,
+              participatorids:data.participatorids,
+              userName:'',
+              userId:'',
+              problem:data.problem,
+              problemImgs:data.problemImgs,
+              participators:data.participators,
+              id:data.id,
+            
+            },
+            this.findchildren();
+            
+            this.question_ary=this.formItem.problem.split(',');
+            var arry=this.formItem.participatorids.split('');
+            this.formItem.participatorids=[];
+            arry.forEach((v)=>{
+                this.formItem.participatorids.push(v*1)
+            })
+            console.log(this.formItem.participatorids)
           } else {
             this.$Modal.error('网络错误,请重试！')
           }
         })
       },
-      //获取楼栋列表
-      getBuildings() {
-        let token = sessionStorage.getItem("token")
-        if(token === null){
-          window.location.href = '/#/login'
-          window.location.reload()
-        }else{
-          let params = {
-            orgId: sessionStorage.getItem("orgId"),
-            projectId: sessionStorage.getItem("curProjectId")
-          }
-          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
-            this.buildingList = res.data.buildings.map(item => ({
-              id: item.buildingId,
-              name: item.buildingName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
-      },
-      
-      //开始时间
-      getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
-      },
-      //结束时间
-      getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
-      },
-      //新增按钮
-      addProject(){
-        this.addModal = true
-      },
-      //取消
-      cancel() {
-        this.addModal = false
-        this.$Message.info('你取消了操作')
-        // this.unitList=[ ]
-        // this.roomsList=[ ]
-        // this.$refs.addForm.resetFields()
-        // this.$refs.table.init()
-      },
-      //发起
-      start(){
-        this.modal_loading = true
-        let params = {
-          id: this.viewForm.id
-        }
-        this.$request.post("/apiHost/api/transfer/start",params,res=>{
-          if (res.code === 200) {
-            setTimeout(() => {
-              this.modal_loading = false
-              this.viewModal = false
-              this.viewForm.dataId=[ ]
-              this.$Message.success("发起成功!")
-              this.$refs.table.init()
-            }, 2000)
-          } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //驳回
-      viewReject(id){
-        this.reject_loading = true
-        let params = {
-          id,
-          status:0
-        }
-        this.$request.post("/apiHost/api/transfer/check",params,res=>{
-          if (res.code === 200) {
-            setTimeout(() => {
-              this.reject_loading = false
-              this.isDisable=false
-              this.$Message.success("审核驳回!")
-              this.viewModal = false
-              this.$refs.table.init()
-            }, 2000)
-            this.isDisable=true
-          } else {
-            this.reject_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        },res=>{
-          this.reject_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //通过
-      viewPass(id){
-        this.modal_loading = true
-        let params = {
-          id,
-          status:1
-        }
-        this.$request.post("/apiHost/api/transfer/check",params,res=>{
-          if (res.code === 200) {
-            setTimeout(() => {
-              this.modal_loading = false
-              this.passDisable=false
-              this.$Message.success("审核通过!")
-              this.viewModal = false
-              this.$refs.table.init()
-            }, 2000)
-            this.passDisable=true
-          } else {
-            this.modal_loading = false
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        },res=>{
-          this.modal_loading = false
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      
-      //终止提交
-      endSubmit(){
-        let id = this.selection.map(item=>item.id).toString()
-        let params = {
-          id
-        }
-        this.$request.post("/apiHost/api/transfer/cutOut",params,res=>{
-          this.$Message.success("终止成功")
-          this.modal_loading=false
-          this.endModal=false
-          this.$refs.table.init()
-        },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.modal_loading=false
-          this.endModal=false
-          this.$refs.table.init()
-        })
-      },
-      //终止取消
-      endCancel(){
-        this.$Message.info('你取消了操作')
-        this.endModal=false
-        this.$refs.table.init()
-      },
-      //删除
-      deleteProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认删除?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-              id
-            }
-            this.$request.post("/apiHost/api/transfer/delete",params,res=>{
-              this.$Message.success("删除成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error(res.message)
-              this.$Modal.remove()
-              this.$refs.table.init()
-            })
-          }
-        })
-      },
-      //状态详情
-      statusProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.selected_count > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-
-        let params = {
-          id: this.selection[0].id
-        }
-        this.$request.post("/apiHost/api/transfer/status",params,res=>{
-            this.nodesList = res.data.nodes.map(item => ({
-              roleName: item.roleName,
-              name: item.name,
-              id:item.id
-            }))
-            this.historysList =res.data.historys.map(item=> ({
-              createdAt:item.createdAt,
-              status:item.status,
-              nodeName:item.nodeName,
-              userName:item.userName
-            }))
-            this.nodesList.map((item,i)=> {
-              if(item.id === res.data.currentNodeId){
-                this.currentNodeId = i
-              }
-            })
-            this.statusModal = true
-          }, res=>{
-            this.$Modal.error({title: '提示信息', content: res.message})
-          },
-        )
-      },
-      statuSubmit(){
-        this.statusModal = false
-        this.loading = false
-        this.$refs.table.init()
-      },
-      //搜索
-      searchSubmit () {
-        this.isFirst = true
-        this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //搜索重置
-      searchCancel() {
-        this.formItem={
-          status: '',
-          buildingId: '',
-          roomId: '',
-          areaId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
-        }
-        this.isFirst = true
-        setTimeout(()=>{
-          this.$refs.table.init()
-          this.isFirst = false
-        },200)
-      },
-        // 提示窗关闭
-        closes () {
-            this.noteModal = false
-        },
+        // 选择文件
         uploadfile(index){
             document.querySelector('#upfile').click();
             this.upindex=index;
         },
+        // 图片幻灯
         showtheimg(index){
             this.showimg=index;
             this.visible=true;
         },
+        // 选择常见问题
         choose_question(item,index){
-            if(this.question_ary.indexOf(index)==-1){
-                this.question_ary.push(index)
-                document.querySelectorAll('.question')[index].classList.add('question_active');
+         
+            if(this.question_ary.indexOf(item.problem)==-1){
+                this.question_ary.push(item.problem)
             }else{
-                this.question_ary.splice(this.question_ary.indexOf(index),1)
-                document.querySelectorAll('.question')[index].classList.remove('question_active');
-
+                  
+                this.question_ary.splice(this.question_ary.indexOf(item.problem),1)
             }
-        }
+        },
+         // 历史报修数据
+        clientRepairList(){
+          this.RepairList_show=true
+          console.log(this.RepairForm.clientId)
+          if(this.RepairForm.clientId==""){
+            this.$Modal.error('请先输入手机号!')
+          }
+          this.$refs.table.init()
+        } 
+    },
+    
+    
    
-    }
   }
 </script>
 <style scoped>
@@ -818,15 +650,19 @@ import qs from "qs";
         width: 100%;
         height: 100%;
     }
-
+  div.addimg .ivu-icon{
+    font-size: 40px;line-height:1.5;
+  }
     .question{
         margin: 5px;
         color: #bbbec4;
+        min-width: 100px;
     }
     .question_active{
         background-color: #2d8cf0;
         border:#2d8cf0;
         color: #fff;
     }
+    
 </style>
 

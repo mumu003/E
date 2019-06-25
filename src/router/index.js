@@ -78,6 +78,15 @@ export default new Router({
           component: resolve => require(['@/views/customerManagement/index.vue'], resolve),
         },
         {
+          path: '/repairList',
+          name: 'repairList',
+          meta: {
+            title: '报修数据'
+          },
+          component: resolve => require(['@/views/repairList/index.vue'], resolve),
+        },
+        
+        {
           path: '/problemConfiguration',
           name: 'problemConfiguration',
           meta: {

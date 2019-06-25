@@ -12,38 +12,31 @@
               <Row type="flex" justify="start">
                 <Col span="6">
                   <FormItem label="工单号">
-                    <Input v-model="formItem.gongdanhao" :maxlength=30 placeholder="请输入工单号" /></Input>
-                  </FormItem>
-                </Col>
-                <Col span="6">
-                  <FormItem label="状态">
-                    <Select v-model="formItem.status" placeholder="待派单">
-                      <Option value="">待派单</Option>
-                      <Option value="-1">待维修</Option>
-                      <Option value="1">待评价</Option>
-                      <Option value="2">已评价</Option>
-                    </Select>
+                    <Input v-model="formItem.workOrderNo" :maxlength=30 placeholder="请输入工单号" /></Input>
                   </FormItem>
                 </Col>
                 
                 <Col span="6">
                   <FormItem label="姓名">
-                    <Input v-model="formItem.xingming" :maxlength=20 placeholder="请输入姓名"></Input>
+                    <Input v-model="formItem.name" :maxlength=20 placeholder="请输入姓名"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem label="手机号">
-                    <Input v-model="formItem.shoujihao" :maxlength=20 placeholder="请输入手机号"></Input>
+                    <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"></Input>
                   </FormItem>
                 </Col>
+              </Row>
+
+              <Row>
                 <Col span="6">
                   <FormItem label="更新时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -68,10 +61,6 @@
             <Row>
               <Col>
                 <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-                <!-- <Button type="primary" icon="edit" @click="viewProject">办理</Button>warning -->
-                <!--<Button type="primary" icon="clipboard" @click="statusProject">状态详情</Button>-->
-                <!-- <Button type="error" icon="close"　@click="endProject">终止</Button> -->
-                <!--<Button type="error" icon="close"　@click="deleteProject">删除</Button>-->
               </Col>
               <Col>
               </Col>
@@ -223,32 +212,6 @@
       <p>是否确认终止该流程，终止后将无法继续该流程?</p>
     </Modal>
 
-   <!-- <Modal v-model="statusModal" title="状态详情"
-      width="800"
-      :loading="loading"
-      @on-ok="statusOk"
-      @on-cancel="cancel">
-      <Row>
-        <Col span="24" style="margin-bottom: 10px;font-weight: bold;font-size: 16px;">处理进度</Col>
-        <Col span="24">
-          <Steps :current="1">
-            <Step v-for="item in nodesList" :title="item.name" :content="item.roleName" ></Step>
-          </Steps>
-        </Col>
-        <Col span="24" style="margin: 15px 0px;font-weight: bold;font-size: 16px;">进度详情</Col>
-        <Col span="24">
-          <Timeline>
-            <TimelineItem v-for="(item,index) in historysList" :color="item.status === 0 ? 'red' : 'green'">
-              <p>{{item.createdAt}}</p>
-              <p v-if="index === 0">发起</p>
-              <p v-else-if="index === historysList.length-1">归档节点:完结</p>
-              <p v-else>节点{{index+ 1}}:{{item.status === 1 ? '通过' : '驳回'}}</p>
-              <p>{{index===0 ? '发起人' : '操作人'}}:{{item.userName}}</p>
-            </TimelineItem>
-          </Timeline>
-        </Col>
-      </Row>
-    </Modal>-->
 
     <Modal v-model="noteModal" width="300" title="提示信息">
       <p id="note-info">请选择至少一条数据！</p>
@@ -260,6 +223,7 @@
   </div>
 </template>
 <script>
+  import qs from "qs";
   export default {
     data () {
       return {
@@ -294,67 +258,33 @@
         },
         //表单
         formItem: {
-          status:'',
-          gongdanhao:'',
-          unitName:'',
-          roomName:'',
-          shoujihao:'',
-          startUpdateTime:'',
-          endUpdateTime:'',
-          page:'1'
+          workOrderNo:'',
+          // priority:'',
+          // officeLocation:'',
+          name:'',
+          phone:'',
+          beginTime:"",
+          endTime:""
+          // companyName:'',
+          // repairSource:'',
+          // companyName:''
         },
         // 设置结束时间大于开始时间
         end:{
             disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+              return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/contractBill/list",
+          url:"/apiHost/api/emaint/repairProblem/repairProblemSingleList",
               columns:[
                 {
                   type:"selection",
                   key:'_checked',
                   width:60
                 },
-                // {
-                //   title: '状态',
-                //   key: 'status',
-                //   width:100,
-                //   render:(h,params)=>{
-                //     switch(params.row.status){
-                //       case '-1':
-                //         return h('div',{
-                //           style:{
-                //               width: '80px',
-                //               color: '#b725ed'
-                //           }
-                //         },"待发起")
-                //       case '0':
-                //         return h('div',{
-                //           style:{
-                //               width: '80px',
-                //               color: '#ED3F14'
-                //           }
-                //         },"终止")
-                //       case '1':
-                //         return h('div',{
-                //           style:{
-                //             width: '80px',
-                //             color: '#2D8CF0'
-                //           }
-                //         },"进行中")
-                //       case '2':
-                //         return h('div',{
-                //           style:{
-                //             width: '80px',
-                //             color: '#19BE6B'
-                //           }
-                //         },"已归档")
-                //     }
-                //   }
-                // },
+             
                 {
                   title: '操作',
                   key: 'options', 
@@ -370,7 +300,10 @@
                                     on: {
                                         click: () => {
                                             this.$router.push({
-                                              name:"dispatch"
+                                              name:"dispatch",
+                                              params:{
+                                                id:params.row.id
+                                              }
                                             })
                                         }
                                     }
@@ -380,47 +313,47 @@
                 },
                 {
                   title: '工单号码 ',
-                  key: 'gongdanhao',
+                  key: 'workOrderNo',
                   width:180
                 },
                 {
                   title: '优先级',
-                  key: 'shoujihao',
+                  key: 'priority',
                   width:120
                 },
                 {
                   title: '状态',
-                  key: 'gongdanhao',
+                  key: 'state',
                   width:120
                 },
                 {
                   title: '办公位',
-                  key: 'xingming',
+                  key: 'officeLocation',
                   width:120
                 },
                 {
                   title: '姓名',
-                  key: 'updatedAt',
+                  key: 'name',
                   width:120
                 },
                 {
                   title: '手机号',
-                  key: 'updatedAt',
+                  key: 'phone',
                   width:150
                 },
                 {
                   title: '组织',
-                  key: 'updatedAt',
+                  key: 'companyName',
                   width:200
                 },
                 {
                   title: '来源',
-                  key: 'updatedAt',
+                  key: 'repairSource',
                   width:150
                 },
                 {
                   title: '更新时间',
-                  key: 'updatedAt',
+                  key: 'gmtModified',
                   width:200
                 }
               ],
@@ -654,7 +587,7 @@
       },
       //开始时间
       getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
+        this.formItem.beginTime=startDate
         // this.end.disabledDate(startDate)
       },
       //结束时间
@@ -764,10 +697,8 @@
           this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
-      //
+      // 问题受理 / 新增
       addProject(){
-        // this.addModal = true
-        // this.getIndex()
         this.$router.push({
           name:'workOrderManage'
         })
@@ -1111,16 +1042,16 @@
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/contractBill/list",this.formItem, res => {
-          if (res.code === 200) {
+        this.$request.post("/apiHost/api/emaint/repairProblem/repairProblemSingleList",qs.stringify(this.formItem), res => {
+          this.$Modal.error({title: '提示信息', content: res.resMessage})
+        }, res => {
+          if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
           }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //重置
@@ -1131,7 +1062,7 @@
           buildingId: '',
           roomId: '',
           unitId: '',
-          startUpdateTime: '',
+          beginTime: '',
           endUpdateTime: ''
         }
         this.isFirst = true
