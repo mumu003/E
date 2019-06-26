@@ -49,11 +49,7 @@
               </Col>
               <Col span="6">
               <FormItem label="执行人">
-                 <Select v-model="formItem.userName" placeholder="全部">
-                      <Option value="">全部</Option>
-                      <Option value="张三">张三</Option>
-                      <Option value="李四">李四</Option>
-                    </Select>
+                <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>
               </FormItem>
               </Col>
               <Col span="6">

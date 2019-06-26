@@ -62,7 +62,7 @@
       <Col span="24">
       <Card>
         <Row class="searchable-table-con">
-          <m-table :config="tableConfig" :searchParams="formItem" ref="table"  :isFirst="isFirst"></m-table>
+          <m-table :config="tableConfig" :searchParams="searchparam" ref="table"  :isFirst="isFirst"></m-table>
         </Row>
       </Card>
       </Col>
@@ -121,10 +121,12 @@ import qs from "qs";
         modalStar:5,// 星级,
         // 评语
         evaluatList:["好","很好","非常好"], 
-       
+       searchparam:{
+         clientId:''
+       },
         //表单
         formItem: {
-          companyName:'',
+          companyName:'',          
           name:'',
           phone:'',
           sex:'',
@@ -138,7 +140,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/client/list",
+          url:"/apiHost/api/emaint/repairProblem/clientRepairProblemList",
           columns:[
             {
                   title: '操作',
@@ -167,12 +169,12 @@ import qs from "qs";
                 },
             {
               title: '工单号码',
-              key: 'name',
+              key: 'workOrderNo',
               width:120
             },
             {
               title: '变更状态 ',
-              key: 'name',
+              key: 'state',
               width:120,
             //   render:(h,params)=>{
             //     return h('div',params.row.enable==1?'禁用':'启用')
@@ -208,7 +210,16 @@ import qs from "qs";
         },
       }
     },
-    mounted(){//方法
+    created(){//方法
+    this.searchparam.clientId=this.$route.params.id;
+   
+      this.$request.post('/apiHost/api/emaint/client/info',qs.stringify({id:this.$route.params.id}),res=>{},res=>{
+        if(res.statusCode==200){
+      
+          this.formItem=res.responseResult;
+    
+        }
+      })
       // this.getBuildings()
       // this.addarea()
       /*this.getIndex()*/

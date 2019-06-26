@@ -7,12 +7,13 @@
           {{$route.meta.title}}
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
+        <!-- 检索 -->
         <div id="search-body">
           <Form  :model="formItem" :label-width="80">
             <Row type="flex" justify="start">
               <Col span="6">
               <FormItem label="姓名">
-                <Input v-model="formItem.customerName" :maxlength=20 placeholder="请输入姓名"></Input>
+                <Input v-model="formItem.name" :maxlength=20 placeholder="请输入姓名"></Input>
               </FormItem>
               </Col>
               <Col span="6">
@@ -25,10 +26,8 @@
               <Row>
               <Col span="6">
               <FormItem label="优先级">
-                <Select v-model="formItem.status" placeholder="高">
-                  <Option value="">高</Option>
-                  <Option value="-1">中</Option>
-                  <Option value="1">一般</Option>
+                <Select v-model="formItem.priority" placeholder="请选择优先级">
+                  <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
                 </Select>
               </FormItem>
               </Col>
@@ -36,12 +35,12 @@
               <Row>
               <Col span="6">
               <FormItem label="创建时间">
-                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
             </Row>
@@ -102,9 +101,10 @@
           </Col>
           <Col span="16">
           <FormItem label="优先级" prop="priority">
-            <Select v-model="addForm.priority" placeholder="优先级">
-              <Option value="待派单">高</Option>
-              <Option value="待维修">很高</Option>
+            <Select v-model="addForm.priority" placeholder="请选择优先级">
+              <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
+              <!-- <Option value="待派单">高</Option>
+              <Option value="待维修">很高</Option> -->
             </Select>
           </FormItem>
           </Col>
@@ -156,10 +156,8 @@
           </Col>
           <Col span="16">
           <FormItem label="优先级" prop="priority">
-            <Select v-model="addForm.priority" placeholder="优先级">
-              <Option value="高">高</Option>
-              <Option value="中">中</Option>
-              <Option value="低">低</Option>
+            <Select v-model="addForm.priority" placeholder="请选择优先级">
+              <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
             </Select>
           </FormItem>
           </Col>
@@ -198,7 +196,7 @@
           </Row>
         <div slot="footer" style="text-align: center;;margin:0 auto;">
           <Button @click="cancel">取消</Button>
-          <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
+          <Button type="primary"  @click="disable_sure" :loading="modal_loading">确定</Button>
         </div>
       </Modal>
 
@@ -212,7 +210,7 @@
           </Row>
         <div slot="footer" style="text-align: center;;margin:0 auto;">
           <Button @click="cancel">取消</Button>
-          <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
+          <Button type="primary"  @click="enble_sure" :loading="modal_loading">确定</Button>
         </div>
       </Modal>
   
@@ -236,37 +234,27 @@ import qs from "qs";
         noteModal: false, //弹窗
         isShow: false, //新增-资料抓取显示
         loading: true, //加载
-        buildingList: [], //楼栋
-        unitList: [], //单元
-        roomsList: [], //房间
         addData: [], //新增表格数据
-        viewData: [], //审核表格数据
-        nodesList: [], //处理进度
-        historysList: [], //进度详情
-        currentNodeId: '', //处理进度节点
-        addUnitNameIsNo:'',//新增名字空的
-        viewTabs: 'name1', //Tabs
-        buttons:{ }, //按钮
-
-        // 处理禁用启用弹窗
-        enable:false,
-        disable:false,
         //搜索时间
         searchTime:{
           tStartTime:"",
           tEndTime:"",
         },
+        
+        // 处理禁用启用弹窗
+        enable:false,
+        disable:false,
+        userId:"",
+        priority:[],
+        
         //表单
         formItem: {
-          status:'',
-          customerName:'',
+          
+          name:'',
           phone:'',
-          buildingName:'',
-          roomNum:'',
-          addressNum:'',
-          startUpdateTime:'',
-          endUpdateTime:'',
-          page:'1'
+          beginTime:'',
+          endTime:'',
+          priority:'',
         },
         // 设置结束时间大于开始时间
         end:{
@@ -276,7 +264,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/client/list",
+          url:"/apiHost/api/emaint/client/page",
           columns:[
             {
                   title: '操作',
@@ -297,9 +285,9 @@ import qs from "qs";
                                         click: () => {
                                             this.$router.push({
                                               name:"repairList",
-                                              // params:{
-                                              //   id:params.row.id
-                                              // }
+                                              params:{
+                                                id:params.row.id
+                                              }
                                             })
                                         }
                                     }
@@ -324,6 +312,7 @@ import qs from "qs";
                                                   if(res.statusCode==200){
                                                     console.log(res)
                                                     var data=res.responseResult
+                                                    this.addForm.id=data.id
                                                     this.addForm.companyName=data.companyName
                                                     this.addForm.name=data.name
                                                     this.addForm.phone=data.phone
@@ -349,7 +338,8 @@ import qs from "qs";
                                     },
                                     on: {
                                         click: () => {
-                                          console.log(params.row.enable)
+                                          this.userId=params.row.id
+                                          // console.log(params.row.enable)
                                           if(params.row.enable=1){
                                             // 禁用状态，需要启用
                                             this.enable=true
@@ -372,8 +362,7 @@ import qs from "qs";
               key: 'enable',
               width:120,
               render:(h,params)=>{
-                return h('div',params.row.enable==1?'禁用':'启用')
-               
+                return h('div',params.row.enable==0?'启用':'禁用') 
               }
             },
             {
@@ -411,6 +400,7 @@ import qs from "qs";
         },
         //新增-表单数据
         addForm:{
+          id:"",
           companyName:'',
           name:'',
           phone:'',
@@ -426,121 +416,45 @@ import qs from "qs";
             { required: true, message: '请输入姓名', trigger: 'blur' }
           ],
           phone: [
-            { required: true, message: '请输入手机号', trigger: 'blur' }
+            { required: true, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
+                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
           ],
           priority: [
             { required: true, message: '请选择优先级', trigger: 'change' }
           ],
         },
         
-        //新增-表格
-        addContract: [
-          {
-            title: '楼栋号',
-            key: 'buildingName',
-            width:150,
-          },
-          {
-            title: '房间号',
-            key: 'rommNum',
-            width:150
-          },
-          {
-            title: '门牌号',
-            key: 'addressNum',
-            width:150
-          },
-          {
-            title: '购买用途',
-            key: 'purpose',
-            width:150
-          },
-          {
-            title: '业主名字',
-            key: 'customerName',
-            width:150
-          },
-          {
-            title: '身份证号',
-            key: 'idNumber',
-            width:150
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:150
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:150
-          },
-          {
-            title: '备注',
-            key: 'remark',
-            width:150
-          }
-        ],
-        //新增模态框验证
-        
-        //审核-表单数据
-        viewForm:{
-          buildingName:'',
-          unitName:'',
-          roomNum:'',
-          customerName:'',
-          status:'',
-          id:''
-        },
-        //审核-表格数据
-        viewContract: [
-          {
-            title: '楼栋号',
-            key: 'buildingName',
-            width:150,
-          },
-          {
-            title: '房间号',
-            key: 'roomNum',
-            width:150
-          },
-          {
-            title: '门牌号',
-            key: 'addressNum',
-            width:150
-          },
-          {
-            title: '购买用途',
-            key: 'purpose',
-            width:150
-          },
-          {
-            title: '业主名字',
-            key: 'customerName',
-            width:150
-          },
-          {
-            title: '身份证号',
-            key: 'idCard',
-            width:150
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:150
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:150
-          },
-          {
-            title: '备注',
-            key: 'remark',
-            width:150
-          }
-        ]
       }
+    },
+    created(){
+      // 优先级下拉列表
+      this.$request.post("/apiHost/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
+              this.modal_loading = false
+              this.$Message.error("网络出错，请重试！")
+            } , res => {
+              if (res.statusCode === 200) {
+                console.log(res)
+                var data=res.responseResult
+                data.forEach((v)=>{
+                    this.priority.push(v)
+                })
+                  this.$Message.success({title: '提示信息', content: res.resMessage})
+              } else {
+                this.modal_loading = false
+                this.$Modal.error({title: '提示信息', content: res.resMessage})
+          }
+      })
+    },
+    mounted(){//方法
+      // this.getBuildings()
+      // this.addarea()
+      /*this.getIndex()*/
     },
     computed: {
       // 被选择的列表数据条数
@@ -552,11 +466,7 @@ import qs from "qs";
         return this.$refs.table.selection
       }
     },
-    mounted(){//方法
-      // this.getBuildings()
-      // this.addarea()
-      /*this.getIndex()*/
-    },
+    
     methods: {
       //开始时间
       getStartDate(startDate){
@@ -573,28 +483,23 @@ import qs from "qs";
       //新增模态框提交
       addSubmit(){
         this.modal_loading = true
-            this.$request.post("/apiHost/api/emaint/client/save",this.addForm, res => {
-              if (res.code === 200) {
+            this.$request.post("/apiHost/api/emaint/client/save",this.addForm,res=>{
+              this.modal_loading = false
+              this.$Message.error("网络出错，请重试！")
+            } , res => {
+              if (res.statusCode === 200) {
                 setTimeout(() => {
                   this.addModal = false
+                  this.editModal=false
                   this.modal_loading = false
-                  this.addData = []
-                  this.isShow = false
-                  this.$Message.success("新增成功！")
-                  this.unitList=[ ]
-                  this.roomsList=[ ]
-                  // this.$refs.addForm.resetFields()
+                  this.$Message.success({title: '提示信息', content: res.responseResult})
                   this.$refs.table.init()
-                }, 2000)
+                }, 1000)
               } else {
                 this.modal_loading = false
-                this.$Modal.error({title: '提示信息', content: res.message})
+                this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
-            }, res => {
-              this.modal_loading = false
-              this.$Modal.error({title: '提示信息', content: res.message})
             })
-       
       },
       //取消
       cancel() {
@@ -602,23 +507,24 @@ import qs from "qs";
         this.enable = false
         this.disable = false
         this.$Message.info('你取消了操作')
-        // this.$refs.addForm.resetFields()
         this.$refs.table.init()
       },
 
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
-          if (res.code === 200) {
+        this.formItem.pageNo=1;
+        this.formItem.limit=10;
+        this.$request.post("/apiHost/api/emaint/client/page",qs.stringify(this.formItem), res => {
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
+        }, res => {
+           if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
           }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
         })
       },
       //搜索重置
@@ -641,8 +547,37 @@ import qs from "qs";
       // 同步客户
       viewProject(){
 
+      },
+
+      // 启用
+      enble_sure(){
+          this.$request.post("/apiHost/api/emaint/client/enable",qs.stringify({id:this.userId}), res => {
+            this.$Modal.error("网络出错，请重试！")
+          }, res => {
+            if (res.statusCode === 200) {
+              this.$Message.success({title: '提示信息', content: res.responseResult})
+              this.enable = false
+              this.$refs.table.init()
+            } else {
+              this.$Modal.error({title: '提示信息', content: res.responseResult})
+            }
+        })
+      },
+      
+      // 禁用
+      disable_sure(){
+          this.$request.post("/apiHost/api/emaint/client/disable",qs.stringify({id:this.userId}), res => {
+            this.$Modal.error("网络出错，请重试！")
+          }, res => {
+            if (res.statusCode === 200) {
+              this.$Message.success({title: '提示信息', content: res.responseResult})
+              this.disable = false
+              this.$refs.table.init()
+            } else {
+              this.$Modal.error({title: '提示信息', content: res.responseResult})
+            }
+        })
       }
-     
     }
   }
 </script>

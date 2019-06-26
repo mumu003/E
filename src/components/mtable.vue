@@ -82,6 +82,7 @@ export default {
       params = arr
       if(!this.config.unParam){
         params.page = this.isFirst === true ? 1 : this.currentPage
+        params.pageNo=this.isFirst === true ? 1 : this.currentPage
         params.limit = this.config.limit != undefined?this.config.limit :this.limit
         this.limit = params.limit;
       }

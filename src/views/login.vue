@@ -55,6 +55,7 @@ export default {
   mounted() {
     this.addListen();
   },
+
   methods: {
     addListen() {
       document.onkeydown = e => {
