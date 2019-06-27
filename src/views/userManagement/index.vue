@@ -92,15 +92,9 @@
           </FormItem>
           </Col>
           <Col span="22">
-            <FormItem label="所属角色" prop="type">
-              <Select v-model="addForm.type" placeholder="请选择角色">
-                <Option value="1">合同备案</Option>
-                <Option value="5">发函</Option>
-                <Option value="6">交房通知</Option>
-                <Option value="2">水电过户</Option>
-                <Option value="3">两书</Option>
-                <Option value="4">产权办理</Option>
-                <Option value="7">协议书申请</Option>
+            <FormItem label="所属角色" prop="roleId">
+              <Select v-model="addForm.roleId" placeholder="请选择角色" multiple >
+                <Option :value="item.roleId" v-for="(item,index) in roleList" :key="index">{{item.roleName}}</Option>
               </Select>
             </FormItem>
           </Col>
@@ -145,12 +139,12 @@
         <Row>
           <Col span="22" >
           <FormItem label="密码"  prop="pwd">
-            <Input v-model="updatePwdForm.pwd" type="password" placeholder="请输入密码" :maxlength=50 style="width: 100%"></Input>
+            <Input v-model="updatePwdForm.newPassword1" type="password" placeholder="请输入密码" :maxlength=50 style="width: 100%"></Input>
           </FormItem>
           </Col>
           <Col span="22" >
           <FormItem label="重复密码" prop="pwdTwo">
-            <Input v-model="updatePwdForm.pwdTwo" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
+            <Input v-model="updatePwdForm.newPassword2" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
           </FormItem>
           </Col>
 
@@ -171,7 +165,7 @@
       <p id="note-info">是否确认删除该数据？</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
         <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
-        <Button type="primary" size="default" @click="deleteModal=false">确定</Button>
+        <Button type="primary" size="default" @click="delUser()">确定</Button>
       </div>
     </Modal>
   </div>
@@ -247,6 +241,8 @@ import qs from "qs";
       //   }
       // };
       return {
+        delId:"",//删除用户id
+        settingDatas: [],//设置数据
         syncDisable : false,//异步房屋禁用
         loading : true,//加载
         modal_loading : false,//模态框加载
@@ -265,7 +261,7 @@ import qs from "qs";
         viewSettingNodesOne: [],//流程设置详情数据接收list
         viewSettingNodesTwo: [],//流程设置详情数据中间转换list
         viewSettingNodes: [],//流程设置详情显示list
-        settingDatas: [],//设置数据
+        
         settingNodes: [],//设置节点
         settingNodesLength: '',//设置节点长度
         archiveSetting: [],//存档资料接收list
@@ -324,7 +320,7 @@ import qs from "qs";
           phone:'',
           pwd:'',
           pwdTwo:'',
-          type:''
+          roleId:''
         },//新增资料数据
         ruleAddMaterial:{
           name: [
@@ -371,16 +367,17 @@ import qs from "qs";
         },
         //修改密码
         updatePwdForm:{
-          id : '',
-          pwd:'',
-          pwdTwo:''
+          id : sessionStorage.userID,
+          oldPassword:"",
+          newPassword1:'',
+          newPassword2:''
         },
         ruleupdatePwd:{
-          pwd: [
+          newPassword1: [
             { required: true, trigger: 'blur' },
             // { validator:validatorMaterialNameEdit , trigger: 'change'}
           ],
-          pwdTwo: [
+          newPassword2: [
             { required: true, trigger: 'blur' },
             // { validator:validateSource, trigger: 'blur' }
           ]
@@ -388,7 +385,7 @@ import qs from "qs";
         selectMaterialForm:{
           index: '',
           dataIds:[]
-        },//选择资料数据
+        },
         tableConfig:{
             url:"/apiHost/api/user/data",
               columns:[
@@ -430,6 +427,7 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.updatePwdModal=true
+                                          this.updatePwdForm.oldPassword=params.row.password
                                     }
                                 }
                             },"修改密码"),
@@ -441,6 +439,7 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.deleteModal=true
+                                          this.delId=params.row.id
                                     }
                                 }
                             },"删除"),
@@ -459,12 +458,12 @@ import qs from "qs";
                 },
                 {
                   title: '角色',
-                  key: 'name',
+                  key: 'roleName',
                   align:'center'
                 },
                 {
                   title: '创建时间',
-                  key: 'gmtCreate',
+                  key: 'createDate',
                   align:'center'
                 }
               ]
@@ -567,24 +566,20 @@ import qs from "qs";
           id:0,
           name:'',
           type:''
-        },//新增角色数据
+        },
+        //新增角色数据
         addDataForm:{
-          id:'',
-          sort:'',
-          name:'',
-          quantity:'',
-          required:'',
-          archive:''
-        },//新增资料数据
+        },
         editArchiveForm:{
           type:'',
           requirePurchase:[],
-        },//编辑资料数据
+        },
+        //编辑资料数据
         viewForm :{
           type: '',
           requirePurchase: '1',
           overName:''
-        },//详情数据
+        },
         noteModal: false //弹窗
       }
     },
@@ -599,34 +594,55 @@ import qs from "qs";
       }
     },
     mounted(){
-      // this.getRoleList()//获取角色
+      this.getRoleList()//获取角色
     },
     methods:{
+      delUser(){
+        // delId
+          this.$request.post("/apiHost/api/user/disable", qs.stringify({id:this.delId}), res => {
+	         this.$Modal.success("删除成功")
+	        }, res => {
+            this.$refs.table.init()
+            this.$Modal.success("删除成功")
+            this.deleteModal=false
+	          // this.$Modal.error({title: '提示信息', content: res.message})
+	        })
+      },
       updatePwdlCancel(){
         this.updatePwdModal = false,
         this.$Message.info('你取消了操作')
         this.$refs.table.init()
       },
       updatePwdSubmit(){
-
+// updatePwdForm
+        this.$request.post("/apiHost/api/user/updatePassword", qs.stringify(this.updatePwdForm), res => {
+	         
+	        }, res => {
+            // this.$refs.table.init()
+            if(res.statusCode === 200){
+              this.updatePwdForm.newPassword1 = ""
+              this.updatePwdForm.newPassword2 = ""
+              this.$Message.success('修改成功！')
+            }else{
+              this.$Modal.error({title: '提示信息', content: res.responseResult})
+            }
+            
+	        })
       },
       //获取角色
-      // getRoleList(){
-      // 	let token = sessionStorage.getItem("token")
-      // 	if(token === null){
-      // 	  window.location.href = '/#/login'
-      //     window.location.reload()
-      // 	}else{
-      // 	  this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-	    //       this.roleList = res.data.data.map(item => ({
-	    //         roleId: item.roleId,
-	    //         roleName: item.roleName
-	    //       }))
-	    //     }, res => {
-	    //       this.$Modal.error({title: '提示信息', content: res.message})
-	    //     })
-      // 	}
-      // },
+      getRoleList(){
+      	  this.$request.post("/apiHost/api/emaint/role/list", '', res => {
+	          this.roleList = res.responseResult.map(item => ({
+	            roleId: item.id,
+	            roleName: item.name
+	          }))
+	        }, res => {
+            this.roleList = res.responseResult.map(item => ({
+	            roleId: item.id,
+	            roleName: item.name
+	          }))
+	        })
+      },
       //获取角色名称
       // getRoleName(roleId,index){
       //   this.roleList.forEach(item=>{
@@ -777,32 +793,27 @@ import qs from "qs";
       closes () {
         this.noteModal = false
       },
-      //新增资料
-      // addMaterial () {
-      //   if(this.settingDatas.length === 20){
-      //     this.$Modal.info({title: '提示信息', content: "资料最多20个"})
-      //   }else{
-      //     this.addMaterialModal = true
-      //     this.$refs.addForm.resetFields()
-      //   }
-      // },
+
       //新增用户
       addSubmit () {
+        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
+        name=name.join(",")
         this.addDataForm={
               id:"",
+              roleId:name,
               name:this.addForm.name,
               phone:this.addForm.phone,
               password:this.addForm.pwd,
-              loginName:sessionStorage.loginName
+              loginName:this.addForm.name
         }
         // qs
-        this.$request.post("/apiHost/api/user/save",qs.stringify(this.addDataForm),res=>{
+        this.$request.post("/apiHost/api/user/save",this.addDataForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
               this.addMaterialModal = false
               this.modal_loading = false
               this.$refs.addForm.resetFields()
-              this.$Message.success("提交成功!")
+              this.$Message.success("添加成功!")
               this.$refs.table.init()
             }, 2000)
           } else {
@@ -810,8 +821,18 @@ import qs from "qs";
             this.modal_loading = false
           }
         },res=>{
-          this.$Modal.error({title: '提示信息', content: res.message})
-          this.modal_loading = false
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
+          }
         })
         // this.$refs.addForm.validate((valid) => {
         //   if (valid) {
@@ -881,12 +902,10 @@ import qs from "qs";
           }
         })
       },
-      //编辑资料取消
       editMaterialCancel (){
         this.editMaterialModal = false
         this.$refs.editMaterialForm.resetFields()
       },
-      //编辑资料取消
       updatePwdCancel (){
         this.updatePwdModal = false
         this.$refs.updatePwdForm.resetFields()

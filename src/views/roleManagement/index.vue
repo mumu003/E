@@ -12,19 +12,19 @@
               <Row>
                 <Col span="6">
                   <FormItem label="角色名称">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入角色名称"></Input>
+                    <Input v-model="formItem.name" :maxlength=20 placeholder="请输入角色名称"></Input>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col span="6">
                   <FormItem label="创建时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -74,6 +74,11 @@
           <Col span="22" >
           <FormItem label="角色说明" prop="explain">
             <Input v-model="addDataForm.explain" type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
+          </FormItem>
+          </Col>
+          <Col span="22" >
+          <FormItem label="编码" prop="explain">
+            <Input v-model="addDataForm.code"  style="width: 100%" placeholder="请输入角色编码" :maxlength=11></Input>
           </FormItem>
           </Col>
         </Row>
@@ -136,7 +141,7 @@
       <p id="note-info">是否确认删除该角色？</p>
       <div slot="footer" style="text-align:center;margin:0 auto;">
         <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
-        <Button type="primary" size="default" @click="deleteRole()">确定</Button>
+        <Button type="primary" size="default" @click="deleteRole">确定</Button>
       </div>
     </Modal>
   </div>
@@ -256,10 +261,12 @@ import qs from "qs";
           quantity:''
         },//回传资料tag显示
         formItem: {
-          // type: '',
-          // startUpdateTime: '',
-          // endUpdateTime:'',
-          // page:1
+          orderBy:"gmtCreate",
+          name:"",
+          beginTime:"",
+          endTime:"",
+          page:1,
+          limit:10
         },
         end:{
             disabledDate :(function(date){
@@ -338,8 +345,8 @@ import qs from "qs";
           dataIds:[]
         },//选择资料数据
         tableConfig:{
-            url:"/apiHost/api/emaint/role/list",
-            unParam:true,
+            url:"/apiHost/api/emaint/role/page",
+            // unParam:true,
               columns:[
                 {
                   type:"selection",
@@ -349,7 +356,7 @@ import qs from "qs";
                 {
                   title: '操作',
                   key: 'name',
-                  width:150,
+                  width:200,
                   align:'center',
                   render:(h,params)=>{
                         return h('div',{
@@ -402,21 +409,7 @@ import qs from "qs";
                                           this.roleID=params.row.id
                                     }
                                 }
-                            },"删除"),
-                            h('Button',{
-                                props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                },
-                                style:{
-                                  margin:"5px 0px"
-                                },
-                                on: {
-                                    click: () => {
-                                          this.$router.push({path:"/distributeUser"})
-                                    }
-                                }
-                            },"分配用户")
+                            },"删除")
                           ])
                   }
                 },
@@ -577,9 +570,10 @@ import qs from "qs";
 	        }, res => {
             this.$refs.table.init()
             this.$Modal.success("删除成功")
+          })
+          setTimeout(()=>{
             this.deleteModal=false
-	          // this.$Modal.error({title: '提示信息', content: res.message})
-	        })
+          },200)
       },
       //获取角色
       getRoleList(){
@@ -618,45 +612,47 @@ import qs from "qs";
       },
       //开始时间
       getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
+        this.formItem.beginTime=startDate
       },
       //结束时间
       getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+        this.formItem.endTime=endDate
       },
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
+        this.$request.post("/apiHost/api/emaint/role/page",qs.stringify(this.formItem), res => {
+          if (res.statusCode === 200) {
+            // this.$Message.success("搜索成功！")
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            // this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
+          if (res.statusCode === 200) {
+            // this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            // this.$Modal.error({title: '提示信息', content: res.message})
+          }
         })
       },
       //搜索重置
       searchReset(){
         this.formItem = {
-          type: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          orderBy: 'gmtCreate',
+          beginTime: '',
+          endTime: '',
+          name:"",
+          page:1,
+          limit:10
         }
-        this.isFirst = true
-        this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       //流程设置详情
       viewProject(){
@@ -847,13 +843,13 @@ import qs from "qs";
         //     this.modal_loading = false
         //   }
         // })
-        this.$request.post("/apiHost/api/emaint/role/save",qs.stringify(this.addDataForm),res=>{
+        this.$request.post("/apiHost/api/emaint/role/save",this.addDataForm,res=>{
           if (res.statusCode === 200) {
             // setTimeout(() => {
-              this.editModal = false
+              this.addMaterialModal = false
               this.modal_loading = false
-              this.$refs.editForm.resetFields()
-              this.$Message.success("提交成功!")
+              // this.$refs.editForm.resetFields()
+              this.$Message.success("添加成功!")
               this.$refs.table.init()
             // }, 2000)
           } else {
@@ -863,10 +859,10 @@ import qs from "qs";
         },res=>{
           if (res.statusCode === 200) {
             // setTimeout(() => {
-              this.editModal = false
+              this.addMaterialModal = false
               this.modal_loading = false
-              this.$refs.editForm.resetFields()
-              this.$Message.success("提交成功!")
+              // this.$refs.editForm.resetFields()
+              this.$Message.success("添加成功!")
               this.$refs.table.init()
             // }, 2000)
           } else {

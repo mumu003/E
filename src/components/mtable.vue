@@ -127,7 +127,7 @@ export default {
         })
         this.tableData = list
         this.tableData.sort(util.compare('gmtModified'))
-        this.total = data.responseResult.total
+        this.total = data.responseResult.total || data.responseResult.length
         this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
       })
     },
@@ -144,17 +144,18 @@ export default {
     },
     pageChange (page) {
       this.currentPage = page
+      console.log(this.currentPage)
       this.init()
     },
     
   },
   watch:{
-    　searchParams: {  
-　　　　handler(newValue, oldValue) {  
-　　　　　　this.init();
-　　　　},  
-　　　　deep: true  
-　　}  
+//     　searchParams: {  
+// 　　　　handler(newValue, oldValue) {  
+// 　　　　　　this.init();
+// 　　　　},  
+// 　　　　deep: true  
+// 　　}  
   }
 }
 </script>

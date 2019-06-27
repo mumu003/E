@@ -142,7 +142,7 @@
                           on:{
                             click:()=>{
                               this.isShowEvaluation=true
-                              this.evaluationTitle="给"+params.row.toUserId+"的评价"
+                              this.evaluationTitle="给"+params.row.fromClientName+"的评价"
                               this.modalStar=params.row.star
                               this.modalLabel=params.row.label
                               console.log(params.row)
@@ -153,7 +153,7 @@
                 },
                 {
                   title: '执行人',
-                  key: 'fromClientId',
+                  key: 'toUserName',
                   width:100,
                   align:"center"
                 },
@@ -185,7 +185,7 @@
                 },
                 {
                   title: '姓名',
-                  key: 'toUserId',
+                  key: 'fromClientName',
                   width:100,
                   align:"center"
                 },
@@ -212,14 +212,14 @@
       }
     },
     computed: {
-      // 被选择的列表数据条数
-      selected_count(){
-        return this.$refs.table.selected_count
-      },
-      // 被选择的列表数据
-      selection(){
-        return this.$refs.table.selection
-      }
+      // // 被选择的列表数据条数
+      // selected_count(){
+      //   return this.$refs.table.selected_count
+      // },
+      // // 被选择的列表数据
+      // selection(){
+      //   return this.$refs.table.selection
+      // }
     },
     mounted(){//方法
       // this.getRoleList()//获取角色
