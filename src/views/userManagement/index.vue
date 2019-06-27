@@ -12,24 +12,24 @@
               <Row>
                 <Col span="6">
                   <FormItem label="用户名">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入用户名"></Input>
+                    <Input v-model="formItem.name" :maxlength=20 placeholder="请输入用户名"></Input>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem label="手机号">
-                    <Input v-model="formItem.roomNum" :maxlength=20 placeholder="请输入手机号"></Input>
+                    <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"></Input>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col span="6">
                   <FormItem label="创建时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.startUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem>
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -117,13 +117,15 @@
           </Col>
           <Col span="22" >
           <FormItem label="手机号" prop="phone">
-            <Input v-model="editMaterialForm.quantity" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
+            <Input v-model="editMaterialForm.phone" style="width: 100%" placeholder="请输入手机号" :maxlength=11></Input>
           </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="所属角色" prop="type">
-            <Input v-model="editMaterialForm.type" style="width: 100%" placeholder="请选择角色" :maxlength=11></Input>
-          </FormItem>
+           <FormItem label="所属角色" prop="roleId">
+              <Select v-model="editMaterialForm.roleId" placeholder="请选择角色" multiple >
+                <Option :value="item.roleId" v-for="(item,index) in roleList" :key="index">{{item.roleName}}</Option>
+              </Select>
+            </FormItem>
           </Col>
   
         </Row>
@@ -138,12 +140,12 @@
       <Form  ref="updatePwdForm" :model="updatePwdForm" :label-width="100" :rules="ruleupdatePwd" >
         <Row>
           <Col span="22" >
-          <FormItem label="密码"  prop="pwd">
+          <FormItem label="密码"  prop="newPassword1">
             <Input v-model="updatePwdForm.newPassword1" type="password" placeholder="请输入密码" :maxlength=50 style="width: 100%"></Input>
           </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="重复密码" prop="pwdTwo">
+          <FormItem label="重复密码" prop="newPassword2">
             <Input v-model="updatePwdForm.newPassword2" type="password" style="width: 100%" placeholder="请重复密码" :maxlength=11></Input>
           </FormItem>
           </Col>
@@ -242,6 +244,7 @@ import qs from "qs";
       // };
       return {
         delId:"",//删除用户id
+        updatePwdId:"",//修改密码id
         settingDatas: [],//设置数据
         syncDisable : false,//异步房屋禁用
         loading : true,//加载
@@ -286,11 +289,14 @@ import qs from "qs";
           quantity:''
         },//回传资料tag显示
         formItem: {
-          
+          beginTime:"",
+          endTime:"",
+          name:"",
+          phone:""
         },
         end:{
             disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+              return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
         //搜索模块数据
@@ -346,10 +352,10 @@ import qs from "qs";
         },
         //用户修改
         editMaterialForm:{
-          id : '',
+          id:'',
           name:'',
           phone:'',
-          type:''
+          roleId:''
         },
         ruleEditMaterial:{
           name: [
@@ -360,15 +366,13 @@ import qs from "qs";
             { required: true, trigger: 'blur' },
             // { validator:validateSource, trigger: 'blur' }
           ],
-          type: [
+          roleId: [
             { required: true, trigger: 'blur' },
             // { validator:validateSource, trigger: 'blur' }
           ]
         },
         //修改密码
         updatePwdForm:{
-          id : sessionStorage.userID,
-          oldPassword:"",
           newPassword1:'',
           newPassword2:''
         },
@@ -416,6 +420,7 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.editMaterialModal=true
+                                          this.editMaterialForm.id=params.row.id
                                     }
                                 }
                             },"修改"),
@@ -427,7 +432,8 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.updatePwdModal=true
-                                          this.updatePwdForm.oldPassword=params.row.password
+                                          this.updatePwdId=params.row.id
+                                          console.log(params.row.id)
                                     }
                                 }
                             },"修改密码"),
@@ -614,11 +620,15 @@ import qs from "qs";
         this.$refs.table.init()
       },
       updatePwdSubmit(){
-// updatePwdForm
-        this.$request.post("/apiHost/api/user/updatePassword", qs.stringify(this.updatePwdForm), res => {
+        let updatePwdParams={
+          id:this.updatePwdId,
+          newPassword1:this.updatePwdForm.newPassword1,
+          newPassword2:this.updatePwdForm.newPassword2,
+        }
+        this.$request.post("/apiHost/api/user/adminUpdatePassword", qs.stringify(updatePwdParams), res => {
 	         
 	        }, res => {
-            // this.$refs.table.init()
+            this.$refs.table.init()
             if(res.statusCode === 200){
               this.updatePwdForm.newPassword1 = ""
               this.updatePwdForm.newPassword2 = ""
@@ -653,45 +663,43 @@ import qs from "qs";
       // },
       //开始时间
       getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
+        this.formItem.beginTime=startDate
       },
       //结束时间
       getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+        this.formItem.endTime=endDate
       },
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
+        this.$request.post("/apiHost/api/user/data",qs.stringify(this.formItem), res => {
+          if (res.statusCode === 200) {
+            // this.$Message.success("搜索成功！")
+            // this.isFirst = false
             this.$refs.table.init()
           } else {
             this.$Modal.error({title: '提示信息', content: res.message})
           }
         }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
+          if (res.statusCode === 200) {
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+          }
         })
       },
       //搜索重置
       searchReset(){
         this.formItem = {
-          type: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
+          name: '',
+          beginTime: '',
+          endTime: ''
         }
-        this.isFirst = true
-        this.$request.post("/apiHost/api/processSetting/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
+        setTimeout(()=>{
+          this.isFirst = true
+          this.$refs.table.init()
+        },200)
+        
       },
       //流程设置取消
       viewCancel(){
@@ -799,7 +807,6 @@ import qs from "qs";
         let name=JSON.parse(JSON.stringify(this.addForm.roleId))
         name=name.join(",")
         this.addDataForm={
-              id:"",
               roleId:name,
               name:this.addForm.name,
               phone:this.addForm.phone,
@@ -834,22 +841,7 @@ import qs from "qs";
             this.modal_loading = false
           }
         })
-        // this.$refs.addForm.validate((valid) => {
-        //   if (valid) {
-        //     this.modal_loading = true
-        //     this.addDataForm={
-        //           id:"",
-        //           name:this.addForm.name,
-        //           phone:this.addForm.phone,
-        //           password:this.addForm.pwd,
-        //           loginName:sessionStorage.loginName
-        //     },
-        //     this.settingDatas.push(this.addDataForm)
-        //     this.addMaterialModal = false
-        //     this.$refs.addForm.resetFields()
-        //     this.modal_loading = false
-        //   }
-        // })
+
       },
       //新增资料取消
       addCancel () {
@@ -859,46 +851,43 @@ import qs from "qs";
       selection_edit(selection){
         this.editSelect = selection
       },
-      //编辑资料
-      editMaterial () {
-        if (this.editSelect.length === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.editSelect.length > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.editMaterialForm ={
-          id : this.editSelect[0].id,
-          sort : this.editSelect[0].sort,
-          name : this.editSelect[0].name,
-          quantity : this.editSelect[0].quantity.toString(),
-          required : this.editSelect[0].required,
-          archive : this.editSelect[0].archive
-        }
-        this.editMaterialModal = true
-      },
-      //编辑资料确定
+      //用户修改
       editMaterialSubmit (){
-        this.$refs.editMaterialForm.validate((valid) => {
-          if (valid) {
-            this.modal_loading = true
-            let dataSort = this.editMaterialForm.sort-1
-            let obj = {
-              id : this.editMaterialForm.id,
-              sort:this.editMaterialForm.sort,
-              name:this.editMaterialForm.name,
-              quantity:this.editMaterialForm.quantity,
-              required:this.editMaterialForm.required,
-              archive:this.editMaterialForm.archive
-            }
-            this.$Vue.set(this.settingDatas,dataSort,obj)
-            this.editMaterialModal = false
+        let roleId=JSON.parse(JSON.stringify(this.editMaterialForm.roleId))
+        roleId=roleId.join(",")
+        let editForm={
+              id:this.editMaterialForm.id,
+              roleId:roleId,
+              phone:this.editMaterialForm.phone,
+              loginName:this.editMaterialForm.name,
+              name:this.editMaterialForm.name
+        }
+        // qs
+        this.$request.post("/apiHost/api/user/save",editForm,res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.editMaterialModal = false
+              this.modal_loading = false
+              this.$refs.editMaterialForm.resetFields()
+              this.$Message.success("编辑成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
             this.modal_loading = false
-            this.$refs.editMaterialForm.resetFields()
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.message})
+            this.modal_loading = false
           }
         })
       },

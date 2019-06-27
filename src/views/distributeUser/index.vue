@@ -7,32 +7,40 @@
           <p slot="title">
               角色新增
           </p>
-        <i-form  :model="addformdata" :rules="ruleValidate"  :label-width="90" class="addform" >
-          <Form-item label="角色名称" prop="name">
-              <Input  placeholder="请输入角色名称" :maxlength=50 style="width: 100%"></Input>
-          </Form-item>
-          
-          <Form-item label="角色说明" >
-              <Input  type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
-          </Form-item>   
-          <Form-item>
-              <i-button type="primary">取消</i-button>
-              <i-button type="ghost"  style="margin-left: 8px">确定</i-button>
-          </Form-item>
-        </i-form>
+          <Row>
+            <Col span="5">
+            角色名称：
+            </Col>
+            <Col span="12">
+            {{this.$route.params.name}}
+            </Col>
+          </Row>
+          <Row>
+            <Col span="5">
+            角色说明：
+            </Col>
+            <Col span="12">
+            {{this.$route.params.explain}}
+            </Col>
+          </Row>
    
         </Card>
       </Col>
     </Row>
-<Row :gutter="10" class="mt10">
-      <Col span="24">
-        <Card>
-          <!-- <Row class="searchable-table-con"> -->
-            <Table :columns="tableConfig.columns" :data="tableData"></Table>
-            <!-- <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table> -->
-          <!-- </Row> -->
-        </Card>
-      </Col>
+    <Row :gutter="10" class="mt10">
+          <Col span="24">
+            <Card>
+                <Table @on-select="selectionChange" ref="selection" :columns="tableConfig.columns" :data="tableData"></Table>
+            </Card>
+          </Col>
+          <Row>
+            <Col span="20">
+            </Col>
+            <Col span="4">
+              <Button type="primary" @click="permission">确定</Button>
+            </Col>
+            
+          </Row>
     </Row>
     
 <Modal
@@ -310,6 +318,31 @@ export default {
     }
   },
   methods: {
+    // 配置权限
+    permission(){
+      let params={
+        permissionId:"",
+        roleId:this.$route.params.roleId
+      }
+           this.$request.post("/apiHost/api/emaint/role/configuration/permission", params, res => {
+            
+          }, res => {
+            this.$Modal.success("分配成功")
+          })
+    },
+    // 选项
+    selectionChange(row){
+      console.log(row)
+    },
+    // 获取角色权限
+    getpermissionList(){
+      this.$request.post("/apiHost/api/emaint/permissions/list", {}, res => {
+            
+      }, res => {
+        this.tableData=res.responseResult
+      })
+      // 
+    },
     addquestion() {
       this.addmodel = true;
       this.updatemodel = false;
@@ -321,6 +354,9 @@ export default {
     ok() {
       console.log("删除了");
     }
+  },
+  mounted(){
+    this.getpermissionList()
   }
 };
 </script>

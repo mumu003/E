@@ -99,8 +99,8 @@
           </FormItem>
           </Col>
           <Col span="22" >
-          <FormItem label="角色说明" prop="quantity">
-            <Input v-model="addMaterialForm.quantity" type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
+          <FormItem label="角色说明" prop="explain">
+            <Input v-model="editMaterialForm.explain" type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
           </FormItem>
           </Col>
         </Row>
@@ -312,7 +312,8 @@ import qs from "qs";
         editMaterialForm:{
           id : '',
           name:'',
-          quantity:'',
+          explain:'',
+          code:''
         },
         ruleEditMaterial:{
           name: [
@@ -378,6 +379,8 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.editMaterialModal=true
+                                          this.editMaterialForm.code=params.row.code,
+                                          this.editMaterialForm.id=params.row.id
                                     }
                                 }
                             },"修改"),
@@ -391,7 +394,7 @@ import qs from "qs";
                                 },
                                 on: {
                                     click: () => {
-                                          this.$router.push({path:"/distributeUser"})
+                                          this.$router.push({name:"distributeUser",params:params.row})
                                     }
                                 }
                             },"配置权限"),
@@ -824,25 +827,8 @@ import qs from "qs";
           this.$refs.addMaterialForm.resetFields()
         }
       },
-      //新增资料确定
+      //角色新增
       addSubmit () {
-        // this.$refs.addMaterialForm.validate((valid) => {
-        //   if (valid) {
-        //     this.modal_loading = true
-        //     this.addDataForm={
-        //       id:0,
-        //       sort:this.settingDatas.length+1,
-        //       name:this.addMaterialForm.name,
-        //       quantity:this.addMaterialForm.quantity,
-        //       required:this.addMaterialForm.required,
-        //       archive:this.addMaterialForm.archive
-        //     },
-        //     this.settingDatas.push(this.addDataForm)
-        //     this.addMaterialModal = false
-        //     this.$refs.addMaterialForm.resetFields()
-        //     this.modal_loading = false
-        //   }
-        // })
         this.$request.post("/apiHost/api/emaint/role/save",this.addDataForm,res=>{
           if (res.statusCode === 200) {
             // setTimeout(() => {
@@ -879,46 +865,33 @@ import qs from "qs";
       selection_edit(selection){
         this.editSelect = selection
       },
-      //编辑资料
-      editMaterial () {
-        if (this.editSelect.length === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        if (this.editSelect.length > 1) {
-          document.getElementById('note-info').innerHTML = '只能选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.editMaterialForm ={
-          id : this.editSelect[0].id,
-          sort : this.editSelect[0].sort,
-          name : this.editSelect[0].name,
-          quantity : this.editSelect[0].quantity.toString(),
-          required : this.editSelect[0].required,
-          archive : this.editSelect[0].archive
-        }
-        this.editMaterialModal = true
-      },
-      //编辑资料确定
+      //角色修改
       editMaterialSubmit (){
-        this.$refs.editMaterialForm.validate((valid) => {
-          if (valid) {
-            this.modal_loading = true
-            let dataSort = this.editMaterialForm.sort-1
-            let obj = {
-              id : this.editMaterialForm.id,
-              sort:this.editMaterialForm.sort,
-              name:this.editMaterialForm.name,
-              quantity:this.editMaterialForm.quantity,
-              required:this.editMaterialForm.required,
-              archive:this.editMaterialForm.archive
-            }
-            this.$Vue.set(this.settingDatas,dataSort,obj)
-            this.editMaterialModal = false
+        this.$request.post("/apiHost/api/emaint/role/save",this.editMaterialForm,res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.editMaterialModal = false
+              this.modal_loading = false
+              // this.$refs.editForm.resetFields()
+              this.$Message.success("修改成功!")
+              this.$refs.table.init()
+            // }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
             this.modal_loading = false
-            this.$refs.editMaterialForm.resetFields()
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.editMaterialModal = false
+              this.modal_loading = false
+              // this.$refs.editForm.resetFields()
+              this.$Message.success("修改成功!")
+              this.$refs.table.init()
+            // }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
           }
         })
       },
