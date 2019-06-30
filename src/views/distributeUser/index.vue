@@ -173,25 +173,39 @@ export default {
       }
       this.$request.post("/apiHost/api/emaint/role/configuration/permission?permissionId="+idList+"&roleId="+sessionStorage.roleId,{}, res => {
       // this.$request.post("/apiHost/api/emaint/role/configuration/permission",params, res => {
-        this.$Message.success("分配成功")
-        this.$router.push({path:"/roleManagement"})
+        if(res.statusCode==200){
+          this.$Message.success("分配成功")
+          this.$router.push("/roleManagement")
+        }else{
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
       }, res => {
-        this.$Message.success("分配成功")
-        this.$router.push("/roleManagement")
+        if(res.statusCode==200){
+          this.$Message.success("分配成功")
+          this.$router.push("/roleManagement")
+        }else{
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
+        
       })
     },
     // 获取角色权限
     getpermissionList(){
       this.$request.post("/apiHost/api/emaint/permissions/list", {}, res => {
-             this.tableData=res.responseResult
-              this.tableData.map((item,index)=>{
-                item.open=false;
-              })
+        if(res.statusCode==200){
+            this.tableData=res.responseResult
+            this.tableData.map((item,index)=>{
+              item.open=false;
+            })
+        }
       }, res => {
-        this.tableData=res.responseResult
-        this.tableData.map((item,index)=>{
-          item.open=false;
-        })
+        if(res.statusCode==200){
+            this.tableData=res.responseResult
+            this.tableData.map((item,index)=>{
+              item.open=false;
+            })
+        }
+        
       })
     }
   },

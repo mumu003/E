@@ -215,7 +215,11 @@ import qs from "qs";
         this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
         },data=>{
         // 成功的回调
-        console.log(111)
+          if(data.statusCode==200){
+            console.log(111)
+          }else{
+              this.$Modal.error({title: '提示信息', content: data.responseResult})
+          }
         })
 
       },

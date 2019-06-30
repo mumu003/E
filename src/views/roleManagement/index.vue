@@ -365,7 +365,7 @@ import qs from "qs";
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            // this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
           }
         }, res => {
           if (res.statusCode === 200) {
@@ -373,7 +373,7 @@ import qs from "qs";
             this.isFirst = false
             this.$refs.table.init()
           } else {
-            // this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
           }
         })
       },

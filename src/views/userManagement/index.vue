@@ -418,10 +418,12 @@ import qs from "qs";
           this.$request.post("/apiHost/api/user/delete", qs.stringify({id:this.delId}), res => {
 	         this.$Modal.success("删除成功")
 	        }, res => {
-            this.$refs.table.init()
-            this.$Modal.success("删除成功")
-            
-	          // this.$Modal.error({title: '提示信息', content: res.message})
+            if(res.statusCode==200){
+              this.$refs.table.init()
+              this.$Modal.success("删除成功")
+            }else{
+              this.$Modal.error({title: '提示信息', content: res.responseResult})
+            }
           })
           setTimeout(()=>{
             this.deleteModal=false
@@ -436,10 +438,13 @@ import qs from "qs";
 	            roleName: item.name
 	          }))
 	        }, res => {
-            this.roleList = res.responseResult.map(item => ({
-	            roleId: item.id,
-	            roleName: item.name
-	          }))
+            if(res.statusCode==200){
+                this.roleList = res.responseResult.map(item => ({
+                  roleId: item.id,
+                  roleName: item.name
+                }))
+            }
+            
 	        })
       },
       //开始时间
@@ -459,13 +464,13 @@ import qs from "qs";
             // this.isFirst = false
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
           }
         }, res => {
           if (res.statusCode === 200) {
             this.$refs.table.init()
           } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
           }
         })
       },
