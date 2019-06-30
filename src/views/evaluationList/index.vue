@@ -101,15 +101,12 @@
       return {
         isShowEvaluation:false,//是否显示评价
         evaluationTitle:"",//评价标题
-        modalStar:0,
-        modalLabel:"",
-        passDisable: false, //防止通过双击事件
-        isDisable: false, //防止驳回双击事件
+        modalStar:0,//星级
+        modalLabel:"",//评价标签
         isFirst: false, //是否是首页
         loading: true, //
         modal_loading: false, //延迟
-        reject_loading: false, //驳回
-        //表单
+        //查询表单
         formItem: {
           pageNo:"1",
           workOrderNo:"",
@@ -124,7 +121,7 @@
               return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
-        //表格
+        //表格配置
         tableConfig:{
           url:"/apiHost/api/emaint/repair-estimate/page",
               columns:[
@@ -211,37 +208,7 @@
         },
       }
     },
-    computed: {
-      // // 被选择的列表数据条数
-      // selected_count(){
-      //   return this.$refs.table.selected_count
-      // },
-      // // 被选择的列表数据
-      // selection(){
-      //   return this.$refs.table.selection
-      // }
-    },
-    mounted(){//方法
-      // this.getRoleList()//获取角色
-    },
     methods: {
-      // 获取角色
-      getRoleList(){
-        let token = sessionStorage.getItem("token")
-        if(token === null){
-          window.location.href = '/#/login'
-          window.location.reload()
-        }else{
-          this.$request.post("/apiHost/api/user/getRoleList", '', res => {
-            this.roleList = res.data.data.map(item => ({
-              roleId: item.roleId,
-              roleName: item.roleName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
-      },
       // 开始时间
       getStartDate(startDate){
         this.formItem.beginTime=startDate
@@ -250,49 +217,9 @@
       getEndDate(endDate){
         this.formItem.endTime=endDate
       },
-      // 删除
-      deleteProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认删除?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-                id
-            }
-            this.$request.post("/apiHost/api/contractApplication/delete",params,res=>{
-              this.$Message.success("删除成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error("删除失败")
-              this.$Modal.remove()
-            })
-          }
-        })
-      },
-
       // 搜索
       searchSubmit(){
         this.isFirst = true
-        // this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
-        //   if (res.code === 200) {
-        //     this.$Message.success("搜索成功！")
-        //     this.isFirst = false
-        //     this.$refs.table.init()
-        //   } else {
-        //     this.$Modal.error({title: '提示信息', content: res.message})
-        //   }
-        // }, res => {
-        //   this.$Modal.error({title: '提示信息', content: res.message})
-        // })
-        
         this.$refs.table.init()
       },
       // 重置
@@ -307,10 +234,6 @@
           this.$refs.table.init()
           this.isFirst = false
         },200)
-      },
-      // 提示窗关闭
-      closes () {
-        this.noteModal = false
       }
     }
   }

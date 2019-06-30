@@ -54,12 +54,6 @@
       </Col>
     </Row>
 
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
-      </div>
-    </Modal>
 
   </div>
 </template>
@@ -135,7 +129,6 @@ import qs from "qs";
         searchTime:"",//搜索时间
         isFirst: false, //首页.
         loading: true, //加载
-        noteModal: false, //弹窗  
         //表单
         formItem: {
           year:new Date().getFullYear(),
@@ -235,17 +228,6 @@ import qs from "qs";
         this.formItem.year=year
         this.formItem.month=month
         this.$refs.table.init()
-        // this.$request.post("/apiHost/api/ownershipBill/list",this.formItem, res => {
-        //   if (res.code === 200) {
-        //     this.$Message.success("搜索成功！")
-        //     this.isFirst = false
-        //     this.$refs.table.init()
-        //   } else {
-        //     this.$Modal.error({title: '提示信息', content: res.message})
-        //   }
-        // }, res => {
-        //   this.$Modal.error({title: '提示信息', content: res.message})
-        // })
       },
       //重置
       searchCancel(){
@@ -255,10 +237,6 @@ import qs from "qs";
           this.$refs.table.init()
           this.isFirst = false
         },200)
-      },
-      // 提示窗关闭
-      closes () {
-        this.noteModal = false
       }
     }
   }

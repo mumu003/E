@@ -85,13 +85,23 @@
           document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-selected")
           document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-active")
         }
-        let str=url.slice(url.length - 12,url.length)
+        let str=url
+        str=str.slice(str.length - 12,str.length)
         if(str=="reportDetail"){
           this.$router.push({name:"reportDetail",params:{companyName:sessionStorage.companyName}})
         }else{
           this.$router.push(url)
         }
-        
+        // console.log(str)
+        // let str1=url
+        // str1=str1.slice(str1.length - 14,str1.length)
+        // console.log(str1)
+        // if(str1=="distributeUser"){
+        //   console.log("进去了")
+        //   this.$router.push({name:"distributeUser",params:{name:sessionStorage.roleName,explain:sessionStorage.explain}})
+        // }else{
+        //   this.$router.push(url)
+        // }
       },
       removeItem(event, name){
         if (this.initItems.length == 1) {
