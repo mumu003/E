@@ -7,319 +7,221 @@
           <p slot="title">
               角色新增
           </p>
-        <i-form  :model="addformdata" :rules="ruleValidate"  :label-width="90" class="addform" >
-          <Form-item label="角色名称" prop="name">
-              <Input  placeholder="请输入角色名称" :maxlength=50 style="width: 100%"></Input>
-          </Form-item>
-          
-          <Form-item label="角色说明" >
-              <Input  type="textarea" :rows="4"  style="width: 100%" placeholder="请输入角色说明" :maxlength=11></Input>
-          </Form-item>   
-          <Form-item>
-              <i-button type="primary">取消</i-button>
-              <i-button type="ghost"  style="margin-left: 8px">确定</i-button>
-          </Form-item>
-        </i-form>
+          <Row>
+            <Col span="5">
+            角色名称：
+            </Col>
+            <Col span="12">
+            {{roleName}}
+            </Col>
+          </Row>
+          <Row>
+            <Col span="5">
+            角色说明：
+            </Col>
+            <Col span="12">
+            {{explain}}
+            </Col>
+          </Row>
    
         </Card>
       </Col>
     </Row>
-<Row :gutter="10" class="mt10">
-      <Col span="24">
-        <Card>
-          <!-- <Row class="searchable-table-con"> -->
-            <Table :columns="tableConfig.columns" :data="tableData"></Table>
-            <!-- <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table> -->
-          <!-- </Row> -->
-        </Card>
-      </Col>
+    <Row :gutter="10" class="mt10">
+          <Col span="24">
+            <Card>
+              <Row class="tableItem">
+                <div class="tableColHead" >
+                  <Col span="4" >
+                    <div @click="clickAll">
+                        <Checkbox v-model="selectAll" @on-change="checkAll" ></Checkbox>
+                    </div>
+                  </Col>
+                  <Col span="20" style="font-weight:bolder;">
+                    权限名称
+                  </Col>
+                </div>
+                
+              </Row>
+              <Row v-for="(item,index) in tableData" :key="index" :class="{tableItem:true,bottom:index==tableData.length-1}" >
+                <div class="tableCol" ref="tableCol" @click="clickItem" :class="{active:selectList.indexOf(item.id) != -1 ? true : false}">
+                  <Col span="4">
+                    <Checkbox  @on-change="checkItemAll(item.id)"  :value="selectList.indexOf(item.id) != -1 ? true : false" ></Checkbox>
+                  </Col>
+                  <Col span="16"  >
+                  <div @click="openList(item,index)" class="tableName">
+                    <span>
+                      {{item.name}}
+                    </span>
+                    <Icon type="chevron-down"  ref="iconDown" class="iconDown"  v-show="item.childs.length>0"></Icon>
+                    <Icon type="chevron-up" ref="iconUp" class="iconUp"  v-show="item.childs.length>0"></Icon>
+                  </div>
+                    
+                  </Col>
+                </div>
+                <div ref="openlist" class="openlist"  @click="clickItem">
+                    <div v-for="(v,i) in item.childs" :key="i" class="tableCol" ref="tableCol" :class="{active:selectList.indexOf(v.id) != -1 ? true : false}">
+                      <Col span="4">
+                        <Checkbox @on-change="checkItemAll(v.id)"  :value="selectList.indexOf(v.id) != -1 ? true : false"></Checkbox>
+                      </Col>
+                      <Col span="18" style="display:flex;justify-content:space-between;">
+                        <span>
+                          {{v.name}}
+                        </span>
+                      </Col>
+                  </div>
+                </div>
+                
+              </Row>
+
+            </Card>
+          </Col>
+          <Row>
+            <Col span="20">
+            </Col>
+            <Col span="4">
+              <Button type="primary" @click="permission">确定</Button>
+            </Col>
+            
+          </Row>
     </Row>
-    
-<Modal
-class="model"
-        v-model="modal1"
-        title="提示框"
-        @on-ok="ok"
-       >
-        <h4>是否删除该条问题</h4>
-    </Modal>
-
-  
-
-    
+      
   </div>
 </template>
 <script type="text/ecmascript-6">
+import qs from "qs";
 export default {
   data() {
     return {
-      addmodel: true,
-      updatemodel: false,
-      modal1: false,
-      controlmodal: false,
-      addformdata: {
-        questionname: "",
-        city: ""
-      },
-      ruleValidate: {
-        name: [
-          { required: true, message: "类型名称不能为空", trigger: "blur" }
-        ]
-      },
-      activeid: "",
-      tableConfig: {
-        url: "/apiHost/api/contractApplication/list",
-        columns: [
-          {
-            type: "selection",
-            key: "_checked",
-            width: 60,
-            align: "right"
-          },
-          {
-            title: "权限名称",
-            key: "name",
-            align: "center"
-          }
-        ]
-      },
+      selectAll:false,//全选
+      isClick:false,//是否点击全选
+      roleName:sessionStorage.roleName,
+      explain:sessionStorage.explain,
+      selectList:[],//选中的权限列表
+      // 表格数据
       tableData: [
-        {
-          name: "用户管理列表"
-        },
-        {
-          name: "用户新增"
-        },
-        {
-          name: "用户修改"
-        },
-        {
-          name: "用户修改密码"
-        },
-        {
-          name: "用户删除"
-        },
-        {
-          name: "角色管理列表"
-        },
-        {
-          name: "角色新增"
-        },
-        {
-          name: "角色修改"
-        },
-        {
-          name: "配置权限"
-        },
-        {
-          name: "角色删除"
-        },
-        {
-          name: "其他权限···"
-        }
-      ],
-      //新增-表单
-      addForm: {
-        areaId: "",
-        areaName: "",
-        buildingId: "",
-        buildingName: "",
-        unitId: "",
-        unitName: "",
-        roomId: "",
-        roomNum: "",
-        customerName: "",
-        area: "",
-        idCard: "",
-        contract: "",
-        purpose: "",
-        phone: "",
-        address: "",
-        remark: "",
-        deliveryDate: "",
-        actualDate: "",
-        orgId: "",
-        projectId: ""
-      },
-      //新增模态框验证
-      ruleAdd: {
-        buildingId: [
-          { required: true, message: "请选择楼栋号", trigger: "change" }
-        ],
-        unitId: [
-          { required: true, message: "请选择单元号", trigger: "change" }
-        ],
-        roomId: [{ required: true, message: "请选择房间号", trigger: "change" }]
-      },
-      //新增表格数据
-      addTable: [
-        {
-          title: "地块",
-          key: "areaName",
-          width: 150,
-          align: "center"
-        },
-        {
-          title: "房间号",
-          key: "rommNum",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "商品买卖合同号/拆迁协议号",
-          key: "contractNumber",
-          width: 200,
-          align: "center"
-        },
-        {
-          title: "合同交付期限",
-          key: "deliveryDate",
-          width: 180,
-          align: "center"
-        },
-        {
-          title: "建筑面积",
-          key: "area",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "业主姓名",
-          key: "customerName",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "业主身份证号",
-          key: "idNumber",
-          width: 160,
-          align: "center"
-        },
-        {
-          title: "联系电话",
-          key: "phone",
-          width: 120,
-          align: "center"
-        },
-        {
-          title: "联系地址",
-          key: "address",
-          width: 200,
-          align: "center"
-        },
-        {
-          title: "用途",
-          key: "purpose",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "备注",
-          key: "rommNum",
-          width: 150,
-          align: "center"
-        }
-      ],
-      //审核表单
-      viewForm: {
-        id: "",
-        buildingName: "",
-        unitName: "",
-        roomNum: ""
-      },
-      //审核表格数据
-      viewTable: [
-        {
-          title: "地块",
-          key: "areaName",
-          width: 150,
-          align: "center"
-        },
-        {
-          title: "房间号",
-          key: "roomNum",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "商品买卖合同号/拆迁协议号",
-          key: "contract",
-          width: 200,
-          align: "center"
-        },
-        {
-          title: "合同交互期限",
-          key: "deliveryDate",
-          width: 180,
-          align: "center"
-        },
-        {
-          title: "建筑面积",
-          key: "area",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "业主姓名",
-          key: "customerName",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "业主身份证号",
-          key: "idCard",
-          width: 160,
-          align: "center"
-        },
-        {
-          title: "联系电话",
-          key: "phone",
-          width: 120,
-          align: "center"
-        },
-        {
-          title: "联系地址",
-          key: "address",
-          width: 200,
-          align: "center"
-        },
-        {
-          title: "用途",
-          key: "purpose",
-          width: 100,
-          align: "center"
-        },
-        {
-          title: "备注",
-          key: "remark",
-          width: 150,
-          align: "center"
-        }
       ]
     };
   },
-  // components: { expandRow },
-  computed: {
-    // 被选择的列表数据条数
-    selected_count() {
-      return this.$refs.table.selected_count;
+  methods: {
+    // 点击子复选框
+    clickItem(){
+      this.isClick=false
     },
-    // 被选择的列表数据
-    selection() {
-      return this.$refs.table.selection;
+    // 点击父复选框
+    clickAll(){
+      this.isClick=true
+    },
+    // 全选
+    checkAll(){
+      if(this.isClick==true){
+        if(this.selectAll){
+          this.selectList=[]
+          this.tableData.map((item)=>{
+            this.selectList.push(item.id)
+            item.childs.map((v)=>{
+              this.selectList.push(v.id)
+            })
+          })
+        }else{
+          this.selectList=[]
+        }
+        // console.log(this.selectList)
+      }else{
+        if(this.selectList.length<this.$refs.tableCol.length){
+          this.selectAll=false
+        }else{
+          this.selectAll=true
+        }
+      }  
+      console.log(this.$refs.tableCol.length)
+
+    },
+    // 单选
+    checkItemAll(id){
+        console.log(id)
+        if(this.selectList.indexOf(id)==-1){
+            this.selectList.push(id)
+        }else{
+            this.selectList.splice(this.selectList.indexOf(id),1)
+        }
+        // console.log(this.selectList)
+        
+    },
+    // 打开二级列表
+    openList(item,index){
+        item.open=!item.open
+        if(item.childs.length>0){
+          if(item.open){
+            document.querySelectorAll(".iconDown")[index].style.display="none"
+            document.querySelectorAll(".iconUp")[index].style.display="unset"
+            document.querySelectorAll(".openlist")[index].style.display="block"
+          }else{
+            document.querySelectorAll(".iconDown")[index].style.display="unset"
+            document.querySelectorAll(".iconUp")[index].style.display="none"
+            document.querySelectorAll(".openlist")[index].style.display="none"
+          }
+        }
+    },
+    // 配置权限
+    permission(){
+      let idList=""
+      idList=this.selectList.join(",")
+      let params={
+        permissionId:idList,
+        roleId:sessionStorage.roleId
+      }
+      this.$request.post("/apiHost/api/emaint/role/configuration/permission?permissionId="+idList+"&roleId="+sessionStorage.roleId,{}, res => {
+      // this.$request.post("/apiHost/api/emaint/role/configuration/permission",params, res => {
+        if(res.statusCode==200){
+          this.$Message.success("分配成功")
+          this.$router.push("/roleManagement")
+        }else{
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
+      }, res => {
+        if(res.statusCode==200){
+          this.$Message.success("分配成功")
+          this.$router.push("/roleManagement")
+        }else{
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
+        
+      })
+    },
+    // 获取角色权限
+    getpermissionList(){
+      this.$request.post("/apiHost/api/emaint/permissions/list", {}, res => {
+        if(res.statusCode==200){
+            this.tableData=res.responseResult
+            this.tableData.map((item,index)=>{
+              item.open=false;
+            })
+        }
+      }, res => {
+        if(res.statusCode==200){
+            this.tableData=res.responseResult
+            this.tableData.map((item,index)=>{
+              item.open=false;
+            })
+        }
+        
+      })
     }
   },
-  methods: {
-    addquestion() {
-      this.addmodel = true;
-      this.updatemodel = false;
+  mounted(){
+    this.getpermissionList()
+  },
+  watch:{
+    tableData(){
+      return this.tableData
     },
-    updatequestion() {
-      this.addmodel = false;
-      this.updatemodel = true;
-    },
-    ok() {
-      console.log("删除了");
+    selectList(){
+      if(this.selectList.length<this.$refs.tableCol.length){
+          this.selectAll=false
+        }else{
+          this.selectAll=true
+        }
     }
   }
 };
@@ -381,6 +283,36 @@ div.controlbutton button {
   width: 100%;
   border: none;
   border-radius: 0px;
+}
+.openlist{
+  display: none;
+}
+.iconUp{
+   display: none;
+}
+.tableItem{
+  z-index:100000;
+  border:1px solid gainsboro;
+  border-bottom:none;
+  cursor: pointer;
+}
+.active{
+  background-color: #2d8cf0;
+  color: white;
+}
+.tableCol,.tableColHead{
+  height:50px;
+  display:flex;
+  align-items:center;
+}
+.tableName{
+  height:50px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.bottom{
+  border-bottom:1px solid gainsboro;
 }
 </style>
 

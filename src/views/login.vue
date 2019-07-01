@@ -80,7 +80,7 @@ export default {
                 this.$router.push("/")
                 this.$Message.success("登录成功！")
               } else {
-                this.$Modal.error({title: '提示信息', content: res.message})
+                this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
             },res=>{
               if (res.statusCode === 200) {
@@ -91,7 +91,7 @@ export default {
                 this.$router.push("/")
                 this.$Message.success("登录成功！")
               } else {
-                this.$Modal.error({title: '提示信息', content: res.message})
+                this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
             })
           }

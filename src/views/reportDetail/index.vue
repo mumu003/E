@@ -442,7 +442,7 @@
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemDetailsData?year=2019&month=6&companyName="+this.$route.query.companyName, data => {
+        this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemDetailsData?year=2019&month=6&companyName="+this.$route.params.companyName, data => {
         },data=>{
         // 成功的回调
         console.log(111)

@@ -4,8 +4,7 @@
       <Col span="24">
         <Card class="search-card">
           <p slot="title">
-              <!-- {{$route.meta.title}} -->
-              客户管理
+              {{$route.meta.title}}
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
@@ -23,10 +22,10 @@
                   </Col>
                   <Col span="6">
                   <FormItem label="登录渠道">
-                    <Select v-model="formItem.loginChannel" placeholder="报修小程序">
-                      <Option value="">报修小程序</Option>
-                      <Option value="-1">运维小程序</Option>
-                      <Option value="1">管理后台</Option>
+                    <Select v-model="formItem.loginChannel" placeholder="请选择登录渠道">
+                      <Option value="后台管理">后台管理</Option>
+                      <Option value="报修小程序">报修小程序</Option>
+                      <Option value="维修小程序">维修小程序</Option>
                     </Select>
                   </FormItem>
                   </Col>
@@ -68,25 +67,15 @@
       </Col>
     </Row>
 
-
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
-      </div>
-    </Modal>
   </div>
 </template>
 <script type="text/ecmascript-6">
   export default {
     data () {
       return {
-        passDisable: false, //防止通过双击事件
-        isDisable: false, //防止驳回双击事件
         isFirst: false, //是否是首页
         loading: true, //
-        noteModal: false, //弹窗   
-        //表单
+        //查询表单
         formItem: {
           phone:'',
           name:'',
@@ -100,7 +89,7 @@
               return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
-        //表格
+        //表格配置
         tableConfig:{
           url:"/apiHost/api/user/loginRecordData",
               columns:[
@@ -132,18 +121,6 @@
         }
       }
     },
-    computed: {
-      // 被选择的列表数据条数
-      selected_count(){
-        return this.$refs.table.selected_count
-      },
-      // 被选择的列表数据
-      selection(){
-        return this.$refs.table.selection
-      }
-    },
-    mounted(){//方法
-    },
     methods: {
       // 开始时间
       getStartDate(startDate){
@@ -153,47 +130,9 @@
       getEndDate(endDate){
         this.formItem.endTime=endDate
       },
-      // 删除
-      deleteProject(){
-        if (this.selected_count === 0) {
-          document.getElementById('note-info').innerHTML = '请选择一条数据！'
-          this.noteModal = true
-          return false
-        }
-        this.$Modal.confirm({
-          title: '操作提示',
-          content: '确认删除?',
-          loading: true,
-          onOk: () => {
-            let id = this.selection.map(item=>item.id).toString()
-            let params = {
-                id
-            }
-            this.$request.post("/apiHost/api/contractApplication/delete",params,res=>{
-              this.$Message.success("删除成功")
-              this.$Modal.remove()
-              this.$refs.table.init()
-            },res=>{
-              this.$Message.error("删除失败")
-              this.$Modal.remove()
-            })
-          }
-        })
-      },
       // 搜索
       searchSubmit(){
         this.isFirst = true
-        // this.$request.post("/apiHost/api/contractApplication/list",this.formItem, res => {
-        //   if (res.code === 200) {
-        //     this.$Message.success("搜索成功！")
-        //     this.isFirst = false
-        //     this.$refs.table.init()
-        //   } else {
-        //     this.$Modal.error({title: '提示信息', content: res.message})
-        //   }
-        // }, res => {
-        //   this.$Modal.error({title: '提示信息', content: res.message})
-        // })
         this.$refs.table.init()
       },
       // 重置
@@ -208,10 +147,6 @@
           this.$refs.table.init()
           this.isFirst = false
         },200)
-      },
-      // 提示窗关闭
-      closes () {
-        this.noteModal = false
       }
     }
   }

@@ -154,7 +154,7 @@ export default new Router({
         path: '/distributeUser',
           name: 'distributeUser',
           meta: {
-            title: '分配用户'
+            title: '配置权限'
           },
           component: resolve => require(['@/views/distributeUser/index.vue'], resolve),
         },
