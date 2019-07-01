@@ -163,7 +163,7 @@
       this.menuList = [
             {
               "id": 4,
-              "name": "问题受理",
+              "name": "工单受理",
               "url": "/questionAcceptance",
             },
             {

@@ -111,6 +111,8 @@ export default {
         this.total = data.responseResult.total || data.responseResult.length
         this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
       },data=>{
+        if(data.statusCode!=200)
+        return
         // 成功的回调
         let list=[]
         if(data.responseResult.list){

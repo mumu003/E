@@ -9,7 +9,7 @@
         </p>
         <!-- 检索 -->
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80">
+          <Form  :model="formItem" :label-width="80" :rules="ruleSearch">
             <Row type="flex" justify="start">
               <Col span="6">
               <FormItem label="姓名">
@@ -17,13 +17,10 @@
               </FormItem>
               </Col>
               <Col span="6">
-              <FormItem label="电话">
+              <FormItem label="电话" prop="phone">
                 <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入电话"></Input>
               </FormItem>
               </Col>
-              </Row>
-
-              <Row>
               <Col span="6">
               <FormItem label="优先级">
                 <Select v-model="formItem.priority" placeholder="请选择优先级">
@@ -35,12 +32,14 @@
               <Row>
               <Col span="6">
               <FormItem label="创建时间">
-                <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getEndDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
+                <!-- <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
               <Col span="6">
               <FormItem>
-                <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                <!-- <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
             </Row>
@@ -65,7 +64,7 @@
           <Row>
             <Col>
             <Button type="primary" icon="plus-round" @click="addClient">新增</Button>
-            <Button type="primary" icon="ios-loop-strong" @click="viewProject">同步客户</Button>
+            <Button type="primary" icon="ios-loop-strong" @click="syncClient">同步客户</Button>
             </Col>
             <Col>
             </Col>
@@ -186,7 +185,7 @@
       </div>
     </Modal>
    
-    <Modal v-model="disable" title="提示信息"
+      <Modal v-model="disable" title="提示信息"
             width="600"
             @on-cancel="cancel">
           <Row>
@@ -259,7 +258,7 @@ import qs from "qs";
         // 设置结束时间大于开始时间
         end:{
             disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
+              return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
         //表格
@@ -319,6 +318,16 @@ import qs from "qs";
                                                     this.addForm.officeLocation=data.officeLocation
                                                     this.addForm.priority=data.priority
                                                     this.addForm.sex=data.sex
+                                                    switch(data.sex){
+                                                      case  "男":
+                                                        return this.addForm.sex="男"
+                                                      case  "male":
+                                                        return this.addForm.sex="男"
+                                                      case  "女":
+                                                        return this.addForm.sex="女"
+                                                      case  "female":
+                                                        return this.addForm.sex="女"
+                                                    }
                                                     this.$Message.success(res.resMessage)
                                                 }
                                             })
@@ -341,14 +350,15 @@ import qs from "qs";
                                           this.userId=params.row.id
                                           // console.log(params.row.enable)
                                           if(params.row.enable=1){
-                                            // 禁用状态，需要启用
-                                            this.enable=true
-                                          }else{
+                                            // 启用状态，需要禁用
                                             this.disable=true
+                                          }else{
+                                            this.enable=true
                                           } 
                                         }
                                     }
-                                }, params.row.enable==0?'禁用':'启用'),
+                                    // 1 是启用状态
+                                }, params.row.enable==1?'禁用':'启用'),
                             ]);
                         }
                 },
@@ -362,7 +372,7 @@ import qs from "qs";
               key: 'enable',
               width:120,
               render:(h,params)=>{
-                return h('div',params.row.enable==0?'启用':'禁用') 
+                return h('div',params.row.enable==1?'启用':'禁用') 
               }
             },
             {
@@ -373,7 +383,22 @@ import qs from "qs";
             {
               title: '性别',
               key: 'sex',
-              width:150
+              width:150,
+              render:(h,params)=>{
+                switch(params.row.sex){
+                  case "male":
+                    return h('div',"男")
+                  case "男":
+                    return h('div',"男")
+                  case "female":
+                    return h('div',"女")
+                  case "女":
+                    return h('div',"女")
+                }
+              }
+              // render:(h,params)=>{
+              //   return h("div",params.row.sex=="male"?"男":"女")
+              // }
             },
             {
               title: '办公位',
@@ -429,6 +454,19 @@ import qs from "qs";
             { required: true, message: '请选择优先级', trigger: 'change' }
           ],
         },
+        // 检索表单的验证
+        ruleSearch:{
+            phone: [
+            { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
+                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
+          ],
+        }
         
       }
     },
@@ -545,8 +583,18 @@ import qs from "qs";
       },
 
       // 同步客户
-      viewProject(){
-
+      syncClient(){
+          this.$request.post("/apiHost/api/emaint/client/syncClient",{}, res => {
+            this.$Modal.error("网络出错，请重试！")
+          }, res => {
+            if (res.statusCode === 200) {
+              this.$Message.success({title: '提示信息', content: res.responseResult})
+              this.enable = false
+              this.$refs.table.init()
+            } else {
+              this.$Modal.error({title: '提示信息', content: res.responseResult})
+            }
+        })
       },
 
       // 启用
@@ -566,6 +614,7 @@ import qs from "qs";
       
       // 禁用
       disable_sure(){
+        console.log(123)
           this.$request.post("/apiHost/api/emaint/client/disable",qs.stringify({id:this.userId}), res => {
             this.$Modal.error("网络出错，请重试！")
           }, res => {

@@ -9,16 +9,16 @@
                   <Button type="primary"  @click="controlmodal=!controlmodal" >操作<Icon type="arrow-up-b" color="white" style="margin-left:17px;"></Icon></Button>
                   <div v-if="controlmodal"  class="controlbutton">
                       <div><Button  @click="addquestion" >新增下一级</Button></div> 
-                      <div>  <Button   @click="updatequestion" >编辑</Button></div> 
-                      <div> <Button   @click="modal1 = true;controlmodal=false;">删除</Button></div> 
+                      <div><Button   @click="updatequestion" >编辑</Button></div> 
+                      <div><Button   @click="delquestion">删除</Button></div> 
                   </div>
-              
+              <!-- modal1 = true;controlmodal=false; -->
             </Row>
               <Col>
-                 <div class="first" v-for="(item,index) in questionlis" :key="index">
-                <div @click="activeli.id==item.parentId?activeli.id='':activeli.id=item.parentId;" :style="{backgroundColor:activeli.id==item.parentId?'#2b85e4':''}">{{item.parentProblem}}</div> 
-                
-                <div class="two"  v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
+                <div class="first" v-for="(item,index) in questionlis" :key="index">
+                  <div @click="activeli.id==item.parentId?activeli.id='':activeli.id=item.parentId;" :style="{backgroundColor:activeli.id==item.parentId?'#2b85e4':''}">{{item.parentProblem}}</div> 
+                  
+                  <div class="two" v-for="(v,i) in item.childList" :key="i" @click="activeli.id==v.id?activeli.id='':activeli.id=v.id;" :style="{backgroundColor:activeli.id==v.id?'#2b85e4':''}">{{v.problem}}</div>
               </div>
               <!-- <div class="first" v-for="(item,index) in questionlis" :key="index">
                 <div @click="activeli.id=item.id;activeli.parentId=item.parentId" :style="{color:activeli.id==item.id?'#2b85e4':''}">{{item.problem}}</div> 
@@ -33,6 +33,8 @@
         </Card>
       </Col>
     </Row>
+
+    <!-- 问题新增 -->
     <Row :gutter="10" v-if="addmodel">
       <Col span="24">
         <Card class="search-card">
@@ -44,7 +46,7 @@
             <i-input  placeholder="请输入类型名称" v-model="addformdata.problem"></i-input>
         </Form-item>
         
-        <Form-item label="父级类目" >
+        <Form-item label="父级类目">
             <i-select  placeholder="请选择父级" v-model="addformdata.parentId">
                 <i-option value="">无</i-option>
                 <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
@@ -52,20 +54,21 @@
             </i-select>
         </Form-item>   
         <Form-item>
-            <i-button type="primary" @click="cancel('add')">取消</i-button>
-            <i-button type="ghost"  style="margin-left: 8px" @click="save('add')">确定</i-button>
+            <i-button type="ghost" @click="cancel('add')">取消</i-button>
+            <i-button type="primary"  style="margin-left: 8px" @click="save('add')">确定</i-button>
         </Form-item>
     </i-form>
    
         </Card>
       </Col>
     </Row>
+
+    <!-- 问题编辑 -->
      <Row :gutter="10" v-if="updatemodel">
       <Col span="24">
         <Card class="search-card">
           <p slot="title">
               问题编辑
-           
           </p>
         <i-form  :model="updatedata" :rules="ruleValidate"  :label-width="90" class="addform" >
         <Form-item label="类型名称" prop="problem">
@@ -73,15 +76,14 @@
         </Form-item>
         
         <Form-item label="父级类目" >
-            <i-select  placeholder="请选择父级" v-model="updatedata.parentId">
+            <i-select placeholder="请选择父级类目"  v-model="updatedata.parentId" :disabled="updatedata.treeLevel==1?true:false">
                 <i-option value="">无</i-option>
                 <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
-               
             </i-select>
         </Form-item>   
         <Form-item>
-            <i-button type="primary" @click="cancel('update')">取消</i-button>
-            <i-button type="ghost"  style="margin-left: 8px" @click="save('update')">确定</i-button>
+            <i-button type="ghost" @click="cancel('update')">取消</i-button>
+            <i-button type="primary"  style="margin-left: 8px" @click="save('update')">确定</i-button>
         </Form-item>
     </i-form>
    
@@ -315,7 +317,6 @@ import qs from 'qs';
         ]
       }
     },
-   
     computed: {
       // 被选择的列表数据条数
       selected_count(){
@@ -342,7 +343,6 @@ import qs from 'qs';
      save(type){
      
         if(type=='add'){
-
           this.$request.post('/apiHost/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
             if(data.statusCode!=200)
             this.$Modal.error({title: '提示信息', content: data.responseResult})
@@ -370,23 +370,19 @@ import qs from 'qs';
        
      },
      updatequestion(){
-       if(this.activeli.id=='')
-       {
+       if(this.activeli.id==''){
           this.$Message.info('选择一条记录')
         return;
-        
        }
-      this.addmodel=false;
-       this.updatemodel=true;
-         this.controlmodal=false;
+        this.addmodel=false;
+        this.updatemodel=true;
+        this.controlmodal=false;
         this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
           if(res.statusCode==200){
             this.updatedata=res.responseResult;
           
           }
         })
-
-        
      },
      ok(){
          this.$request.post('/apiHost/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
@@ -397,17 +393,25 @@ import qs from 'qs';
 
      },
       getlist(){
-//  查询一级问题
+    //  查询一级问题
      this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},data=>{
-      
-     },data=>{
-        if(data.statusCode==200){
-        
-            this.questionlis=data.responseResult;
-        
-
-        }
-     })
+        },data=>{
+            if(data.statusCode==200){
+            
+                this.questionlis=data.responseResult;
+                // console.log(data.responseResult.treeLevel)
+            }
+        })
+     },
+    //  删除问题
+      delquestion(){
+        if(this.activeli.id==''){
+            this.$Message.info('请先选择一条记录')
+            return;
+          }
+        this.modal1 = true;
+        this.controlmodal=false;
+          
      }
      
    },

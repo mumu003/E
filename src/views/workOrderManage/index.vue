@@ -18,7 +18,12 @@
               </Col>
               <Col span="6">
               <FormItem label="办公位">
-                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
+                <AutoComplete
+        v-model="formItem.officeLocation"
+        :data="newarr"
+        @on-search="handleSearch1"
+        placeholder="请输入办公位"
+        ></AutoComplete>
               </FormItem>
               </Col>
               <Col span="4">
@@ -90,7 +95,9 @@
                     <Modal 
                         title="View Image" 
                         v-model="visible"
-                        @on-cancel="imgcancel" :closable="false">
+                        @on-cancel="imgcancel" :closable="false"
+                        :mask-closable="false"
+                        >
                         <img :src="imglist[showimg]" v-if="visible" style="width: 100%">
                     </Modal>
                         <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
@@ -142,9 +149,10 @@
              </Row>
              <Row>
               <Col span="8">
-                <FormItem label="参与者" >
-                    <!-- <Input class="buttoninput" @on-click="choosemodel1=true"  v-model="formItem2.participatorids" icon="search" readonly :maxlength=20 placeholder="检索参与者"></Input> -->
-                    <Select v-model="formItem.participatorids" :disabled="viewForm.id!=''?true:false" multiple  style="width:100%;">
+              <!--表单验证 prop='participatorids' -->
+                <FormItem label="参与者"  >
+                  <!-- :disabled="viewForm.id!=''?true:false" -->
+                    <Select v-model="formItem.participatorids" multiple  style="width:100%;">
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index" >
                           <span>{{item.name}}</span>
                           <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
@@ -172,8 +180,8 @@
 
  <Modal v-model="choosemodel" title="执行人选择" width="500"
       @on-cancel="choosemodel=false">
-        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;" >
-        <Radio   style="clear:both;width:100%;font-size:13px;" :label="index"  v-for="(item,index) in userlist" :key="index">
+        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
+        <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
            
             <span style="margin-left:15px;">{{item.name}}</span>
             <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
@@ -208,461 +216,588 @@
 </template>
 <script>
 import qs from "qs";
- 
-  export default {
-    data () {
-      return {
-        choosemodel:false,
-        choosemodel1:false,
-        participatorids:[],
-        userindex:'',
-        userlist:[],
-        childList:[],
-        childList1:[],
-        passDisable: false,//防止通过双击事件
-        isDisable: false,//防止驳回双击事件
-        modal_loading: false, //延迟
-        reject_loading: false, //驳回
-        isFirst: false, //首页
-        addModal: false, //新增模态框
-        viewModal: false, //审核模态框
-        statusModal: false, //状态模态框
-        endModal: false, //终止模态框
-        noteModal: false, //弹窗
-        isShow: false, //新增-资料抓取显示
-        loading: true, //加载
-        buildingList: [], //楼栋
-        unitList: [], //单元
-        roomsList: [], //房间
-        addData: [], //新增表格数据
-        viewData: [], //审核表格数据
-        nodesList: [], //处理进度
-        historysList: [], //进度详情
-        currentNodeId: '', //处理进度节点
-        addUnitNameIsNo:'',//新增名字空的
-        viewTabs: 'name1', //Tabs
-        buttons:{ }, //按钮
-        //搜索时间
-        searchTime:{
-          tStartTime:"",
-          tEndTime:"",
-        },
-        imglist:[
-            '',
-           '',
-           '',
+import axios from "axios";
+export default {
+  data() {
+    return {
+      choosemodel: false,
+      choosemodel1: false,
+      participatorids: [],
+      userindex: "",
+      userlist: [],
+      childList: [],
+      childList1: [],
+      passDisable: false, //防止通过双击事件
+      isDisable: false, //防止驳回双击事件
+      modal_loading: false, //延迟
+      reject_loading: false, //驳回
+      isFirst: false, //首页
+      addModal: false, //新增模态框
+      viewModal: false, //审核模态框
+      statusModal: false, //状态模态框
+      endModal: false, //终止模态框
+      noteModal: false, //弹窗
+      isShow: false, //新增-资料抓取显示
+      loading: true, //加载
+      buildingList: [], //楼栋
+      unitList: [], //单元
+      roomsList: [], //房间
+      addData: [], //新增表格数据
+      viewData: [], //审核表格数据
+      nodesList: [], //处理进度
+      historysList: [], //进度详情
+      currentNodeId: "", //处理进度节点
+      addUnitNameIsNo: "", //新增名字空的
+      viewTabs: "name1", //Tabs
+      buttons: {}, //按钮
+      //搜索时间
+      searchTime: {
+        tStartTime: "",
+        tEndTime: ""
+      },
+      imglist: [""],
+      upindex: "",
+      files: [],
+      newarr:[],
+      officeLocations:[],
+      showimg: "",
+      //表单
+      formItem: {
+        clientId: "",
+        phone: "",
+        officeLocation: "",
+        name: "",
+        companyName: "",
+        priority: "",
+        sex: "",
+        problemClass: "",
+        problemType: "",
+        remark: "",
+        participatorids: [],
+
+        problem: "暂无数据",
+        problemImgs: "",
+        participators: []
+      },
+      treeList: [],
+      // 设置表单验证
+      ruleValidate: {
+        phone: [
+          {
+            required: true,
+            message: "请输入正确的手机号",
+            trigger: "blur",
+            transform(value) {
+              var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              if (!reg.test(value)) {
+                return false;
+              } else {
+                return value;
+              }
+            }
+          }
         ],
-        upindex:'',
-        files:[],
-        showimg:'',
-        //表单
-        formItem: {
-          clientId:"",
-          phone:"",
-          officeLocation:"",
-          name:"",
-          companyName:"",
-          priority:"",
-          sex:"",
-          problemClass:'',
-          problemType:'',
-          remark:'',
-          participatorids:[],
-        
-          problem:'暂无数据',
-          problemImgs:'',
-          participators:'',
-        },
-        treeList:[],
-        // 设置表单验证
-        ruleValidate: {
-            phone: [
-                { required: true, message: '手机号不能为空', trigger: 'blur' }
-            ],
-            one_type:[
-               { required: true, message: '该选项不能为空', trigger: 'blur' } 
-            ],
-            executor:[
-               { required: true, message: '该选项不能为空', trigger: 'input' } 
-            ]
-        },
-        // 设置结束时间大于开始时间
-        end:{
-            disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.startUpdateTime)
-            }).bind(this)
-        },
-        // 常见问题
-        ques_list:[],
-        // 常见问题点击样式
-        question_ary:[],
-        visible: false,
-        viewForm:{
+        one_type: [
+          { required: true, message: "该选项不能为空", trigger: "blur" }
+        ],
+        executor: [
+          { required: true, message: "该选项不能为空", trigger: "input" }
+        ],
+        participatorids:[
+          { required: true, message: "该选项不能为空", trigger: "blur" }
+        ]
+      },
+      // 设置结束时间大于开始时间
+      end: {
+        disabledDate: function(date) {
+          return date.valueOf() < new Date(this.formItem.startUpdateTime);
+        }.bind(this)
+      },
+      // 常见问题
+      ques_list: [],
+      // 常见问题点击样式
+      question_ary: [],
+      visible: false,
+      viewForm: {
         // 通过id是否存在来决定所有选项是否可操作
-          id:""
-        },
-        // 历史报修数据模态框
-        RepairList_show:false,
-        //表格
-        tableConfig:{
-          url:"/apiHost/api/emaint/repairProblem/clientRepairProblemList",
-          columns:[
-            // {
-            //   type:"selection",
-            //   key:'_checked',
-            //   width:60
-            // },
-            {
-              title: '工单号码 ',
-              key: 'workOrderNo',
-              width:180
-            },
-            {
-              title: '优先级',
-              key: 'priority',
-              width:200
-            },
-            {
-              title: '状态',
-              key: 'state',
-              width:120
-            },
-            {
-              // PS:暂无该字段
-              title: '变更状态',
-              key: ' phone',
-              width:120
-            },
-            {
-              title: '办公位',
-              key: 'officeLocation',
-              width:120
-            },
-            {
-              title: '姓名',
-              key: 'name',
-              width:120
-            },
-            {
-              title: '手机号',
-              key: 'phone',
-              width:150
-            },
-            {
-              title: '执行人',
-              key: 'userName',
-              width:120
-            },
-            {
-              title: '来源',
-              key: 'repairSource',
-              width:150
-            },
-            {
-              title: '更新时间',
-              key: 'gmtCreate',
-              width:200
-            },
-          ],
-        },
-        RepairForm: {
-            clientId:"",
-            beginTime:"",
-            endTime:"",
-            isChange:"",
-            workOrderNo:"",
-            name:"",
-            state:"",
-            phone:"",
-            userName:"",
+        id: ""
+      },
+      // 历史报修数据模态框
+      RepairList_show: false,
+      //表格
+      tableConfig: {
+        url: "/apiHost/api/emaint/repairProblem/clientRepairProblemList",
+        columns: [
+          // {
+          //   type:"selection",
+          //   key:'_checked',
+          //   width:60
+          // },
+          {
+            title: "工单号码 ",
+            key: "workOrderNo",
+            width: 180
+          },
+          {
+            title: "优先级",
+            key: "priority",
+            width: 200
+          },
+          {
+            title: "状态",
+            key: "state",
+            width: 120
+          },
+          {
+            // PS:暂无该字段
+            title: "变更状态",
+            key: " phone",
+            width: 120
+          },
+          {
+            title: "办公位",
+            key: "officeLocation",
+            width: 120
+          },
+          {
+            title: "姓名",
+            key: "name",
+            width: 120
+          },
+          {
+            title: "手机号",
+            key: "phone",
+            width: 150
+          },
+          {
+            title: "执行人",
+            key: "userName",
+            width: 120
+          },
+          {
+            title: "来源",
+            key: "repairSource",
+            width: 150
+          },
+          {
+            title: "更新时间",
+            key: "gmtCreate",
+            width: 200
           }
+        ]
+      },
+      RepairForm: {
+        clientId: "",
+        beginTime: "",
+        endTime: "",
+        isChange: "",
+        workOrderNo: "",
+        name: "",
+        state: "",
+        phone: "",
+        userName: ""
       }
-    },
-    mounted(){//方法
-        if(this.$route.params.id){
-           this.viewForm.id=this.$route.params.id
-          this.getinfo()
+    };
+  },
+  mounted() {
+    //方法
+    if (this.$route.params.id) {
+      this.viewForm.id = this.$route.params.id;
+      this.getinfo();
+    }
+  },
+  beforeCreate() {
+
+    this.$request.post(
+      "/apiHost/api/emaint/problem-base/treeList",
+      {},
+      res => {},
+      res => {
+        if (res.statusCode == 200) {
+          this.treeList = res.responseResult;
         }
+      }
+    );
+    this.$request.post(
+      "/apiHost/api/user/searchUserProblemNum",
+      qs.stringify({ limit: 1000, page: 1, keyword: "" }),
+      res => {},
+      res => {
+        if (res.statusCode == 200) {
+          this.userlist = res.responseResult.list;
+        }
+      }
+    );
+  },
+  methods: {
+    imgcancel() {
+      if (this.imglist.indexOf("") == -1) this.imglist.push("");
+      this.imglist.splice(this.showimg, 1);
+      this.files.splice(this.showimg, 1);
+
+      this.imglist.push("");
+      this.imglist.pop("");
     },
-     beforeCreate(){
-        this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},res=>{},res=>{
-          if(res.statusCode==200){
-            this.treeList=res.responseResult;
-          }
+    // 办公位自动检索
+    handleSearch1(value){
+      this.newarr=[];
 
-        })
-        this.$request.post('/apiHost/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
-          if(res.statusCode==200){
-            this.userlist=res.responseResult.list;
-
+      this.officeLocations.forEach((v)=>{
+          if(v.indexOf(value)!=-1){
+            this.newarr.push(v)
           }
-        })
+      })
+      
       
     },
-    methods: {     
-      changefile(e){
-          var file=e.target.files[0]
-         
-          var reader=new FileReader()
-          reader.readAsDataURL(file);
-          var that=this;
-          reader.onload=function(){
-              that.imglist[that.upindex]=this.result;
-              
-              that.files.push(file);
-              
-              that.imglist.push('')
-              that.imglist.pop();
-                // that.imglist.push(this.result);
-          }
-        },
-        imgcancel(){
-          this.imglist[this.showimg]='';
-          this.files.splice(this.showimg,1);    
-          this.imglist.push('');
-          this.imglist.pop('');
-      },
-      // 二级菜单
-      findchildren2(){
-        console.log(this.formItem.problemType)
-        this.childList.forEach((v)=>{
-          if(v.problem==this.formItem.problemType){
-              this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:v.id}),res=>{},res=>{
-                if(res.statusCode==200)
-                  this.ques_list=res.responseResult
-                })
-          }
-        })
-      },
+    changefile(e) {
+      var file = e.target.files[0];
 
-      // 一级菜单
-      findchildren(){
-        this.treeList.forEach(v=>{
-          if(v.parentProblem==this.formItem.problemClass){
-            this.childList=v.childList;
-            this.formItem.problemType=''
-            this.ques_list=[]
-            // if(this.formItem.problemType=='')
-            // this.formItem.problemType=v.childList[0].problem
-          }
-        this.findchildren2();
-        })
-      },
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      var that = this;
+      reader.onload = function() {
+        that.imglist[that.upindex] = this.result;
 
-      // 输入手机号进行检索
-      search(){
-        this.$request.post('/apiHost/api/emaint/client/phone',qs.stringify({phone:this.formItem.phone}),res=>{},res=>{
-          if(res.statusCode==200&&res.responseResult!=null){
-              var data=res.responseResult;
-              this.formItem.phone=data.phone
-              this.formItem.officeLocation=data.officeLocation
-              this.formItem.name=data.name
-              this.formItem.companyName=data.companyName;
-              this.formItem.priority=data.priority;
-              this.formItem.sex=data.sex;
-              this.formItem.clientId=data.id;
+        that.files.push(file);
+        if (that.imglist.length < 6) that.imglist.push("");
 
-
-              this.RepairForm.clientId=data.id
-              this.RepairForm.beginTime=data.beginTime || ""
-              this.RepairForm.endTime=data.endTime || ""
-              this.RepairForm.isChange=data.isChange || ""
-              this.RepairForm.workOrderNo=data.workOrderNo || ""
-              this.RepairForm.name=data.name ;
-              this.RepairForm.state=data.state;
-              this.RepairForm.phone=data.phone;
-              this.RepairForm.userName=data.userName || "";
-          }
-        })
-      },
-      // 报修提交
-      repairSubmit(){
-         if(this.viewForm.id!=''){
-            // console.log(this.formItem.userId)
-            // console.log(this.formItem.id)
-            this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.formItem.id,userId:this.formItem.userId}),res=>{},res=>{
-                  this.$Message.success(res.responseResult)
-                   setTimeout(()=>{
-                    this.$router.push({
-                      name:"workOrder"
-                    })
-                  },800)
-            })
-         }
-         else{
-          if(this.question_ary.length>0)
-          this.formItem.problem=this.question_ary.toString();
-          
-          this.formItem.problemImgs='123';
-         
-          this.formItem.participators=this.userlist.filter((v)=>{
-              if(this.formItem.participatorids.indexOf(v.id))
-                  {
-                    return true
-                  }
-          })
-        
-            this.formItem.participatorids=this.formItem.participatorids.toString();
-            this.formItem.participators=this.formItem.participators.toString();
-            console.log(this.formItem)
-            this.$request.post('/apiHost/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
-            if(res.statusCode==200){
-              this.$Message.success(res.resMessage)
-            }
-         })
-         }
-      },
-      // 上一步
-      goback(){
-          window.history.go(-1)
-      },
-
-      getinfo(){
-        this.$request.post("/apiHost/api/emaint/repairProblem/view",qs.stringify(this.viewForm), res => {
-           this.$Modal.error('网络错误,请重试！')
-        }, res => {
-          if (res.statusCode === 200) {
-            this.$Message.success("查询成功！")
-
-            var data=res.responseResult
-           
-           this.formItem=data;
-           this.formItem={
-              clientId:data.clientId,
-              phone:data.phone,
-              officeLocation:data.officeLocation,
-              name:data.name,
-              companyName:data.companyName,
-              priority:data.priority,
-              sex:data.sex,
-              problemClass:data.problemClass,
-              problemType:data.problemType,
-              remark:data.remark,
-              participatorids:data.participatorids,
-              userName:'',
-              userId:'',
-              problem:data.problem,
-              problemImgs:data.problemImgs,
-              participators:data.participators,
-              id:data.id,
-            
-            },
-            this.findchildren();
-            
-            this.question_ary=this.formItem.problem.split(',');
-            var arry=this.formItem.participatorids.split('');
-            this.formItem.participatorids=[];
-            arry.forEach((v)=>{
-                this.formItem.participatorids.push(v*1)
-            })
-            console.log(this.formItem.participatorids)
-          } else {
-            this.$Modal.error('网络错误,请重试！')
-          }
-        })
-      },
-        // 选择文件
-        uploadfile(index){
-            document.querySelector('#upfile').click();
-            this.upindex=index;
-        },
-        // 图片幻灯
-        showtheimg(index){
-            this.showimg=index;
-            this.visible=true;
-        },
-        // 选择常见问题
-        choose_question(item,index){
-         
-            if(this.question_ary.indexOf(item.problem)==-1){
-                this.question_ary.push(item.problem)
-            }else{
-                  
-                this.question_ary.splice(this.question_ary.indexOf(item.problem),1)
-            }
-        },
-         // 历史报修数据
-        clientRepairList(){
-          this.RepairList_show=true
-          console.log(this.RepairForm.clientId)
-          if(this.RepairForm.clientId==""){
-            this.$Modal.error('请先输入手机号!')
-          }
-          this.$refs.table.init()
-        } 
+        that.imglist.push("");
+        that.imglist.pop("");
+        // that.imglist.push(this.result);
+      };
     },
-    
-    
-   
+    // 二级菜单
+    findchildren2() {
+      // console.log(this.formItem.problemType);
+      this.childList.forEach(v => {
+        if (v.problem == this.formItem.problemType) {
+          this.$request.post(
+            "/apiHost/api/emaint/problem-base/list",
+            qs.stringify({ parentId: v.id }),
+            res => {},
+            res => {
+              if (res.statusCode == 200) this.ques_list = res.responseResult;
+            }
+          );
+        }
+      });
+    },
+
+    // 一级菜单
+    findchildren() {
+      this.treeList.forEach(v => {
+        if (v.parentProblem == this.formItem.problemClass) {
+          this.childList = v.childList;
+          this.formItem.problemType = "";
+          this.ques_list = [];
+          // if(this.formItem.problemType=='')
+          // this.formItem.problemType=v.childList[0].problem
+        }
+        this.findchildren2();
+      });
+    },
+
+    // 输入手机号进行检索
+    search() {
+      if (this.formItem.phone.length == 11) {
+      this.$request.post(
+        "/apiHost/api/emaint/client/phone",
+        qs.stringify({ phone: this.formItem.phone }),
+        res => {},
+        res => {
+          if (res.statusCode == 200 && res.responseResult != null) {
+            this.$Message.success("查询成功!");
+            var data = res.responseResult;
+            this.formItem.phone = data.phone;
+            // this.formItem.officeLocation = data.officeLocation;
+            this.formItem.name = data.name;
+            this.formItem.companyName = data.companyName;
+            this.formItem.priority = data.priority;
+            this.formItem.sex = data.sex;
+            this.formItem.clientId = data.id;
+            this.$request.post('/apiHost/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
+             if(res.statusCode==200){
+               this.officeLocations=res.responseResult
+             }
+            })
+
+            this.RepairForm.clientId = data.id;
+            this.RepairForm.beginTime = data.beginTime || "";
+            this.RepairForm.endTime = data.endTime || "";
+            this.RepairForm.isChange = data.isChange || "";
+            this.RepairForm.workOrderNo = data.workOrderNo || "";
+            this.RepairForm.name = data.name;
+            this.RepairForm.state = data.state;
+            this.RepairForm.phone = data.phone;
+            this.RepairForm.userName = data.userName || "";
+
+            switch (data.sex) {
+              case "男":
+                 (this.formItem.sex = "男") ;break; 
+              case "male":
+                 (this.formItem.sex = "男");break;
+              case "女":
+                 (this.formItem.sex = "女");break;
+              case "female":
+                 (this.formItem.sex = "女");break;
+              default : break;
+            }
+            
+          } else {
+              setTimeout(() => {
+                this.$Message.error("查询失败");
+                this.formItem.name=""
+                this.formItem.companyName=""
+                this.formItem.priority=""
+                this.formItem.sex=""
+              }, 1000);
+            
+          }
+        }
+      );
+      }
+    },
+    // 报修提交
+    repairSubmit() {
+      // 派单
+      if (this.viewForm.id != "") {
+        this.$request.post(
+          "/apiHost/api/emaint/repairProblem/updateUser",
+          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
+          res => {},
+          res => {
+            this.$Message.success(res.responseResult);
+            setTimeout(() => {
+              this.$router.push({
+                name: "workOrder"
+              });
+            }, 800);
+          }
+        );
+      } else {
+        // 新增
+        if (this.question_ary.length > 0)
+          this.formItem.problem = this.question_ary.toString();
+        
+        this.formItem.problemImgs = this.files;
+        var newarr=[]
+        this.userlist.forEach(v=>{
+          if(this.formItem.participatorids.indexOf(v.id) != -1){
+            
+              newarr.push(v.name)
+          }
+        })
+        this.formItem.participatorids = this.formItem.participatorids.toString();
+        this.formItem.participators =newarr.toString();
+
+        //  把this.formItem转为FormData数据用来传递文件
+        var data = new FormData(); //重点在这里 如果使用 var data = {}; data.inputfile=... 这样的方式不能正常上传
+
+        // formData添加formItem的键值对
+        for (var i in this.formItem) {
+          data.append(i, this.formItem[i]);
+        }
+
+        for (var i = 0; i < this.files.length; i++) {
+          data.append("problemImgs", this.files[i]);
+        }
+
+        if(this.formItem.phone!=""&&this.formItem.problemClass!=""){
+          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+          axios
+            .post("/apiHost/api/emaint/repairProblem/save", data, headers)
+            .then(
+                (resdata)=> {
+                if (resdata.data.statusCode == 200) {
+                  this.$Message.success('新增成功！');
+                  setTimeout(()=>{
+                    this.$router.push({name:'workOrder'})
+                  },1000)
+                }
+              },
+              (err) =>{
+                this.$Message.success(err);
+              }
+            )
+        }else{
+          this.$Message.error("输入不能为空")
+        }
+        // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+        // axios
+        //   .post("/apiHost/api/emaint/repairProblem/save", data, headers)
+        //   .then(
+        //     function(data) {
+        //       if (data.statusCode == 200) {
+        //         this.$Message.success(res.resMessage);
+        //       }
+        //     },
+        //     function(err) {
+        //       this.$Message.success(err);
+        //     }
+        //   );
+
+        // this.$request.post('/apiHost/api/file/uploads',this.files,res=>{},res=>{
+        //   console.log(res);
+        // })
+
+        //     this.$request.post('/apiHost/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
+        //     if(res.statusCode==200){
+        //       this.$Message.success(res.resMessage)
+        //     }
+        //  })
+      }
+    },
+    // 上一步
+    goback() {
+      window.history.go(-1);
+    },
+
+    getinfo() {
+      this.$request.post(
+        "/apiHost/api/emaint/repairProblem/view",
+        qs.stringify(this.viewForm),
+        res => {
+          this.$Modal.error("网络错误,请重试！");
+        },
+        res => {
+          if (res.statusCode === 200) {
+            this.$Message.success("查询成功！");
+
+            var data = res.responseResult;
+
+            this.formItem = data;
+            (this.formItem = {
+              clientId: data.clientId,
+              phone: data.phone,
+              officeLocation: data.officeLocation,
+              name: data.name,
+              companyName: data.companyName,
+              priority: data.priority,
+              sex: data.sex,
+              problemClass: data.problemClass,
+              problemType: data.problemType,
+              remark: data.remark,
+              participatorids: data.participatorids,
+              userName: "",
+              userId: "",
+              problem: data.problem,
+              problemImgs: data.problemImgs,
+              participators: data.participators,
+              id: data.id
+            }),
+              this.findchildren();
+
+            this.question_ary = this.formItem.problem.split(",");
+            var arry = this.formItem.participatorids.split("");
+            this.formItem.participatorids = [];
+            arry.forEach(v => {
+              this.formItem.participatorids.push(v * 1);
+            });
+            // console.log(this.formItem.participatorids);
+          } else {
+            this.$Modal.error("网络错误,请重试！");
+          }
+        }
+      );
+    },
+    // 选择文件
+    uploadfile(index) {
+      document.querySelector("#upfile").click();
+      this.upindex = index;
+    },
+    // 图片幻灯
+    showtheimg(index) {
+      this.showimg = index;
+      this.visible = true;
+    },
+    // 选择常见问题
+    choose_question(item, index) {
+      if (this.question_ary.indexOf(item.problem) == -1) {
+        this.question_ary.push(item.problem);
+      } else {
+        this.question_ary.splice(this.question_ary.indexOf(item.problem), 1);
+      }
+    },
+    // 历史报修数据
+    clientRepairList() {
+      this.RepairList_show = true;
+      // console.log(this.RepairForm.clientId);
+      if (this.RepairForm.clientId == "") {
+        this.$Modal.error("请先输入手机号!");
+      }
+      this.$refs.table.init();
+    }
   }
+};
 </script>
 <style scoped>
-    #username_form .ivu-form-item-content{
-        text-align: left !important;
-    }
-    .demo-upload-list{
-        display: inline-block;
-        width: 60px;
-        height: 60px;
-        text-align: center;
-        line-height: 60px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        overflow: hidden;
-        background: #fff;
-        position: relative;
-        box-shadow: 0 1px 1px rgba(0,0,0,.2);
-        margin-right: 4px;
-    }
-    .demo-upload-list img{
-        width: 100%;
-        height: 100%;
-    }
-    .demo-upload-list-cover{
-        display: none;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0,0,0,.6);
-    }
-    .demo-upload-list:hover .demo-upload-list-cover{
-        display: block;
-    }
-    .demo-upload-list-cover i{
-        color: #fff;
-        font-size: 20px;
-        cursor: pointer;
-        margin: 0 2px;
-    }
-    div.addimg{
-        display: inline-block;
-        
-            width: 58px; 
-            height: 58px; 
-            line-height: 58px;
-            border:1px solid #eee;
-            border-radius:5px;
-            position: absolute;
-    }
-    div.addimg img{
-        width: 100%;
-        height: 100%;
-    }
-  div.addimg .ivu-icon{
-    font-size: 40px;line-height:1.5;
-  }
-    .question{
-        margin: 5px;
-        color: #bbbec4;
-        min-width: 100px;
-    }
-    .question_active{
-        background-color: #2d8cf0;
-        border:#2d8cf0;
-        color: #fff;
-    }
-    
+#username_form .ivu-form-item-content {
+  text-align: left !important;
+}
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+div.addimg {
+  display: inline-block;
+
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  position: absolute;
+}
+div.addimg img {
+  width: 100%;
+  height: 100%;
+}
+div.addimg .ivu-icon {
+  font-size: 40px;
+  line-height: 1.5;
+}
+.question {
+  margin: 5px;
+  color: #bbbec4;
+  min-width: 100px;
+}
+.question_active {
+  background-color: #2d8cf0;
+  border: #2d8cf0;
+  color: #fff;
+}
 </style>
 

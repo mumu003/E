@@ -1,4 +1,5 @@
 <template>
+<!-- 工单受理 -->
   <div>
     <Row :gutter="10">
       <Col span="24">
@@ -8,7 +9,7 @@
             <collapse-icon foldPart="search-body"></collapse-icon>
           </p>
           <div id="search-body">
-            <Form  :model="formItem" :label-width="80">
+            <Form  :model="formItem" :label-width="80" :rules="ruleAdd">
               <Row type="flex" justify="start">
                 <Col span="6">
                   <FormItem label="工单号">
@@ -22,10 +23,26 @@
                   </FormItem>
                 </Col>
                 <Col span="6">
-                  <FormItem label="手机号">
+                  <FormItem label="手机号" prop="phone">
                     <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"></Input>
                   </FormItem>
                 </Col>
+              </Row>
+              <Row>
+              <Col span="6">
+              <FormItem label="是否变更">
+                 <Select v-model="formItem.isChange" placeholder="全部">
+                      <Option value="">全部</Option>
+                      <Option value="是">已变更</Option>
+                      <Option value="否">未变更</Option>
+                    </Select>
+              </FormItem>
+              </Col>
+              <Col span="6">
+              <FormItem label="执行人">
+                <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>
+              </FormItem>
+              </Col>
               </Row>
 
               <Row>
@@ -73,56 +90,6 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增合同备案" width="800"
-      @on-cancel="addCancel">
-      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
-        <Row>
-          <Col span="8">
-            <FormItem label="工单号" prop="buildingId">
-              <Select v-model="addForm.buildingId" placeholder="请选择工单号号"  @on-change="getUnits(addForm.buildingId)">
-                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="单元" prop="unitId">
-              <div v-if="addUnitNameIsNo !== ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-                </Select>
-              </div>
-              <div v-if="addUnitNameIsNo === ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                </Select>
-              </div>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="姓名" prop="roomId">
-              <Select v-model="addForm.roomId" placeholder="请选择姓名" @on-change="getModalName(addForm.roomId)">
-                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="手机号">
-              <Input v-model="addForm.shoujihao" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align: right;">
-        <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
-      </div>
-    </Modal>
 
     <Modal v-model="viewModal" width="800"
       @on-cancel="viewCancel" >
@@ -264,7 +231,9 @@
           name:'',
           phone:'',
           beginTime:"",
-          endTime:""
+          endTime:"",
+          isChange:"",
+          userName:""
           // companyName:'',
           // repairSource:'',
           // companyName:''
@@ -275,6 +244,7 @@
               return date.valueOf() < new Date( this.formItem.beginTime)
             }).bind(this)
         },
+        
         //表格
         tableConfig:{
           url:"/apiHost/api/emaint/repairProblem/repairProblemSingleList",
@@ -358,6 +328,20 @@
                 }
               ],
         },
+
+        //检索表单验证
+         ruleAdd:{
+          phone: [
+            { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
+                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
+          ],
+        },
         //新增表单
         addForm:{
           buildingId:'',
@@ -371,18 +355,7 @@
           orgId:'',
           projectId: '',
         },
-        //新增模态框验证
-        ruleAdd:{
-          buildingId: [
-              { required: true, message: '请选择工单号号', trigger: 'change' }
-          ],
-          unitId: [
-              { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-              { required: true, message: '请选择姓名', trigger: 'change' }
-          ]
-        },
+        
         //新增模态框资料
         addContract: [
           {

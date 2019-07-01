@@ -32,7 +32,7 @@ export default new Router({
           path: '/questionAcceptance',
           name: 'questionAcceptance',
           meta: {
-            title: '问题受理'
+            title: '工单受理'
           },
           component: resolve => require(['@/views/questionAcceptance/index.vue'], resolve),
         },
@@ -52,14 +52,14 @@ export default new Router({
           },
           component: resolve => require(['@/views/workOrderManage/index.vue'], resolve),
         },
-        // {
-        //   path: '/dispatch',
-        //   name: 'dispatch',
-        //   meta: {
-        //     title: '派单'
-        //   },
-        //   component: resolve => require(['@/views/dispatch/index.vue'], resolve),
-        // },
+        {
+          path: '/dispatch',
+          name: 'dispatch',
+          meta: {
+            title: '派单'
+          },
+          component: resolve => require(['@/views/dispatch/index.vue'], resolve),
+        },
 
         {
           path: '/operationSetting',

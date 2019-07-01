@@ -48,10 +48,10 @@
           <div class="search-row">
             <Col>
             </Col>
-            <Col>
+            <!-- <Col>
             <Button type="primary" icon="search" @click="searchSubmit">搜索</Button>
             <Button type="ghost" icon="refresh" @click="searchCancel">重置</Button>
-            </Col>
+            </Col> -->
           </div>
         </div>
       </Card>
@@ -69,7 +69,7 @@
     </Row>
 
 
-    // 查看评价
+    <!-- 查看评价 -->
       <Modal v-model="evaluatModal" title="查看评价"
             width="400"
             @on-cancel="cancel">
@@ -93,7 +93,7 @@
           </Row>
           <Row>
               <Col span="24">
-                <p>工程师很赞，给个好评!</p>
+                <p>{{remark}}</p>
               </Col>
           </Row>
         <div slot="footer" style="text-align: center;;margin:0 auto;">
@@ -118,11 +118,20 @@ import qs from "qs";
         loading: true, //加载
         buttons:{ }, //按钮
         evaluatModal:false,
-        modalStar:5,// 星级,
+        modalStar:0,// 星级,
         // 评语
-        evaluatList:["好","很好","非常好"], 
-       searchparam:{
-         clientId:''
+        evaluatList:[], 
+        remark:"",
+        searchparam:{
+          clientId:'',
+          name:"",
+          state:"",
+          phone:"",
+          // beginTime,
+          // endTime:"",
+          // isChange:"",
+          // workOrderNo:"",
+          // userName:""
        },
         //表单
         formItem: {
@@ -152,7 +161,8 @@ import qs from "qs";
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:params.row.state=="已评价"?false:true
                                     },
                                     style:{
                                       marginRight: '5px',
@@ -160,6 +170,24 @@ import qs from "qs";
                                     on: {
                                         click: () => {
                                             this.evaluatModal=true
+                                            this.$request.post("/apiHost/api/emaint/repair-estimate/view",{workOrderNo:params.row.workOrderNo}, res => {
+                                              this.$Modal.error({title: '提示信息', content: res.resMessage})
+                                            }, res => {
+                                              if (res.statusCode === 200) {
+                                                this.$Message.success("搜索成功！")
+                                                var data=res.responseResult
+
+                                                this.modalStar=data.star
+                                                this.remark=data.remark
+                                                var ary=data.label.split(",")
+                                                ary.forEach((v)=>{
+                                                    this.evaluatList.push(v)
+                                                })
+
+                                              } else {
+                                                this.$Modal.error({title: '提示信息', content: res.resMessage})
+                                              }
+                                          })
                                         }
                                     }
                                 }, '查看评价'),
@@ -199,30 +227,39 @@ import qs from "qs";
             {
               title: '执行人',
               key: 'userName',
-              width:150
+              width:120
             },
             {
               title: '更新时间',
               key: 'gmtModified',
-              width:150
+              width:220
             },
           ],
         },
       }
     },
     created(){//方法
-    this.searchparam.clientId=this.$route.params.id;
+      this.searchparam.clientId=this.$route.params.id;
    
       this.$request.post('/apiHost/api/emaint/client/info',qs.stringify({id:this.$route.params.id}),res=>{},res=>{
         if(res.statusCode==200){
-      
           this.formItem=res.responseResult;
-    
+          switch(res.responseResult.sex){
+                  case "male":
+                    return  this.formItem.sex="男"
+                  case "男":
+                    return this.formItem.sex="男"
+                  case "female":
+                    return this.formItem.sex="女"
+                  case "女":
+                    return this.formItem.sex="女"
+                }
+
+          this.searchparam.name=res.responseResult.name
+          this.searchparam.phone=res.responseResult.phone
+
         }
       })
-      // this.getBuildings()
-      // this.addarea()
-      /*this.getIndex()*/
     },
     methods: {
       //开始时间
@@ -234,37 +271,37 @@ import qs from "qs";
         this.formItem.endUpdateTime=endDate
       },
 
-      //搜索
-      searchSubmit () {
-        this.isFirst = true
-        this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
-      //搜索重置
-      searchCancel() {
-        this.formItem={
-          status: '',
-          buildingId: '',
-          roomId: '',
-          areaId: '',
-          startUpdateTime: '',
-          endUpdateTime: ''
-        }
-        this.isFirst = true
-        setTimeout(()=>{
-          this.$refs.table.init()
-          this.isFirst = false
-        },200)
-      },
+      // //搜索
+      // searchSubmit () {
+      //   this.isFirst = true
+      //   this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
+      //     if (res.code === 200) {
+      //       this.$Message.success("搜索成功！")
+      //       this.isFirst = false
+      //       this.$refs.table.init()
+      //     } else {
+      //       this.$Modal.error({title: '提示信息', content: res.message})
+      //     }
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
+      // //搜索重置
+      // searchCancel() {
+      //   this.formItem={
+      //     status: '',
+      //     buildingId: '',
+      //     roomId: '',
+      //     areaId: '',
+      //     startUpdateTime: '',
+      //     endUpdateTime: ''
+      //   }
+      //   this.isFirst = true
+      //   setTimeout(()=>{
+      //     this.$refs.table.init()
+      //     this.isFirst = false
+      //   },200)
+      // },
       //取消
       cancel() {
         this.evaluatModal = false

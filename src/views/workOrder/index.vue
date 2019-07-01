@@ -1,6 +1,15 @@
 <template>
 <!-- 工单管理 -->
   <div>
+      <Modal 
+                    class="showtheimg"
+                        title="View Image" 
+                        v-model="visible"
+                        @on-cancel="imgcancel" :closable="false"
+                        :mask-closable="false"
+                        >
+                        <img :src="imglist[showimg]" v-if="visible" style="width: 100%;">
+                    </Modal>
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card">
@@ -9,7 +18,7 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80">
+          <Form  :model="formItem" :label-width="80" :rules="ruleAdd">
             <Row type="flex" justify="start">
 
               <Col span="6">
@@ -34,7 +43,7 @@
               </FormItem>
               </Col>
               <Col span="6">
-              <FormItem label="手机号">
+              <FormItem label="手机号" prop="phone">
                 <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"/>
               </FormItem>
               </Col>
@@ -54,7 +63,7 @@
               </Col>
               <Col span="6">
               <FormItem label="更新时间">
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getEndDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
               <Col span="6">
@@ -98,63 +107,7 @@
       </Col>
     </Row>
 
-    <Modal v-model="addModal" title="新增发函流程" width="800"
-      @on-cancel="addCancel">
-      <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
-        <Row>
-          <Col span="8">
-            <FormItem label="姓名" prop="buildingId">
-              <Select v-model="addForm.buildingId" placeholder="请选择楼栋号"  @on-change="getUnits(addForm.buildingId)">
-                <Option :value="item.id" v-for="(item,index) in buildingList" :key="index">{{item.name}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="单元" prop="unitId">
-              <div v-if="addUnitNameIsNo !== ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{addUnitNameIsNo}}</Option>
-                </Select>
-              </div>
-              <div v-if="addUnitNameIsNo === ''">
-                <Select v-model="addForm.unitId" placeholder="请选择单元号" @on-change="getRooms(addForm.unitId)">
-                  <Option :value="item.id" v-for="(item,index) in unitList" :key="index" >{{item.name}}</Option>
-                </Select>
-              </div>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="手机号" prop="roomId">
-              <Select v-model="addForm.roomId" placeholder="请选择房间号" @on-change="getModalName(addForm.roomId)">
-                <Option :value="item.id" v-for="(item,index) in roomsList" :key="index">{{item.num}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="工单号">
-              <Input v-model="addForm.workOrderNo" readonly></Input>
-            </FormItem>
-          </Col>
-          <Col span="8">
-            <FormItem label="发函类型" prop="fileType">
-              <Select v-model="addForm.fileType" placeholder="请选择发函类型" >
-                <Option :value="item.fileType" v-for="(item,index) in fileTypeList" :key="index">{{item.fileName}}</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="24">
-            资料
-          </Col>
-          <Col span="24">
-            <Table stripe border :columns="addContract" :data="addData" ref="addTable" @on-selection-change="select"></Table>
-          </Col>
-        </Row>
-      </Form>
-      <div slot="footer" style="text-align: right;">
-        <Button type="ghost" size="default" @click="addCancel">取消</Button>
-        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
-      </div>
-    </Modal>
+  
 
     <Modal v-model="msgModal" width="800"
       title="备注"
@@ -162,6 +115,18 @@
       @on-cancel="viewCancel('remark')">
           <Form  :model="viewForm" :label-width="80">
             <Row>
+              <Col span="24">
+                <FormItem label="图片描述"  >
+                    
+                        <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
+                            <img :src="item" alt="" v-if="item!=''"   @click="showtheimg(index)">
+                            <i class="ivu-icon ivu-icon-ios-plus-empty"  v-else @click="uploadfile(index)"></i>
+                        </div>
+                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+                    </FormItem>
+                     <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
+                </Col>
               <Col span="24">
                 <FormItem label="备注">
                     <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
@@ -179,27 +144,11 @@
       </div>
     </Modal>
 
-    <Modal v-model="endModal" title="终止发函"
-           :loading="modal_loading"
-           @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
-      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
-    </Modal>
-
-    <Modal v-model="noteModal" width="300" title="提示信息">
-      <p id="note-info">请选择至少一条数据！</p>
-      <div slot="footer" style="text-align:center;margin:0 auto;">
-        <Button type="primary" size="default" @click="closes">确定</Button>
-      </div>
-    </Modal>
-
 
 <Modal v-model="choosemodel" title="执行人选择" width="500"
       @on-cancel="choosemodel=false">
-        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;" >
-        <Radio   style="clear:both;width:100%;font-size:13px;" :label="index"  v-for="(item,index) in userlist" :key="index">
-           
+        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
+        <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
             <span style="margin-left:15px;">{{item.name}}</span>
             <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
         </Radio>
@@ -214,10 +163,13 @@
 </template>
 <script>
   import qs from 'qs'
-  
+  import axios from "axios";
   export default {
     data () {
       return {
+        files: [],
+        imglist: [""],
+        visible: false,
         userindex:'',
         userlist:[],
         chooseindex:'',
@@ -335,16 +287,19 @@
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:params.row.state=="待维修"?false:true
                                     },
                                     on: {
                                         click: () => {
                                            this.choosemodel=true;
                                            this.chooseindex=params.row.id;
-                                            this.userlist.forEach((v,i)=>{
-                                              if(v.id==params.row.userId)
-                                                this.userindex=i;
-                                            })
+                                           
+                                            // this.userlist.forEach((v,i)=>{
+                                            //   if(v.id==params.row.userId){
+                                            //     this.userindex=i;
+                                            //   }                                              
+                                            // })
                                         }
                                     }
                                 }, '变更执行人'),
@@ -357,9 +312,14 @@
               width:180
             },
             {
+              title: '姓名',
+              key: 'name',
+              width:120
+            },
+            {
               title: '优先级',
               key: 'priority',
-              width:200
+              width:120
             },
             {
               title: '状态',
@@ -375,11 +335,6 @@
             {
               title: '办公位',
               key: 'officeLocation',
-              width:120
-            },
-            {
-              title: '姓名',
-              key: 'name',
               width:120
             },
             {
@@ -415,23 +370,18 @@
           endTime:'',
           beginTime:'',
         },
-        //新增模态框验证
+        //检索表单验证
         ruleAdd:{
-          buildingId: [
-            { required: true, message: '请选择楼栋号', trigger: 'change' }
+          phone: [
+            { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
+                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
           ],
-          unitId: [
-            { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-            { required: true, message: '请选择房间号', trigger: 'change' }
-          ],
-          workOrderNo:[
-            { required: true, message: '请填写客户姓名', trigger: 'blur' }
-          ],
-          fileType: [
-            { required: true, message: '请选择发函类型', trigger: 'change' }
-          ]
         },
         //新增模态框资料
         addContract: [
@@ -618,25 +568,65 @@
       }
     },
     mounted(){
-      //获取楼栋
-      this.getBuildings()
+
     },
     beforeCreate(){
       this.$request.post('/apiHost/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
           if(res.statusCode==200){
             this.userlist=res.responseResult.list;
-
           }
         })
     },
     methods: {
+       // 选择文件
+    uploadfile(index) {
+      document.querySelector("#upfile").click();
+      this.upindex = index;
+    },
+    // 图片幻灯
+    showtheimg(index) {
+      this.showimg = index;
+      this.visible = true;
+    },
+        imgcancel() {
+      if (this.imglist.indexOf("") == -1) this.imglist.push("");
+      this.imglist.splice(this.showimg, 1);
+      this.files.splice(this.showimg, 1);
+
+      this.imglist.push("");
+      this.imglist.pop("");
+    },
+    changefile(e) {
+      var file = e.target.files[0];
+
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      var that = this;
+      reader.onload = function() {
+        that.imglist[that.upindex] = this.result;
+
+        that.files.push(file);
+        if (that.imglist.length < 6) that.imglist.push("");
+
+        that.imglist.push("");
+        that.imglist.pop("");
+        // that.imglist.push(this.result);
+      };
+    },
       // 变更执行人
       bgzxr(){
         this.choosemodel=false;
-     
-        this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.chooseindex,userId:this.userlist[this.userindex].id}),res=>{},res=>{
-          if(res.statusCode==200)
-          this.$Message.success(res.resMessage)
+        // console.log(this.userlist[this.userindex].id) 
+        this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.chooseindex,userId:this.userlist[this.userindex].id,changeDescription:''}),res=>{},res=>{
+          if(res.statusCode==200){
+            this.$Message.success(res.resMessage)
+            this.$refs.addForm.resetFields()
+                  this.$refs.table.init()
+          }else{
+            this.$Message.error(res.resMessage)
+            this.$refs.addForm.resetFields()
+            this.$refs.table.init()
+          }
         })
       },
       //开始时间
@@ -1146,7 +1136,8 @@
           roomId: '',
           unitId: '',
           beginTime: '',
-          endTime: ''
+          endTime: '',
+          isChange:""
         }
         this.isFirst = true
         setTimeout(()=>{
@@ -1158,17 +1149,38 @@
       // 备注提交
       msgOk(){
         this.msgModal=false
-        this.$request.post("/apiHost/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
-          if (res.code === 200) {
-            this.$Message.success("搜索成功！")
-            this.msgModal = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.responseResult})
-          }
-        }, res => {
-          this.$Modal.success({title: '提示信息', content: res.responseResult})
-        })
+       
+           var data = new FormData();
+             for (var i in this.viewForm) {
+          data.append(i, this.viewForm[i]);
+        }
+          for (var i = 0; i < this.files.length; i++) {
+          data.append("imgs", this.files[i]);
+        }
+        console.log(data)
+          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+          axios
+            .post("/apiHost/api/emaint/repairProblem/userAddRemark", data, headers)
+            .then(
+                (resdata)=> {
+                 this.$Modal.success({title: '提示信息', content: resdata.data.responseResult})
+              },
+              (err) =>{
+                 this.$Modal.success({title: '提示信息', content: err})
+              }
+            )
+        
+        // this.$request.post("/apiHost/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
+        //   if (res.code === 200) {
+        //     this.$Message.success("搜索成功！")
+        //     this.msgModal = false
+        //     this.$refs.table.init()
+        //   } else {
+        //     this.$Modal.error({title: '提示信息', content: res.responseResult})
+        //   }
+        // }, res => {
+        //   this.$Modal.success({title: '提示信息', content: res.responseResult})
+        // })
 
       },
       //取消操作
@@ -1189,4 +1201,42 @@
     }
   }
 </script>
+<style>
+div.addimg {
+  display: inline-block;
+
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  position: absolute;
+  text-align: center;
+  top: -15px;
+}
+div.addimg img {
+  width: 100%;
+  height: 100%;
+}
+div.addimg .ivu-icon {
+  font-size: 40px;
+  line-height: 1.5;
+}
+div.showtheimg .ivu-modal-mask{
+  z-index: 800;
+}
+div.showtheimg .ivu-modal-wrap{
+  z-index: 1200;
+}
+div.showtheimg .ivu-modal{
+  top:30px;
+}
+div.showtheimg .ivu-modal-body{
+  text-align: center;
+}
+div.showtheimg .ivu-modal-body img{
+  height: 22rem;
+  width: 74%;
+}
+</style>
 
