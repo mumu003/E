@@ -231,7 +231,7 @@ import qs from 'qs';
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/problem-base/list",
+          url:"https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
           columns:[
             {
                   title: '操作',
@@ -251,14 +251,14 @@ import qs from 'qs';
                                     on: {
                                         click: () => {
                                           this.updateModel=true;
-                                              this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:params.row.id}),res=>{},res=>{
+                                              this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:params.row.id}),res=>{},res=>{
                                             if(res.statusCode==200){
                                                   this.updateForm=res.responseResult;
-                                                       this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:this.updateForm.parentId}),res1=>{},res1=>{
+                                                       this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:this.updateForm.parentId}),res1=>{},res1=>{
                                                       if(res1.statusCode==200){
                                                       
                                                         
-                                                          this.$request.post('/apiHost/api/emaint/problem-base/list',qs.stringify({parentId:res1.responseResult.parentId}),res2=>{},res2=>{
+                                                          this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/list',qs.stringify({parentId:res1.responseResult.parentId}),res2=>{},res2=>{
                                                            if(res2.statusCode==200){
                                                                 this.fjlm=res2.responseResult;
                                                      
@@ -546,7 +546,7 @@ import qs from 'qs';
             orgId: sessionStorage.getItem("orgId"),
             projectId: sessionStorage.getItem("curProjectId")
           }
-          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
+          this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingList", params, res => {
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.buildingName
@@ -568,7 +568,7 @@ import qs from 'qs';
         })
         this.unitList=[];
         this.roomsList=[];
-        this.$request.post("/apiHost/api/room/getBuildingRoom",{
+        this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           userId: sessionStorage.getItem("userId"),
@@ -627,7 +627,7 @@ import qs from 'qs';
             this.addForm.roomNum = item.num
           }
         })
-        this.$request.post("/apiHost/api/room/getRoomCustomer",{
+        this.$request.post("https://emaint.ahjarzeng.com/api/room/getRoomCustomer",{
           roomId
         }, res => {
           this.addForm.customerName=""
@@ -678,7 +678,7 @@ import qs from 'qs';
           if (valid) {
             var data={};
             type=='update'?data=this.updateForm:data=this.addForm;
-            this.$request.post("/apiHost/api/emaint/problem-base/save",data, res => {
+            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/save",data, res => {
               if (res.statusCode === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
@@ -734,7 +734,7 @@ import qs from 'qs';
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId")
         }
-        this.$request.post("/apiHost/api/processSetting/data",params, res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/processSetting/data",params, res => {
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -765,7 +765,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/start",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -794,7 +794,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           status:'1'
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
@@ -820,7 +820,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           status:'0'
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -855,7 +855,7 @@ import qs from 'qs';
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/sendFileBill/status",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/status",params,res=>{
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -892,7 +892,7 @@ import qs from 'qs';
         let params = {
           id
         }
-        this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -919,7 +919,7 @@ import qs from 'qs';
           loading: true,
           onOk: () => {
 
-            this.$request.post("/apiHost/api/emaint/problem-base/remove",qs.stringify({id}),res=>{
+            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/remove",qs.stringify({id}),res=>{
               this.$Message.success("删除成功")
              
             },res=>{
@@ -935,7 +935,7 @@ import qs from 'qs';
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/emaint/problem-base/list",this.formItem, res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/list",this.formItem, res => {
           if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -986,7 +986,7 @@ import qs from 'qs';
       },
        getlist(){
 //  查询一级问题
-     this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},data=>{
+     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList',{},data=>{
       
      },data=>{
         if(data.statusCode==200){
@@ -1001,7 +1001,7 @@ import qs from 'qs';
     },
     created(){
       this.getlist();
-      this.$request.post('/apiHost/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
+      this.$request.post('https://emaint.ahjarzeng.com/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
        if(res.statusCode==200)
          { 
            

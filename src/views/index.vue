@@ -101,6 +101,7 @@
   import axios from "axios"
   import breadcrumbNav from './../components/breadcrumb-nav.vue'
   import headImg from "./../assets/img/head.jpg"
+  import Bus from './../bus.js'
   export default{
     components: {
       breadcrumbNav,
@@ -172,22 +173,40 @@
             {
               "id": 5,
               "name": "工单管理",
-              "url": "/workOrder",
-            },
-            {
-              "id": 6,
-              "name": "运维设置",
-              "url": "/operationSetting",
+              "childList": [
+                {
+                "id": 6,
+                "name": "工单列表",
+                "url": "/workOrder",
+                },
+                {
+                  "id": 10,
+                  "name": "评价列表",
+                  "url": "evaluationList",
+                },
+              ]
             },
             {
               "id": 7,
               "name": "客户管理",
-              "url": "/customerManagement",
+              // "url": "/customerManagement",
+              "childList": [
+                {
+                "id": 6,
+                "name": "客户列表",
+                "url": "/customerManagement",
+                },
+                {
+                  "id": 11,
+                  "name": "登录历史",
+                  "url": "/loginHistory",
+                },
+              ]
             },
             {
-              "id": 8,
-              "name": "问题管理",
-              // "url": "/twoBooks",
+              "id": 6,
+              "name": "运维设置",
+              // "url": "/operationSetting",
               "childList": [
                 {
                 "id": 81,
@@ -199,22 +218,17 @@
                 "name": "常见问题",
                 "url": "/commonProblem",
                 },
+                {
+                  "id": 11,
+                  "name": "逾期设置",
+                  "url": "/operationSetting",
+                },
               ]
             },
             {
               "id": 9,
               "name": "数据报表",
               "url": "/dataReport",
-            },
-            {
-              "id": 10,
-              "name": "评价列表",
-              "url": "evaluationList",
-            },
-            {
-              "id": 11,
-              "name": "登录历史",
-              "url": "/loginHistory",
             },
             {
               "id": 12,
@@ -254,7 +268,7 @@
             //   newPassword2:this.formValidate.correctPwd
             // }
             
-            // this.$request.post('/apiHost/api/user/updatePassword',qs.stringify(param),res => {
+            // this.$request.post('https://emaint.ahjarzeng.com/api/user/updatePassword',qs.stringify(param),res => {
             //   if (res.statusCode == 200) {
             //       this.changeLoading()
             //       this.modal1 = false
@@ -289,7 +303,7 @@
                 "token": sessionStorage.token,
               },
               method: "post",
-              url: "/apiHost/api/user/updatePassword",
+              url: "https://emaint.ahjarzeng.com/api/user/updatePassword",
               data: param,
               crossDomain: true
             })
@@ -339,6 +353,7 @@
         this.shrink = !this.shrink
       },
       logout(){
+        Bus.$emit("webConnect",'close')
         sessionStorage.removeItem("token")
         sessionStorage.removeItem("userId")
         sessionStorage.removeItem("userName")
@@ -348,19 +363,19 @@
       },
       getCompany(){
         this.$request.post(
-          "/apiHost/api/repairMessage/userUnreadData",
+          "https://emaint.ahjarzeng.com/api/repairMessage/userUnreadData",
           {
             limit:10,
             page:1
           },
           res => {
             this.msg_badge=res.responseResult.total
-            console.log(111)
+            // console.log(111)
           },
           res => {
             // this.$Modal.error({ title: "提示信息", content: res.resMessage });
             this.msg_badge=res.responseResult.total
-            console.log(111)
+            // console.log(111)
           }
         );
       },
@@ -377,7 +392,7 @@
           orgId: this.company,
           userId: sessionStorage.getItem("userId")
         }
-        this.$request.post("/apiHost/api/user/setOrgAndProject", params, res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/setOrgAndProject", params, res => {
           if (res.code === 200) {
             // console.log(res.data)
             sessionStorage.setItem("orgId",this.company)

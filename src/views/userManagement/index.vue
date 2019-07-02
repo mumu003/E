@@ -292,7 +292,7 @@ import qs from "qs";
         },
         // 表格配置
         tableConfig:{
-            url:"/apiHost/api/user/data",
+            url:"https://emaint.ahjarzeng.com/api/user/data",
               columns:[
                 {
                   type:"selection",
@@ -414,7 +414,7 @@ import qs from "qs";
         })
         // console.log(delList)
         delList=delList.join(",")
-        this.$request.post("/apiHost/api/user/delete", qs.stringify({id:delList}), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/delete", qs.stringify({id:delList}), res => {
 	         this.$Modal.success("删除成功")
 	        }, res => {
             this.$refs.table.init()
@@ -427,7 +427,7 @@ import qs from "qs";
       // 删除单个用户
       delUser(){
         // delId
-          this.$request.post("/apiHost/api/user/delete", qs.stringify({id:this.delId}), res => {
+          this.$request.post("https://emaint.ahjarzeng.com/api/user/delete", qs.stringify({id:this.delId}), res => {
 	         this.$Modal.success("删除成功")
 	        }, res => {
             if(res.statusCode==200){
@@ -444,7 +444,7 @@ import qs from "qs";
       },
       //获取角色
       getRoleList(){
-      	  this.$request.post("/apiHost/api/emaint/role/list", '', res => {
+      	  this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/list", '', res => {
 	          this.roleList = res.responseResult.map(item => ({
 	            roleId: item.id,
 	            roleName: item.name
@@ -470,7 +470,7 @@ import qs from "qs";
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/apiHost/api/user/data",qs.stringify(this.formItem), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/data",qs.stringify(this.formItem), res => {
           if (res.statusCode === 200) {
             // this.$Message.success("搜索成功！")
             // this.isFirst = false
@@ -523,7 +523,7 @@ import qs from "qs";
               loginName:this.addForm.name
         }
         // qs
-        this.$request.post("/apiHost/api/user/save",this.addDataForm,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/save",this.addDataForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
               this.addMaterialModal = false
@@ -573,7 +573,7 @@ import qs from "qs";
               name:this.editMaterialForm.name
         }
         // qs
-        this.$request.post("/apiHost/api/user/save",editForm,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/save",editForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
               this.editMaterialModal = false
@@ -617,7 +617,7 @@ import qs from "qs";
           newPassword1:this.updatePwdForm.newPassword1,
           newPassword2:this.updatePwdForm.newPassword2,
         }
-        this.$request.post("/apiHost/api/user/adminUpdatePassword", qs.stringify(updatePwdParams), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/user/adminUpdatePassword", qs.stringify(updatePwdParams), res => {
 	          this.$refs.table.init()
             if(res.statusCode === 200){
               this.updatePwdForm.newPassword1 = ""

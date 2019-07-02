@@ -40,7 +40,7 @@ export default new Router({
           path: '/workOrder',
           name: 'workOrder',
           meta: {
-            title: '工单管理'
+            title: '工单列表'
           },
           component: resolve => require(['@/views/workOrder/index.vue'], resolve),
         },
@@ -73,7 +73,7 @@ export default new Router({
           path: '/customerManagement',
           name: 'customerManagement',
           meta: {
-            title: '客户管理'
+            title: '客户列表'
           },
           component: resolve => require(['@/views/customerManagement/index.vue'], resolve),
         },

@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <script>
+import Bus from './bus.js'
+import "./assets/css/login.css"; // 使用 CSS
 export default {
   name: 'App',
   
@@ -13,27 +15,39 @@ export default {
       ws:""
     }
   },
-  
   created(){
-    // 创建ws实例
-    if(window.WebSocket!=null){
-    this.ws=new WebSocket("wss://emaint.ahjarzeng.com/api/websocket/"+sessionStorage.getItem('userID'))
-
-    this.ws.onopen=this.onopen // 连接成功后执行的方法
-    this.ws.onerror=this.onerror // 连接出错后执行的方法
-    this.ws.onclose=this.onclose // 连接关闭后执行的方法
-    this.ws.onmessage=this.message      // 监听接收到的消息
+    if(sessionStorage.getItem('token')!=null){
+      this.webConnect()
     }
-    else{
-      console.log('浏览器不支持')
-    }
+    
+  },
+  beforeMount(){
+    Bus.$on('webConnect', (msg) => {
+      if(msg=='connect'){
+        this.webConnect()
+      }else if(msg=='close'){
+        this.ws.close()  
+      }
+    })
   },
   methods:{
+    webConnect(){
+        // 创建ws实例
+      if(window.WebSocket!=null){
+        this.ws=new WebSocket("wss://emaint.ahjarzeng.com/api/websocket/"+sessionStorage.getItem('userID'))
+
+        this.ws.onopen=this.onopen // 连接成功后执行的方法
+        this.ws.onerror=this.onerror // 连接出错后执行的方法
+        this.ws.onclose=this.onclose // 连接关闭后执行的方法
+        this.ws.onmessage=this.message      // 监听接收到的消息
+      }
+      else if(window.WebSocket==null){
+          console.log('您的浏览器不支持websocket')
+      }
+    },
     message(e){
       // e.data是收到的消息内容，会以json字符串的形式传过来
-      console.log(e)
-      alert(e.data)
-
+      console.log(e.data)
     },
     send(){
       this.ws.send("要发送的内容,要用字符串格式")
@@ -42,7 +56,8 @@ export default {
       console.log('websocket已连接')
     },
     onerror(){
-      console.log('websocket连接失败')
+      // console.log('websocket连接失败')
+      this.$Message.error("websocket连接失败")
     },
     onclose(){
       console.log('websocket已关闭')

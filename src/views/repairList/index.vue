@@ -149,7 +149,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/repairProblem/clientRepairProblemList",
+          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientRepairProblemList",
           columns:[
             {
                   title: '操作',
@@ -170,7 +170,7 @@ import qs from "qs";
                                     on: {
                                         click: () => {
                                             this.evaluatModal=true
-                                            this.$request.post("/apiHost/api/emaint/repair-estimate/view",{workOrderNo:params.row.workOrderNo}, res => {
+                                            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/repair-estimate/view",{workOrderNo:params.row.workOrderNo}, res => {
                                               this.$Modal.error({title: '提示信息', content: res.resMessage})
                                             }, res => {
                                               if (res.statusCode === 200) {
@@ -241,7 +241,7 @@ import qs from "qs";
     created(){//方法
       this.searchparam.clientId=this.$route.params.id;
    
-      this.$request.post('/apiHost/api/emaint/client/info',qs.stringify({id:this.$route.params.id}),res=>{},res=>{
+      this.$request.post('https://emaint.ahjarzeng.com/api/emaint/client/info',qs.stringify({id:this.$route.params.id}),res=>{},res=>{
         if(res.statusCode==200){
           this.formItem=res.responseResult;
           switch(res.responseResult.sex){
@@ -274,7 +274,7 @@ import qs from "qs";
       // //搜索
       // searchSubmit () {
       //   this.isFirst = true
-      //   this.$request.post("/apiHost/api/transfer/list",this.formItem, res => {
+      //   this.$request.post("https://emaint.ahjarzeng.com/api/transfer/list",this.formItem, res => {
       //     if (res.code === 200) {
       //       this.$Message.success("搜索成功！")
       //       this.isFirst = false

@@ -37,6 +37,7 @@
 import "../assets/css/login.css"; // 使用 CSS
 import axios from "axios";
 import qs from "qs";
+import Bus from './../bus.js'
 export default {
   data() {
     return {
@@ -71,8 +72,8 @@ export default {
           if (!window.sessionStorage) {
             alert("浏览器不支持sessionStorage");
           } else {
-            this.$request.post('/apiHost/api/user/a/login',qs.stringify(this.form),res => {
-              if (res.statusCode === 200) {
+            this.$request.post('https://emaint.ahjarzeng.com/api/user/a/login',qs.stringify(this.form),res => {
+              if (res.statusCode === 200) {  //这里是错误的请求
                 sessionStorage.setItem("token", res.responseResult.token)
                 sessionStorage.setItem("userID", res.responseResult.userID)
                 sessionStorage.setItem("loginName",res.responseResult.loginName)
@@ -85,6 +86,7 @@ export default {
               }
             },res=>{
               if (res.statusCode === 200) {
+                Bus.$emit("webConnect",'connect')
                 sessionStorage.setItem("token", res.responseResult.token)
                 sessionStorage.setItem("userID", res.responseResult.userID)
                 sessionStorage.setItem("loginName",res.responseResult.loginName)
