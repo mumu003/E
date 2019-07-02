@@ -197,6 +197,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
         delId:"",//删除用户id
@@ -234,15 +235,19 @@ import qs from "qs";
         ruleAddMaterial:{
           name: [
             { required: true, message: '用户名不能为空', trigger: 'blur' },
+            { type: 'string', max: 20, message: '用户名不能超过20个字符', trigger: 'blur' }
           ],
           phone: [
             { required: true, message: '手机号不能为空', trigger: 'blur' },
+            { type: 'string', max: 11,min:11, message: '请输入正确的手机格式', trigger: 'blur' }
           ],
           pwd:[
             { required: true, message: '密码不能为空', trigger: 'blur' },
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ],
           pwdTwo:[
             { required: true, message: '请再次输入密码', trigger: 'blur' },
+            { type: 'string', min:6,  max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ],
           roleId:[
             { required: true, message: '所属角色不能为空', trigger: 'blur' },
@@ -259,9 +264,11 @@ import qs from "qs";
         ruleEditMaterial:{
           name: [
             { required: true, message: '用户名不能为空', trigger: 'blur' },
+            { type: 'string', max: 20, message: '用户名不能超过20个字符', trigger: 'blur' }
           ],
           phone: [
             { required: true,  message: '手机号不能为空',trigger: 'blur' },
+            { type: 'string', max: 11,min:11, message: '请输入正确的手机格式', trigger: 'blur' }
           ],
           roleId: [
             { required: true,  message: '所属角色不能为空',trigger: 'blur' },
@@ -276,9 +283,11 @@ import qs from "qs";
         ruleupdatePwd:{
           newPassword1: [
             { required: true, message: '新密码不能为空', trigger: 'blur' },
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ],
           newPassword2: [
             { required: true, message: '请再次确认新密码',trigger: 'blur' },
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ]
         },
         // 表格配置
@@ -312,6 +321,8 @@ import qs from "qs";
                                 on: {
                                     click: () => {
                                           this.editMaterialModal=true
+                                          this.editMaterialForm.name=params.row.loginName
+                                          this.editMaterialForm.phone=params.row.phone
                                           this.editMaterialForm.id=params.row.id
                                     }
                                 }
@@ -383,6 +394,7 @@ import qs from "qs";
     },
     mounted(){
       this.getRoleList()//获取角色
+      console.log(this.auth)
     },
     methods:{
       // 批量删除弹出框处理

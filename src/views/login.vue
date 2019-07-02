@@ -77,6 +77,7 @@ export default {
                 sessionStorage.setItem("userID", res.responseResult.userID)
                 sessionStorage.setItem("loginName",res.responseResult.loginName)
                 sessionStorage.setItem("roleName",res.responseResult.name)
+                sessionStorage.setItem("auth",JSON.stringify(res.responseResult.auth))
                 this.$router.push("/")
                 this.$Message.success("登录成功！")
               } else {
@@ -88,6 +89,7 @@ export default {
                 sessionStorage.setItem("userID", res.responseResult.userID)
                 sessionStorage.setItem("loginName",res.responseResult.loginName)
                 sessionStorage.setItem("roleName",res.responseResult.name)
+                sessionStorage.setItem("auth",JSON.stringify(res.responseResult.auth))
                 this.$router.push("/")
                 this.$Message.success("登录成功！")
               } else {
