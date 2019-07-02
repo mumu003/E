@@ -326,7 +326,7 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "/apiHost/api/emaint/repairProblem/clientRepairProblemList",
+        url: "https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientRepairProblemList",
         columns: [
           // {
           //   type:"selection",
@@ -409,7 +409,7 @@ export default {
   beforeCreate() {
 
     this.$request.post(
-      "/apiHost/api/emaint/problem-base/treeList",
+      "https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList",
       {},
       res => {},
       res => {
@@ -419,7 +419,7 @@ export default {
       }
     );
     this.$request.post(
-      "/apiHost/api/user/searchUserProblemNum",
+      "https://emaint.ahjarzeng.com/api/user/searchUserProblemNum",
       qs.stringify({ limit: 1000, page: 1, keyword: "" }),
       res => {},
       res => {
@@ -473,7 +473,7 @@ export default {
       this.childList.forEach(v => {
         if (v.problem == this.formItem.problemType) {
           this.$request.post(
-            "/apiHost/api/emaint/problem-base/list",
+            "https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
             qs.stringify({ parentId: v.id }),
             res => {},
             res => {
@@ -502,7 +502,7 @@ export default {
     search() {
       if (this.formItem.phone.length == 11) {
       this.$request.post(
-        "/apiHost/api/emaint/client/phone",
+        "https://emaint.ahjarzeng.com/api/emaint/client/phone",
         qs.stringify({ phone: this.formItem.phone }),
         res => {},
         res => {
@@ -516,7 +516,7 @@ export default {
             this.formItem.priority = data.priority;
             this.formItem.sex = data.sex;
             this.formItem.clientId = data.id;
-            this.$request.post('/apiHost/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
+            this.$request.post('https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
              if(res.statusCode==200){
                this.officeLocations=res.responseResult
              }
@@ -563,7 +563,7 @@ export default {
       // 派单
       if (this.viewForm.id != "") {
         this.$request.post(
-          "/apiHost/api/emaint/repairProblem/updateUser",
+          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/updateUser",
           qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
           res => {},
           res => {
@@ -606,7 +606,7 @@ export default {
         if(this.formItem.phone!=""&&this.formItem.problemClass!=""){
           let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
           axios
-            .post("/apiHost/api/emaint/repairProblem/save", data, headers)
+            .post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/save", data, headers)
             .then(
                 (resdata)=> {
                 if (resdata.data.statusCode == 200) {
@@ -625,7 +625,7 @@ export default {
         }
         // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
         // axios
-        //   .post("/apiHost/api/emaint/repairProblem/save", data, headers)
+        //   .post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/save", data, headers)
         //   .then(
         //     function(data) {
         //       if (data.statusCode == 200) {
@@ -637,11 +637,11 @@ export default {
         //     }
         //   );
 
-        // this.$request.post('/apiHost/api/file/uploads',this.files,res=>{},res=>{
+        // this.$request.post('https://emaint.ahjarzeng.com/api/file/uploads',this.files,res=>{},res=>{
         //   console.log(res);
         // })
 
-        //     this.$request.post('/apiHost/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
+        //     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
         //     if(res.statusCode==200){
         //       this.$Message.success(res.resMessage)
         //     }
@@ -655,7 +655,7 @@ export default {
 
     getinfo() {
       this.$request.post(
-        "/apiHost/api/emaint/repairProblem/view",
+        "https://emaint.ahjarzeng.com/api/emaint/repairProblem/view",
         qs.stringify(this.viewForm),
         res => {
           this.$Modal.error("网络错误,请重试！");

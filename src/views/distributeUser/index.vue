@@ -171,8 +171,8 @@ export default {
         permissionId:idList,
         roleId:sessionStorage.roleId
       }
-      this.$request.post("/apiHost/api/emaint/role/configuration/permission?permissionId="+idList+"&roleId="+sessionStorage.roleId,{}, res => {
-      // this.$request.post("/apiHost/api/emaint/role/configuration/permission",params, res => {
+      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/configuration/permission?permissionId="+idList+"&roleId="+sessionStorage.roleId,{}, res => {
+      // this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/configuration/permission",params, res => {
         if(res.statusCode==200){
           this.$Message.success("分配成功")
           this.$router.push("/roleManagement")
@@ -191,7 +191,7 @@ export default {
     },
     // 获取角色权限
     getpermissionList(){
-      this.$request.post("/apiHost/api/emaint/permissions/list", {}, res => {
+      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/permissions/list", {}, res => {
         if(res.statusCode==200){
             this.tableData=res.responseResult
             this.tableData.map((item,index)=>{

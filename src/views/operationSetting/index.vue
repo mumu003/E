@@ -258,11 +258,11 @@ import qs from "qs";
       /*this.getIndex()*/
     },
     beforeCreate(){
-      this.$request.post('/apiHost/api/emaint/system-setting/data',{},res=>{},res=>{
+      this.$request.post('https://emaint.ahjarzeng.com/api/emaint/system-setting/data',{},res=>{},res=>{
         if(res.statusCode==200)
           this.formItem=res.responseResult;
       })
-      this.$request.post('/apiHost/api/emaint/role/list',{},res=>{},res=>{
+      this.$request.post('https://emaint.ahjarzeng.com/api/emaint/role/list',{},res=>{},res=>{
        if(res.statusCode==200)
        this.roleList=res.responseResult;
       })
@@ -271,7 +271,7 @@ import qs from "qs";
     methods: {
       // 获取初始数据
       getSetting() {
-        // this.$request.post("/apiHost/api/emaint/system-setting/data", res => {
+        // this.$request.post("https://emaint.ahjarzeng.com/api/emaint/system-setting/data", res => {
         //     this.$Modal.error({title: '提示信息', content:res.resMessage})
         // }, res => {
         //   if (res.statusCode == 200) {
@@ -295,7 +295,7 @@ import qs from "qs";
         })
         this.unitList=[];
         this.roomsList=[];
-        this.$request.post("/apiHost/api/room/getBuildingRoom",{
+        this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingRoom",{
           orgId:sessionStorage.orgId,
           projectId:sessionStorage.curProjectId,
           userId: sessionStorage.getItem("userId"),
@@ -365,7 +365,7 @@ import qs from "qs";
           let params = {
             roomId:this.addForm.roomId
           }
-          this.$request.post("/apiHost/api/room/getRoomInfo",params, res => {
+          this.$request.post("https://emaint.ahjarzeng.com/api/room/getRoomInfo",params, res => {
             this.addForm.customerName = res.data.customerName
             this.addForm.roomNum = res.data.rommNum
             this.addForm.addressNum = res.data.addressNum
@@ -399,7 +399,7 @@ import qs from "qs";
           if(this.addData.length !== 0){
             this.addForm.orgId = sessionStorage.getItem("orgId")
             this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("/apiHost/api/deliveryNotice/add",this.addForm, res => {
+            this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/add",this.addForm, res => {
               if (res.code === 200) {
                 setTimeout(() => {
                   this.addModal = false
@@ -444,7 +444,7 @@ import qs from "qs";
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/deliveryNotice/view",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/view",params,res=>{
           this.viewData=[]
           this.viewForm.buildingName = res.data.buildingName
           this.viewForm.unitName = res.data.unitName
@@ -478,7 +478,7 @@ import qs from "qs";
         let params = {
           id: this.viewForm.id
         }
-        this.$request.post("/apiHost/api/deliveryNotice/start",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/start",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -503,7 +503,7 @@ import qs from "qs";
           id,
           status:0
         }
-        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.reject_loading = false
@@ -529,7 +529,7 @@ import qs from "qs";
           id,
           status:1
         }
-        this.$request.post("/apiHost/api/deliveryNotice/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -569,7 +569,7 @@ import qs from "qs";
         let params = {
           id
         }
-        this.$request.post("/apiHost/api/deliveryNotice/cutOut",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -603,7 +603,7 @@ import qs from "qs";
             let params = {
               id
             }
-            this.$request.post("/apiHost/api/deliveryNotice/delete",params,res=>{
+            this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/delete",params,res=>{
               this.$Message.success("删除成功")
               this.$Modal.remove()
               this.$refs.table.init()
@@ -630,7 +630,7 @@ import qs from "qs";
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/deliveryNotice/status",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/deliveryNotice/status",params,res=>{
             this.nodesList = res.data.nodes.map(item => ({
               roleName: item.roleName,
               name: item.name,
@@ -674,7 +674,7 @@ import qs from "qs";
       //搜索提交
       settingSubmit () {
         // this.isFirst = true
-        this.$request.post("/apiHost/api/emaint/system-setting/save",this.formItem, res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/system-setting/save",this.formItem, res => {
             this.$Modal.error({title: '提示信息', content:res.responseResult})
         }, res => {
           if (res.statusCode == 200) {

@@ -91,7 +91,7 @@
         },
         //表格配置
         tableConfig:{
-          url:"/apiHost/api/user/loginRecordData",
+          url:"https://emaint.ahjarzeng.com/api/user/loginRecordData",
               columns:[
                 {
                   title: '登录渠道',

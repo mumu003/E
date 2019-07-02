@@ -343,7 +343,7 @@ import qs from 'qs';
      save(type){
      
         if(type=='add'){
-          this.$request.post('/apiHost/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
+          this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
             if(data.statusCode!=200)
             this.$Modal.error({title: '提示信息', content: data.responseResult})
             else{
@@ -353,7 +353,7 @@ import qs from 'qs';
           })
         }
         else{
-         this.$request.post('/apiHost/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
+         this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
            if(data.statusCode==200)
             this.$Message.success('修改成功')
             this.getlist()
@@ -377,7 +377,7 @@ import qs from 'qs';
         this.addmodel=false;
         this.updatemodel=true;
         this.controlmodal=false;
-        this.$request.post('/apiHost/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
+        this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
           if(res.statusCode==200){
             this.updatedata=res.responseResult;
           
@@ -385,7 +385,7 @@ import qs from 'qs';
         })
      },
      ok(){
-         this.$request.post('/apiHost/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
+         this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
                 if(data.statusCode==200)
                    this.$Message.success('删除成功')
                    this.getlist();
@@ -394,7 +394,7 @@ import qs from 'qs';
      },
       getlist(){
     //  查询一级问题
-     this.$request.post('/apiHost/api/emaint/problem-base/treeList',{},data=>{
+     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList',{},data=>{
         },data=>{
             if(data.statusCode==200){
             

@@ -136,7 +136,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/repairProblem/totalComapnyCountList",
+          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/totalComapnyCountList",
               columns:[
                 {
                   title: '操作',
@@ -212,11 +212,11 @@ import qs from "qs";
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("/apiHost/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
+        this.$request.get("https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
         },data=>{
         // 成功的回调
           if(data.statusCode==200){
-            console.log(111)
+            // console.log(111)
           }else{
               this.$Modal.error({title: '提示信息', content: data.responseResult})
           }

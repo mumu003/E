@@ -174,7 +174,7 @@ import qs from "qs";
         },
         // 表格配置
         tableConfig:{
-            url:"/apiHost/api/emaint/role/page",
+            url:"https://emaint.ahjarzeng.com/api/emaint/role/page",
             // unParam:true,
               columns:[
                 {
@@ -326,7 +326,7 @@ import qs from "qs";
         })
         // console.log(delList)
         delList=delList.join(",")
-        this.$request.post("/apiHost/api/emaint/role/remove", qs.stringify({id:delList}), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/remove", qs.stringify({id:delList}), res => {
 	         this.$Modal.success("删除成功")
 	        }, res => {
             this.$refs.table.init()
@@ -338,7 +338,7 @@ import qs from "qs";
       },
       // 删除单个角色
       deleteRole(){
-        this.$request.post("/apiHost/api/emaint/role/remove", qs.stringify({id:this.roleID}), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/remove", qs.stringify({id:this.roleID}), res => {
 	         this.$Modal.success("删除成功")
 	        }, res => {
             this.$refs.table.init()
@@ -359,7 +359,7 @@ import qs from "qs";
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/apiHost/api/emaint/role/page",qs.stringify(this.formItem), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/page",qs.stringify(this.formItem), res => {
           if (res.statusCode === 200) {
             // this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -398,7 +398,7 @@ import qs from "qs";
       },
       //角色新增
       addSubmit () {
-        this.$request.post("/apiHost/api/emaint/role/save",this.addDataForm,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/save",this.addDataForm,res=>{
           if (res.statusCode === 200) {
             // setTimeout(() => {
               this.addMaterialModal = false
@@ -433,7 +433,7 @@ import qs from "qs";
       },
       //角色修改
       editMaterialSubmit (){
-        this.$request.post("/apiHost/api/emaint/role/save",this.editMaterialForm,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/save",this.editMaterialForm,res=>{
           if (res.statusCode === 200) {
               this.modal_loading = false
               this.$Message.success("修改成功!")

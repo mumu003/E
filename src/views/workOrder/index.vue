@@ -235,7 +235,7 @@
         },
         //表格
         tableConfig:{
-          url:"/apiHost/api/emaint/repairProblem/repairProblemList",
+          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/repairProblemList",
           columns:[
             {
               type:"selection",
@@ -571,7 +571,7 @@
 
     },
     beforeCreate(){
-      this.$request.post('/apiHost/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
+      this.$request.post('https://emaint.ahjarzeng.com/api/user/searchUserProblemNum',qs.stringify({limit:1000,page:1,keyword:''}),res=>{},res=>{
           if(res.statusCode==200){
             this.userlist=res.responseResult.list;
           }
@@ -617,7 +617,7 @@
       bgzxr(){
         this.choosemodel=false;
         // console.log(this.userlist[this.userindex].id) 
-        this.$request.post('/apiHost/api/emaint/repairProblem/updateUser',qs.stringify({id:this.chooseindex,userId:this.userlist[this.userindex].id,changeDescription:''}),res=>{},res=>{
+        this.$request.post('https://emaint.ahjarzeng.com/api/emaint/repairProblem/updateUser',qs.stringify({id:this.chooseindex,userId:this.userlist[this.userindex].id,changeDescription:''}),res=>{},res=>{
           if(res.statusCode==200){
             this.$Message.success(res.resMessage)
             this.$refs.addForm.resetFields()
@@ -648,7 +648,7 @@
             orgId: sessionStorage.getItem("orgId"),
             projectId: sessionStorage.getItem("curProjectId")
           }
-          this.$request.post("/apiHost/api/room/getBuildingList", params, res => {
+          this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingList", params, res => {
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.name
@@ -670,7 +670,7 @@
         })
         this.unitList=[];
         this.roomsList=[];
-        this.$request.post("/apiHost/api/room/getBuildingRoom",{
+        this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           userId: sessionStorage.getItem("userId"),
@@ -729,7 +729,7 @@
             this.addForm. phone = item.num
           }
         })
-        this.$request.post("/apiHost/api/room/getRoomCustomer",{
+        this.$request.post("https://emaint.ahjarzeng.com/api/room/getRoomCustomer",{
           roomId
         }, res => {
           this.addForm.workOrderNo=""
@@ -764,7 +764,7 @@
           if (valid) {
             this.addForm.orgId = sessionStorage.getItem("orgId")
             this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("/apiHost/api/sendFileBill/add",this.addForm, res => {
+            this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/add",this.addForm, res => {
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
@@ -804,7 +804,7 @@
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId")
         }
-        this.$request.post("/apiHost/api/processSetting/data",params, res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/processSetting/data",params, res => {
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -831,7 +831,7 @@
       // 导出
       // PS：跨域问题
       exportProject(){
-          this.$request.get("/apiHost/api/emaint/repairProblem/exportRepairProblemData",{}, res => {
+          this.$request.get("https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData",{}, res => {
             this.$Modal.error('导出失败！')
         }, res => {
           if (res.code === 200) {
@@ -858,7 +858,7 @@
       //   let params = {
       //     id: this.selection[0].id
       //   }
-      //   this.$request.post("/apiHost/api/sendFileBill/view",params,res=>{
+      //   this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/view",params,res=>{
       //     this.viewForm.id = res.data.id
       //     this.viewForm.name = res.data.name
       //     this.viewForm.unitName = res.data.unitName
@@ -906,7 +906,7 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        this.$request.post("/apiHost/api/sendFileBill/start",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/start",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -935,7 +935,7 @@
           id: this.viewForm.id,
           state:'1'
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
@@ -961,7 +961,7 @@
           id: this.viewForm.id,
           state:'0'
         }
-        this.$request.post("/apiHost/api/sendFileBill/check",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.msgModal = false
@@ -996,7 +996,7 @@
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("/apiHost/api/sendFileBill/state",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/state",params,res=>{
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -1049,7 +1049,7 @@
       //       let params = {
       //         id
       //       }
-      //       this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+      //       this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/cutOut",params,res=>{
       //         this.$Message.success("终止成功")
       //         this.$Modal.remove()
       //         this.$refs.table.init()
@@ -1067,7 +1067,7 @@
         let params = {
           id
         }
-        this.$request.post("/apiHost/api/sendFileBill/cutOut",params,res=>{
+        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -1101,7 +1101,7 @@
             let params = {
               id
             }
-            this.$request.post("/apiHost/api/sendFileBill/delete",params,res=>{
+            this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/delete",params,res=>{
               this.$Message.success("删除成功")
               this.$Modal.remove()
               this.$refs.table.init()
@@ -1115,7 +1115,7 @@
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("/apiHost/api/emaint/repairProblem/repairProblemList",qs.stringify(this.formItem), res => {
+        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/repairProblemList",qs.stringify(this.formItem), res => {
             this.$Modal.error({title: '提示信息', content: res.resMessage})
         }, res => {
            if (res.statusCode === 200) {
@@ -1160,7 +1160,7 @@
         console.log(data)
           let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
           axios
-            .post("/apiHost/api/emaint/repairProblem/userAddRemark", data, headers)
+            .post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/userAddRemark", data, headers)
             .then(
                 (resdata)=> {
                  this.$Modal.success({title: '提示信息', content: resdata.data.responseResult})
@@ -1170,7 +1170,7 @@
               }
             )
         
-        // this.$request.post("/apiHost/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
+        // this.$request.post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
         //   if (res.code === 200) {
         //     this.$Message.success("搜索成功！")
         //     this.msgModal = false

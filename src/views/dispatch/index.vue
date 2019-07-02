@@ -312,7 +312,7 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "/apiHost/api/emaint/repairProblem/clientRepairProblemList",
+        url: "https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientRepairProblemList",
         columns: [
           // {
           //   type:"selection",
@@ -394,7 +394,7 @@ export default {
   },
   created() {
     this.$request.post(
-      "/apiHost/api/emaint/problem-base/treeList",
+      "https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList",
       {},
       res => {},
       res => {
@@ -404,7 +404,7 @@ export default {
       }
     );
     this.$request.post(
-      "/apiHost/api/user/searchUserProblemNum",
+      "https://emaint.ahjarzeng.com/api/user/searchUserProblemNum",
       qs.stringify({ limit: 1000, page: 1, keyword: "" }),
       res => {},
       res => {
@@ -457,7 +457,7 @@ export default {
     //   this.childList.forEach(v => {
     //     if (v.problem == this.formItem.problemType) {
     //       this.$request.post(
-    //         "/apiHost/api/emaint/problem-base/list",
+    //         "https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
     //         qs.stringify({ parentId: v.id }),
     //         res => {},
     //         res => {
@@ -469,7 +469,7 @@ export default {
     // },
     search() {
       this.$request.post(
-        "/apiHost/api/emaint/client/phone",
+        "https://emaint.ahjarzeng.com/api/emaint/client/phone",
         qs.stringify({ phone: this.formItem.phone }),
         res => {},
         res => {
@@ -500,7 +500,7 @@ export default {
     repairSubmit() {
       if (this.viewForm.id != "") {
         this.$request.post(
-          "/apiHost/api/emaint/repairProblem/singleUser",
+          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/singleUser",
           qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
           res => {},
           res => {
@@ -524,7 +524,7 @@ export default {
         this.formItem.participatorids = this.formItem.participatorids.toString();
         this.formItem.participators = this.formItem.participators.toString();
         this.$request.post(
-          "/apiHost/api/emaint/repairProblem/save",
+          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/save",
           qs.stringify(this.formItem),
           res => {},
           res => {
@@ -542,7 +542,7 @@ export default {
 
     getinfo() {
       this.$request.post(
-        "/apiHost/api/emaint/repairProblem/view",
+        "https://emaint.ahjarzeng.com/api/emaint/repairProblem/view",
         qs.stringify(this.viewForm),
         res => {
           this.$Modal.error("网络错误,请重试！");
