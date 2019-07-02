@@ -340,6 +340,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteAllModal=false
+            this.$refs.table.selection=[]
           },200)
       },
       // 删除单个角色
@@ -352,6 +353,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteModal=false
+            this.$refs.table.selection=[]
           },200)
       },
       //开始时间

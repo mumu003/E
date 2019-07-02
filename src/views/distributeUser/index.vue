@@ -226,7 +226,7 @@ export default {
         limit:10,
         roleId:sessionStorage.roleId
       }
-      this.$request.post("/apiHost/api/emaint/role/permissionPage", qs.stringify(RoleParam), res => {
+      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/permissionPage", qs.stringify(RoleParam), res => {
         if(res.statusCode==200){
           this.selectList=[]
           res.responseResult.list.map((item)=>{

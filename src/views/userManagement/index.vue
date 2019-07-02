@@ -394,11 +394,11 @@ import qs from "qs";
     },
     mounted(){
       this.getRoleList()//获取角色
-      console.log(this.auth)
     },
     methods:{
       // 批量删除弹出框处理
       delModal(){
+        console.log(this.selection)
         if(this.selection.length>0){
           this.deleteAllModal=true
         }else{
@@ -422,6 +422,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteAllModal=false
+            this.$refs.table.selection=[]
           },200)
       },
       // 删除单个用户
@@ -439,6 +440,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteModal=false
+            this.$refs.table.selection=[]
           },1000)
           
       },
