@@ -1,7 +1,7 @@
 <template>
     <div class="content">
       <Card class="rows">
-        <div class="col">
+        <div class="col" @click="goWork">
           <h1>{{waitingList_num}}</h1>
           <p>待派单</p>
         </div>
@@ -193,6 +193,9 @@ export default {
       console.log(page)
       this.currentPage = page
       this.getAgency(page)
+    },
+    goWork(){
+      this.$router.push("/workOrder")
     }
   },
   // watch:{

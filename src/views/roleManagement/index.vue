@@ -209,6 +209,8 @@ import qs from "qs";
                                           this.editMaterialModal=true
                                           this.editMaterialForm.code=params.row.code,
                                           this.editMaterialForm.id=params.row.id
+                                          this.editMaterialForm.name=params.row.name,
+                                          this.editMaterialForm.explain=params.row.explain
                                     }
                                 }
                             },"修改"),
@@ -276,6 +278,10 @@ import qs from "qs";
         ruleAddMaterial:{
           name: [
             { required: true, message: '角色名称不能为空', trigger: 'blur' },
+            { type: 'string', max: 20, message: '角色名称不能超过20个字符', trigger: 'blur' }
+          ],
+          explain:[
+            { type: 'string', max: 20, message: '角色说明不能超过20个字符', trigger: 'blur' }
           ],
           code: [
             { required: true, message: '角色编码不能为空', trigger: 'blur' },
@@ -334,6 +340,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteAllModal=false
+            this.$refs.table.selection=[]
           },200)
       },
       // 删除单个角色
@@ -346,6 +353,7 @@ import qs from "qs";
           })
           setTimeout(()=>{
             this.deleteModal=false
+            this.$refs.table.selection=[]
           },200)
       },
       //开始时间

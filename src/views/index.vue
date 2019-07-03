@@ -143,13 +143,16 @@
         },
         ruleValidate: {
           oldPwd: [
-            {required: true, message: '原密码不能为空', trigger: 'blur'}
+            {required: true, message: '原密码不能为空', trigger: 'blur'},
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ],
           newPwd: [
-            {required: true, message: '新密码不能为空', trigger: 'blur'}
+            {required: true, message: '新密码不能为空', trigger: 'blur'},
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' }
           ],
           correctPwd: [
             {required: true, message: '确认密码不能为空', trigger: 'blur'},
+            { type: 'string', min:6, max: 20, message: '密码为6-20个字符', trigger: 'blur' },
             {validator: checkPaswword, trigger: 'blur'}
           ]
         }

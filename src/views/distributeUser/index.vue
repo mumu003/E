@@ -46,7 +46,7 @@
               <Row v-for="(item,index) in tableData" :key="index" :class="{tableItem:true,bottom:index==tableData.length-1}" >
                 <div class="tableCol" ref="tableCol" @click="clickItem" :class="{active:selectList.indexOf(item.id) != -1 ? true : false}">
                   <Col span="4">
-                    <Checkbox  @on-change="checkItemAll(item.id)"  :value="selectList.indexOf(item.id) != -1 ? true : false" ></Checkbox>
+                    <Checkbox  @on-change="checkItemAll(item.id,item.childs)"  :value="selectList.indexOf(item.id) != -1 ? true : false" ></Checkbox>
                   </Col>
                   <Col span="16"  >
                   <div @click="openList(item,index)" class="tableName">
@@ -138,15 +138,26 @@ export default {
 
     },
     // 单选
-    checkItemAll(id){
-        console.log(id)
-        if(this.selectList.indexOf(id)==-1){
+    checkItemAll(id,item){
+        if(!item){
+          if(this.selectList.indexOf(id)==-1){
             this.selectList.push(id)
+          }else{
+              this.selectList.splice(this.selectList.indexOf(id),1)
+          }
         }else{
-            this.selectList.splice(this.selectList.indexOf(id),1)
-        }
-        // console.log(this.selectList)
-        
+          if(this.selectList.indexOf(id)==-1){
+            this.selectList.push(id)
+            item.map((v)=>{
+              this.selectList.push(v.id)
+            })
+          }else{
+              this.selectList.splice(this.selectList.indexOf(id),1)
+              item.map((v)=>{
+                this.selectList.splice(this.selectList.indexOf(v.id),1)
+              })
+          }
+        }        
     },
     // 打开二级列表
     openList(item,index){
@@ -207,10 +218,36 @@ export default {
         }
         
       })
+    },
+    //获取本角色权限
+    getRolepermission(){
+      let RoleParam={
+        page:1,
+        limit:10,
+        roleId:sessionStorage.roleId
+      }
+      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/permissionPage", qs.stringify(RoleParam), res => {
+        if(res.statusCode==200){
+          this.selectList=[]
+          res.responseResult.list.map((item)=>{
+              this.selectList.push(item.id)
+          })
+        }
+      }, res => {
+        if(res.statusCode==200){
+          this.selectList=[]
+          res.responseResult.list.map((item)=>{
+              this.selectList.push(item.id)
+          })
+          console.log(this.selectList)
+        }
+        
+      })
     }
   },
   mounted(){
     this.getpermissionList()
+    this.getRolepermission()
   },
   watch:{
     tableData(){
