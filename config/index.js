@@ -11,16 +11,16 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/apiHost': {
-         // target: 'http://rap2api.taobao.org/app/mock/20325',
-        //target: 'http://128.21.2.4:8080',
-        // target: 'http://128.9.4.121:8063',
-        target: 'https://emaint.ahjarzeng.com',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/apiHost': ''
-        }
-      },
+      // '/apiHost': {
+      //    // target: 'http://rap2api.taobao.org/app/mock/20325',
+      //   //target: 'http://128.21.2.4:8080',
+      //   // target: 'http://128.9.4.121:8063',
+      //   target: 'https://emaint.ahjarzeng.com',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/apiHost': ''
+      //   }
+      // },
     },
 
     // Various Dev Server settings
