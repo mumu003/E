@@ -222,7 +222,7 @@
                 "token": sessionStorage.token,
               },
               method: "post",
-              url: "https://emaint.ahjarzeng.com/api/user/changePassword",
+              url: "/api/user/changePassword",
               data: param,
               crossDomain: true
             })

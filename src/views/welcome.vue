@@ -156,7 +156,7 @@ export default {
         window.location.reload();
       } else {
         this.$request.post(
-          "https://emaint.ahjarzeng.com/api/repairMessage/userUnreadData",
+          "/api/repairMessage/userUnreadData",
           qs.stringify(param),
           res => {
             this.msg_list=res.responseResult.list
@@ -178,7 +178,7 @@ export default {
     },
     getCount(){
       this.$request.post(
-          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/totalUserTaskCount",
+          "/api/emaint/repairProblem/totalUserTaskCount",
           {},
           res => {
             
@@ -201,7 +201,7 @@ export default {
   // watch:{
   //   currentPage(){
   //      this.$request.post(
-  //         "https://emaint.ahjarzeng.com/api/repairMessage/userUnreadData",
+  //         "/api/repairMessage/userUnreadData",
   //         {
   //           limit:10,
   //           page:this.currentPage

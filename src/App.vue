@@ -16,6 +16,7 @@ export default {
     }
   },
   created(){
+    
     if(sessionStorage.getItem('token')!=null){
       this.webConnect()
     }
@@ -48,6 +49,23 @@ export default {
     message(e){
       // e.data是收到的消息内容，会以json字符串的形式传过来
       console.log(e.data)
+      // 收到消息后弹窗
+      // if(e.data!='连接成功'){
+      this.$Modal.info({
+      title:'来电通知',
+      content:'<h1>'+e.data+'</h1>',
+      okText:'去新增工单',
+      closable:true,
+      onOk:()=>{
+       this.$router.push({
+        name: "workOrderManage",
+        params:{
+          phone:e.data
+        }
+      });
+      }
+    }) 
+    // }
     },
     send(){
       this.ws.send("要发送的内容,要用字符串格式")

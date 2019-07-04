@@ -4,7 +4,7 @@
       <Tag type="dot" v-if="isCurrent('/')" color="blue" name="首页" @click.native="routeTo('/')">首页</Tag>
       <Tag type="dot" v-else name="首页" @click.native="routeTo('/')">首页</Tag>
 
-      <div :to="item.link" v-for="(item,index) in items" :key="index">
+      <div :to="item.link" v-for="(item,index) in items" :id="item.link" :key="index">
         <Tag type="dot" v-if="isCurrent(item.link)" color="blue" :name="item.title" closable
              @click.native="routeTo(item.link)"
              @on-close="removeItem">{{item.title}}
@@ -104,6 +104,7 @@
         // }
       },
       removeItem(event, name){
+       
         if (this.initItems.length == 1) {
           for (let value of (document.querySelectorAll('.ivu-menu-item'))) {
             if (value.classList.contains('ivu-menu-item-active')) {
@@ -133,6 +134,7 @@
           if (index == 0) {
             this.$router.push('/')
           } else {
+            
             document.getElementById(this.initItems[index - 1].link.split("?")[0]).classList.add("ivu-menu-item-selected")
             document.getElementById(this.initItems[index - 1].link.split("?")[0]).classList.add("ivu-menu-item-active")
             this.$router.push(this.initItems[index - 1].link)

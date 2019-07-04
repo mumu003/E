@@ -11,19 +11,20 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
             <Row type="flex" justify="start">
-              <Col span="6">
+              <Col span="7">
               <FormItem label="手机号" prop="phone">
                 <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入手机号"></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="办公位">
+              <Col span="7">
+              <FormItem label="办公位" :label-width="100">
                 <AutoComplete
-        v-model="formItem.officeLocation"
-        :data="newarr"
-        @on-search="handleSearch1"
-        placeholder="请输入办公位"
-        ></AutoComplete>
+                  v-model="formItem.officeLocation"
+                  :data="newarr"
+                  @on-search="handleSearch1"
+                  placeholder="请输入办公位"
+                  >
+                </AutoComplete>
               </FormItem>
               </Col>
               <Col span="4">
@@ -31,26 +32,54 @@
               </Col>
               </Row>
 
+
+              <!-- 联系人号码 -->
+              <Row type="flex" justify="start">
+              <Col span="7">
+                <FormItem label="联系人手机号" :label-width="100" prop="contactPhone">
+                  <AutoComplete
+                    v-model="formItem.contactPhone"
+                    :data="newarr2"
+                    @on-search="handleSearch2"
+                    placeholder="请输入联系人手机号"
+                    >
+                    </AutoComplete>
+                </FormItem>
+              </Col>
+              <Col span="7">
+                <FormItem label="是否代为报修" :label-width="100" >
+                   <RadioGroup v-model="formItem.replacementRepair">
+                    <Radio label="1">
+                        <span>是</span>
+                    </Radio>
+                    <Radio label="0">
+                      <span>否</span>
+                    </Radio>  
+                  </RadioGroup>
+                </FormItem>
+              </Col>
+              </Row>
+
               <Row>
-              <Col span="6">
+              <Col span="7">
               <FormItem label="姓名">
                     <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="公司">
+              <Col span="7">
+              <FormItem label="公司" :label-width="100">
                     <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
               <Row>
-              <Col span="6">
+              <Col span="7">
               <FormItem label="优先级">
                     <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="性别">
+              <Col span="7">
+              <FormItem label="性别" :label-width="100">
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
@@ -90,7 +119,7 @@
                 </FormItem>
               </Col>
 
-              <Col span="6">
+              <Col span="7">
                 <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
@@ -114,11 +143,11 @@
               <Row>
                 <Col span="8">
                 <FormItem label="常见问题">
-                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" :style="{'pointer-events':viewForm.id!=''?'none':'all'}"  disabled>暂无</Button>
-                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" :style="{'pointer-events':viewForm.id!=''?'none':'all'}" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
+                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
+                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
                 </FormItem>
                 </Col>
-                <Col span="6">
+                <Col span="7">
                 <FormItem label="备注">
                     <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" placeholder="300字以内"></Input>
                 </FormItem>
@@ -135,24 +164,25 @@
       <Col span="24">
       <Card class="search-card">
         <p slot="title">
-        信息
+        派单信息
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="8" v-if="viewForm.id!=''">
-                <FormItem label="执行人" prop="executor">
+              <!-- v-if="viewForm.id!=''" -->
+              <Col span="7" >
+                <FormItem label="执行人">
                     <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
               </Col>
              </Row>
              <Row>
-              <Col span="8">
+              <Col span="7">
               <!--表单验证 prop='participatorids' -->
                 <FormItem label="参与者"  >
-                  <!-- :disabled="viewForm.id!=''?true:false" -->
                     <Select v-model="formItem.participatorids" multiple  style="width:100%;">
+                  <!-- :disabled="viewForm.id!=''?true:false" -->
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index" >
                           <span>{{item.name}}</span>
                           <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
@@ -180,27 +210,23 @@
 
  <Modal v-model="choosemodel" title="执行人选择" width="500"
       @on-cancel="choosemodel=false">
-        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
-        <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
-           
+    <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
+        <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index"> 
             <span style="margin-left:15px;">{{item.name}}</span>
             <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
         </Radio>
-        
     </RadioGroup>
       <div slot="footer" style="text-align: right;">
-      
         <Button type="primary" size="default" @click="formItem.userName=userlist[userindex].name;formItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-
 
     <!-- 历史报修数据 -->
     <Modal v-model="RepairList_show" width="800"
       title="历史报修数据"
       >
 
-      <m-table :config="tableConfig" :searchParams="RepairForm"  ref="table"  :isFirst="isFirst"></m-table>    
+      <m-table  :config="tableConfig" :searchParams="RepairForm"  ref="table"  :isFirst="isFirst"></m-table>    
       <div slot="footer" style="text-align:right;">
         <Row>
           <Col span="24" v-if="this.viewTabs === 'remark'">
@@ -220,6 +246,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      table_show:false,
       choosemodel: false,
       choosemodel1: false,
       participatorids: [],
@@ -259,13 +286,16 @@ export default {
       upindex: "",
       files: [],
       newarr:[],
+      newarr2:[],
       officeLocations:[],
+      contactPhones:[],
       showimg: "",
       //表单
       formItem: {
         clientId: "",
         phone: "",
         officeLocation: "",
+        contactPhone:"",
         name: "",
         companyName: "",
         priority: "",
@@ -277,7 +307,10 @@ export default {
 
         problem: "暂无数据",
         problemImgs: "",
-        participators: []
+        participators: [],
+        userId:'',
+        userName:"",
+        replacementRepair:""
       },
       treeList: [],
       // 设置表单验证
@@ -297,6 +330,24 @@ export default {
             }
           }
         ],
+         contactPhone: [
+          {
+            required: true,
+            message: "请输入正确的手机号",
+            trigger: "blur",
+            transform(value) {
+              var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              if (!reg.test(value)) {
+                return false;
+              } else {
+                return value;
+              }
+            }
+          }
+        ],
+        // replacementRepair:[
+        //    { required: true,  }
+        // ],
         one_type: [
           { required: true, message: "该选项不能为空", trigger: "blur" }
         ],
@@ -326,13 +377,8 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientRepairProblemList",
+        url: "/api/emaint/repairProblem/clientRepairProblemList",
         columns: [
-          // {
-          //   type:"selection",
-          //   key:'_checked',
-          //   width:60
-          // },
           {
             title: "工单号码 ",
             key: "workOrderNo",
@@ -409,7 +455,7 @@ export default {
   beforeCreate() {
 
     this.$request.post(
-      "https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList",
+      "/api/emaint/problem-base/treeList",
       {},
       res => {},
       res => {
@@ -419,7 +465,7 @@ export default {
       }
     );
     this.$request.post(
-      "https://emaint.ahjarzeng.com/api/user/searchUserProblemNum",
+      "/api/user/searchUserProblemNum",
       qs.stringify({ limit: 1000, page: 1, keyword: "" }),
       res => {},
       res => {
@@ -441,14 +487,20 @@ export default {
     // 办公位自动检索
     handleSearch1(value){
       this.newarr=[];
-
       this.officeLocations.forEach((v)=>{
           if(v.indexOf(value)!=-1){
             this.newarr.push(v)
           }
       })
-      
-      
+    },
+    // 联系人号码自动检索
+    handleSearch2(value){
+      this.newarr2=[];
+      this.contactPhones.forEach((v)=>{
+          if(v.indexOf(value)!=-1){
+            this.newarr2.push(v)
+          }
+      })
     },
     changefile(e) {
       var file = e.target.files[0];
@@ -473,7 +525,7 @@ export default {
       this.childList.forEach(v => {
         if (v.problem == this.formItem.problemType) {
           this.$request.post(
-            "https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
+            "/api/emaint/problem-base/list",
             qs.stringify({ parentId: v.id }),
             res => {},
             res => {
@@ -502,7 +554,7 @@ export default {
     search() {
       if (this.formItem.phone.length == 11) {
       this.$request.post(
-        "https://emaint.ahjarzeng.com/api/emaint/client/phone",
+        "/api/emaint/client/phone",
         qs.stringify({ phone: this.formItem.phone }),
         res => {},
         res => {
@@ -510,15 +562,23 @@ export default {
             this.$Message.success("查询成功!");
             var data = res.responseResult;
             this.formItem.phone = data.phone;
-            // this.formItem.officeLocation = data.officeLocation;
+            this.formItem.contactPhone=data.contactPhone
+            this.formItem.officeLocation = data.officeLocation;
             this.formItem.name = data.name;
             this.formItem.companyName = data.companyName;
             this.formItem.priority = data.priority;
             this.formItem.sex = data.sex;
             this.formItem.clientId = data.id;
-            this.$request.post('https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
+            // 获取办公位记录
+            this.$request.post('/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
              if(res.statusCode==200){
                this.officeLocations=res.responseResult
+             }
+            })
+            // 获取联系人手机号
+            this.$request.post('/api/emaint/repairProblem/clientPhone',qs.stringify({clientId:data.id}),res=>{},res=>{
+             if(res.statusCode==200){
+               this.contactPhones=res.responseResult
              }
             })
 
@@ -543,10 +603,9 @@ export default {
                  (this.formItem.sex = "女");break;
               default : break;
             }
-            
           } else {
               setTimeout(() => {
-                this.$Message.error("查询失败");
+                this.$Message.error("客户信息不存在");
                 this.formItem.name=""
                 this.formItem.companyName=""
                 this.formItem.priority=""
@@ -560,10 +619,11 @@ export default {
     },
     // 报修提交
     repairSubmit() {
+      
       // 派单
       if (this.viewForm.id != "") {
         this.$request.post(
-          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/updateUser",
+          "/api/emaint/repairProblem/updateUser",
           qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
           res => {},
           res => {
@@ -584,29 +644,33 @@ export default {
         var newarr=[]
         this.userlist.forEach(v=>{
           if(this.formItem.participatorids.indexOf(v.id) != -1){
-            
               newarr.push(v.name)
           }
         })
         this.formItem.participatorids = this.formItem.participatorids.toString();
         this.formItem.participators =newarr.toString();
 
+        if(this.formItem.replacementRepair!=""){
+          this.formItem.replacementRepair=parseInt(this.formItem.replacementRepair)
+        }
+        
+
         //  把this.formItem转为FormData数据用来传递文件
         var data = new FormData(); //重点在这里 如果使用 var data = {}; data.inputfile=... 这样的方式不能正常上传
+        this.formItem.userId==""?delete this.formItem.userId:'';
 
         // formData添加formItem的键值对
         for (var i in this.formItem) {
           data.append(i, this.formItem[i]);
         }
-
         for (var i = 0; i < this.files.length; i++) {
           data.append("problemImgs", this.files[i]);
         }
 
-        if(this.formItem.phone!=""&&this.formItem.problemClass!=""){
-          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
-          axios
-            .post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/save", data, headers)
+        if(this.formItem.phone!=""&&this.formItem.problemClass!="" && this.formItem.problemType!=""){
+          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头 
+         axios
+            .post("/api/emaint/repairProblem/save", data, headers)
             .then(
                 (resdata)=> {
                 if (resdata.data.statusCode == 200) {
@@ -625,7 +689,7 @@ export default {
         }
         // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
         // axios
-        //   .post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/save", data, headers)
+        //   .post("/api/emaint/repairProblem/save", data, headers)
         //   .then(
         //     function(data) {
         //       if (data.statusCode == 200) {
@@ -637,11 +701,11 @@ export default {
         //     }
         //   );
 
-        // this.$request.post('https://emaint.ahjarzeng.com/api/file/uploads',this.files,res=>{},res=>{
+        // this.$request.post('/api/file/uploads',this.files,res=>{},res=>{
         //   console.log(res);
         // })
 
-        //     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
+        //     this.$request.post('/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
         //     if(res.statusCode==200){
         //       this.$Message.success(res.resMessage)
         //     }
@@ -653,54 +717,56 @@ export default {
       window.history.go(-1);
     },
 
-    getinfo() {
-      this.$request.post(
-        "https://emaint.ahjarzeng.com/api/emaint/repairProblem/view",
-        qs.stringify(this.viewForm),
-        res => {
-          this.$Modal.error("网络错误,请重试！");
-        },
-        res => {
-          if (res.statusCode === 200) {
-            this.$Message.success("查询成功！");
+    // getinfo() {
+    //   console.log(123)
+    //   this.$request.post(
+    //     "/api/emaint/repairProblem/view",
+    //     qs.stringify(this.viewForm),
+    //     res => {
+    //       this.$Modal.error("网络错误,请重试！");
+    //     },
+    //     res => {
+    //       if (res.statusCode === 200) {
+    //         this.$Message.success("查询成功！");
 
-            var data = res.responseResult;
+    //         var data = res.responseResult;
+    //         this.formItem = data;
+            
+    //         (this.formItem = {
+    //           clientId: data.clientId,
+    //           phone: data.phone,
+    //           contactPhone:data.contactPhone,
+    //           officeLocation: data.officeLocation,
+    //           name: data.name,
+    //           companyName: data.companyName,
+    //           priority: data.priority,
+    //           sex: data.sex,
+    //           problemClass: data.problemClass,
+    //           problemType: data.problemType,
+    //           remark: data.remark,
+    //           participatorids: data.participatorids,
+    //           userName: "",
+    //           userId: "",
+    //           problem: data.problem,
+    //           problemImgs: data.problemImgs,
+    //           participators: data.participators,
+    //           id: data.id
+    //         }),
+    //           this.findchildren();
 
-            this.formItem = data;
-            (this.formItem = {
-              clientId: data.clientId,
-              phone: data.phone,
-              officeLocation: data.officeLocation,
-              name: data.name,
-              companyName: data.companyName,
-              priority: data.priority,
-              sex: data.sex,
-              problemClass: data.problemClass,
-              problemType: data.problemType,
-              remark: data.remark,
-              participatorids: data.participatorids,
-              userName: "",
-              userId: "",
-              problem: data.problem,
-              problemImgs: data.problemImgs,
-              participators: data.participators,
-              id: data.id
-            }),
-              this.findchildren();
-
-            this.question_ary = this.formItem.problem.split(",");
-            var arry = this.formItem.participatorids.split("");
-            this.formItem.participatorids = [];
-            arry.forEach(v => {
-              this.formItem.participatorids.push(v * 1);
-            });
-            // console.log(this.formItem.participatorids);
-          } else {
-            this.$Modal.error("网络错误,请重试！");
-          }
-        }
-      );
-    },
+    //         this.question_ary = this.formItem.problem.split(",");
+    //         var arry = this.formItem.participatorids.split("");
+    //         this.formItem.participatorids = [];
+    //         arry.forEach(v => {
+    //           this.formItem.participatorids.push(v * 1);
+    //         });
+    //         // console.log(this.formItem.participatorids);
+    //       } else {
+    //         this.$Modal.error("网络错误,请重试！");
+    //       }
+    //     }
+    //   );
+    // },
     // 选择文件
     uploadfile(index) {
       document.querySelector("#upfile").click();
@@ -711,6 +777,17 @@ export default {
       this.showimg = index;
       this.visible = true;
     },
+    // 历史报修数据
+    clientRepairList() {
+      // console.log(this.RepairForm.clientId);
+      if (this.RepairForm.clientId == null) {
+        this.$Message.error("请先输入手机号!");
+      }else{
+        this.RepairList_show = true;
+        this.$refs.table.init();
+      }
+    },
+   
     // 选择常见问题
     choose_question(item, index) {
       if (this.question_ary.indexOf(item.problem) == -1) {
@@ -719,15 +796,7 @@ export default {
         this.question_ary.splice(this.question_ary.indexOf(item.problem), 1);
       }
     },
-    // 历史报修数据
-    clientRepairList() {
-      this.RepairList_show = true;
-      // console.log(this.RepairForm.clientId);
-      if (this.RepairForm.clientId == "") {
-        this.$Modal.error("请先输入手机号!");
-      }
-      this.$refs.table.init();
-    }
+    
   }
 };
 </script>

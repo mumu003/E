@@ -268,7 +268,7 @@
             //   newPassword2:this.formValidate.correctPwd
             // }
             
-            // this.$request.post('https://emaint.ahjarzeng.com/api/user/updatePassword',qs.stringify(param),res => {
+            // this.$request.post('/api/user/updatePassword',qs.stringify(param),res => {
             //   if (res.statusCode == 200) {
             //       this.changeLoading()
             //       this.modal1 = false
@@ -303,7 +303,7 @@
                 "token": sessionStorage.token,
               },
               method: "post",
-              url: "https://emaint.ahjarzeng.com/api/user/updatePassword",
+              url: "/api/user/updatePassword",
               data: param,
               crossDomain: true
             })
@@ -363,7 +363,7 @@
       },
       getCompany(){
         this.$request.post(
-          "https://emaint.ahjarzeng.com/api/repairMessage/userUnreadData",
+          "/api/repairMessage/userUnreadData",
           {
             limit:10,
             page:1
@@ -392,7 +392,7 @@
           orgId: this.company,
           userId: sessionStorage.getItem("userId")
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/user/setOrgAndProject", params, res => {
+        this.$request.post("/api/user/setOrgAndProject", params, res => {
           if (res.code === 200) {
             // console.log(res.data)
             sessionStorage.setItem("orgId",this.company)

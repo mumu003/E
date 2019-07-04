@@ -123,7 +123,7 @@
         },
         //表格配置
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/repair-estimate/page",
+          url:"/api/emaint/repair-estimate/page",
               columns:[
                 {
                   title: '操作',

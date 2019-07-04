@@ -146,7 +146,7 @@ export default {
     },
     pageChange (page) {
       this.currentPage = page
-      console.log(this.currentPage)
+      // console.log(this.currentPage)
       this.init()
     },
     
@@ -154,7 +154,9 @@ export default {
   watch:{
     　searchParams: {  
 　　　　handler(newValue, oldValue) {  
-　　　　　　this.init();
+          if(oldValue.watch){
+            this.init();
+          }
 　　　　},  
 　　　　deep: true  
 　　}  
