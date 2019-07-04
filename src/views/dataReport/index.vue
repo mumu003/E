@@ -12,14 +12,14 @@
               <Row>
                <Col span="6">
                   <FormItem label="时间">
-                    <DatePicker type="date" placeholder="请选择日期"  v-model="searchTime" class="widthp100"></DatePicker>
+                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginDate" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
-                <!-- <Col span="6">
-                  <FormItem>
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endUpdateTime" class="widthp100"></DatePicker>
+                <Col span="6">
+                  <FormItem >
+                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
                   </FormItem>
-                </Col> -->
+                </Col>
               </Row>
             </Form>
           <div class="search-row">
@@ -126,13 +126,18 @@ import qs from "qs";
   export default {
     data () {
       return {
-        searchTime:"",//搜索时间
         isFirst: false, //首页.
         loading: true, //加载
         //表单
         formItem: {
-          year:new Date().getFullYear(),
-          month:new Date().getMonth()+1,
+          beginDate:"",
+          endDate:"",
+        },
+        // 设置结束时间大于开始时间
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.beginDate)
+            }).bind(this)
         },
         //表格
         tableConfig:{
@@ -151,7 +156,9 @@ import qs from "qs";
                           on: {
                               click: () => {
                                 sessionStorage.setItem("companyName",params.row.companyName)
-                                    this.$router.push({name:"reportDetail",params:{companyName:params.row.companyName}})
+                                sessionStorage.setItem("beginDate",this.formItem.beginDate)
+                                sessionStorage.setItem("endDate",this.formItem.endDate)
+                                this.$router.push({name:"reportDetail",params:{companyName:params.row.companyName}})
                               }
                           }
                         },"详情")
@@ -209,14 +216,28 @@ import qs from "qs";
         }
       }
     },
+    mounted(){
+      let today=new Date();
+      let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
+      let M=Number(WeekFirstDay.getMonth())+1;    
+      this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+WeekFirstDay.getDate();
+      // this.formItem.beginDate=WeekFirstDay
+      console.log(this.formItem.beginDate)
+      // this.formItem.beginDate=new String(this.formItem.beginDate)
+      let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
+      let N=Number(WeekLastDay.getMonth())+1     
+      this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+WeekLastDay.getDate();
+      // this.formItem.endDate=new String(this.formItem.endDate)
+      // this.formItem.endDate=WeekLastDay
+    },
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
+        this.$request.get("https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+this.formItem.beginDate+"&endDate="+this.formItem.endDate+"&accessToken="+sessionStorage.token, data => {
         },data=>{
         // 成功的回调
           if(data.statusCode==200){
-            // console.log(111)
+            console.log("sdnstsmr")
           }else{
               this.$Modal.error({title: '提示信息', content: data.responseResult})
           }
@@ -226,21 +247,25 @@ import qs from "qs";
       //搜索
       searchSubmit () {
         this.isFirst = true
-        let year=new Date(this.searchTime).getFullYear();
-        let month=new Date(this.searchTime).getMonth()+1;
-        console.log(year+""+month)
-        this.formItem.year=year
-        this.formItem.month=month
         this.$refs.table.init()
       },
       //重置
       searchCancel(){
-        this.searchTime=""
+        this.formItem.beginDate=""
+        this.formItem.endDate=""
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()
           this.isFirst = false
         },200)
+      },
+       // 开始时间
+      getStartDate(startDate){
+        this.formItem.beginDate=startDate
+      },
+      // 结束时间
+      getEndDate(endDate){
+        this.formItem.endDate=endDate
       }
     }
   }
