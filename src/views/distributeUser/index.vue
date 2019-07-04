@@ -223,7 +223,7 @@ export default {
     getRolepermission(){
       let RoleParam={
         page:1,
-        limit:10,
+        limit:1000,
         roleId:sessionStorage.roleId
       }
       this.$request.post("/api/emaint/role/permissionPage", qs.stringify(RoleParam), res => {

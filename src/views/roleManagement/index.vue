@@ -129,6 +129,13 @@
         <Button type="primary" size="default" @click="delAll">确定</Button>
       </div>
     </Modal>
+    <Modal v-model="unDeleteModal" width="300" title="提示">
+      <p id="note-info">该角色已分配用户，无法删除</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <!-- <Button type="ghost" size="default" @click="deleteAllModal=false">取消</Button> -->
+        <Button type="primary" size="default" @click="unDeleteModal=false">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <style type="text/css">
@@ -149,6 +156,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        unDeleteModal:false,//无法删除
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
         loading : true,//加载
@@ -242,8 +250,12 @@ import qs from "qs";
                                 },
                                 on: {
                                     click: () => {
-                                          this.deleteModal=true
-                                          this.roleID=params.row.id
+                                      if(params.row.num>0){
+                                        this.unDeleteModal=true
+                                      }else{
+                                        this.deleteModal=true
+                                      }
+                                      this.roleID=params.row.id
                                     }
                                 }
                             },"删除")
@@ -317,11 +329,22 @@ import qs from "qs";
     methods:{
       // 批量删除弹出框处理
       delModal(){
-        if(this.selection.length>0){
-          this.deleteAllModal=true
-        }else{
-          this.noteModal = true
+        // console.log(this.selection)
+        this.selection.map((item)=>{
+          if(item.num>0){
+            this.unDeleteModal=true
+            return
+          }
+        })
+        if(!this.unDeleteModal){
+          if(this.selection.length>0){
+            this.deleteAllModal=true
+          }else{
+            this.noteModal = true
+          }
         }
+        
+        
       },
       // 批量删除
       delAll(){
