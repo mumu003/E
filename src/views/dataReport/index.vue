@@ -216,19 +216,16 @@ import qs from "qs";
         }
       }
     },
-    mounted(){
+    created(){
       let today=new Date();
       let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
       let M=Number(WeekFirstDay.getMonth())+1;    
       this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+WeekFirstDay.getDate();
-      // this.formItem.beginDate=WeekFirstDay
-      console.log(this.formItem.beginDate)
-      // this.formItem.beginDate=new String(this.formItem.beginDate)
+
       let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
       let N=Number(WeekLastDay.getMonth())+1     
       this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+WeekLastDay.getDate();
-      // this.formItem.endDate=new String(this.formItem.endDate)
-      // this.formItem.endDate=WeekLastDay
+
     },
     methods: {
       // 导出

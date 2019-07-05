@@ -154,7 +154,7 @@
         }
       }
     },
-    mounted(){
+    created(){
       let beginDate = new Date(sessionStorage.beginDate)
       let M=beginDate.getMonth()+1
       this.formItem.beginDate = beginDate.getFullYear()+"-"+M+"-"+beginDate.getDate()
