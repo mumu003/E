@@ -85,7 +85,7 @@
         <Row>
           <Col span="16">
           <FormItem label="公司名称"  prop="companyName">
-              <Input v-model="addForm.companyName" placeholder="请输入公司名称"></Input>
+              <Input v-model="addForm.companyName" :maxlength="30" placeholder="请输入公司名称"></Input>
           </FormItem>
           </Col>
           <Col span="16">
@@ -109,7 +109,7 @@
           </Col>
           <Col span="16">
           <FormItem label="办公位">
-            <Input v-model="addForm.officeLocation" placeholder="请输入办公位"></Input>
+            <Input v-model="addForm.officeLocation" :maxlength="30" placeholder="请输入办公位"></Input>
           </FormItem>
           </Col>
           <Col span="16">
@@ -483,7 +483,7 @@ import qs from "qs";
                 data.forEach((v)=>{
                     this.priority.push(v)
                 })
-                  this.$Message.success({title: '提示信息', content: res.resMessage})
+                  // this.$Message.success({title: '提示信息', content: "加载成功"})
               } else {
                 this.modal_loading = false
                 this.$Modal.error({title: '提示信息', content: res.resMessage})
@@ -528,7 +528,9 @@ import qs from "qs";
       //新增模态框提交
       addSubmit(){
         this.modal_loading = true
-            this.$request.post("/api/emaint/client/save",this.addForm,res=>{
+        if(this.addForm.companyName!=""&&this.addForm.name!=""&&
+          this.addForm.phone!=""&&this.addForm.priority!=""){
+          this.$request.post("/api/emaint/client/save",this.addForm,res=>{
               this.modal_loading = false
               this.$Message.error("网络出错，请重试！")
             } , res => {
@@ -545,6 +547,12 @@ import qs from "qs";
                 this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
             })
+        }else{
+          this.modal_loading = false
+          this.$Modal.error({title: '提示信息', content:"必填项不能为空"})
+        }
+
+            
       },
       //取消
       cancel() {
@@ -593,7 +601,7 @@ import qs from "qs";
       // 同步客户
       syncClient(){
           this.$request.post("/api/emaint/client/syncClient",{}, res => {
-            this.$Modal.error("网络出错，请重试！")
+            this.$Message.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {
               this.$Message.success({title: '提示信息', content: res.responseResult})
@@ -608,7 +616,7 @@ import qs from "qs";
       // 启用
       enble_sure(){
           this.$request.post("/api/emaint/client/enable",qs.stringify({id:this.userId}), res => {
-            this.$Modal.error("网络出错，请重试！")
+            this.$Message.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {
               this.$Message.success({title: '提示信息', content: res.responseResult})
@@ -623,7 +631,7 @@ import qs from "qs";
       // 禁用
       disable_sure(){
           this.$request.post("/api/emaint/client/disable",qs.stringify({id:this.userId}), res => {
-            this.$Modal.error("网络出错，请重试！")
+            this.$Message.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {
               this.$Message.success({title: '提示信息', content: res.responseResult})

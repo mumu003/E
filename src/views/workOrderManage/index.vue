@@ -36,7 +36,7 @@
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
               <Col span="7">
-                <FormItem label="联系人手机号" :label-width="100" prop="contactPhone">
+                <FormItem label="联系人手机号" :label-width="127" prop="contactPhone">
                   <AutoComplete
                     v-model="formItem.contactPhone"
                     :data="newarr2"
@@ -47,7 +47,7 @@
                 </FormItem>
               </Col>
               <Col span="7">
-                <FormItem label="是否代为报修" :label-width="100" >
+                <FormItem label="是否代为报修" :label-width="127" >
                    <RadioGroup v-model="formItem.replacementRepair">
                     <Radio label="1">
                         <span>是</span>
@@ -184,8 +184,8 @@
                     <Select v-model="formItem.participatorids" multiple  style="width:100%;">
                   <!-- :disabled="viewForm.id!=''?true:false" -->
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index" >
-                          <span>{{item.name}}</span>
-                          <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+                          <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
+                          <span>{{item.problemNum==null?0:item.problemNum}}单</span>
                       </Option>
                       
                   </Select>
@@ -222,11 +222,11 @@
     </Modal>
 
     <!-- 历史报修数据 -->
-    <Modal v-model="RepairList_show" width="800"
+    <Modal v-model="RepairList_show"  width="800"
       title="历史报修数据"
       >
 
-      <m-table  :config="tableConfig" :searchParams="RepairForm"  ref="table"  :isFirst="isFirst"></m-table>    
+      <m-table  :config="tableConfig" :searchParams="RepairForm"    ref="table"  :isFirst="isFirst"></m-table>    
       <div slot="footer" style="text-align:right;">
         <Row>
           <Col span="24" v-if="this.viewTabs === 'remark'">
@@ -243,6 +243,7 @@
 <script>
 import qs from "qs";
 import axios from "axios";
+import util from "@/assets/js/util";
 export default {
   data() {
     return {
@@ -377,7 +378,7 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "/api/emaint/repairProblem/clientRepairProblemList",
+        url: "",
         columns: [
           {
             title: "工单号码 ",
@@ -387,7 +388,7 @@ export default {
           {
             title: "优先级",
             key: "priority",
-            width: 200
+            width: 120
           },
           {
             title: "状态",
@@ -397,8 +398,16 @@ export default {
           {
             // PS:暂无该字段
             title: "变更状态",
-            key: " phone",
-            width: 120
+            key: " orderChange",
+            width: 120,
+            render:(h,params)=>{
+                switch(params.row.orderChange){
+                  case 0:
+                    return h('div',"否")
+                  case 1:
+                    return h('div',"是")
+                }
+              }
           },
           {
             title: "办公位",
@@ -434,22 +443,15 @@ export default {
       },
       RepairForm: {
         clientId: "",
-        beginTime: "",
-        endTime: "",
-        isChange: "",
-        workOrderNo: "",
-        name: "",
-        state: "",
-        phone: "",
-        userName: ""
+       
       }
     };
   },
   mounted() {
     //方法
-    if (this.$route.params.id) {
-      this.viewForm.id = this.$route.params.id;
-      this.getinfo();
+    if (this.$route.params.phone) {
+    this.formItem.phone=this.$route.params.phone
+    this.search(this.$route.params.phone);
     }
   },
   beforeCreate() {
@@ -470,7 +472,9 @@ export default {
       res => {},
       res => {
         if (res.statusCode == 200) {
+        
           this.userlist = res.responseResult.list;
+           this.userlist.sort(util.compare("problemNum"));
         }
       }
     );
@@ -551,7 +555,7 @@ export default {
     },
 
     // 输入手机号进行检索
-    search() {
+    search(e) {
       if (this.formItem.phone.length == 11) {
       this.$request.post(
         "/api/emaint/client/phone",
@@ -583,14 +587,14 @@ export default {
             })
 
             this.RepairForm.clientId = data.id;
-            this.RepairForm.beginTime = data.beginTime || "";
-            this.RepairForm.endTime = data.endTime || "";
-            this.RepairForm.isChange = data.isChange || "";
-            this.RepairForm.workOrderNo = data.workOrderNo || "";
-            this.RepairForm.name = data.name;
-            this.RepairForm.state = data.state;
-            this.RepairForm.phone = data.phone;
-            this.RepairForm.userName = data.userName || "";
+            // this.RepairForm.beginTime = data.beginTime || "";
+            // this.RepairForm.endTime = data.endTime || "";
+            // this.RepairForm.isChange = data.isChange || "";
+            // this.RepairForm.workOrderNo = data.workOrderNo || "";
+            // this.RepairForm.name = data.name;
+            // this.RepairForm.state = data.state;
+            // this.RepairForm.phone = data.phone;
+            // this.RepairForm.userName = data.userName || "";
 
             switch (data.sex) {
               case "男":
@@ -604,14 +608,28 @@ export default {
               default : break;
             }
           } else {
-              setTimeout(() => {
                 this.$Message.error("客户信息不存在");
-                this.formItem.name=""
-                this.formItem.companyName=""
-                this.formItem.priority=""
-                this.formItem.sex=""
-              }, 1000);
-            
+                this.RepairForm.clientId=''
+                this.formItem={
+                  clientId: "",
+                  phone: "",
+                  officeLocation: "",
+                  contactPhone:"",
+                  name: "",
+                  companyName: "",
+                  priority: "",
+                  sex: "",
+                  problemClass: "",
+                  problemType: "",
+                  remark: "",
+                  participatorids: [],
+                  problem: "暂无数据",
+                  problemImgs: "",
+                  participators: [],
+                  userId:'',
+                  userName:"",
+                  replacementRepair:""
+                }           
           }
         }
       );
@@ -780,10 +798,11 @@ export default {
     // 历史报修数据
     clientRepairList() {
       // console.log(this.RepairForm.clientId);
-      if (this.RepairForm.clientId == null) {
+      if (this.RepairForm.clientId==''||this.RepairForm.clientId==null) {
         this.$Message.error("请先输入手机号!");
       }else{
         this.RepairList_show = true;
+        this.tableConfig.url='/api/emaint/repairProblem/clientRepairProblemList'
         this.$refs.table.init();
       }
     },
