@@ -4,77 +4,114 @@
     <Row :gutter="10" >
       <Col span="24">
         <Card class="search-card">
-          <div class="search-row">
+          <!-- <div class="search-row"> -->
             <Row>
-              <Col span="24">
+              <Col span="2">
               <Button type="primary" @click="addMaterialModal=true" icon="plus-round">新增</Button>
               </Col>
             </Row>
-          </div>
+          <!-- </div> -->
           <Row class="searchable-table-con">
             <m-table :config="tableConfig" :searchParams="formItem" ref="table" ></m-table>
         </Row>
         </Card>
       </Col>
     </Row>
-    <!-- <Row :gutter="10" class="mt10">
-          <Col span="24">
-            <Card>
-              <Row class="tableItem">
-                <div class="tableColHead" >
-                  <Col span="4" >
-                    <div @click="clickAll">
-                        <Checkbox v-model="selectAll" @on-change="checkAll" ></Checkbox>
-                    </div>
-                  </Col>
-                  <Col span="20" style="font-weight:bolder;">
-                    权限名称
-                  </Col>
-                </div>
-                
-              </Row>
-              <Row v-for="(item,index) in tableData" :key="index" :class="{tableItem:true,bottom:index==tableData.length-1}" >
-                <div class="tableCol" ref="tableCol" @click="clickItem" :class="{active:selectList.indexOf(item.id) != -1 ? true : false}">
-                  <Col span="4">
-                    <Checkbox  @on-change="checkItemAll(item.id,item.childs)"  :value="selectList.indexOf(item.id) != -1 ? true : false" ></Checkbox>
-                  </Col>
-                  <Col span="16"  >
-                  <div @click="openList(item,index)" class="tableName">
-                    <span>
-                      {{item.name}}
-                    </span>
-                    <Icon type="chevron-down"  ref="iconDown" class="iconDown"  v-show="item.childs.length>0"></Icon>
-                    <Icon type="chevron-up" ref="iconUp" class="iconUp"  v-show="item.childs.length>0"></Icon>
-                  </div>
-                    
-                  </Col>
-                </div>
-                <div ref="openlist" class="openlist"  @click="clickItem">
-                    <div v-for="(v,i) in item.childs" :key="i" class="tableCol" ref="tableCol" :class="{active:selectList.indexOf(v.id) != -1 ? true : false}">
-                      <Col span="4">
-                        <Checkbox @on-change="checkItemAll(v.id)"  :value="selectList.indexOf(v.id) != -1 ? true : false"></Checkbox>
-                      </Col>
-                      <Col span="18" style="display:flex;justify-content:space-between;">
-                        <span>
-                          {{v.name}}
-                        </span>
-                      </Col>
-                  </div>
-                </div>
-                
-              </Row>
+    <Row :gutter="10" >
+      <Col span="24">
+        <Card class="search-card">
+          <div class="search-row">
+            <Row>
+              <Col span="4">
+                所属类型:              
+              </Col>
+              <Col span="20">
+                所属类型:              
+              </Col>
+            </Row>
+            <Row>
+              <Col span="2">
+              <Button type="primary" @click="addkeyModal=true" icon="plus-round">添加键值</Button>
+              </Col>
+            </Row>
+          </div>
+          <Row class="searchable-table-con">
+            <m-table :config="tableRightConfig" :searchParams="formItem" ref="table" ></m-table>
+        </Row>
+        </Card>
+      </Col>
+    </Row>
 
-            </Card>
+    <Modal title="新增字典" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
+      <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAddMaterial" >
+        <Row>
+          <Col span="22" >
+            <FormItem label="类型"  prop="type">
+              <Input v-model="addForm.type" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
           </Col>
-          <Row>
-            <Col span="20">
-            </Col>
-            <Col span="4">
-              <Button type="primary" @click="permission">确定</Button>
-            </Col>
-            
-          </Row>
-    </Row> -->
+          <Col span="22" >
+            <FormItem label="描述"  prop="msg">
+              <Input v-model="addForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="addCancel">取消</Button>
+        <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+    <Modal title="修改字典" v-model="updateModal" :closable="false" width="400px" @on-cancel="updateCancel">
+      <Form  ref="updateForm" :model="updateForm" :label-width="100" :rules="ruleupdate" >
+        <Row>
+          <Col span="22" >
+            <FormItem label="类型"  prop="type">
+              <Input v-model="updateForm.type" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="描述"  prop="msg">
+              <Input v-model="updateForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="updateCancel">取消</Button>
+        <Button type="primary" size="default" @click="updateSubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+    <Modal title="添加键值" v-model="addkeyModal" :closable="false" width="400px" @on-cancel="addkeyCancel">
+      <Form  ref="addkeyForm" :model="addkeyForm" :label-width="100" :rules="ruleaddkey" >
+        <Row>
+          <Col span="22" >
+            <FormItem label="标签"  prop="label">
+              <Input v-model="addkeyForm.label" placeholder="请输入标签" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="键值"  prop="key">
+              <Input v-model="addkeyForm.key" placeholder="请输入键值" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="排序"  prop="sort">
+              <Input v-model="addkeyForm.sort" placeholder="请输入排序" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="描述"  prop="msg">
+              <Input v-model="addkeyForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="addkeyCancel">取消</Button>
+        <Button type="primary" size="default" @click="addkeySubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
       
   </div>
 </template>
@@ -83,53 +120,403 @@ import qs from "qs";
 export default {
   data() {
     return {
+      addMaterialModal:false,
+      updateModal:false,
+      addkeyModal:false,
       selectAll:false,//全选
       isClick:false,//是否点击全选
       roleName:sessionStorage.roleName,
       explain:sessionStorage.explain,
       selectList:[],//选中的权限列表
+      // 新增用户
+      addForm:{
+          type:"",
+          msg:""
+      },
+      //新增表单验证
+      ruleAddMaterial:{
+          type: [
+            { required: true, message: '类型不能为空', trigger: 'blur' },
+          ],
+           msg: [
+            { required: true, message: '描述不能为空', trigger: 'blur' },
+          ],
+      },
+      updateForm:{
+        type:"",
+        msg:""
+      },
+      //新增表单验证
+      ruleupdate:{
+          type: [
+            { required: true, message: '类型不能为空', trigger: 'blur' },
+          ],
+           msg: [
+            { required: true, message: '描述不能为空', trigger: 'blur' },
+          ],
+      },
+      addkeyForm:{
+        label:"",
+        key:"",
+        sort:"",
+        msg:""
+      },
+      ruleaddkey:{
+          label: [
+            { required: true, message: '标签不能为空', trigger: 'blur' },
+          ],
+           key: [
+            { required: true, message: '键值不能为空', trigger: 'blur' },
+          ],
+          sort: [
+            { required: true, message: '排序不能为空', trigger: 'blur' },
+          ],
+      },
+      formItem:{
+        name:""
+      },
       // 表格数据
-        tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/totalComapnyCountList",
+      tableConfig:{
+          url:"https://emaint.ahjarzeng.com/api/dictionary/data",
               columns:[
                 {
                   title: '操作',
-                  width:90,
+                  width:180,
                   align:"center",
                   render:(h,params)=>{
-                        return h('Button', {
-                                    props: {
+                        return h('div',{
+                          style:{
+                            display:"flex",
+                            justifyContent:"space-between",
+                            flexWrap:"wrap"
+                          }
+                        },
+                          [
+                            h('Button',{
+                                props: {
                                         type: 'primary',
                                         size: 'small'
-                                    },
-                          on: {
-                              click: () => {
-                                sessionStorage.setItem("companyName",params.row.companyName)
-                                sessionStorage.setItem("beginDate",this.formItem.beginDate)
-                                sessionStorage.setItem("endDate",this.formItem.endDate)
-                                this.$router.push({name:"reportDetail",params:{companyName:params.row.companyName}})
-                              }
-                          }
-                        },"详情")
+                                },
+                                style:{
+                                  margin:"5px 0px"
+                                },
+                                on: {
+                                    click: () => {
+                                          this.updateModal=true
+                                          this.updateForm.type=params.row.name
+
+                                    }
+                                }
+                            },"修改"),
+                            h('Button',{
+                                props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                },
+                                style:{
+                                  margin:"5px 0px"
+                                },
+                                on: {
+                                    click: () => {
+                                          // this.$router.push({name:"distributeUser",params:params.row})
+                                          this.$router.push({path:"/distributeUser"})
+                                          sessionStorage.setItem("roleName",params.row.name)
+                                          sessionStorage.setItem("explain",params.row.explain)
+                                          sessionStorage.setItem("roleId",params.row.id)
+                                    }
+                                }
+                            },"设置"),
+                            h('Button',{
+                                props: {
+                                        type: 'error',
+                                        size: 'small'
+                                },
+                                style:{
+                                  margin:"5px 0px"
+                                },
+                                on: {
+                                    click: () => {
+                                      if(params.row.num>0){
+                                        this.unDeleteModal=true
+                                      }else{
+                                        this.deleteModal=true
+                                      }
+                                      this.roleID=params.row.id
+                                    }
+                                }
+                            },"删除")
+                          ])
                   }
                 },
                 {
                   title: '类型',
-                  key: 'companyName',
+                  key: 'name',
                   width:150,
                   align:"center"
                 },
                 {
                   title: '描述',
-                  key: 'yjCount',
+                  key: 'dictionaries',
                   width:100,
                   align:"center"
                 }
               ],
-        }
+      },
+      tableRightConfig:{
+          url:"https://emaint.ahjarzeng.com/api/dictionary/data",
+              columns:[
+                {
+                  title: '操作',
+                  width:120,
+                  align:"center",
+                  render:(h,params)=>{
+                        return h('div',{
+                          style:{
+                            display:"flex",
+                            justifyContent:"space-between",
+                            flexWrap:"wrap"
+                          }
+                        },
+                          [
+                            h('Button',{
+                                props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                },
+                                style:{
+                                  margin:"5px 0px"
+                                },
+                                on: {
+                                    click: () => {
+                                          this.updateModal=true
+                                          this.updateForm.type=params.row.name
+
+                                    }
+                                }
+                            },"修改"),
+                
+                            h('Button',{
+                                props: {
+                                        type: 'error',
+                                        size: 'small'
+                                },
+                                style:{
+                                  margin:"5px 0px"
+                                },
+                                on: {
+                                    click: () => {
+                                      if(params.row.num>0){
+                                        this.unDeleteModal=true
+                                      }else{
+                                        this.deleteModal=true
+                                      }
+                                      this.roleID=params.row.id
+                                    }
+                                }
+                            },"删除")
+                          ])
+                  }
+                },
+                {
+                  title: '键值',
+                  key: 'name',
+                  width:150,
+                  align:"center"
+                },
+                {
+                  title: '键名',
+                  key: 'dictionaries',
+                  width:100,
+                  align:"center"
+                },
+                {
+                  title: '排序',
+                  key: 'dictionaries',
+                  width:100,
+                  align:"center"
+                }
+              ],
+      }
     };
   },
   methods: {
+    //新增用户
+    addSubmit () {
+        if(this.addForm.pwd != this.addForm.pwdTwo){
+          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+          return
+        }
+        if(this.addForm.roleId.length<=0){
+          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+          return
+        }
+        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+        if(!reg.test(this.addForm.phone)){
+          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
+          return     
+        }
+        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
+        name=name.join(",")
+        this.addDataForm={
+              roleId:name,
+              name:this.addForm.name,
+              phone:this.addForm.phone,
+              password:this.addForm.pwd,
+              loginName:this.addForm.name
+        }
+        // qs
+        this.$request.post("/api/user/save",this.addDataForm,res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        })
+
+    },
+    //新增取消
+    addCancel () {
+        this.addMaterialModal = false
+        this.$refs.addForm.resetFields()
+    },
+    //修改用户
+    updateSubmit () {
+        if(this.addForm.pwd != this.addForm.pwdTwo){
+          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+          return
+        }
+        if(this.addForm.roleId.length<=0){
+          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+          return
+        }
+        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+        if(!reg.test(this.addForm.phone)){
+          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
+          return     
+        }
+        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
+        name=name.join(",")
+        this.addDataForm={
+              roleId:name,
+              name:this.addForm.name,
+              phone:this.addForm.phone,
+              password:this.addForm.pwd,
+              loginName:this.addForm.name
+        }
+        // qs
+        this.$request.post("/api/user/save",this.addDataForm,res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        })
+
+    },
+    //修改取消
+    updateCancel () {
+        this.updateModal = false
+        this.$refs.updateForm.resetFields()
+    },
+    //修改用户
+    addkeySubmit () {
+        if(this.addForm.pwd != this.addForm.pwdTwo){
+          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+          return
+        }
+        if(this.addForm.roleId.length<=0){
+          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+          return
+        }
+        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+        if(!reg.test(this.addForm.phone)){
+          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
+          return     
+        }
+        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
+        name=name.join(",")
+        this.addDataForm={
+              roleId:name,
+              name:this.addForm.name,
+              phone:this.addForm.phone,
+              password:this.addForm.pwd,
+              loginName:this.addForm.name
+        }
+        // qs
+        this.$request.post("/api/user/save",this.addDataForm,res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.addMaterialModal = false
+              this.modal_loading = false
+              this.$refs.addForm.resetFields()
+              this.$Message.success("添加成功!")
+              this.$refs.table.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        })
+
+    },
+    //修改取消
+    addkeyCancel () {
+        this.addkeyModal = false
+        this.$refs.addkeyForm.resetFields()
+    },
     // 点击子复选框
     clickItem(){
       this.isClick=false
@@ -290,12 +677,19 @@ export default {
 };
 </script>
 <style scoped>
+div.search-row{
+  height: 65px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
 div.page {
   width: 100%;
   display: flex;
 }
 div.page > div {
-  width: 50% !important;
+  width: 100% !important;
   margin-top: 0px;
   margin-right: 5px !important;
   margin-left: 0px !important;
