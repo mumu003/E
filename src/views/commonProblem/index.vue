@@ -10,11 +10,12 @@
                
               </Col>
               <Col>
-               <div class="first" v-for="(item,index) in questionlis" :key="index">
-                <div  >{{item.parentProblem}}</div> 
-                
-                <div class="two"  @click="activeli.id==v.id?activeli.id='':activeli.id=v.id;activeli.parentId=v.parentId;" :style="{backgroundColor:activeli.id==v.id?'#2b85e4':''}" v-for="(v,i) in item.childList" :key="i">{{v.problem}}</div>
-              </div>
+               <template>
+          <Tree :data="questionlis" 
+          @on-select-change="showchildren"
+          :empty-text="'加载中...'"
+          ></Tree>
+        </template>
               </Col>
             </Row>
           </div>
@@ -228,10 +229,11 @@ import qs from 'qs';
         formItem: {
           parentId:'',
           problem:'',
+          watch:true,
         },
         //表格
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
+          url:"/api/emaint/problem-base/list",
           columns:[
             {
                   title: '操作',
@@ -251,14 +253,14 @@ import qs from 'qs';
                                     on: {
                                         click: () => {
                                           this.updateModel=true;
-                                              this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:params.row.id}),res=>{},res=>{
+                                              this.$request.post('/api/emaint/problem-base/view',qs.stringify({id:params.row.id}),res=>{},res=>{
                                             if(res.statusCode==200){
                                                   this.updateForm=res.responseResult;
-                                                       this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:this.updateForm.parentId}),res1=>{},res1=>{
+                                                       this.$request.post('/api/emaint/problem-base/view',qs.stringify({id:this.updateForm.parentId}),res1=>{},res1=>{
                                                       if(res1.statusCode==200){
                                                       
                                                         
-                                                          this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/list',qs.stringify({parentId:res1.responseResult.parentId}),res2=>{},res2=>{
+                                                          this.$request.post('/api/emaint/problem-base/list',qs.stringify({parentId:res1.responseResult.parentId}),res2=>{},res2=>{
                                                            if(res2.statusCode==200){
                                                                 this.fjlm=res2.responseResult;
                                                      
@@ -515,9 +517,19 @@ import qs from 'qs';
     },
     mounted(){
       //获取楼栋
-      this.getBuildings()
+      
     },
     methods: {
+      showchildren(v){
+    
+        if(v[0].childList){
+         return
+        }
+        else {
+          this.activeli.id=v[0].id
+        this.activeli.parentId=v[0].parentId;
+        }
+     },
       //Tabs切换
       changs(){
         if(this.viewTabs === 'name1'){
@@ -536,109 +548,109 @@ import qs from 'qs';
         this.formItem.endUpdateTime=endDate
       },
       //获取楼栋列表
-      getBuildings() {
-        let token = sessionStorage.getItem("token")
-        if(token === null){
-          window.location.href = '/#/login'
-          window.location.reload()
-        }else{
-          let params = {
-            orgId: sessionStorage.getItem("orgId"),
-            projectId: sessionStorage.getItem("curProjectId")
-          }
-          this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingList", params, res => {
-            this.buildingList = res.data.buildings.map(item => ({
-              id: item.buildingId,
-              name: item.buildingName
-            }))
-          }, res => {
-            this.$Modal.error({title: '提示信息', content: res.message})
-          })
-        }
-      },
+      // getBuildings() {
+      //   let token = sessionStorage.getItem("token")
+      //   if(token === null){
+      //     window.location.href = '/#/login'
+      //     window.location.reload()
+      //   }else{
+      //     let params = {
+      //       orgId: sessionStorage.getItem("orgId"),
+      //       projectId: sessionStorage.getItem("curProjectId")
+      //     }
+      //     this.$request.post("/api/room/getBuildingList", params, res => {
+      //       this.buildingList = res.data.buildings.map(item => ({
+      //         id: item.buildingId,
+      //         name: item.buildingName
+      //       }))
+      //     }, res => {
+      //       this.$Modal.error({title: '提示信息', content: res.message})
+      //     })
+      //   }
+      // },
       //获取单元列表
-      getUnits(buildingId) {
-        if(typeof(buildingId) === "undefined"){
-          return ;
-        }
-        this.buildingList.forEach(item=>{
-          if(buildingId===item.id){
-            this.addForm.buildingName = item.name
-          }
-        })
-        this.unitList=[];
-        this.roomsList=[];
-        this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingRoom",{
-          orgId: sessionStorage.getItem("orgId"),
-          projectId: sessionStorage.getItem("curProjectId"),
-          userId: sessionStorage.getItem("userId"),
-          type:5,
-          fileType:1,
-          buildingId
-        }, res => {
-          this.addUnitNameIsNo = ''
-          this.unitList = res.data.units.map(item => ({
-            id: item.unitId,
-            name: item.unitName,
-            rooms:item.rooms
-          }))
-          if(this.unitList[0].name === ''){
-            if(this.addForm.buildingName !== ""){
-              this.addUnitNameIsNo = this.addForm.buildingName
-            }
-          }
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-        this.addForm.unitId = ""
-        this.addForm.unitName = ""
-        this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
-        this.addForm.fileType = ""
-      },
-      //获取房间列表
-      getRooms(unitId) {
-        this.unitList.forEach(item=>{
-          if(unitId===item.id){
-            this.addForm.unitName = item.name
-          }
-        })
-        this.unitList.map((item,i)=>{
-          if (item.id===unitId) {
-            this.roomsList = item.rooms.map(item => ({
-              id: item.roomId,
-              num: item.roomNum
-            }))
-          }
-        })
-        this.addForm.roomId = ""
-        this.addForm.roomNum = ""
-        this.addForm.customerName = ""
-        this.addForm.fileType = ""
-      },
-      //模态框的业主姓名
-      getModalName(roomId) {
-        if(typeof(roomId) === "undefined"){
-          return ;
-        }
-        this.roomsList.forEach(item=>{
-          if(roomId===item.id){
-            this.addForm.roomNum = item.num
-          }
-        })
-        this.$request.post("https://emaint.ahjarzeng.com/api/room/getRoomCustomer",{
-          roomId
-        }, res => {
-          this.addForm.customerName=""
-          res.data.data.map(item =>{
-            this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
-          })
-          this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
-        }, res => {
-          this.$Modal.error({title: '提示信息', content: res.message})
-        })
-      },
+      // getUnits(buildingId) {
+      //   if(typeof(buildingId) === "undefined"){
+      //     return ;
+      //   }
+      //   this.buildingList.forEach(item=>{
+      //     if(buildingId===item.id){
+      //       this.addForm.buildingName = item.name
+      //     }
+      //   })
+      //   this.unitList=[];
+      //   this.roomsList=[];
+      //   this.$request.post("/api/room/getBuildingRoom",{
+      //     orgId: sessionStorage.getItem("orgId"),
+      //     projectId: sessionStorage.getItem("curProjectId"),
+      //     userId: sessionStorage.getItem("userId"),
+      //     type:5,
+      //     fileType:1,
+      //     buildingId
+      //   }, res => {
+      //     this.addUnitNameIsNo = ''
+      //     this.unitList = res.data.units.map(item => ({
+      //       id: item.unitId,
+      //       name: item.unitName,
+      //       rooms:item.rooms
+      //     }))
+      //     if(this.unitList[0].name === ''){
+      //       if(this.addForm.buildingName !== ""){
+      //         this.addUnitNameIsNo = this.addForm.buildingName
+      //       }
+      //     }
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      //   this.addForm.unitId = ""
+      //   this.addForm.unitName = ""
+      //   this.addForm.roomId = ""
+      //   this.addForm.roomNum = ""
+      //   this.addForm.customerName = ""
+      //   this.addForm.fileType = ""
+      // },
+      // //获取房间列表
+      // getRooms(unitId) {
+      //   this.unitList.forEach(item=>{
+      //     if(unitId===item.id){
+      //       this.addForm.unitName = item.name
+      //     }
+      //   })
+      //   this.unitList.map((item,i)=>{
+      //     if (item.id===unitId) {
+      //       this.roomsList = item.rooms.map(item => ({
+      //         id: item.roomId,
+      //         num: item.roomNum
+      //       }))
+      //     }
+      //   })
+      //   this.addForm.roomId = ""
+      //   this.addForm.roomNum = ""
+      //   this.addForm.customerName = ""
+      //   this.addForm.fileType = ""
+      // },
+      // //模态框的业主姓名
+      // getModalName(roomId) {
+      //   if(typeof(roomId) === "undefined"){
+      //     return ;
+      //   }
+      //   this.roomsList.forEach(item=>{
+      //     if(roomId===item.id){
+      //       this.addForm.roomNum = item.num
+      //     }
+      //   })
+      //   this.$request.post("/api/room/getRoomCustomer",{
+      //     roomId
+      //   }, res => {
+      //     this.addForm.customerName=""
+      //     res.data.data.map(item =>{
+      //       this.addForm.customerName =this.addForm.customerName+ item.customerName+'/'
+      //     })
+      //     this.addForm.customerName=this.addForm.customerName.substr(0,this.addForm.customerName .length-1)//排除最后一个
+      //   }, res => {
+      //     this.$Modal.error({title: '提示信息', content: res.message})
+      //   })
+      // },
       //新增
       addProject(){
         if(this.activeli.id=='')
@@ -678,7 +690,7 @@ import qs from 'qs';
           if (valid) {
             var data={};
             type=='update'?data=this.updateForm:data=this.addForm;
-            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/save",data, res => {
+            this.$request.post("/api/emaint/problem-base/save",data, res => {
               if (res.statusCode === 200) {
                 setTimeout(() => {
                   this.modal_loading = false;
@@ -734,7 +746,7 @@ import qs from 'qs';
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId")
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/processSetting/data",params, res => {
+        this.$request.post("/api/processSetting/data",params, res => {
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -765,7 +777,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/start",params,res=>{
+        this.$request.post("/api/sendFileBill/start",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false
@@ -794,7 +806,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           status:'1'
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
+        this.$request.post("/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
@@ -820,7 +832,7 @@ import qs from 'qs';
           id: this.viewForm.id,
           status:'0'
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/check",params,res=>{
+        this.$request.post("/api/sendFileBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -855,7 +867,7 @@ import qs from 'qs';
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/status",params,res=>{
+        this.$request.post("/api/sendFileBill/status",params,res=>{
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -892,7 +904,7 @@ import qs from 'qs';
         let params = {
           id
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/sendFileBill/cutOut",params,res=>{
+        this.$request.post("/api/sendFileBill/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -919,7 +931,7 @@ import qs from 'qs';
           loading: true,
           onOk: () => {
 
-            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/remove",qs.stringify({id}),res=>{
+            this.$request.post("/api/emaint/problem-base/remove",qs.stringify({id}),res=>{
               this.$Message.success("删除成功")
              
             },res=>{
@@ -935,7 +947,7 @@ import qs from 'qs';
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/problem-base/list",this.formItem, res => {
+        this.$request.post("/api/emaint/problem-base/list",this.formItem, res => {
           if (res.statusCode === 200) {
             this.$Message.success("搜索成功！")
             this.isFirst = false
@@ -986,22 +998,34 @@ import qs from 'qs';
       },
        getlist(){
 //  查询一级问题
-     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList',{},data=>{
-      
-     },data=>{
-        if(data.statusCode==200){
-        
-            this.questionlis=data.responseResult;
-        
-
-        }
-     })
-     }
+        this.$request.post('/api/emaint/problem-base/treeList',{},data=>{
+        },data=>{
+            if(data.statusCode==200){
+            
+                
+                data.responseResult.forEach(v=>{
+                 
+                  v.title=v.parentProblem;
+                  v.children=v.childList;
+                  if(v.children.length>0){
+                    v.expand=false;
+                      v.children.forEach(v1=>{
+                        v1.title=v1.problem;
+                         v.expand=false;
+                      })
+                  }
+                })
+                this.questionlis=data.responseResult;
+               
+                // console.log(data.responseResult.treeLevel)
+            }
+        })
+     },
       
     },
     created(){
       this.getlist();
-      this.$request.post('https://emaint.ahjarzeng.com/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
+      this.$request.post('/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
        if(res.statusCode==200)
          { 
            
@@ -1042,9 +1066,11 @@ div.page>div.mt10 div.ivu-row>div.ivu-col:first-of-type{
   
 }
 div.page>div.mt10 div.ivu-row>div.ivu-col:last-of-type{
-  
-  border: 1px solid #eee;
-   background-color: rgba(240, 240, 240, 1);
+  margin-top: 10px;
+  /* border: 1px solid #eee; */
+   /* background-color: rgba(240, 240, 240, 1); */
+   padding-left: 15%;
+   text-align: left;
 }
 div.page div.ivu-card-body{
   padding: 0px;
@@ -1070,6 +1096,11 @@ width: unset;
 .mt11 div.ivu-card{
       padding-bottom: 10px;
     padding-right: 10px;
+}
+
+/* 树形列表 */
+.ivu-tree-title{
+  font-size: 14px;
 }
 </style>
 

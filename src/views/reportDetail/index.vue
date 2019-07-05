@@ -100,7 +100,7 @@
         },
         //表格
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/repairProblemListListByCompany",
+          url:"/api/emaint/repairProblem/repairProblemListListByCompany",
               columns:[
                 {
                   title: '日期',

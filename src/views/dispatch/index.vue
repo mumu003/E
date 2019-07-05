@@ -11,13 +11,13 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
             <Row type="flex" justify="start">
-              <Col span="6">
+              <Col span="7">
               <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入手机号"></Input>
+                <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="办公位">
+              <Col span="7">
+              <FormItem label="办公位" :label-width="100">
                 <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
               </Col>
@@ -26,26 +26,48 @@
               </Col>
               </Row>
 
+
+              <!-- 联系人号码 -->
+              <Row type="flex" justify="start">
+              <Col span="7">
+              <FormItem label="联系人手机号" :label-width="100">
+                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
+              <Col span="7">
+                <FormItem label="是否代为报修" :label-width="100" >
+                   <RadioGroup v-model="formItem.replacementRepair" >
+                    <Radio label="1" :disabled="viewForm.id!=''?true:false">
+                        <span>是</span>
+                    </Radio>
+                    <Radio label="0" :disabled="viewForm.id!=''?true:false">
+                      <span>否</span>
+                    </Radio>  
+                  </RadioGroup>
+                </FormItem>
+              </Col>
+              </Row>
+
               <Row>
-              <Col span="6">
+              <Col span="7">
               <FormItem label="姓名">
                     <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="公司">
+              <Col span="7">
+              <FormItem label="公司" :label-width="100">
                     <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
               <Row>
-              <Col span="6">
+              <Col span="7">
               <FormItem label="优先级">
                     <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
-              <FormItem label="性别">
+              <Col span="7">
+              <FormItem label="性别" :label-width="100">
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
@@ -67,7 +89,7 @@
           <Form  :model="formItem" :label-width="110" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
               <Col span="5">
-                <FormItem label="报修类型" prop="one_type">
+                <FormItem label="报修类型" >
                  <Input v-model="formItem.problemClass" disabled ></Input> 
                   <!-- <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
                         <Option v-for="(item,index) in treeList" :value="item.parentProblem" :key="index">{{ item.parentProblem}}</Option>
@@ -83,7 +105,7 @@
                 </FormItem>
               </Col>
 
-              <Col span="6">
+              <Col span="7">
                 <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
@@ -113,9 +135,9 @@
                     <Button type="ghost" size="large">Ghost</Button> -->
                 </FormItem>
                 </Col>
-                <Col span="6">
+                <Col span="7">
                 <FormItem label="备注">
-                    <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" placeholder="300字以内"></Input>
+                    <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" ></Input>
                 </FormItem>
                 </Col>
               </Row>
@@ -138,7 +160,7 @@
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
               <Col span="8" >
                 <FormItem label="执行人" prop="executor">
-                    <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
+                    <Input  class="buttoninput" :disabled="!state_show" :style="{'pointer-events':!state_show?'none':'all'}" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
               </Col>
              </Row>
@@ -146,7 +168,7 @@
               <Col span="8">
                 <FormItem label="参与者">
                     <!-- <Input v-model="formItem.participators" ></Input>  -->
-                    <Select v-model="formItem.participatorids"  multiple  style="width:100%;">
+                    <Select v-model="formItem.participatorids"  multiple  style="width:100%;" :disabled="!state_show">
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
                           <span>{{item.name}}</span>
                           <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
@@ -165,7 +187,7 @@
       <Row>
         <Col span="24">
           <Button size="default" @click="goback" >上一步</Button>
-          <Button type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button>
+          <Button v-if="state_show" type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button>
          </Col>
       </Row>
     </div>
@@ -173,8 +195,7 @@
     <Modal v-model="choosemodel" title="执行人选择" width="500"
           @on-cancel="choosemodel=false">
           <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
-          <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
-            
+          <Radio  style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
               <span style="margin-left:15px;">{{item.name}}</span>
               <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
           </Radio>
@@ -186,7 +207,8 @@
     </Modal>
 
     <!-- 历史报修数据 -->
-    <Modal v-model="RepairList_show" v-if="RepairList_show" width="800"
+    <!-- v-if="RepairList_show" -->
+    <Modal v-model="RepairList_show"  width="800"
       title="历史报修数据"
       >
 
@@ -248,11 +270,14 @@ export default {
       upindex: "",
       files: [],
       showimg: "",
+      // 处理报修提交按钮
+      state_show:false,
       //表单
       formItem: {
         clientId: "",
         phone: "",
         officeLocation: "",
+        contactPhone:"",
         name: "",
         companyName: "",
         priority: "",
@@ -264,36 +289,16 @@ export default {
 
         problem: "",
         problemImgs: "",
-        participators: ""
+        participators: "",
+        replacementRepair:""
       },
 
       treeList: [],
       // 设置表单验证
       ruleValidate: {
-        phone: [
-          {
-            required: false,
-            message: "请输入正确的手机号",
-            trigger: "blur",
-            transform(value) {
-              var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
-              if (!reg.test(value)) {
-                return false;
-              } else {
-                return value;
-              }
-            }
-          }
-        ],
-        one_type: [
-          { required: true, message: "该选项不能为空", trigger: "blur" }
-        ],
         executor: [
           { required: true, message: "该选项不能为空", trigger: "input" }
         ],
-        participatorids:[
-          { required: true, message: "该选项不能为空", trigger: "blur" }
-        ]
       },
       // 设置结束时间大于开始时间
       end: {
@@ -312,13 +317,8 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "https://emaint.ahjarzeng.com/api/emaint/repairProblem/clientRepairProblemList",
+        url: "/api/emaint/repairProblem/clientRepairProblemList",
         columns: [
-          // {
-          //   type:"selection",
-          //   key:'_checked',
-          //   width:60
-          // },
           {
             title: "工单号码 ",
             key: "workOrderNo",
@@ -394,7 +394,7 @@ export default {
   },
   created() {
     this.$request.post(
-      "https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList",
+      "/api/emaint/problem-base/treeList",
       {},
       res => {},
       res => {
@@ -404,7 +404,7 @@ export default {
       }
     );
     this.$request.post(
-      "https://emaint.ahjarzeng.com/api/user/searchUserProblemNum",
+      "/api/user/searchUserProblemNum",
       qs.stringify({ limit: 1000, page: 1, keyword: "" }),
       res => {},
       res => {
@@ -438,38 +438,9 @@ export default {
       this.imglist.pop("");
     },
 
-    // findchildren() {
-    //   console.log("--------------");
-    //   console.log(this.formItem.problemClass);
-    //   console.log("---------------");
-    //   this.treeList.forEach(v => {
-        
-    //     if (v.parentProblem == this.formItem.problemClass) {
-    //       this.childList = v.childList;
-    //     }
-    //     if (this.formItem.problemType == "") {
-    //       this.formItem.problemType = v.childList[0].problem;
-    //     }
-    //     this.findchildren2();
-    //   });
-    // },
-    // findchildren2() {
-    //   this.childList.forEach(v => {
-    //     if (v.problem == this.formItem.problemType) {
-    //       this.$request.post(
-    //         "https://emaint.ahjarzeng.com/api/emaint/problem-base/list",
-    //         qs.stringify({ parentId: v.id }),
-    //         res => {},
-    //         res => {
-    //           if (res.statusCode == 200) this.ques_list = res.responseResult;
-    //         }
-    //       );
-    //     }
-    //   });
-    // },
     search() {
       this.$request.post(
-        "https://emaint.ahjarzeng.com/api/emaint/client/phone",
+        "/api/emaint/client/phone",
         qs.stringify({ phone: this.formItem.phone }),
         res => {},
         res => {
@@ -492,16 +463,17 @@ export default {
             this.RepairForm.state = data.state;
             this.RepairForm.phone = data.phone;
             this.RepairForm.userName = data.userName || "";
-          }
+          } 
         }
       );
     },
     // 报修提交
     repairSubmit() {
       if (this.viewForm.id != "") {
+        if(this.formItem.userId!=""&&this.formItem.userId!=null){
         this.$request.post(
-          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/singleUser",
-          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
+          "/api/emaint/repairProblem/updateUser",
+          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId,participatorids:this.formItem.participatorids.toString(),changeDescription:"" }),
           res => {},
           res => {
             this.$Message.success(res.responseResult);
@@ -510,30 +482,12 @@ export default {
                 name: "workOrder"
               });
             }, 800);
-          }
-        );
-      } else {
-        if (this.question_ary.length > 0)
-          this.formItem.problem = this.question_ary.toString();
-        this.formItem.problemImgs = "123";
-        this.formItem.participators = this.userlist.filter(v => {
-          if (this.formItem.participatorids.indexOf(v.id)) {
-            return true;
-          }
-        });
-        this.formItem.participatorids = this.formItem.participatorids.toString();
-        this.formItem.participators = this.formItem.participators.toString();
-        this.$request.post(
-          "https://emaint.ahjarzeng.com/api/emaint/repairProblem/save",
-          qs.stringify(this.formItem),
-          res => {},
-          res => {
-            if (res.statusCode == 200) {
-              this.$Message.success(res.resMessage);
-            }
-          }
-        );
-      }
+          })
+        }else{
+          this.$Message.error("请选择执行人")
+        }
+      } 
+     
     },
     // 上一步
     goback() {
@@ -542,7 +496,7 @@ export default {
 
     getinfo() {
       this.$request.post(
-        "https://emaint.ahjarzeng.com/api/emaint/repairProblem/view",
+        "/api/emaint/repairProblem/view",
         qs.stringify(this.viewForm),
         res => {
           this.$Modal.error("网络错误,请重试！");
@@ -556,6 +510,7 @@ export default {
               clientId: data.clientId,
               phone: data.phone,
               officeLocation: data.officeLocation,
+              contactPhone: data.contactPhone,
               name: data.name,
               companyName: data.companyName,
               priority: data.priority,
@@ -564,13 +519,57 @@ export default {
               problemType: data.problemType,
               remark: data.remark,
               participatorids: data.participatorids,
-              userName: "",
-              userId: "",
+              userName: data.userName,
+              userId: data.userId,
               problem: data.problem,
               problemImgs: data.problemImgs,
               participators: data.participators,
+              replacementRepair:data.replacementRepair,
               id: data.id
             };
+            
+
+            switch(data.state){
+              case '待维修':
+                this.state_show=true;break;
+                case '待派单':
+                this.state_show=true;break;
+                case '待评价':
+                this.state_show=false;break;
+                case '已评价':
+                this.state_show=false;break;
+                default:break;
+            }
+
+            //  处理参与者id
+            if(this.formItem.participatorids){
+              if(this.formItem.participatorids.indexOf(",")!=-1){
+                  var arry = this.formItem.participatorids.split(",");
+                  this.formItem.participatorids = [];
+                  arry.forEach(v => {
+                    this.formItem.participatorids.push(v * 1);
+                  });
+              }else{
+                  var str=this.formItem.participatorids
+                  this.formItem.participatorids = []
+                  this.formItem.participatorids.push(str*1)
+              }
+            }
+            
+
+            // 处理参与者列表
+          if(this.formItem.participators){
+            if(this.formItem.participators.indexOf(",")!=-1){
+              var arry2 = this.formItem.participators.split(",");
+              this.formItem.participators = [];
+              arry2.forEach(v => {
+                this.formItem.participators.push(v);
+              });
+            }else{
+              this.formItem.participators=[]
+              this.formItem.participators.push(data.participators)
+            }
+          }
               
               // 图片回显
               if(data.problemImgs){
@@ -578,49 +577,57 @@ export default {
                   // 多张图
                   var ary=data.problemImgs.split("|~|")
                     ary.forEach(v=>{
-                    v=v.match(/(\S*)\|IMG/)[1]
+                      if(v.indexOf("|IMG")!=-1){
+                        v=v.match(/(\S*)\|IMG/)[1]
+                      }else if(v.indexOf("|wx")!=-1){
+                        v=v.match(/(\S*)\|wx/)[1]
+                      }
                     this.imglist.push(v)
                   })
                 }else if(data.problemImgs.indexOf("|IMG")!=-1){
                   // 只有一张图
                   this.imglist.push(data.problemImgs.split("|IMG")[0])
-                }
-                else{
+                }else if(data.problemImgs.indexOf("|wx")!=-1){
+                  // 只有一张图
+                  this.imglist.push(data.problemImgs.split("|wx")[0])
+                }else{
                   this.imglist.push(data.problemImgs)
                 }
-                // console.log("---图片回显")
-                // console.log(this.imglist)
-                // console.log("----")
               }
 
             // 处理性别
             switch (data.sex) {
               case "男":
-                this.formItem.sex = "男";break;;
+                this.formItem.sex = "男";break;
               case "male":
-                this.formItem.sex = "男";break;;
+                this.formItem.sex = "男";break;
               case "女":
                 this.formItem.sex = "女";break;
               case "female":
                  this.formItem.sex = "女";break;
               default:break;
             }
-            // this.findchildren();
 
-            this.question_ary = this.formItem.problem.split(",");
-           
-            var arry = this.formItem.participatorids.split(",");
-            this.formItem.participatorids = [];
-            arry.forEach(v => {
-              this.formItem.participatorids.push(v * 1);
-            });
+            
+            // 处理常见问题
+            if(this.formItem.problem){
+              if(this.formItem.problem.indexOf(",")!=-1){
+                  this.question_ary = this.formItem.problem.split(",");
+              }else{
+                this.question_ary.push(this.formItem.problem)
+              }
+            }else{
+              this.question_ary=[]
+            }
+            
+            
+          // 处理是否代报修
+          if(this.formItem.replacementRepair!=null){
+            this.formItem.replacementRepair=this.formItem.replacementRepair.toString()
+          } 
+          console.log(this.formItem.replacementRepair)
 
 
-            var arry2 = this.formItem.participators.split(",");
-            this.formItem.participators = [];
-            arry2.forEach(v => {
-              this.formItem.participators.push(v);
-            });
           } else {
             this.$Modal.error("网络错误,请重试！");
           }
@@ -645,7 +652,6 @@ export default {
     // 历史报修数据
     clientRepairList() {
       this.RepairList_show = true;
-      console.log(this.RepairForm.clientId);
       if (this.RepairForm.clientId == "") {
         this.$Modal.error("请先输入手机号!");
       }

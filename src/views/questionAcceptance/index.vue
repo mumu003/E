@@ -226,17 +226,12 @@
         //表单
         formItem: {
           workOrderNo:'',
-          // priority:'',
-          // officeLocation:'',
           name:'',
           phone:'',
           beginTime:"",
           endTime:"",
           isChange:"",
           userName:""
-          // companyName:'',
-          // repairSource:'',
-          // companyName:''
         },
         // 设置结束时间大于开始时间
         end:{
@@ -247,7 +242,7 @@
         
         //表格
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/repairProblemSingleList",
+          url:"/api/emaint/repairProblem/repairProblemSingleList",
               columns:[
                 {
                   type:"selection",
@@ -561,11 +556,10 @@
       //开始时间
       getStartDate(startDate){
         this.formItem.beginTime=startDate
-        // this.end.disabledDate(startDate)
       },
       //结束时间
       getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+        this.formItem.endTime=endDate
         
       },
       //获取工单号列表
@@ -579,7 +573,7 @@
             orgId: sessionStorage.getItem("orgId"),
             projectId: sessionStorage.getItem("curProjectId")
           }
-          this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingList", params, res => {
+          this.$request.post("/api/room/getBuildingList", params, res => {
             this.buildingList = res.data.buildings.map(item => ({
               id: item.buildingId,
               name: item.gongdanhao
@@ -601,7 +595,7 @@
         })
         this.unitList=[];
         this.roomsList=[];
-        this.$request.post("https://emaint.ahjarzeng.com/api/room/getBuildingRoom",{
+        this.$request.post("/api/room/getBuildingRoom",{
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId"),
           userId: sessionStorage.getItem("userId"),
@@ -658,7 +652,7 @@
             this.addForm.xingming = item.num
           }
         })
-        this.$request.post("https://emaint.ahjarzeng.com/api/room/getRoomCustomer",{
+        this.$request.post("/api/room/getRoomCustomer",{
           roomId
         }, res => {
           this.addForm.shoujihao=""
@@ -691,7 +685,7 @@
           if (valid) {
             this.addForm.orgId = sessionStorage.getItem("orgId")
             this.addForm.projectId = sessionStorage.getItem("curProjectId")
-            this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/add",this.addForm, res => {
+            this.$request.post("/api/contractBill/add",this.addForm, res => {
               if (res.code === 200) {
                 setTimeout(() => {
                   this.modal_loading = false
@@ -732,7 +726,7 @@
           orgId: sessionStorage.getItem("orgId"),
           projectId: sessionStorage.getItem("curProjectId")
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/processSetting/data",params, res => {
+        this.$request.post("/api/processSetting/data",params, res => {
           this.addData = res.data.map(item=>({
             _disabled: item.required === '1' ?  true : false,
             _checked: item.required === '1' ?  true : false,
@@ -770,7 +764,7 @@
       //   let params = {
       //       id: this.selection[0].id
       //   }
-      //   this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/view",params,res=>{
+      //   this.$request.post("/api/contractBill/view",params,res=>{
       //     this.viewForm.id = res.data.id
       //     this.viewForm.gongdanhao = res.data.gongdanhao
       //     this.viewForm.unitName = res.data.unitName
@@ -811,7 +805,7 @@
             id: this.viewForm.id,
             status:'1'
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/check",params,res=>{
+        this.$request.post("/api/contractBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.modal_loading = false;
@@ -837,7 +831,7 @@
             id: this.viewForm.id,
             status:'0'
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/check",params,res=>{
+        this.$request.post("/api/contractBill/check",params,res=>{
           if (res.code === 200) {
             setTimeout(() => {
               this.viewModal = false
@@ -863,7 +857,7 @@
           id: this.viewForm.id,
           dataId: this.viewForm.dataId
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/start",params,res=>{
+        this.$request.post("/api/contractBill/start",params,res=>{
             if (res.code === 200) {
               setTimeout(() => {
                 this.modal_loading = false
@@ -900,7 +894,7 @@
         let params = {
           id: this.selection[0].id
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/status",params,res=>{
+        this.$request.post("/api/contractBill/status",params,res=>{
           this.nodesList = res.data.nodes.map(item => ({
             roleName: item.roleName,
             name: item.name,
@@ -950,7 +944,7 @@
       //       let params = {
       //           id
       //       }
-      //       this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/cutOut",params,res=>{
+      //       this.$request.post("/api/contractBill/cutOut",params,res=>{
       //         this.$Message.success("终止成功")
       //         this.$Modal.remove()
       //         this.$refs.table.init()
@@ -967,7 +961,7 @@
         let params = {
           id
         }
-        this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/cutOut",params,res=>{
+        this.$request.post("/api/contractBill/cutOut",params,res=>{
           this.$Message.success("终止成功")
           this.modal_loading=false
           this.endModal=false
@@ -1001,7 +995,7 @@
             let params = {
                 id
             }
-            this.$request.post("https://emaint.ahjarzeng.com/api/contractBill/delete",params,res=>{
+            this.$request.post("/api/contractBill/delete",params,res=>{
               this.$Message.success("删除成功")
               this.$Modal.remove()
               this.$refs.table.init()
@@ -1015,28 +1009,29 @@
       //搜索
       searchSubmit () {
         this.isFirst = true
-        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/repairProblem/repairProblemSingleList",qs.stringify(this.formItem), res => {
-          this.$Modal.error({title: '提示信息', content: res.resMessage})
-        }, res => {
-          if (res.statusCode === 200) {
-            this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.resMessage})
-          }
-        })
+        this.$refs.table.init()
+        this.isFirst = false
+        // this.$request.post("/api/emaint/repairProblem/repairProblemSingleList",qs.stringify(this.formItem), res => {
+        //   this.$Modal.error({title: '提示信息', content: res.resMessage})
+        // }, res => {
+        //   if (res.statusCode === 200) {
+        //     this.$Message.success("搜索成功！")
+        //     this.isFirst = false
+        //     this.$refs.table.init()
+        //   } else {
+        //     this.$Modal.error({title: '提示信息', content: res.resMessage})
+        //   }
+        // })
       },
       //重置
       searchCancel () {
         this.formItem={
-          status: '',
-          shoujihao: '',
-          buildingId: '',
-          roomId: '',
-          unitId: '',
+          workOrderNo: '',
+          name: '',
+          phone: '',
+          userName: '',
           beginTime: '',
-          endUpdateTime: ''
+          endTime: ''
         }
         this.isFirst = true
         setTimeout(()=>{

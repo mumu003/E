@@ -1,6 +1,7 @@
 import axios from 'axios'
 import qs from 'qs';
 
+axios.defaults.baseURL='https://emaint.ahjarzeng.com'
 export function qsdata(data) {
   return qs.parse(qs.stringify(data));
 }
@@ -8,6 +9,7 @@ export function qsdata(data) {
 export default {
 
   post(url, data, success_call, fail_callback) {
+    // url=url.replace(/\/apiHost/,'https://emaint.ahjarzeng.com')
     // data.token = sessionStorage.token;
     return axios.post(url, data)
       .then(function (response) {

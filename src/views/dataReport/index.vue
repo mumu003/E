@@ -141,7 +141,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/repairProblem/totalComapnyCountList",
+          url:"/api/emaint/repairProblem/totalComapnyCountList",
               columns:[
                 {
                   title: '操作',

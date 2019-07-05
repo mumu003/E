@@ -15,11 +15,17 @@
               <!-- modal1 = true;controlmodal=false; -->
             </Row>
               <Col>
-                <div class="first" v-for="(item,index) in questionlis" :key="index">
-                  <div @click="activeli.id==item.parentId?activeli.id='':activeli.id=item.parentId;" :style="{backgroundColor:activeli.id==item.parentId?'#2b85e4':''}">{{item.parentProblem}}</div> 
+                <!-- <div class="first" v-for="(item,index) in questionlis" @click="tagleechildren" :key="index">
+                  <div @click="activeli.id==item.parentId?activeli.id='':activeli.id=item.parentId;"  :style="{backgroundColor:activeli.id==item.parentId?'#2b85e4':''}">{{item.parentProblem}}</div> 
                   
                   <div class="two" v-for="(v,i) in item.childList" :key="i" @click="activeli.id==v.id?activeli.id='':activeli.id=v.id;" :style="{backgroundColor:activeli.id==v.id?'#2b85e4':''}">{{v.problem}}</div>
-              </div>
+              </div> -->
+              <template>
+          <Tree :data="questionlis" 
+          @on-select-change="showchildren"
+          :empty-text="'加载中...'"
+          ></Tree>
+        </template>
               <!-- <div class="first" v-for="(item,index) in questionlis" :key="index">
                 <div @click="activeli.id=item.id;activeli.parentId=item.parentId" :style="{color:activeli.id==item.id?'#2b85e4':''}">{{item.problem}}</div> 
                 
@@ -340,10 +346,21 @@ import qs from 'qs';
           this.updatedata={};
         }
      },
+    
+     showchildren(v){
+    
+        if(v[0].childList){
+          this.activeli.id=v[0].parentId
+        }
+        else {
+          this.activeli.id=v[0].id
+        this.activeli.parentId=v[0].parentId;
+        }
+     },
      save(type){
      
         if(type=='add'){
-          this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
+          this.$request.post('/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
             if(data.statusCode!=200)
             this.$Modal.error({title: '提示信息', content: data.responseResult})
             else{
@@ -353,7 +370,7 @@ import qs from 'qs';
           })
         }
         else{
-         this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
+         this.$request.post('/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
            if(data.statusCode==200)
             this.$Message.success('修改成功')
             this.getlist()
@@ -377,7 +394,7 @@ import qs from 'qs';
         this.addmodel=false;
         this.updatemodel=true;
         this.controlmodal=false;
-        this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
+        this.$request.post('/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
           if(res.statusCode==200){
             this.updatedata=res.responseResult;
           
@@ -385,7 +402,7 @@ import qs from 'qs';
         })
      },
      ok(){
-         this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
+         this.$request.post('/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
                 if(data.statusCode==200)
                    this.$Message.success('删除成功')
                    this.getlist();
@@ -394,11 +411,25 @@ import qs from 'qs';
      },
       getlist(){
     //  查询一级问题
-     this.$request.post('https://emaint.ahjarzeng.com/api/emaint/problem-base/treeList',{},data=>{
+     this.$request.post('/api/emaint/problem-base/treeList',{},data=>{
         },data=>{
             if(data.statusCode==200){
             
+                
+                data.responseResult.forEach(v=>{
+                
+                  v.title=v.parentProblem;
+                  v.children=v.childList;
+                  if(v.children.length>0){
+                    v.expand=false;
+                      v.children.forEach(v1=>{
+                        v1.title=v1.problem;
+                         v.expand=false;
+                      })
+                  }
+                })
                 this.questionlis=data.responseResult;
+               
                 // console.log(data.responseResult.treeLevel)
             }
         })
@@ -439,8 +470,10 @@ div.page>div.mt10 div.ivu-row>div.ivu-col:first-of-type{
 }
 div.page>div.mt10 div.ivu-row>div.ivu-col:last-of-type{
   margin-top: 10px;
-  border: 1px solid #eee;
-   background-color: rgba(240, 240, 240, 1);
+  /* border: 1px solid #eee; */
+   /* background-color: rgba(240, 240, 240, 1); */
+   padding-left: 15%;
+   text-align: left;
 }
 div.ivu-card-body{
   padding: 0px;
@@ -453,10 +486,19 @@ div.first,div.two{
   
 }
 div.first{
-     background-color: rgba(204, 204, 204, 1) 
+     background-color: rgba(204, 204, 204, 1);
+     
+     text-align: left;
+     
 }
 div.two{
   background-color: rgba(240, 240, 240, 1);
+  padding-left: 20%;
+  text-align: left;
+}
+div.first>div:first-child{
+  padding-left: 10%;
+  border-bottom: 1px solid #ccc;
 }
 .ivu-form{
   padding: 0px 15px;
@@ -480,6 +522,10 @@ div.controlbutton button{
  border:none;
  border-radius: 0px;
 
+}
+/* 树形列表 */
+.ivu-tree-title{
+  font-size: 14px;
 }
 </style>
 

@@ -265,7 +265,7 @@ import qs from "qs";
         },
         //表格
         tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/emaint/client/page",
+          url:"/api/emaint/client/page",
           columns:[
             {
                   title: '操作',
@@ -307,7 +307,7 @@ import qs from "qs";
                                             // this.editPhone=params.row.phone
                                             // this.editId=params.row.id
                                             if(params.row.id){
-                                                this.$request.post('https://emaint.ahjarzeng.com/api/emaint/client/phone',qs.stringify({phone:params.row.phone}),res=>{
+                                                this.$request.post('/api/emaint/client/phone',qs.stringify({phone:params.row.phone}),res=>{
                                                   this.$Message.error("网络出错，请重试！")
                                                 },res=>{
                                                   if(res.statusCode==200){
@@ -351,7 +351,7 @@ import qs from "qs";
                                         click: () => {
                                           this.userId=params.row.id
                                           // console.log(params.row.enable)
-                                          if(params.row.enable=1){
+                                          if(params.row.enable==1){
                                             // 启用状态，需要禁用
                                             this.disable=true
                                           }else{
@@ -474,12 +474,11 @@ import qs from "qs";
     },
     created(){
       // 优先级下拉列表
-      this.$request.post("https://emaint.ahjarzeng.com/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
+      this.$request.post("/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
               this.modal_loading = false
               this.$Message.error("网络出错，请重试！")
             } , res => {
               if (res.statusCode === 200) {
-                console.log(res)
                 var data=res.responseResult
                 data.forEach((v)=>{
                     this.priority.push(v)
@@ -529,7 +528,7 @@ import qs from "qs";
       //新增模态框提交
       addSubmit(){
         this.modal_loading = true
-            this.$request.post("https://emaint.ahjarzeng.com/api/emaint/client/save",this.addForm,res=>{
+            this.$request.post("/api/emaint/client/save",this.addForm,res=>{
               this.modal_loading = false
               this.$Message.error("网络出错，请重试！")
             } , res => {
@@ -562,7 +561,7 @@ import qs from "qs";
         this.isFirst = true
         this.formItem.pageNo=1;
         this.formItem.limit=10;
-        this.$request.post("https://emaint.ahjarzeng.com/api/emaint/client/page",qs.stringify(this.formItem), res => {
+        this.$request.post("/api/emaint/client/page",qs.stringify(this.formItem), res => {
             this.$Modal.error({title: '提示信息', content: res.resMessage})
         }, res => {
            if (res.statusCode === 200) {
@@ -593,7 +592,7 @@ import qs from "qs";
 
       // 同步客户
       syncClient(){
-          this.$request.post("https://emaint.ahjarzeng.com/api/emaint/client/syncClient",{}, res => {
+          this.$request.post("/api/emaint/client/syncClient",{}, res => {
             this.$Modal.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {
@@ -608,7 +607,7 @@ import qs from "qs";
 
       // 启用
       enble_sure(){
-          this.$request.post("https://emaint.ahjarzeng.com/api/emaint/client/enable",qs.stringify({id:this.userId}), res => {
+          this.$request.post("/api/emaint/client/enable",qs.stringify({id:this.userId}), res => {
             this.$Modal.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {
@@ -623,8 +622,7 @@ import qs from "qs";
       
       // 禁用
       disable_sure(){
-        console.log(123)
-          this.$request.post("https://emaint.ahjarzeng.com/api/emaint/client/disable",qs.stringify({id:this.userId}), res => {
+          this.$request.post("/api/emaint/client/disable",qs.stringify({id:this.userId}), res => {
             this.$Modal.error("网络出错，请重试！")
           }, res => {
             if (res.statusCode === 200) {

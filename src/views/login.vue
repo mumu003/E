@@ -72,7 +72,7 @@ export default {
           if (!window.sessionStorage) {
             alert("浏览器不支持sessionStorage");
           } else {
-            this.$request.post('https://emaint.ahjarzeng.com/api/user/a/login',qs.stringify(this.form),res => {
+            this.$request.post('/api/user/a/login',qs.stringify(this.form),res => {
               if (res.statusCode === 200) {  //这里是错误的请求
                 sessionStorage.setItem("token", res.responseResult.token)
                 sessionStorage.setItem("userID", res.responseResult.userID)
