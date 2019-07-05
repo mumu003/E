@@ -14,7 +14,7 @@
 
               <Col span="8">
                 <FormItem label="接单逾期时间" :label-width="120">
-                  <Input  v-model="formItem.assignCycle"  :maxlength=30 placeholder="请选择"/>
+                  <Input  v-model="formItem.assignCycle"  :maxlength=5 @on-keyup='vlinumber' placeholder="请输入接单逾期时间"/>
                 </FormItem>
               </Col>
               <Col span="4">
@@ -41,7 +41,7 @@
              <Row type="flex"  style="margin-top:20px;margin-bottom:20px;" justify="start">
               <Col span="8">
                 <FormItem label="报修逾期时间" :label-width="120">
-                  <Input  v-model="formItem.maintainCycle"  :maxlength=30 placeholder="请输入报修逾期时间"/>
+                  <Input  v-model="formItem.maintainCycle"   :maxlength=5 @on-keyup="vlinumber" placeholder="请输入报修逾期时间"/>
                 </FormItem>
               </Col>
               <Col span="4">
@@ -701,6 +701,10 @@ import qs from "qs";
           this.$refs.table.init()
           this.isFirst = false
         },200)
+      },
+      // 验证输入时间
+      vlinumber(e){
+        e.target.value=e.target.value.replace(/^(0+)|[^\d]+/g,'');
       },
       // 提示窗关闭
       closes () {

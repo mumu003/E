@@ -13,7 +13,7 @@
             <Row type="flex" justify="start">
               <Col span="7">
               <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+                <Input v-model="formItem.phone" icon="search"  :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
               <Col span="7">
@@ -30,12 +30,12 @@
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
               <Col span="7">
-              <FormItem label="联系人手机号" :label-width="100">
+              <FormItem label="联系人手机号" :label-width="127">
                 <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
               </FormItem>
               </Col>
               <Col span="7">
-                <FormItem label="是否代为报修" :label-width="100" >
+                <FormItem label="是否代为报修" :label-width="127" >
                    <RadioGroup v-model="formItem.replacementRepair" >
                     <Radio label="1" :disabled="viewForm.id!=''?true:false">
                         <span>是</span>
@@ -127,8 +127,8 @@
               <Row>
                 <Col span="8">
                 <FormItem label="常见问题">
-                    <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" :style="{'pointer-events':viewForm.id!=''?'none':'all'}"  disabled>暂无</Button>
-                    <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" :key="index">{{item}}</Button>
+                    <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
+                    <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
                     <!-- <Button type="ghost" size="large">Ghost</Button>
                     <Button type="ghost" size="large">Ghost</Button>
                     <Button type="ghost" size="large">Ghost</Button>
@@ -170,8 +170,8 @@
                     <!-- <Input v-model="formItem.participators" ></Input>  -->
                     <Select v-model="formItem.participatorids"  multiple  style="width:100%;" :disabled="!state_show">
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
-                          <span>{{item.name}}</span>
-                          <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+                          <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
+                          <span>{{item.problemNum==null?0:item.problemNum}}单</span>
                       </Option>
                   </Select>
                 </FormItem>
@@ -317,7 +317,7 @@ export default {
       RepairList_show: false,
       //表格
       tableConfig: {
-        url: "/api/emaint/repairProblem/clientRepairProblemList",
+       url: "",
         columns: [
           {
             title: "工单号码 ",
@@ -327,7 +327,7 @@ export default {
           {
             title: "优先级",
             key: "priority",
-            width: 200
+            width: 120
           },
           {
             title: "状态",
@@ -337,8 +337,16 @@ export default {
           {
             // PS:暂无该字段
             title: "变更状态",
-            key: " phone",
-            width: 120
+            key: " orderChange",
+            width: 120,
+            render:(h,params)=>{
+                switch(params.row.orderChange){
+                  case 0:
+                    return h('div',"否")
+                  case 1:
+                    return h('div',"是")
+                }
+              }
           },
           {
             title: "办公位",
@@ -374,25 +382,16 @@ export default {
       },
       RepairForm: {
         clientId: "",
-        beginTime: "",
-        endTime: "",
-        isChange: "",
-        workOrderNo: "",
-        name: "",
-        state: "",
-        phone: "",
-        userName: ""
+       
       }
     };
   },
   mounted() {
-    //方法
-    if (this.$route.params.id) {
-      this.viewForm.id = this.$route.params.id;
-      this.getinfo();
-    }
+ 
+    
   },
   created() {
+    this.search();
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -414,6 +413,14 @@ export default {
         }
       }
     );
+     if (sessionStorage.getItem('paramid')) {
+      this.viewForm.id =sessionStorage.getItem('paramid');
+      this.getinfo();
+    }
+    // if (this.$route.params.id) {
+    //   this.viewForm.id = this.$route.params.id;
+    //   this.getinfo();
+    // }
   },
   methods: {
     changefile(e) {
@@ -455,14 +462,8 @@ export default {
             this.formItem.clientId = data.id;
 
             this.RepairForm.clientId = data.id;
-            this.RepairForm.beginTime = data.beginTime || "";
-            this.RepairForm.endTime = data.endTime || "";
-            this.RepairForm.isChange = data.isChange || "";
-            this.RepairForm.workOrderNo = data.workOrderNo || "";
-            this.RepairForm.name = data.name;
-            this.RepairForm.state = data.state;
-            this.RepairForm.phone = data.phone;
-            this.RepairForm.userName = data.userName || "";
+           
+            
           } 
         }
       );
@@ -527,6 +528,7 @@ export default {
               replacementRepair:data.replacementRepair,
               id: data.id
             };
+            this.RepairForm.clientId=data.clientId;
             
 
             switch(data.state){
@@ -581,7 +583,10 @@ export default {
                         v=v.match(/(\S*)\|IMG/)[1]
                       }else if(v.indexOf("|wx")!=-1){
                         v=v.match(/(\S*)\|wx/)[1]
+                      }else if(v.indexOf("|tmp")!=-1){
+                        v=v.match(/(\S*)\|tmp/)[1]
                       }
+                      
                     this.imglist.push(v)
                   })
                 }else if(data.problemImgs.indexOf("|IMG")!=-1){
@@ -590,7 +595,11 @@ export default {
                 }else if(data.problemImgs.indexOf("|wx")!=-1){
                   // 只有一张图
                   this.imglist.push(data.problemImgs.split("|wx")[0])
-                }else{
+                }else if(data.problemImgs.indexOf("|tmp")!=-1){
+                  // 只有一张图
+                  this.imglist.push(data.problemImgs.split("|tmp")[0])
+                }
+                else{
                   this.imglist.push(data.problemImgs)
                 }
               }
@@ -625,7 +634,7 @@ export default {
           if(this.formItem.replacementRepair!=null){
             this.formItem.replacementRepair=this.formItem.replacementRepair.toString()
           } 
-          console.log(this.formItem.replacementRepair)
+         
 
 
           } else {
@@ -651,12 +660,15 @@ export default {
     },
     // 历史报修数据
     clientRepairList() {
-      this.RepairList_show = true;
-      if (this.RepairForm.clientId == "") {
-        this.$Modal.error("请先输入手机号!");
+      // console.log(this.RepairForm.clientId);
+      if (this.RepairForm.clientId==''||this.RepairForm.clientId==null) {
+        this.$Message.error("请先输入手机号!");
+      }else{
+        this.RepairList_show = true;
+        this.tableConfig.url='/api/emaint/repairProblem/clientRepairProblemList'
+        this.$refs.table.init();
       }
-      this.$refs.table.init();
-    }
+    },
   }
 };
 </script>

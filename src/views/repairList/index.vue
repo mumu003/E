@@ -170,19 +170,35 @@ import qs from "qs";
                                     on: {
                                         click: () => {
                                             this.evaluatModal=true
-                                            this.$request.post("/api/emaint/repair-estimate/view",{workOrderNo:params.row.workOrderNo}, res => {
+                                            this.evaluatList=[]
+                                            this.$request.post("/api/emaint/repair-estimate/view",qs.stringify({workOrderNo:params.row.workOrderNo}), res => {
                                               this.$Modal.error({title: '提示信息', content: res.resMessage})
                                             }, res => {
                                               if (res.statusCode === 200) {
                                                 this.$Message.success("搜索成功！")
                                                 var data=res.responseResult
 
-                                                this.modalStar=data.star
+                                                // 星级
+                                                this.modalStar=parseInt(data.star)
+                                                // 评价留言
                                                 this.remark=data.remark
-                                                var ary=data.label.split(",")
-                                                ary.forEach((v)=>{
-                                                    this.evaluatList.push(v)
-                                                })
+
+                                                // 处理评价
+                                                if(data.label){
+                                                  if(data.label.indexOf(",")!=-1){
+                                                    var ary=data.label.split(",")
+                                                    ary.forEach((v)=>{
+                                                        this.evaluatList.push(v)
+                                                    })
+                                                  }else{
+                                                    this.evaluatList.push(data.label)
+                                                  }
+                                                }else{
+                                                  var str="暂无评价"
+                                                  this.evaluatList.push(str)
+                                                }
+                                                
+                                                
 
                                               } else {
                                                 this.$Modal.error({title: '提示信息', content: res.resMessage})

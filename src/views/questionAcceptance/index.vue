@@ -28,7 +28,7 @@
                   </FormItem>
                 </Col>
               </Row>
-              <Row>
+              <!-- <Row>
               <Col span="6">
               <FormItem label="是否变更">
                  <Select v-model="formItem.isChange" placeholder="全部">
@@ -43,7 +43,7 @@
                 <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>
               </FormItem>
               </Col>
-              </Row>
+              </Row> -->
 
               <Row>
                 <Col span="6">
@@ -230,8 +230,8 @@
           phone:'',
           beginTime:"",
           endTime:"",
-          isChange:"",
-          userName:""
+          // isChange:"",
+          // userName:""
         },
         // 设置结束时间大于开始时间
         end:{

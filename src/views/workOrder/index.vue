@@ -265,11 +265,9 @@ export default {
                     },
                     on: {
                       click: () => {
+                        sessionStorage.setItem('paramid',params.row.id)
                         this.$router.push({
                           name: "dispatch",
-                          params: {
-                            id: params.row.id
-                          }
                         });
                       }
                     }
@@ -683,26 +681,16 @@ export default {
         name: "workOrderManage"
       });
     },
+
+
     // 导出
-    // PS：跨域问题
-    exportProject() {
-      this.$request.get(
-        "/api/emaint/repairProblem/exportRepairProblemData",
-        {},
-        res => {
-          this.$Modal.error("导出失败！");
-        },
-        res => {
-          if (res.code === 200) {
-            this.$Message.success("导出成功！");
-            this.$refs.table.init();
-          } else {
-            this.$Modal.error("网络错误,请重试！");
-          }
-        }
-      );
+     exportProject() {
+        var beginDate= this.formItem.beginTime || '1990-06-01';
+        var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
+        var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate='+beginDate+'&endDate='+endDate+'&accessToken='+sessionStorage.getItem('token');
+        window.open(url);
     },
-  
+
     //搜索
     searchSubmit() {
       this.isFirst = true;
@@ -755,17 +743,14 @@ export default {
       for (var i = 0; i < this.files.length; i++) {
         data.append("imgs", this.files[i]);
       }
-      console.log(data);
+
       let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
       axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
         resdata => {
-          this.$Modal.success({
-            title: "提示信息",
-            content: resdata.data.responseResult
-          });
+          this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
         },
         err => {
-          this.$Modal.success({ title: "提示信息", content: err });
+          this.$Modal.success({ title: "提示信息", content: "添加备注失败" });
         }
       );
 
