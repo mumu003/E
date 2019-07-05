@@ -197,7 +197,7 @@ import qs from "qs";
   export default {
     data () {
       return {
-        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
+        // auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         hasDelAuth:false,//有删除权限
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
@@ -238,9 +238,14 @@ import qs from "qs";
             { required: true, message: '用户名不能为空', trigger: 'blur' },
             { type: 'string', max: 20, message: '用户名不能超过20个字符', trigger: 'blur' }
           ],
-          phone: [
-            { required: true, message: '手机号不能为空', trigger: 'blur' },
-            { type: 'string', max: 11,min:11, message: '请输入正确的手机格式', trigger: 'blur' }
+          phone: [{ required: false, message: '请输入正确的手机号', trigger: 'blur' , transform(value){
+                    var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                    if(!reg.test(value)){
+                        return false
+                    }else{
+                        return value
+                    }
+          }}
           ],
           pwd:[
             { required: true, message: '密码不能为空', trigger: 'blur' },
@@ -395,11 +400,11 @@ import qs from "qs";
     },
     mounted(){
       this.getRoleList()//获取角色
-      for(let key in this.auth){
-        if(this.auth[key]=="用户删除"){
-          this.hasDelAuth=true
-        }  
-      }
+      // for(let key in this.auth){
+      //   if(this.auth[key]=="用户删除"){
+      //     this.hasDelAuth=true
+      //   }  
+      // }
       
     },
     methods:{
@@ -521,6 +526,11 @@ import qs from "qs";
         if(this.addForm.roleId.length<=0){
           this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
           return
+        }
+        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+        if(!reg.test(this.addForm.phone)){
+          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
+          return     
         }
         let name=JSON.parse(JSON.stringify(this.addForm.roleId))
         name=name.join(",")

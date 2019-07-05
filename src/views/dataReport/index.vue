@@ -233,16 +233,14 @@ import qs from "qs";
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+this.formItem.beginDate+"&endDate="+this.formItem.endDate+"&accessToken="+sessionStorage.token, data => {
-        },data=>{
-        // 成功的回调
-          if(data.statusCode==200){
-            console.log("sdnstsmr")
-          }else{
-              this.$Modal.error({title: '提示信息', content: data.responseResult})
-          }
-        })
-
+        let begin=new Date(this.formItem.beginDate)
+        let beginM=begin.getMonth()+1
+        begin=begin.getFullYear()+"-"+beginM+"-"+begin.getDate()
+        let end=new Date(this.formItem.endDate)
+        let endM=end.getMonth()+1
+        end=end.getFullYear()+"-"+endM+"-"+end.getDate()
+        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
+        location.href=url
       },
       //搜索
       searchSubmit () {

@@ -32,7 +32,7 @@
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
               <Button type="primary" class="set-pwd" @click="modal1 = true">修改密码</Button>
               <Badge :count="msg_badge" class="msg-badge">
-                <Icon size="23" type="android-notifications" color="#999"></Icon>
+                <Icon size="23" type="android-notifications" color="#999" @click="goHome"></Icon>
               </Badge>
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
@@ -245,6 +245,11 @@
                 "name": "角色管理",
                 "url": "/roleManagement",
                 },
+                {
+                "id": 123,
+                "name": "数据字典",
+                "url": "/dataDictionary",
+                }
               ]
             }
       ]
@@ -258,6 +263,9 @@
       // }
     },
     methods: {
+      goHome(){
+        this.$router.push("/")
+      },
       handleSubmit(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
