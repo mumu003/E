@@ -450,12 +450,11 @@ export default {
   mounted() {
     //方法
     if (this.$route.params.phone) {
-    this.formItem.phone=this.$route.params.phone
-    this.search(this.$route.params.phone);
+      this.formItem.phone=this.$route.params.phone
+      this.search(this.$route.params.phone);
     }
   },
   beforeCreate() {
-
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
