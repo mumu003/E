@@ -216,33 +216,28 @@ import qs from "qs";
         }
       }
     },
-    mounted(){
+    created(){
       let today=new Date();
       let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
       let M=Number(WeekFirstDay.getMonth())+1;    
       this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+WeekFirstDay.getDate();
-      // this.formItem.beginDate=WeekFirstDay
-      console.log(this.formItem.beginDate)
-      // this.formItem.beginDate=new String(this.formItem.beginDate)
+
       let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
       let N=Number(WeekLastDay.getMonth())+1     
       this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+WeekLastDay.getDate();
-      // this.formItem.endDate=new String(this.formItem.endDate)
-      // this.formItem.endDate=WeekLastDay
+
     },
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("/api/emaint/repairProblem/exportCompanyProblemData?year=2019&month=6", data => {
-        },data=>{
-        // 成功的回调
-          if(data.statusCode==200){
-            console.log("sdnstsmr")
-          }else{
-              this.$Modal.error({title: '提示信息', content: data.responseResult})
-          }
-        })
-
+        let begin=new Date(this.formItem.beginDate)
+        let beginM=begin.getMonth()+1
+        begin=begin.getFullYear()+"-"+beginM+"-"+begin.getDate()
+        let end=new Date(this.formItem.endDate)
+        let endM=end.getMonth()+1
+        end=end.getFullYear()+"-"+endM+"-"+end.getDate()
+        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
+        location.href=url
       },
       //搜索
       searchSubmit () {

@@ -154,7 +154,7 @@
         }
       }
     },
-    mounted(){
+    created(){
       let beginDate = new Date(sessionStorage.beginDate)
       let M=beginDate.getMonth()+1
       this.formItem.beginDate = beginDate.getFullYear()+"-"+M+"-"+beginDate.getDate()
@@ -165,12 +165,14 @@
     methods: {
       // 导出
       exportTabel(){
-        this.$request.get("/api/emaint/repairProblem/exportCompanyProblemDetailsData?year=2019&month=6&companyName="+this.$route.params.companyName, data => {
-        },data=>{
-        // 成功的回调
-        // console.log(111)
-        })
-
+        let begin=new Date(this.formItem.beginDate)
+        let beginM=begin.getMonth()+1
+        begin=begin.getFullYear()+"-"+beginM+"-"+begin.getDate()
+        let end=new Date(this.formItem.endDate)
+        let endM=end.getMonth()+1
+        end=end.getFullYear()+"-"+endM+"-"+end.getDate()
+        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemDetailsData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token+"&companyName="+this.$route.params.companyName
+        location.href=url
       },
       //开始时间
       getStartDate(startDate){

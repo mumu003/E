@@ -158,6 +158,14 @@ export default new Router({
           },
           component: resolve => require(['@/views/distributeUser/index.vue'], resolve),
         },
+        {
+        path: '/dataDictionary',
+          name: 'dataDictionary',
+          meta: {
+            title: '数据字典'
+          },
+          component: resolve => require(['@/views/dataDictionary/index.vue'], resolve),
+        },
         
         
         
