@@ -66,12 +66,12 @@ export default {
           okText:'去新增工单',
           closable:true,
           onOk:()=>{
-          this.$router.push({
-            name: "workOrderManage",
-            params:{
-              phone:e.data
-            }
-          });
+            this.$router.push({
+              name: "workOrderManage",
+              params:{
+                phone:e.data
+              }
+            });
         }
       }) 
   
