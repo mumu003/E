@@ -53,8 +53,8 @@
           <div class="search-row">
             <Row>
               <Col>
-              <Button type="primary" @click="addMaterialModal=true" icon="plus-round">新增</Button>
-              <Button type="error" icon="close" @click="delModal" v-if="hasDelAuth">删除</Button>
+              <Button type="primary" @click="addMaterialModal=true" v-if="auth.tf_user_edit" icon="plus-round">新增</Button>
+              <Button type="error" icon="close" @click="delModal" v-if="auth.tf_user_delete">删除</Button>
               
               </Col>
               <Col>
@@ -197,8 +197,7 @@ import qs from "qs";
   export default {
     data () {
       return {
-        // auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
-        hasDelAuth:false,//有删除权限
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
         delId:"",//删除用户id
@@ -322,7 +321,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_user_edit
                                 },
                                 on: {
                                     click: () => {
@@ -336,7 +336,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_user_edit
                                 },
                                 on: {
                                     click: () => {
@@ -349,7 +350,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'error',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_user_delete
                                 },
                                 on: {
                                     click: () => {
@@ -400,12 +402,6 @@ import qs from "qs";
     },
     mounted(){
       this.getRoleList()//获取角色
-      // for(let key in this.auth){
-      //   if(this.auth[key]=="用户删除"){
-      //     this.hasDelAuth=true
-      //   }  
-      // }
-      
     },
     methods:{
       // 批量删除弹出框处理

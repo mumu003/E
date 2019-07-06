@@ -42,7 +42,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
               </Col>
               <Col>
               </Col>
@@ -127,7 +127,7 @@ import qs from "qs";
   export default {
     data () {
       return {
-        bt:"",
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         isFirst: false, //首页.
         loading: true, //加载
         //表单
@@ -136,11 +136,11 @@ import qs from "qs";
           endDate:"",
         },
         // 设置结束时间大于开始时间
-        // end:{
-        //     disabledDate :(function(date){
-        //       return date.valueOf() < new Date( this.formItem.beginDate)
-        //     }).bind(this)
-        // },
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.beginDate)
+            }).bind(this)
+        },
         //表格
         tableConfig:{
           url:"/api/emaint/repairProblem/totalComapnyCountList",
@@ -262,8 +262,6 @@ import qs from "qs";
         let now=new Date(this.formItem.endDate)
         let nowM=now.getMonth()+1
         this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
-        console.log(this.formItem.beginDate)
-        console.log(this.formItem.endDate)
       },
       // 结束时间
       getEndDate(endDate){
@@ -271,8 +269,6 @@ import qs from "qs";
         let now=new Date(this.formItem.beginDate)
         let nowM=now.getMonth()+1
         this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
-        console.log(this.formItem.beginDate)
-        console.log(this.formItem.endDate)
       }
     }
   }

@@ -122,6 +122,7 @@ export default {
       }
     };
     return {
+      auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
       total: 0,
       currentPage: 1,
       limit: 10,
@@ -203,35 +204,11 @@ export default {
       this.getAgency(page)
     },
     goWork(){
-      this.$router.push("/workOrder")
+      if(this.auth.tf_repair_problem_list){
+        this.$router.push("/workOrder")
+      }
     }
-  },
-  // watch:{
-  //   currentPage(){
-  //      this.$request.post(
-  //         "/api/repairMessage/userUnreadData",
-  //         {
-  //           limit:10,
-  //           page:this.currentPage
-  //         },
-  //         res => {
-  //           this.msg_list=res.responseResult.list
-  //         },
-  //         res => {
-  //           // this.$Modal.error({ title: "提示信息", content: res.resMessage });
-  //           this.msg_list=res.responseResult.list
-  //           this.msg_list.map((item) => {
-  //               item._checked = this.allChecked
-  //           })
-  //           this.msg_list.map((item, index) => {
-  //             this.msg_list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
-  //           })
-  //           this.total = res.responseResult.total || res.responseResult.length
-  //           this.currentPage = res.responseResult.pageNum === 0 ? 1 : res.responseResult.pageNum
-  //         }
-  //       );
-  //   }
-  // }
+  }
 };
 </script>
 

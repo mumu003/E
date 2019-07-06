@@ -6,7 +6,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
               
               </Col>
               <Col>
@@ -89,6 +89,7 @@
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         isFirst:false,
         loading: true, //加载
         modal_loading: false, //延迟
