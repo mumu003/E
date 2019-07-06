@@ -18,7 +18,7 @@
                     {{item.content}}
                 </div>
                 <div class="msg-time">
-                    {{item.sendTime}}
+                    {{item.gmtCreate}}
                 </div>
               </Card>
           </div>
@@ -83,10 +83,18 @@
 .msg-row .ivu-card-body{
   display: flex;
   justify-content: space-between;
+  align-items: center;
   /* border: 1px solid #999; */
 }
 .msg-row{
   cursor: pointer;
+}
+.msg-content{
+  width: 80%;
+  text-align: left;
+}
+.msg-time{
+  width: 20%;
 }
 </style>
 

@@ -12,12 +12,13 @@
               <Row>
                <Col span="6">
                   <FormItem label="时间">
-                    <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginDate" class="widthp100"></DatePicker>
+                    <DatePicker format="yyyy-MM-dd"  type="date" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginDate" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem >
-                    <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
+                    <!-- :options="end" -->
+                    <DatePicker format="yyyy-MM-dd" type="date"  placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -126,6 +127,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        bt:"",
         isFirst: false, //首页.
         loading: true, //加载
         //表单
@@ -134,11 +136,11 @@ import qs from "qs";
           endDate:"",
         },
         // 设置结束时间大于开始时间
-        end:{
-            disabledDate :(function(date){
-              return date.valueOf() < new Date( this.formItem.beginDate)
-            }).bind(this)
-        },
+        // end:{
+        //     disabledDate :(function(date){
+        //       return date.valueOf() < new Date( this.formItem.beginDate)
+        //     }).bind(this)
+        // },
         //表格
         tableConfig:{
           url:"/api/emaint/repairProblem/totalComapnyCountList",
@@ -221,11 +223,11 @@ import qs from "qs";
       let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
       let M=Number(WeekFirstDay.getMonth())+1;    
       this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+WeekFirstDay.getDate();
-
+      // this.getStartDate(this.formItem.beginDate)
       let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
       let N=Number(WeekLastDay.getMonth())+1     
       this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+WeekLastDay.getDate();
-
+      // this.getEndDate(this.formItem.endDate)
     },
     methods: {
       // 导出
@@ -257,10 +259,20 @@ import qs from "qs";
        // 开始时间
       getStartDate(startDate){
         this.formItem.beginDate=startDate
+        let now=new Date(this.formItem.endDate)
+        let nowM=now.getMonth()+1
+        this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
+        console.log(this.formItem.beginDate)
+        console.log(this.formItem.endDate)
       },
       // 结束时间
       getEndDate(endDate){
         this.formItem.endDate=endDate
+        let now=new Date(this.formItem.beginDate)
+        let nowM=now.getMonth()+1
+        this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
+        console.log(this.formItem.beginDate)
+        console.log(this.formItem.endDate)
       }
     }
   }
