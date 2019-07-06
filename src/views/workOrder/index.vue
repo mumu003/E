@@ -687,7 +687,8 @@ export default {
      exportProject() {
         var beginDate= this.formItem.beginTime || '1990-06-01';
         var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
-        var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate='+beginDate+'&endDate='+endDate+'&accessToken='+sessionStorage.getItem('token');
+        var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginDate='+beginDate+'&endDate='+endDate+'&accessToken='+sessionStorage.getItem('token');
+        
         window.open(url);
     },
 

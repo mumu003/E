@@ -121,6 +121,7 @@
         modal1: false,
         modal2: false,
         openedSubmenuArr: [],
+        
         isFullScreen: false,
         menuList: [],
         company: '',
@@ -159,16 +160,19 @@
       }
     },
     mounted(){
-      this.getCompany()
+      this.getCompany();
+
     },
     created(){
       this.head = headImg
       this.username=sessionStorage.loginName
+      
       this.menuList = [
             {
               "id": 4,
               "name": "工单受理",
               "url": "/questionAcceptance",
+              "code":"tf_repair_problem_appointer_list",
             },
             {
               "id": 5,
@@ -178,11 +182,13 @@
                 "id": 6,
                 "name": "工单列表",
                 "url": "/workOrder",
+                "code":"tf_repair_problem_list",
                 },
                 {
                   "id": 10,
                   "name": "评价列表",
                   "url": "evaluationList",
+                  "code":"tf_repair_eveluate_list",
                 },
               ]
             },
@@ -195,11 +201,13 @@
                 "id": 6,
                 "name": "客户列表",
                 "url": "/customerManagement",
+                "code":"tf_client_list",
                 },
                 {
                   "id": 11,
                   "name": "登录历史",
                   "url": "/loginHistory",
+                  "code":"tf_login_record_list",
                 },
               ]
             },
@@ -212,16 +220,19 @@
                 "id": 81,
                 "name": "问题配置",
                 "url": "/problemConfiguration",
+                "code":"tf_problem_balse_level3_list",
                 },
                 {
                 "id": 82,
                 "name": "常见问题",
                 "url": "/commonProblem",
+                "code":"tf_problem_balse_list",
                 },
                 {
                   "id": 11,
                   "name": "逾期设置",
                   "url": "/operationSetting",
+                  "code":"tf_system_settting_list",
                 },
               ]
             },
@@ -229,6 +240,7 @@
               "id": 9,
               "name": "数据报表",
               "url": "/dataReport",
+              "code":"tf_company_problem_data",
             },
             {
               "id": 12,
@@ -239,16 +251,19 @@
                 "id": 121,
                 "name": "用户管理",
                 "url": "/userManagement",
+                "code":"tf_user_list",
                 },
                 {
                 "id": 122,
                 "name": "角色管理",
                 "url": "/roleManagement",
+                "code":"tf_role_list",
                 },
                 {
                 "id": 123,
                 "name": "数据字典",
                 "url": "/dataDictionary",
+                "code":"tf_dictionary_list",
                 }
               ]
             }

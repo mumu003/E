@@ -51,7 +51,7 @@
                   <Col span="16"  >
                   <div @click="openList(item,index)" class="tableName">
                     <span>
-                      {{item.name}}
+                      {{item.name+'-----'+item.code}}
                     </span>
                     <Icon type="chevron-down"  ref="iconDown" class="iconDown"  v-show="item.childs.length>0"></Icon>
                     <Icon type="chevron-up" ref="iconUp" class="iconUp"  v-show="item.childs.length>0"></Icon>
@@ -66,7 +66,7 @@
                       </Col>
                       <Col span="18" style="display:flex;justify-content:space-between;">
                         <span>
-                          {{v.name}}
+                          {{v.name+'---'+v.code}}
                         </span>
                       </Col>
                   </div>

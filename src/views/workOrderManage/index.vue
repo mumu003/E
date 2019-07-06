@@ -306,7 +306,7 @@ export default {
         remark: "",
         participatorids: [],
 
-        problem: "暂无数据",
+        problem: "",
         problemImgs: "",
         participators: [],
         userId:'',
@@ -622,7 +622,7 @@ export default {
                   problemType: "",
                   remark: "",
                   participatorids: [],
-                  problem: "暂无数据",
+                  problem: "",
                   problemImgs: "",
                   participators: [],
                   userId:'',
@@ -632,6 +632,27 @@ export default {
           }
         }
       );
+      }else{
+        this.formItem={
+                  clientId: "",
+                  phone: "",
+                  officeLocation: "",
+                  contactPhone:"",
+                  name: "",
+                  companyName: "",
+                  priority: "",
+                  sex: "",
+                  problemClass: "",
+                  problemType: "",
+                  remark: "",
+                  participatorids: [],
+                  problem: "",
+                  problemImgs: "",
+                  participators: [],
+                  userId:'',
+                  userName:"",
+                  replacementRepair:""
+                } 
       }
     },
     // 报修提交

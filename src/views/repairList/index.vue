@@ -73,7 +73,12 @@
       <Modal v-model="evaluatModal" title="查看评价"
             width="400"
             @on-cancel="cancel">
-          <Row style="text-align: center;margin:5px 0">
+          <Row style="text-align: center;margin:5px 0;margin-bottom:10px;">
+            <Col span="24">
+               <span style="font-size:16px">给{{toUserName}}的评价</span>
+            </Col>
+          </Row>
+          <Row style="text-align: center;margin:5px 0;padding:5px 0;border-top:1px solid grey">
             <Col span="24">
                 <!-- <div class="evaluationRate"> -->
                     <Rate disabled :value="modalStar"></Rate>
@@ -121,6 +126,7 @@ import qs from "qs";
         modalStar:0,// 星级,
         // 评语
         evaluatList:[], 
+        toUserName:"",
         remark:"",
         searchparam:{
           clientId:'',
@@ -162,7 +168,7 @@ import qs from "qs";
                                     props: {
                                         type: 'primary',
                                         size: 'small',
-                                        disabled:params.row.state=="已评价"?false:true
+                                        disabled:params.row.state=="已评价"?true:false
                                     },
                                     style:{
                                       marginRight: '5px',
@@ -198,6 +204,10 @@ import qs from "qs";
                                                   this.evaluatList.push(str)
                                                 }
                                                 
+                                                // 处理评价的工程师
+                                                if(data.toUserName){
+                                                  this.toUserName=data.toUserName
+                                                }
                                                 
 
                                               } else {

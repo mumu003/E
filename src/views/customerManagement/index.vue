@@ -247,7 +247,8 @@ import qs from "qs";
         disable:false,
         userId:"",
         priority:[],
-        
+        phone_rule:false,
+
         //表单
         formItem: {
           
@@ -530,7 +531,19 @@ import qs from "qs";
         this.modal_loading = true
         if(this.addForm.companyName!=""&&this.addForm.name!=""&&
           this.addForm.phone!=""&&this.addForm.priority!=""){
-          this.$request.post("/api/emaint/client/save",this.addForm,res=>{
+
+            // 处理手机号
+            var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(this.addForm.phone)){
+                    this.phone_rule=false
+                  }else{
+                    this.phone_rule=true
+                  }
+            if(!this.phone_rule){
+              this.modal_loading = false
+              this.$Modal.error({title: '提示信息', content: "请输入正确格式的手机号"})
+            }else{
+              this.$request.post("/api/emaint/client/save",this.addForm,res=>{
               this.modal_loading = false
               this.$Message.error("网络出错，请重试！")
             } , res => {
@@ -547,6 +560,8 @@ import qs from "qs";
                 this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
             })
+            }
+          
         }else{
           this.modal_loading = false
           this.$Modal.error({title: '提示信息', content:"必填项不能为空"})
