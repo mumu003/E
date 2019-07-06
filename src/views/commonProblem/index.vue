@@ -227,7 +227,7 @@ import qs from 'qs';
         },
         //表单
         formItem: {
-          parentId:'',
+          parentId:'null',
           problem:'',
           watch:true,
         },
@@ -721,7 +721,7 @@ import qs from 'qs';
                 }, 2000);
               } else {
                 this.modal_loading = false
-                this.$Modal.error({title: '提示信息', content: res.message})
+                this.$Modal.error({title: '提示信息', content: res.responseResult})
               }
             })
           }else{
@@ -1003,18 +1003,28 @@ import qs from 'qs';
             if(data.statusCode==200){
             
                 
-                data.responseResult.forEach(v=>{
+                data.responseResult.forEach((v,i)=>{
                  
                   v.title=v.parentProblem;
                   v.children=v.childList;
                   if(v.children.length>0){
-                    v.expand=false;
-                      v.children.forEach(v1=>{
-                        v1.title=v1.problem;
-                         v.expand=false;
+                    if(i==0){
+                    v.expand=true
+                    }
+                    else
+                      v.expand=false;
+                      v.children.forEach((v1,i1)=>{
+                        if(i1==0&&i==0){
+                          v1.selected=true;
+                         
+                        this.formItem.parentId=v1.id;
+                        }
+                         v1.title=v1.problem;
+                         v1.expand=false;
                       })
                   }
                 })
+            
                 this.questionlis=data.responseResult;
                
                 // console.log(data.responseResult.treeLevel)
@@ -1024,6 +1034,7 @@ import qs from 'qs';
       
     },
     created(){
+      
       this.getlist();
       this.$request.post('/api/dictionary/optionsByGroupCode',qs.stringify({groupCode:'problem_priority'}),res=>{},res=>{
        if(res.statusCode==200)

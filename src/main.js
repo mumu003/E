@@ -26,6 +26,7 @@ Vue.component('shrinkable-menu', layoutMenu)
 Vue.component('collapse-icon', cIcon)
 Vue.component('m-table', mTable)
 
+
 Vue.prototype.$request = Request
 Vue.prototype.$Vue = Vue
 Vue.config.productionTip = false

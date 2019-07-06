@@ -3,7 +3,8 @@
     <div>
         <Menu ref="sideMenu" active-name="" :open-names="['1']" theme="dark" width="auto">
             <template v-for="(item,index) in menuList">
-                <MenuItem v-if="item.childList==null" :name="(index+1)" :key="item.id" @click.native="routeTo(item.url)"  :id="item.url">
+                
+                <MenuItem v-if="item.childList==null&&(auths.indexOf(item.code)!=-1)" :name="(index+1)" :key="item.id" @click.native="routeTo(item.url)"  :id="item.url">
                     <Icon :type="item.icon"  :key="'menuicon' + item.id"></Icon>
                     <span class="layout-text" :key="'title' + item.id">{{item.name}}</span>
                 </MenuItem>
@@ -13,7 +14,7 @@
                         <Icon :type="item.icon"></Icon>
                         <span class="layout-text">{{item.name}}</span>
                     </template>
-                    <template v-for="(child,cid) in item.childList">
+                    <template v-for="(child,cid) in item.childList" v-if="auths.indexOf(child.code)!=-1">
                         <MenuItem :name="(index+1)+'-'+(cid+1)" :key="'menuitem' + child.id" @click.native="routeTo(child.url)"  :id="child.url">
                             <Icon :type="child.icon" :size="iconSize" :key="'icon' + child.id"></Icon>
                             <span class="layout-text" :key="'title' + child.id">{{child.name}}</span>
@@ -33,6 +34,11 @@ export default {
         menuList: Array,
         iconSize: Number,
     },
+    data:function(){
+        return{
+              auths:[],
+        }
+    },
     methods: {
     routeTo(url){
         for(let value of document.getElementsByClassName("ivu-menu-vertical")[0].querySelectorAll('.ivu-menu-item')){
@@ -48,7 +54,12 @@ export default {
         this.$router.push(url)
     },
     },
-    mounted(){
+    created(){
+        var auths=JSON.parse(sessionStorage.getItem('auth'));
+        for(var i in auths){
+          this.auths.push(i);
+        }
+      
         // console.log(this.menuList);
     },
 };

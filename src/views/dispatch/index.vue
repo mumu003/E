@@ -107,14 +107,16 @@
 
               <Col span="7">
                 <FormItem label="图片描述"  >
+                    <!-- @on-cancel="imgcancel" -->
                     <Modal 
                         title="View Image" 
                         v-model="visible"
-                        @on-cancel="imgcancel" :closable="false">
+                         :closable="false">
                         <img :src="imglist[showimg]" v-if="visible" style="width: 100%">
                     </Modal>
                         <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
-                            <img :src="item" alt="" v-if="item!=''" :style="{'pointer-events':viewForm.id!=''?'none':'all'}"  @click="showtheimg(index)">
+                           <!-- :style="{'pointer-events':viewForm.id!=''?'none':'all'}" -->
+                            <img :src="item" alt="" v-if="item!=''"  @click="showtheimg(index)">
                             <i class="ivu-icon ivu-icon-ios-plus-empty" :style="{'pointer-events':viewForm.id!=''?'none':'all'}" v-else @click="uploadfile(index)"></i>
                         </div>
                         <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
@@ -127,7 +129,7 @@
               <Row>
                 <Col span="8">
                 <FormItem label="常见问题">
-                    <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
+                    <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
                     <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
                     <!-- <Button type="ghost" size="large">Ghost</Button>
                     <Button type="ghost" size="large">Ghost</Button>
@@ -335,7 +337,6 @@ export default {
             width: 120
           },
           {
-            // PS:暂无该字段
             title: "变更状态",
             key: " orderChange",
             width: 120,
@@ -472,6 +473,9 @@ export default {
     repairSubmit() {
       if (this.viewForm.id != "") {
         if(this.formItem.userId!=""&&this.formItem.userId!=null){
+          console.log(this.userlist)
+          console.log(this.formItem.participatorids)
+          this.formItem.participatorids=this.formItem.participatorids==null?'':this.formItem.participatorids.toString()
         this.$request.post(
           "/api/emaint/repairProblem/updateUser",
           qs.stringify({ id: this.formItem.id, userId: this.formItem.userId,participatorids:this.formItem.participatorids.toString(),changeDescription:"" }),
@@ -579,26 +583,36 @@ export default {
                   // 多张图
                   var ary=data.problemImgs.split("|~|")
                     ary.forEach(v=>{
-                      if(v.indexOf("|IMG")!=-1){
-                        v=v.match(/(\S*)\|IMG/)[1]
-                      }else if(v.indexOf("|wx")!=-1){
-                        v=v.match(/(\S*)\|wx/)[1]
-                      }else if(v.indexOf("|tmp")!=-1){
-                        v=v.match(/(\S*)\|tmp/)[1]
+                      if(v.indexOf("|")!=-1){
+                        v=v.match(/(\S*)\|/)[1]
                       }
+
+                      // if(v.indexOf("|IMG")!=-1){
+                      //   v=v.match(/(\S*)\|IMG/)[1]
+                      // }else if(v.indexOf("|wx")!=-1){
+                      //   v=v.match(/(\S*)\|wx/)[1]
+                      // }else if(v.indexOf("|tmp")!=-1){
+                      //   v=v.match(/(\S*)\|tmp/)[1]
+                      // }
                       
                     this.imglist.push(v)
                   })
-                }else if(data.problemImgs.indexOf("|IMG")!=-1){
+                }else if(data.problemImgs.indexOf("|")!=-1){
                   // 只有一张图
-                  this.imglist.push(data.problemImgs.split("|IMG")[0])
-                }else if(data.problemImgs.indexOf("|wx")!=-1){
-                  // 只有一张图
-                  this.imglist.push(data.problemImgs.split("|wx")[0])
-                }else if(data.problemImgs.indexOf("|tmp")!=-1){
-                  // 只有一张图
-                  this.imglist.push(data.problemImgs.split("|tmp")[0])
+                  this.imglist.push(data.problemImgs.split("|")[0])
                 }
+
+                
+                // else if(data.problemImgs.indexOf("|IMG")!=-1){
+                //   // 只有一张图
+                //   this.imglist.push(data.problemImgs.split("|IMG")[0])
+                // }else if(data.problemImgs.indexOf("|wx")!=-1){
+                //   // 只有一张图
+                //   this.imglist.push(data.problemImgs.split("|wx")[0])
+                // }else if(data.problemImgs.indexOf("|tmp")!=-1){
+                //   // 只有一张图
+                //   this.imglist.push(data.problemImgs.split("|tmp")[0])
+                // }
                 else{
                   this.imglist.push(data.problemImgs)
                 }
