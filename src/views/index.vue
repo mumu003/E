@@ -31,9 +31,12 @@
           <div class="user-dropdown-menu-con" style="width:auto;max-width:600px">
             <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
               <Button type="primary" class="set-pwd" @click="modal1 = true">修改密码</Button>
-              <Badge :count="msg_badge" class="msg-badge">
-                <Icon size="23" type="android-notifications" color="#999" @click="goHome"></Icon>
-              </Badge>
+              <div @click="goHome">
+                  <Badge :count="msg_badge" class="msg-badge" >
+                    <Icon size="23" type="android-notifications" color="#999" ></Icon>
+                  </Badge>
+              </div>
+              
               <Dropdown transfer trigger="click">
                 <a href="javascript:void(0)">
                   <span class="main-user-name" style="width:auto;max-width:290px;font-size:14px">{{username}}</span>

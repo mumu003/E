@@ -17,7 +17,7 @@
         </Card>
       </Col>
     </Row>
-    <Row :gutter="10" >
+    <Row :gutter="10" v-if="setting">
       <Col span="24">
         <Card class="search-card">
           <div class="search-row">
@@ -26,7 +26,7 @@
                 所属类型:              
               </Col>
               <Col span="20">
-                所属类型:              
+                {{type}}           
               </Col>
             </Row>
             <Row>
@@ -36,7 +36,7 @@
             </Row>
           </div>
           <Row class="searchable-table-con">
-            <m-table :config="tableRightConfig" :searchParams="formItem" ref="table" ></m-table>
+            <m-table :config="tableRightConfig" :searchParams="setForm" ref="keytable" ></m-table>
         </Row>
         </Card>
       </Col>
@@ -46,13 +46,13 @@
       <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
           <Col span="22" >
-            <FormItem label="类型"  prop="type">
-              <Input v-model="addForm.type" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="类型"  prop="code">
+              <Input v-model="addForm.code" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
-            <FormItem label="描述"  prop="msg">
-              <Input v-model="addForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="描述"  prop="name">
+              <Input v-model="addForm.name" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
         </Row>
@@ -66,13 +66,13 @@
       <Form  ref="updateForm" :model="updateForm" :label-width="100" :rules="ruleupdate" >
         <Row>
           <Col span="22" >
-            <FormItem label="类型"  prop="type">
-              <Input v-model="updateForm.type" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="类型"  prop="code">
+              <Input v-model="updateForm.code" placeholder="请输入类型" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
-            <FormItem label="描述"  prop="msg">
-              <Input v-model="updateForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="描述"  prop="name">
+              <Input v-model="updateForm.name" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
         </Row>
@@ -86,13 +86,13 @@
       <Form  ref="addkeyForm" :model="addkeyForm" :label-width="100" :rules="ruleaddkey" >
         <Row>
           <Col span="22" >
-            <FormItem label="标签"  prop="label">
-              <Input v-model="addkeyForm.label" placeholder="请输入标签" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="标签"  prop="name">
+              <Input v-model="addkeyForm.name" placeholder="请输入标签" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
-            <FormItem label="键值"  prop="key">
-              <Input v-model="addkeyForm.key" placeholder="请输入键值" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="键值"  prop="value">
+              <Input v-model="addkeyForm.value" placeholder="请输入键值" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
           <Col span="22" >
@@ -101,8 +101,8 @@
             </FormItem>
           </Col>
           <Col span="22" >
-            <FormItem label="描述"  prop="msg">
-              <Input v-model="addkeyForm.msg" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            <FormItem label="描述"  prop="description">
+              <Input v-model="addkeyForm.description" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
             </FormItem>
           </Col>
         </Row>
@@ -110,6 +110,50 @@
       <div slot="footer" style="text-align:right;margin:0 auto;">
         <Button type="ghost" size="default" @click="addkeyCancel">取消</Button>
         <Button type="primary" size="default" @click="addkeySubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+    <Modal title="添加键值" v-model="updatekeyModal" :closable="false" width="400px" @on-cancel="updatekeyCancel">
+      <Form  ref="updatekeyForm" :model="updatekeyForm" :label-width="100" :rules="ruleupdatekey" >
+        <Row>
+          <Col span="22" >
+            <FormItem label="标签"  prop="name">
+              <Input v-model="updatekeyForm.name" placeholder="请输入标签" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="键值"  prop="value">
+              <Input v-model="updatekeyForm.value" placeholder="请输入键值" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="排序"  prop="sort">
+              <Input v-model="updatekeyForm.sort" placeholder="请输入排序" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+          <Col span="22" >
+            <FormItem label="描述"  prop="description">
+              <Input v-model="updatekeyForm.description" placeholder="请输入描述" :maxlength=50 style="width: 100%" ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="updatekeyCancel">取消</Button>
+        <Button type="primary" size="default" @click="updatekeySubmit" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+    <Modal v-model="deleteModal" width="300" title="提示">
+      <p id="note-info">是否确认删除字典？</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <Button type="ghost" size="default" @click="deleteModal=false">取消</Button>
+        <Button type="primary" size="default" @click="del()">确定</Button>
+      </div>
+    </Modal>
+    <Modal v-model="delModal" width="300" title="提示">
+      <p id="note-info">是否确认删除字典？</p>
+      <div slot="footer" style="text-align:center;margin:0 auto;">
+        <Button type="ghost" size="default" @click="delModal=false">取消</Button>
+        <Button type="primary" size="default" @click="delkey()">确定</Button>
       </div>
     </Modal>
       
@@ -120,74 +164,112 @@ import qs from "qs";
 export default {
   data() {
     return {
+      type:"",
+      deleteModal:false,
+      delModal:false,
+      delkeyId:"",
+      delId:"",
+      modal_loading:false,
+      setting:false,
       addMaterialModal:false,
       updateModal:false,
       addkeyModal:false,
-      selectAll:false,//全选
-      isClick:false,//是否点击全选
-      roleName:sessionStorage.roleName,
-      explain:sessionStorage.explain,
-      selectList:[],//选中的权限列表
-      // 新增用户
+      updatekeyModal:false,
+      // 新增
       addForm:{
-          type:"",
-          msg:""
+          code:"",
+          name:""
       },
       //新增表单验证
       ruleAddMaterial:{
-          type: [
+          code: [
             { required: true, message: '类型不能为空', trigger: 'blur' },
           ],
-           msg: [
+          name: [
             { required: true, message: '描述不能为空', trigger: 'blur' },
           ],
       },
+      // 修改
       updateForm:{
-        type:"",
-        msg:""
+        id:"",
+        code:"",
+        name:"",
+        explain:""
       },
-      //新增表单验证
+      //修改表单验证
       ruleupdate:{
-          type: [
+          code: [
             { required: true, message: '类型不能为空', trigger: 'blur' },
           ],
-           msg: [
+           name: [
             { required: true, message: '描述不能为空', trigger: 'blur' },
           ],
       },
+      // 添加键值
       addkeyForm:{
-        label:"",
-        key:"",
+        name:"",
+        value:"",
         sort:"",
-        msg:""
+        description:"",
+        dictionaryCategoryId:"",
+        status:1,
+        id:"",
+        code:""
       },
+      // 添加键值表单验证
       ruleaddkey:{
-          label: [
+          name: [
             { required: true, message: '标签不能为空', trigger: 'blur' },
           ],
-           key: [
+           value: [
             { required: true, message: '键值不能为空', trigger: 'blur' },
           ],
           sort: [
             { required: true, message: '排序不能为空', trigger: 'blur' },
           ],
       },
+      // 添加键值
+      updatekeyForm:{
+        name:"",
+        value:"",
+        sort:"",
+        description:"",
+        dictionaryCategoryId:"",
+        status:1,
+        id:"",
+        code:""
+      },
+      // 添加键值表单验证
+      ruleupdatekey:{
+          name: [
+            { required: true, message: '标签不能为空', trigger: 'blur' },
+          ],
+          value: [
+            { required: true, message: '键值不能为空', trigger: 'blur' },
+          ],
+          sort: [
+            { required: true, message: '排序不能为空', trigger: 'blur' },
+          ],
+      },
+      setForm:{
+        id:""
+      },
       formItem:{
         name:""
       },
       // 表格数据
       tableConfig:{
-          url:"https://emaint.ahjarzeng.com/api/dictionary/data",
+          url:"/api/dictionary/data",
               columns:[
                 {
                   title: '操作',
-                  width:180,
+                  width:160,
                   align:"center",
                   render:(h,params)=>{
                         return h('div',{
                           style:{
                             display:"flex",
-                            justifyContent:"space-between",
+                            justifyContent:"space-around",
                             flexWrap:"wrap"
                           }
                         },
@@ -203,8 +285,9 @@ export default {
                                 on: {
                                     click: () => {
                                           this.updateModal=true
-                                          this.updateForm.type=params.row.name
-
+                                          this.updateForm.code=params.row.code
+                                          this.updateForm.name=params.row.name
+                                          this.updateForm.id=params.row.id
                                     }
                                 }
                             },"修改"),
@@ -218,11 +301,11 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                          // this.$router.push({name:"distributeUser",params:params.row})
-                                          this.$router.push({path:"/distributeUser"})
-                                          sessionStorage.setItem("roleName",params.row.name)
-                                          sessionStorage.setItem("explain",params.row.explain)
-                                          sessionStorage.setItem("roleId",params.row.id)
+                                          this.setting=true
+                                          this.setForm.id=params.row.id
+                                          this.type=params.row.code
+                                          this.addkeyForm.dictionaryCategoryId=params.row.id
+                                          this.updatekeyForm.dictionaryCategoryId=params.row.id
                                     }
                                 }
                             },"设置"),
@@ -236,12 +319,8 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                      if(params.row.num>0){
-                                        this.unDeleteModal=true
-                                      }else{
-                                        this.deleteModal=true
-                                      }
-                                      this.roleID=params.row.id
+                                      this.delId=params.row.id
+                                      this.deleteModal=true
                                     }
                                 }
                             },"删除")
@@ -250,20 +329,20 @@ export default {
                 },
                 {
                   title: '类型',
-                  key: 'name',
-                  width:150,
+                  key: 'code',
+                  width:200,
                   align:"center"
                 },
                 {
                   title: '描述',
-                  key: 'dictionaries',
-                  width:100,
+                  key: 'name',
+                  width:200,
                   align:"center"
                 }
               ],
       },
       tableRightConfig:{
-          url:"https://emaint.ahjarzeng.com/api/dictionary/data",
+          url:"/api/dictionary/optionsById",
               columns:[
                 {
                   title: '操作',
@@ -288,9 +367,13 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                          this.updateModal=true
-                                          this.updateForm.type=params.row.name
-
+                                          this.updatekeyModal=true
+                                          this.updatekeyForm.name=params.row.name
+                                          this.updatekeyForm.value=params.row.value
+                                          this.updatekeyForm.sort=params.row.sort
+                                          this.updatekeyForm.description=params.row.description
+                                          this.updatekeyForm.id=params.row.id
+                                          this.updatekeyForm.code=params.row.code
                                     }
                                 }
                             },"修改"),
@@ -305,12 +388,8 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                      if(params.row.num>0){
-                                        this.unDeleteModal=true
-                                      }else{
-                                        this.deleteModal=true
-                                      }
-                                      this.roleID=params.row.id
+                                      this.delModal=true
+                                      this.delkeyId=params.row.id
                                     }
                                 }
                             },"删除")
@@ -319,19 +398,19 @@ export default {
                 },
                 {
                   title: '键值',
-                  key: 'name',
+                  key: 'value',
                   width:150,
                   align:"center"
                 },
                 {
                   title: '键名',
-                  key: 'dictionaries',
+                  key: 'name',
                   width:100,
                   align:"center"
                 },
                 {
                   title: '排序',
-                  key: 'dictionaries',
+                  key: 'sort',
                   width:100,
                   align:"center"
                 }
@@ -340,32 +419,18 @@ export default {
     };
   },
   methods: {
-    //新增用户
+    //新增
     addSubmit () {
-        if(this.addForm.pwd != this.addForm.pwdTwo){
-          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+        if(!this.addForm.code){
+          this.$Modal.error({title: '提示信息', content: "类型不能为空！"})
           return
         }
-        if(this.addForm.roleId.length<=0){
-          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+        if(!this.addForm.name){
+          this.$Modal.error({title: '提示信息', content: "描述不能为空！"})
           return
         }
-        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
-        if(!reg.test(this.addForm.phone)){
-          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
-          return     
-        }
-        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
-        name=name.join(",")
-        this.addDataForm={
-              roleId:name,
-              name:this.addForm.name,
-              phone:this.addForm.phone,
-              password:this.addForm.pwd,
-              loginName:this.addForm.name
-        }
-        // qs
-        this.$request.post("/api/user/save",this.addDataForm,res=>{
+        
+        this.$request.post("/api/dictionary/saveOptionGroup",this.addForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
               this.addMaterialModal = false
@@ -399,38 +464,24 @@ export default {
         this.addMaterialModal = false
         this.$refs.addForm.resetFields()
     },
-    //修改用户
+    //修改
     updateSubmit () {
-        if(this.addForm.pwd != this.addForm.pwdTwo){
-          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+        if(!this.updateForm.code){
+          this.$Modal.error({title: '提示信息', content: "类型不能为空！"})
           return
         }
-        if(this.addForm.roleId.length<=0){
-          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+        if(!this.updateForm.name){
+          this.$Modal.error({title: '提示信息', content: "描述不能为空！"})
           return
         }
-        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
-        if(!reg.test(this.addForm.phone)){
-          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
-          return     
-        }
-        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
-        name=name.join(",")
-        this.addDataForm={
-              roleId:name,
-              name:this.addForm.name,
-              phone:this.addForm.phone,
-              password:this.addForm.pwd,
-              loginName:this.addForm.name
-        }
-        // qs
-        this.$request.post("/api/user/save",this.addDataForm,res=>{
+
+        this.$request.post("/api/dictionary/saveOptionGroup",this.updateForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
-              this.addMaterialModal = false
+              this.updateModal = false
               this.modal_loading = false
-              this.$refs.addForm.resetFields()
-              this.$Message.success("添加成功!")
+              this.$refs.updateForm.resetFields()
+              this.$Message.success("修改成功!")
               this.$refs.table.init()
             }, 2000)
           } else {
@@ -439,13 +490,13 @@ export default {
           }
         },res=>{
           if (res.statusCode === 200) {
-            // setTimeout(() => {
-              this.addMaterialModal = false
+            setTimeout(() => {
+              this.updateModal = false
               this.modal_loading = false
-              this.$refs.addForm.resetFields()
-              this.$Message.success("添加成功!")
+              this.$refs.updateForm.resetFields()
+              this.$Message.success("修改成功!")
               this.$refs.table.init()
-            // }, 1000)
+            }, 2000)
           } else {
             this.$Modal.error({title: '提示信息', content: res.responseResult})
             this.modal_loading = false
@@ -458,39 +509,30 @@ export default {
         this.updateModal = false
         this.$refs.updateForm.resetFields()
     },
-    //修改用户
+    //添加键值
     addkeySubmit () {
-        if(this.addForm.pwd != this.addForm.pwdTwo){
-          this.$Modal.error({title: '提示信息', content: "两次密码不一致！"})
+        if(!this.addkeyForm.name){
+          this.$Modal.error({title: '提示信息', content: "标签不能为空！"})
           return
         }
-        if(this.addForm.roleId.length<=0){
-          this.$Modal.error({title: '提示信息', content: "所属角色不能为空！"})
+        if(!this.addkeyForm.value){
+          this.$Modal.error({title: '提示信息', content: "键值不能为空！"})
           return
         }
-        var reg=/^[1][3,4,5,7,8][0-9]{9}$/
-        if(!reg.test(this.addForm.phone)){
-          this.$Modal.error({title: '提示信息', content: "手机格式不正确！"})
-          return     
-        }
-        let name=JSON.parse(JSON.stringify(this.addForm.roleId))
-        name=name.join(",")
-        this.addDataForm={
-              roleId:name,
-              name:this.addForm.name,
-              phone:this.addForm.phone,
-              password:this.addForm.pwd,
-              loginName:this.addForm.name
+        if(!this.addkeyForm.sort){
+          this.$Modal.error({title: '提示信息', content: "排序不能为空！"})
+          return
         }
         // qs
-        this.$request.post("/api/user/save",this.addDataForm,res=>{
+        this.addkeyForm.code=this.addkeyForm.value
+        this.$request.post("/api/dictionary/saveOption",this.addkeyForm ,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
-              this.addMaterialModal = false
+              this.addkeyModal = false
               this.modal_loading = false
-              this.$refs.addForm.resetFields()
+              this.$refs.addkeyForm.resetFields()
               this.$Message.success("添加成功!")
-              this.$refs.table.init()
+              this.$refs.keytable.init()
             }, 2000)
           } else {
             this.$Modal.error({title: '提示信息', content: res.responseResult})
@@ -499,11 +541,60 @@ export default {
         },res=>{
           if (res.statusCode === 200) {
             // setTimeout(() => {
-              this.addMaterialModal = false
+              this.addkeyModal = false
               this.modal_loading = false
-              this.$refs.addForm.resetFields()
+              this.$refs.addkeyForm.resetFields()
               this.$Message.success("添加成功!")
-              this.$refs.table.init()
+              this.$refs.keytable.init()
+            // }, 1000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        })
+
+    },
+    //添加取消
+    addkeyCancel () {
+        this.addkeyModal = false
+        this.$refs.addkeyForm.resetFields()
+    },
+    //修改键值
+    updatekeySubmit () {
+        if(!this.updatekeyForm.name){
+          this.$Modal.error({title: '提示信息', content: "标签不能为空！"})
+          return
+        }
+        if(!this.updatekeyForm.value){
+          this.$Modal.error({title: '提示信息', content: "键值不能为空！"})
+          return
+        }
+        if(!this.updatekeyForm.sort){
+          this.$Modal.error({title: '提示信息', content: "排序不能为空！"})
+          return
+        }
+        // qs
+        this.$request.post("/api/dictionary/saveOption",this.updatekeyForm ,res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.updatekeyModal = false
+              this.modal_loading = false
+              this.$refs.updatekeyForm.resetFields()
+              this.$Message.success("修改成功!")
+              this.$refs.keytable.init()
+            }, 2000)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        },res=>{
+          if (res.statusCode === 200) {
+            // setTimeout(() => {
+              this.updatekeyModal = false
+              this.modal_loading = false
+              this.$refs.updatekeyForm.resetFields()
+              this.$Message.success("修改成功!")
+              this.$refs.keytable.init()
             // }, 1000)
           } else {
             this.$Modal.error({title: '提示信息', content: res.responseResult})
@@ -513,167 +604,74 @@ export default {
 
     },
     //修改取消
-    addkeyCancel () {
-        this.addkeyModal = false
-        this.$refs.addkeyForm.resetFields()
+    updatekeyCancel () {
+        this.updatekeyModal = false
+        this.$refs.updatekeyForm.resetFields()
     },
-    // 点击子复选框
-    clickItem(){
-      this.isClick=false
-    },
-    // 点击父复选框
-    clickAll(){
-      this.isClick=true
-    },
-    // 全选
-    checkAll(){
-      if(this.isClick==true){
-        if(this.selectAll){
-          this.selectList=[]
-          this.tableData.map((item)=>{
-            this.selectList.push(item.id)
-            item.childs.map((v)=>{
-              this.selectList.push(v.id)
-            })
-          })
-        }else{
-          this.selectList=[]
-        }
-        // console.log(this.selectList)
-      }else{
-        if(this.selectList.length<this.$refs.tableCol.length){
-          this.selectAll=false
-        }else{
-          this.selectAll=true
-        }
-      }  
-      console.log(this.$refs.tableCol.length)
 
-    },
-    // 单选
-    checkItemAll(id,item){
-        if(!item){
-          if(this.selectList.indexOf(id)==-1){
-            this.selectList.push(id)
-          }else{
-              this.selectList.splice(this.selectList.indexOf(id),1)
+    // 删除字典
+    del(){
+      this.$request.post("/api/dictionary/deleteOptionGroup",qs.stringify({id:this.delId}),res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.$Message.success("删除成功!")
+              this.$refs.table.init()
+              this.deleteModal=false
+            }, 200)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+            this.deleteModal=false
           }
-        }else{
-          if(this.selectList.indexOf(id)==-1){
-            this.selectList.push(id)
-            item.map((v)=>{
-              this.selectList.push(v.id)
-            })
-          }else{
-              this.selectList.splice(this.selectList.indexOf(id),1)
-              item.map((v)=>{
-                this.selectList.splice(this.selectList.indexOf(v.id),1)
-              })
+        },res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.deleteModal=false
+              this.modal_loading = false
+              this.$Message.success("删除成功!")
+              this.$refs.table.init()
+            }, 200)
+          } else {
+            this.deleteModal=false
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
           }
-        }        
+        })
     },
-    // 打开二级列表
-    openList(item,index){
-        item.open=!item.open
-        if(item.childs.length>0){
-          if(item.open){
-            document.querySelectorAll(".iconDown")[index].style.display="none"
-            document.querySelectorAll(".iconUp")[index].style.display="unset"
-            document.querySelectorAll(".openlist")[index].style.display="block"
-          }else{
-            document.querySelectorAll(".iconDown")[index].style.display="unset"
-            document.querySelectorAll(".iconUp")[index].style.display="none"
-            document.querySelectorAll(".openlist")[index].style.display="none"
+    // 删除键
+    delkey(){
+        this.$request.post("/api/dictionary/deleteOption",qs.stringify({id:this.delkeyId}),res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.modal_loading = false
+              this.$Message.success("删除成功!")
+              this.$refs.keytable.init()
+              this.delModal=false
+            }, 200)
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+            this.delModal=false
           }
-        }
-    },
-    // 配置权限
-    permission(){
-      let idList=""
-      idList=this.selectList.join(",")
-      let params={
-        permissionId:idList,
-        roleId:sessionStorage.roleId
-      }
-      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/configuration/permission?permissionId="+idList+"&roleId="+sessionStorage.roleId,{}, res => {
-      // this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/configuration/permission",params, res => {
-        if(res.statusCode==200){
-          this.$Message.success("分配成功")
-          this.$router.push("/roleManagement")
-        }else{
-          this.$Modal.error({title: '提示信息', content: res.responseResult})
-        }
-      }, res => {
-        if(res.statusCode==200){
-          this.$Message.success("分配成功")
-          this.$router.push("/roleManagement")
-        }else{
-          this.$Modal.error({title: '提示信息', content: res.responseResult})
-        }
-        
-      })
-    },
-    // 获取角色权限
-    getpermissionList(){
-      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/permissions/list", {}, res => {
-        if(res.statusCode==200){
-            this.tableData=res.responseResult
-            this.tableData.map((item,index)=>{
-              item.open=false;
-            })
-        }
-      }, res => {
-        if(res.statusCode==200){
-            this.tableData=res.responseResult
-            this.tableData.map((item,index)=>{
-              item.open=false;
-            })
-        }
-        
-      })
-    },
-    //获取本角色权限
-    getRolepermission(){
-      let RoleParam={
-        page:1,
-        limit:1000,
-        roleId:sessionStorage.roleId
-      }
-      this.$request.post("https://emaint.ahjarzeng.com/api/emaint/role/permissionPage", qs.stringify(RoleParam), res => {
-        if(res.statusCode==200){
-          this.selectList=[]
-          res.responseResult.list.map((item)=>{
-              this.selectList.push(item.id)
-          })
-        }
-      }, res => {
-        if(res.statusCode==200){
-          this.selectList=[]
-          res.responseResult.list.map((item)=>{
-              this.selectList.push(item.id)
-          })
-          console.log(this.selectList)
-        }
-        
-      })
+        },res=>{
+          if (res.statusCode === 200) {
+            setTimeout(() => {
+              this.delModal=false
+              this.modal_loading = false
+              this.$Message.success("删除成功!")
+              this.$refs.keytable.init()
+            }, 200)
+          } else {
+            this.delModal=false
+            this.$Modal.error({title: '提示信息', content: res.responseResult})
+            this.modal_loading = false
+          }
+        })
     }
   },
   mounted(){
-    this.getpermissionList()
-    this.getRolepermission()
   },
-  watch:{
-    tableData(){
-      return this.tableData
-    },
-    selectList(){
-      if(this.selectList.length<this.$refs.tableCol.length){
-          this.selectAll=false
-        }else{
-          this.selectAll=true
-        }
-    }
-  }
 };
 </script>
 <style scoped>
