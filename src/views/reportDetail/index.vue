@@ -86,6 +86,7 @@
 </style>
 <script type="text/ecmascript-6">
   import index from "../../router"
+  import axios from 'axios'
   export default {
     data () {
       return {
@@ -172,7 +173,7 @@
         let end=new Date(this.formItem.endDate)
         let endM=end.getMonth()+1
         end=end.getFullYear()+"-"+endM+"-"+end.getDate()
-        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemDetailsData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token+"&companyName="+this.$route.params.companyName
+        let url=axios.defaults.baseURL+"/api/emaint/repairProblem/exportCompanyProblemDetailsData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token+"&companyName="+this.$route.params.companyName
         location.href=url
       },
       //开始时间

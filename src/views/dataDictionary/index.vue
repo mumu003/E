@@ -306,6 +306,7 @@ export default {
                                     click: () => {
                                           this.setting=true
                                           this.setForm.id=params.row.id
+                                          this.$refs.keytable.init()
                                           this.type=params.row.code
                                           this.addkeyForm.dictionaryCategoryId=params.row.id
                                           this.updatekeyForm.dictionaryCategoryId=params.row.id

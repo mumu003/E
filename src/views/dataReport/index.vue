@@ -122,7 +122,8 @@
   }
 </style>
 <script type="text/ecmascript-6">
-import qs from "qs";
+  import qs from "qs";
+  import axios from 'axios'
   import index from "../../router"
   export default {
     data () {
@@ -238,7 +239,7 @@ import qs from "qs";
         let end=new Date(this.formItem.endDate)
         let endM=end.getMonth()+1
         end=end.getFullYear()+"-"+endM+"-"+end.getDate()
-        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
+        let url=axios.defaults.baseURL+"/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
         location.href=url
       },
       //搜索
