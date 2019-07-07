@@ -70,41 +70,16 @@
 
 
     <!-- 查看评价 -->
-      <Modal v-model="evaluatModal" :title="'给'+toUserName+'的评价'"
-            width="400"
-            @on-cancel="cancel">
-          <!-- <Row style="text-align: center;margin:5px 0;margin-bottom:10px;">
-            <Col span="24">
-               <span style="font-size:16px">给{{toUserName}}的评价</span>
-            </Col>
-          </Row> -->
-          <Row style="text-align: center;margin:5px 0;padding:5px 0">
-            <Col span="24">
-                <!-- <div class="evaluationRate"> -->
+      <Modal class="modal" v-model="evaluatModal" :title="'给'+toUserName+'的评价'" width="300">
+                <div class="evaluationRate">
                     <Rate disabled :value="modalStar"></Rate>
-                <!-- </div> -->
-            </Col>
-          </Row>
-          <Row>
-              <Col span="24">
+                </div>
                 <div class="evaluationList" >
-                        <!-- v-for="(item,index) in 4" :key="index" -->
                         <span class="tag" v-for="(item,index) in evaluatList" :key="index">
-                            <!-- {{modalLabel}} -->
                             {{item}}
                         </span>
                     </div>
-              </Col>
-          </Row>
-          <Row>
-              <Col span="24">
-                <p>{{remark}}</p>
-              </Col>
-          </Row>
-        <div slot="footer" style="text-align: center;;margin:0 auto;">
-          <Button @click="cancel">取消</Button>
-          <Button type="primary"  @click="cancel">确定</Button>
-        </div>
+                <div class="evaluationcontent">{{remark}}</div>
       </Modal>
   
 
@@ -339,7 +314,7 @@ import qs from "qs";
     }
   }
 </script>
-<style>
+<style >
 .ivu-modal-body{
     padding: 15px 20px;
 }
@@ -347,7 +322,7 @@ import qs from "qs";
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  margin: 20px 0
+  /* margin: 20px 0 */
 }
 .tag{
   padding: 10px 20px;
@@ -358,6 +333,18 @@ import qs from "qs";
   cursor: default;
 }
 
+.evaluationRate{
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.evaluationcontent{
+  padding: 10px 0px;
+}
+.ivu-modal-footer{
+  display: none;
+}
 </style>
 
 

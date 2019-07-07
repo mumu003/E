@@ -61,11 +61,13 @@
       <div class="evaluationRate">
         <Rate disabled :value="modalStar"></Rate>
       </div>
-     <div class="evaluationList">
-       <!-- v-for="(item,index) in 4" :key="index" -->
-       <span class="tag" >
-         {{modalLabel}}
+     <div class="evaluationList" >
+       <span class="tag" v-for="(item,index) in modalLabel" :key="index">
+         {{item}}
        </span>
+     </div>
+     <div class="evaluationcontent">
+       {{evaluationcontent}}
      </div>
     </Modal>
   </div>
@@ -83,6 +85,9 @@
   flex-wrap: wrap;
   
 }
+.evaluationcontent{
+  padding: 10px
+}
 .tag{
   padding: 10px 20px;
   background-color: #2d8cf0;
@@ -91,7 +96,7 @@
   border-radius: 3px;
   cursor: default;
 }
-.modal .ivu-modal-footer{
+.modal >>> .ivu-modal-footer{
   display: none;
 }
 </style>
@@ -103,6 +108,7 @@
         evaluationTitle:"",//评价标题
         modalStar:0,//星级
         modalLabel:"",//评价标签
+        evaluationcontent:"",//评价内容
         isFirst: false, //是否是首页
         loading: true, //
         modal_loading: false, //延迟
@@ -139,10 +145,16 @@
                           on:{
                             click:()=>{
                               this.isShowEvaluation=true
-                              this.evaluationTitle="给"+params.row.fromClientName+"的评价"
+                              this.evaluationTitle="给"+params.row.toUserName+"的评价"
                               this.modalStar=params.row.star
-                              this.modalLabel=params.row.label
-                              console.log(params.row)
+                              this.evaluationcontent=params.row.remark
+                              if(params.row.label!=""){
+                                let labelAry=params.row.label.split(",")
+                                this.modalLabel=labelAry
+                              }else{
+                                this.modalLabel=[]
+                              }
+                              
                             }
                           }
                         },"查看更多")

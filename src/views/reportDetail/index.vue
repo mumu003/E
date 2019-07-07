@@ -124,7 +124,7 @@
                 },
                 {
                   title: '处理人',
-                  key: 'name',
+                  key: 'userName',
                   width:100,
                   align:"center"
                 },
