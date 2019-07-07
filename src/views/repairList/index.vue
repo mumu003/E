@@ -168,7 +168,7 @@ import qs from "qs";
                                     props: {
                                         type: 'primary',
                                         size: 'small',
-                                        disabled:params.row.state=="已评价"?true:false
+                                        disabled:params.row.state=="已评价"?false :true
                                     },
                                     style:{
                                       marginRight: '5px',
@@ -181,7 +181,7 @@ import qs from "qs";
                                               this.$Modal.error({title: '提示信息', content: res.resMessage})
                                             }, res => {
                                               if (res.statusCode === 200) {
-                                                this.$Message.success("搜索成功！")
+                                                // this.$Message.success("搜索成功！")
                                                 var data=res.responseResult
 
                                                 // 星级

@@ -99,7 +99,7 @@
 
     
 <Modal
-class="model"
+      class="model"
         v-model="modal1"
         title="提示框"
         @on-ok="ok"
@@ -113,419 +113,264 @@ class="model"
   </div>
 </template>
 <script type="text/ecmascript-6">
-import qs from 'qs';
-  export default {
-    data () {
-      return {
-        addmodel:true,
-        updatemodel:false,
-        modal1:false,
-        controlmodal:false,
-        addformdata: {
-                    problem: '',
-                    parentId: '',
-                  
-                },
-                 ruleValidate: {
-                    problem: [
-                        { required: true, message: '类型名称不能为空', trigger: 'blur' }
-                    ],
-                 },
-         activeli:{
-           parentId:'',
-           id:'',
-         },
-         updatedata:{},
-          questionlis:[
-          ],
-       
-                
-       
-        //新增-表单
-        addForm:{
-          areaId:'',
-          areaName:'',
-          buildingId:'',
-          buildingName:'',
-          unitId:'',
-          unitName:'',
-          roomId:'',
-          roomNum:'',
-          customerName:'',
-          area:'',
-          idCard:'',
-          contract:'',
-          purpose:'',
-          phone:'',
-          address:'',
-          remark:'',
-          deliveryDate:'',
-          actualDate:'',
-          orgId:'',
-          projectId: '',
-        },
-        //新增模态框验证
-        ruleAdd:{
-          buildingId: [
-              { required: true, message: '请选择楼栋号', trigger: 'change' }
-          ],
-          unitId: [
-              { required: true, message: '请选择单元号', trigger: 'change' }
-          ],
-          roomId: [
-              { required: true, message: '请选择房间号', trigger: 'change' }
-          ]
-        },
-        //新增表格数据
-        addTable: [
-          {
-            title: '地块',
-            key: 'areaName',
-            width:150,
-            align: 'center'
-          },
-          {
-            title: '房间号',
-            key: 'rommNum',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '商品买卖合同号/拆迁协议号',
-            key: 'contractNumber',
-            width:200,
-            align: 'center'
-          },
-          {
-            title: '合同交付期限',
-            key: 'deliveryDate',
-            width:180,
-            align: 'center'
-          },
-          {
-            title: '建筑面积',
-            key: 'area',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '业主姓名',
-            key: 'customerName',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '业主身份证号',
-            key: 'idNumber',
-            width:160,
-            align: 'center'
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:120,
-            align: 'center'
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:200,
-            align: 'center'
-          },
-          {
-            title: '用途',
-            key: 'purpose',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '备注',
-            key: 'rommNum',
-            width:150,
-            align: 'center'
-          }
-        ],
-        //审核表单
-        viewForm: {
-          id: '',
-          buildingName: '',
-          unitName: '',
-          roomNum: '',
-        },
-        //审核表格数据
-        viewTable: [
-          {
-            title: '地块',
-            key: 'areaName',
-            width:150,
-            align: 'center'
-          },
-          {
-            title: '房间号',
-            key: 'roomNum',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '商品买卖合同号/拆迁协议号',
-            key: 'contract',
-            width:200,
-            align: 'center'
-          },
-          {
-            title: '合同交互期限',
-            key: 'deliveryDate',
-            width:180,
-            align: 'center'
-          },
-          {
-            title: '建筑面积',
-            key: 'area',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '业主姓名',
-            key: 'customerName',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '业主身份证号',
-            key: 'idCard',
-            width:160,
-            align: 'center'
-          },
-          {
-            title: '联系电话',
-            key: 'phone',
-            width:120,
-            align: 'center'
-          },
-          {
-            title: '联系地址',
-            key: 'address',
-            width:200,
-            align: 'center'
-          },
-          {
-            title: '用途',
-            key: 'purpose',
-            width:100,
-            align: 'center'
-          },
-          {
-            title: '备注',
-            key: 'remark',
-            width:150,
-            align: 'center'
-          }
-        ]
-      }
-    },
-    computed: {
-      // 被选择的列表数据条数
-      selected_count(){
-        return this.$refs.table.selected_count
+import qs from "qs";
+export default {
+  data() {
+    return {
+      addmodel: true,
+      updatemodel: false,
+      modal1: false,
+      controlmodal: false,
+      addformdata: {
+        problem: "",
+        parentId: ""
       },
-      // 被选择的列表数据
-      selection(){
-        return this.$refs.table.selection
+      ruleValidate: {
+        problem: [
+          { required: true, message: "类型名称不能为空", trigger: "blur" }
+        ]
+      },
+      activeli: {
+        parentId: "",
+        id: ""
+      },
+      updatedata: {},
+      questionlis: [],
+
+      //新增-表单
+      addForm: {
+        areaId: "",
+        areaName: "",
+        buildingId: "",
+        buildingName: "",
+        unitId: "",
+        unitName: "",
+        roomId: "",
+        roomNum: "",
+        customerName: "",
+        area: "",
+        idCard: "",
+        contract: "",
+        purpose: "",
+        phone: "",
+        address: "",
+        remark: "",
+        deliveryDate: "",
+        actualDate: "",
+        orgId: "",
+        projectId: ""
+      }
+    };
+  },
+  computed: {
+    // 被选择的列表数据条数
+    selected_count() {
+      return this.$refs.table.selected_count;
+    },
+    // 被选择的列表数据
+    selection() {
+      return this.$refs.table.selection;
+    }
+  },
+  methods: {
+    cancel(type) {
+      if (type == "add") {
+        this.addformdata = {
+          problem: "",
+          parentId: ""
+        };
+      } else {
+        this.updatedata = {};
       }
     },
-   methods:{
-     cancel(type){
-        if(type=='add'){
-        this.addformdata={
-                    problem: '',
-                    parentId: '',
-                  
-                }
-        }
-        else{
-          this.updatedata={};
-        }
-     },
-    
-     showchildren(v){
-    
-        if(v[0].childList){
-          this.activeli.id=v[0].parentId
-        }
-        else {
-          this.activeli.id=v[0].id
-        this.activeli.parentId=v[0].parentId;
-        }
-     },
-     save(type){
-     
-        if(type=='add'){
-          this.$request.post('/api/emaint/problem-base/save',this.addformdata,data=>{},data=>{
-            if(data.statusCode!=200)
-            this.$Modal.error({title: '提示信息', content: data.responseResult})
-            else{
-              this.$Message.success('添加成功')
+
+    showchildren(v) {
+      if (v[0].childList) {
+        this.activeli.id = v[0].parentId;
+      } else {
+        this.activeli.id = v[0].id;
+        this.activeli.parentId = v[0].parentId;
+      }
+    },
+    save(type) {
+      if (type == "add") {
+        this.$request.post(
+          "/api/emaint/problem-base/save",
+          this.addformdata,
+          data => {},
+          data => {
+            if (data.statusCode != 200)
+              this.$Modal.error({
+                title: "提示信息",
+                content: data.responseResult
+              });
+            else {
+              this.$Message.success("添加成功");
             }
             this.getlist();
-          })
-        }
-        else{
-         this.$request.post('/api/emaint/problem-base/save',this.updatedata,data=>{},data=>{
-           if(data.statusCode==200)
-            this.$Message.success('修改成功')
-            this.getlist()
-          })
-        }
-     },
-     addquestion(){
-      
-       this.addformdata.parentId=this.activeli.id;
-     
-       this.addmodel=true;
-       this.updatemodel=false;
-       this.controlmodal=false;
-       
-     },
-     updatequestion(){
-       if(this.activeli.id==''){
-          this.$Message.info('选择一条记录')
-        return;
-       }
-        this.addmodel=false;
-        this.updatemodel=true;
-        this.controlmodal=false;
-        this.$request.post('/api/emaint/problem-base/view',qs.stringify({id:this.activeli.id}),res=>{},res=>{
-          if(res.statusCode==200){
-            this.updatedata=res.responseResult;
-          
           }
-        })
-     },
-     ok(){
-         this.$request.post('/api/emaint/problem-base/remove',qs.stringify({id:this.activeli.id}),data=>{},data=>{
-                if(data.statusCode==200)
-                   this.$Message.success('删除成功')
-                   this.getlist();
-         })
+        );
+      } else {
+        this.$request.post(
+          "/api/emaint/problem-base/save",
+          this.updatedata,
+          data => {},
+          data => {
+            if (data.statusCode == 200) this.$Message.success("修改成功");
+            this.getlist();
+          }
+        );
+      }
+    },
+    addquestion() {
+      this.addformdata.parentId = this.activeli.id;
 
-     },
-      getlist(){
-    //  查询一级问题
-     this.$request.post('/api/emaint/problem-base/treeList',{},data=>{
-        },data=>{
-            if(data.statusCode==200){
-            
-                
-                data.responseResult.forEach(v=>{
-                
-                  v.title=v.parentProblem;
-                  v.children=v.childList;
-                  if(v.children.length>0){
-                    v.expand=false;
-                      v.children.forEach(v1=>{
-                        v1.title=v1.problem;
-                         v.expand=false;
-                      })
-                  }
-                })
-                this.questionlis=data.responseResult;
-               
-                // console.log(data.responseResult.treeLevel)
-            }
-        })
-     },
-    //  删除问题
-      delquestion(){
-        if(this.activeli.id==''){
-            this.$Message.info('请先选择一条记录')
-            return;
+      this.addmodel = true;
+      this.updatemodel = false;
+      this.controlmodal = false;
+    },
+    updatequestion() {
+      if (this.activeli.id == "") {
+        this.$Message.info("选择一条记录");
+        return;
+      }
+      this.addmodel = false;
+      this.updatemodel = true;
+      this.controlmodal = false;
+      this.$request.post(
+        "/api/emaint/problem-base/view",
+        qs.stringify({ id: this.activeli.id }),
+        res => {},
+        res => {
+          if (res.statusCode == 200) {
+            this.updatedata = res.responseResult;
           }
-        this.modal1 = true;
-        this.controlmodal=false;
-          
-     }
-     
-   },
-   created(){
-    
-     this.getlist();
-   },
+        }
+      );
+    },
+    ok() {
+      this.$request.post(
+        "/api/emaint/problem-base/remove",
+        qs.stringify({ id: this.activeli.id }),
+        data => {},
+        data => {
+          if (data.statusCode == 200) this.$Message.success("删除成功");
+          this.getlist();
+        }
+      );
+    },
+    getlist() {
+      //  查询一级问题
+      this.$request.post(
+        "/api/emaint/problem-base/treeList",
+        {},
+        data => {},
+        data => {
+          if (data.statusCode == 200) {
+            data.responseResult.forEach(v => {
+              v.title = v.parentProblem;
+              v.children = v.childList;
+              if (v.children.length > 0) {
+                v.expand = false;
+                v.children.forEach(v1 => {
+                  v1.title = v1.problem;
+                  v.expand = false;
+                });
+              }
+            });
+            this.questionlis = data.responseResult;
+
+            // console.log(data.responseResult.treeLevel)
+          }
+        }
+      );
+    },
+    //  删除问题
+    delquestion() {
+      if (this.activeli.id == "") {
+        this.$Message.info("请先选择一条记录");
+        return;
+      }
+      this.modal1 = true;
+      this.controlmodal = false;
+    }
+  },
+  created() {
+    this.getlist();
   }
+};
 </script>
 <style scoped>
-
-div.page{
+div.page {
   width: 100%;
   display: flex;
 }
-div.page>div{
-  width: 50%!important;
+div.page > div {
+  width: 50% !important;
   margin-top: 0px;
-  margin-right: 5px!important;
-  margin-left: 0px!important;
+  margin-right: 5px !important;
+  margin-left: 0px !important;
 }
-div.page>div.mt10 div.ivu-row>div.ivu-col:first-of-type{
- 
+div.page > div.mt10 div.ivu-row > div.ivu-col:first-of-type {
   margin-top: 10px;
 }
-div.page>div.mt10 div.ivu-row>div.ivu-col:last-of-type{
+div.page > div.mt10 div.ivu-row > div.ivu-col:last-of-type {
   margin-top: 10px;
   /* border: 1px solid #eee; */
-   /* background-color: rgba(240, 240, 240, 1); */
-   padding-left: 15%;
-   text-align: left;
+  /* background-color: rgba(240, 240, 240, 1); */
+  padding-left: 15%;
+  text-align: left;
 }
-div.ivu-card-body{
+div.ivu-card-body {
   padding: 0px;
 }
-div.ivu-row{
-      width: 100%;
+div.ivu-row {
+  width: 100%;
 }
-div.first,div.two{
+div.first,
+div.two {
   line-height: 30px;
-  
 }
-div.first{
-     background-color: rgba(204, 204, 204, 1);
-     
-     text-align: left;
-     
+div.first {
+  background-color: rgba(204, 204, 204, 1);
+
+  text-align: left;
 }
-div.two{
+div.two {
   background-color: rgba(240, 240, 240, 1);
   padding-left: 20%;
   text-align: left;
 }
-div.first>div:first-child{
+div.first > div:first-child {
   padding-left: 10%;
   border-bottom: 1px solid #ccc;
 }
-.ivu-form{
+.ivu-form {
   padding: 0px 15px;
   margin-top: 25px;
 }
-div.model div.ivu-modal{
-  width: 340px!important;
+div.model div.ivu-modal {
+  width: 340px !important;
 }
-input.ivu-input,.ivu-select-selection{
-  height: 40px!important;
+input.ivu-input,
+.ivu-select-selection {
+  height: 40px !important;
 }
-div.controlbutton{
-position:absolute;
-background-color:#f7f7f7;
-z-index:15;
-top:35px;
-width:90px;
+div.controlbutton {
+  position: absolute;
+  background-color: #f7f7f7;
+  z-index: 15;
+  top: 35px;
+  width: 90px;
 }
-div.controlbutton button{
- width:100%;
- border:none;
- border-radius: 0px;
-
+div.controlbutton button {
+  width: 100%;
+  border: none;
+  border-radius: 0px;
 }
 /* 树形列表 */
-.ivu-tree-title{
-  font-size: 14px;
+.ivu-tree-title {
+  font-size: 14px !important;
 }
 </style>
 

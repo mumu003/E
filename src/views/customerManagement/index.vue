@@ -1,4 +1,5 @@
 <template>
+<!-- 客户列表 -->
   <div>
     <Row :gutter="10">
       <Col span="24">
@@ -399,9 +400,6 @@ import qs from "qs";
                     return h('div',"女")
                 }
               }
-              // render:(h,params)=>{
-              //   return h("div",params.row.sex=="male"?"男":"女")
-              // }
             },
             {
               title: '办公位',
@@ -491,16 +489,7 @@ import qs from "qs";
           }
       })
     },
-    mounted(){//方法
-      // this.getBuildings()
-      // this.addarea()
-      /*this.getIndex()*/
-    },
     computed: {
-      // 被选择的列表数据条数
-      selected_count(){
-        return this.$refs.table.selected_count
-      },
       // 被选择的列表数据
       selection(){
         return this.$refs.table.selection

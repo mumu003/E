@@ -754,57 +754,6 @@ export default {
     goback() {
       window.history.go(-1);
     },
-
-    // getinfo() {
-    //   console.log(123)
-    //   this.$request.post(
-    //     "/api/emaint/repairProblem/view",
-    //     qs.stringify(this.viewForm),
-    //     res => {
-    //       this.$Modal.error("网络错误,请重试！");
-    //     },
-    //     res => {
-    //       if (res.statusCode === 200) {
-    //         this.$Message.success("查询成功！");
-
-    //         var data = res.responseResult;
-    //         this.formItem = data;
-            
-    //         (this.formItem = {
-    //           clientId: data.clientId,
-    //           phone: data.phone,
-    //           contactPhone:data.contactPhone,
-    //           officeLocation: data.officeLocation,
-    //           name: data.name,
-    //           companyName: data.companyName,
-    //           priority: data.priority,
-    //           sex: data.sex,
-    //           problemClass: data.problemClass,
-    //           problemType: data.problemType,
-    //           remark: data.remark,
-    //           participatorids: data.participatorids,
-    //           userName: "",
-    //           userId: "",
-    //           problem: data.problem,
-    //           problemImgs: data.problemImgs,
-    //           participators: data.participators,
-    //           id: data.id
-    //         }),
-    //           this.findchildren();
-
-    //         this.question_ary = this.formItem.problem.split(",");
-    //         var arry = this.formItem.participatorids.split("");
-    //         this.formItem.participatorids = [];
-    //         arry.forEach(v => {
-    //           this.formItem.participatorids.push(v * 1);
-    //         });
-    //         // console.log(this.formItem.participatorids);
-    //       } else {
-    //         this.$Modal.error("网络错误,请重试！");
-    //       }
-    //     }
-    //   );
-    // },
     // 选择文件
     uploadfile(index) {
       document.querySelector("#upfile").click();

@@ -90,49 +90,53 @@ export default {
       // params.projectId = sessionStorage.getItem("curProjectId")
       // params.orgId = sessionStorage.getItem("orgId")
       // params.t = Math.random()
-      this.$request.post(this.config.url, qs.stringify(params), data => {
-        // 失败的回调
-        this.loading = false
-        let list=[]
-        if(data.responseResult.list){
-          list = data.responseResult.list
-        }else{
-          list = data.responseResult
-        }
-        
-        list.map((item) => {
-          item._checked = this.allChecked
-        })
-        list.map((item, index) => {
-          list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
-        })
-        this.tableData = list
 
-        this.total = data.responseResult.total || data.responseResult.length
-        this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
-      },data=>{
-        if(data.statusCode!=200)
-        return
-        // 成功的回调
-        let list=[]
-        if(data.responseResult.list){
-          list = data.responseResult.list
-        }else{
-          list = data.responseResult
-        }
+      if(this.config.url!=""){
+          this.$request.post(this.config.url, qs.stringify(params), data => {
+          // 失败的回调
+          this.loading = false
+          let list=[]
+          if(data.responseResult.list){
+            list = data.responseResult.list
+          }else{
+            list = data.responseResult
+          }
+          
+          list.map((item) => {
+            item._checked = this.allChecked
+          })
+          list.map((item, index) => {
+            list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
+          })
+          this.tableData = list
+
+          this.total = data.responseResult.total || data.responseResult.length
+          this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
+        },data=>{
+          if(data.statusCode!=200)
+          return
+          // 成功的回调
+          let list=[]
+          if(data.responseResult.list){
+            list = data.responseResult.list
+          }else{
+            list = data.responseResult
+          }
+        
+          list.map((item) => {
+            item._checked = this.allChecked
+          })
+          list.map((item, index) => {
+            list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
+          })
+        
+          this.tableData = list.sort(util.compare('gmtModified'))
+        
+          this.total = data.responseResult.total || data.responseResult.length
+          this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
+        })
+      }
       
-        list.map((item) => {
-          item._checked = this.allChecked
-        })
-        list.map((item, index) => {
-          list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
-        })
-       
-        this.tableData = list.sort(util.compare('gmtModified'))
-       
-        this.total = data.responseResult.total || data.responseResult.length
-        this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
-      })
     },
     select (selection) {
       this.tableData.forEach((item, index) => {

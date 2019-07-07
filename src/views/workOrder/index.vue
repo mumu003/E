@@ -199,21 +199,7 @@ export default {
       addUnitNameIsNo: "", //新增名字空的
       viewTabs: "remark", //Tabs
       buttons: {}, //按钮
-      //发函类型
-      fileTypeList: [
-        {
-          fileType: "Contract",
-          fileName: "未按时转签约"
-        },
-        {
-          fileType: "Payment",
-          fileName: "未按时付款"
-        },
-        {
-          fileType: "Mortgage",
-          fileName: "未按时按揭"
-        }
-      ],
+      
       //搜索时间
       searchTime: {
         tStartTime: "",
@@ -340,7 +326,6 @@ export default {
             width: 120
           },
           {
-            // PS:暂无该字段
             title: "变更状态",
             key: " orderChange",
             width: 120,
@@ -409,191 +394,21 @@ export default {
           }
         ]
       },
-      //新增模态框资料
-      addContract: [
-        {
-          type: "selection",
-          key: "_disabled",
-          width: 0
-        },
-        {
-          type: "selection",
-          key: "_checked",
-          width: 60
-        },
-        {
-          title: "序号",
-          key: "sort",
-          width: 100
-        },
-        {
-          title: "状态",
-          key: "required",
-          width: 150,
-          render: (h, params) => {
-            switch (parseInt(params.row.required)) {
-              case 0:
-                return h("div", "非必填");
-              case 1:
-                return h("div", "必填");
-            }
-          }
-        },
-        {
-          title: "资料名称",
-          key: "name",
-          width: 150
-        },
-        {
-          title: "资料数量",
-          key: "quantity",
-          width: 150
-        },
-        {
-          title: "存档",
-          key: "archive",
-          width: 150,
-          render: (h, params) => {
-            switch (parseInt(params.row.archive)) {
-              case 0:
-                return h("div", "不存档");
-              case 1:
-                return h("div", "存档");
-            }
-          }
-        },
-        {
-          title: "存档份数",
-          key: "archiveQuantity",
-          width: 150
-        }
-      ],
+      
       //备注表单
       viewForm: {
         id: "",
         remark: ""
       },
-      //审核模态框资料
-      viewContract: [
-        {
-          title: "序号",
-          key: "sort",
-          width: 80
-        },
-        {
-          title: "状态",
-          key: "required",
-          width: 100,
-          render: (h, params) => {
-            switch (parseInt(params.row.required)) {
-              case 0:
-                return h("div", "非必填");
-              case 1:
-                return h("div", "必填");
-            }
-          }
-        },
-        {
-          title: "资料名称",
-          key: "name",
-          width: 250
-        },
-        {
-          title: "资料数量",
-          key: "restQuantity",
-          width: 80
-        },
-        {
-          title: "存档",
-          key: "archive",
-          width: 80,
-          render: (h, params) => {
-            switch (parseInt(params.row.archive)) {
-              case 0:
-                return h("div", "不存档");
-              case 1:
-                return h("div", "存档");
-            }
-          }
-        },
-        {
-          title: "存档份数",
-          key: "archiveQuantity",
-          width: 80
-        }
-      ],
-      //审核发起表格
-      viewStartContract: [
-        {
-          type: "selection",
-          key: "_disabled",
-          width: 0
-        },
-        {
-          type: "selection",
-          key: "_checked",
-          width: 80
-        },
-        {
-          title: "序号",
-          key: "sort",
-          width: 100
-        },
-        {
-          title: "状态",
-          key: "required",
-          width: 100,
-          render: (h, params) => {
-            switch (parseInt(params.row.required)) {
-              case 0:
-                return h("div", "非必填");
-              case 1:
-                return h("div", "必填");
-            }
-          }
-        },
-        {
-          title: "资料名称",
-          key: "name",
-          width: 250
-        },
-        {
-          title: "资料数量",
-          key: "restQuantity",
-          width: 80
-        },
-        {
-          title: "存档",
-          key: "archive",
-          width: 80,
-          render: (h, params) => {
-            switch (parseInt(params.row.archive)) {
-              case 0:
-                return h("div", "不存档");
-              case 1:
-                return h("div", "存档");
-            }
-          }
-        },
-        {
-          title: "存档份数",
-          key: "archiveQuantity",
-          width: 80
-        }
-      ]
+ 
     };
   },
   computed: {
-    // 被选择的列表数据条数
-    selected_count() {
-      return this.$refs.table.selected_count;
-    },
     // 被选择的列表数据
     selection() {
       return this.$refs.table.selection;
     }
   },
-  mounted() {},
   beforeCreate() {
     this.$request.post(
       "/api/user/searchUserProblemNum",
@@ -685,11 +500,47 @@ export default {
 
     // 导出
      exportProject() {
-        var beginDate= this.formItem.beginTime || '1990-06-01';
-        var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
-        var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginDate='+beginDate+'&endDate='+endDate+'&accessToken='+sessionStorage.getItem('token');
+       
+      // location.href='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+this.formItem.beginTime
+      //   +'&endTime='+this.formItem.endTime+
+      //   +'&isChange='+this.formItem.isChange+
+      //   +'&workOrderNo='+this.formItem.workOrderNo+
+      //   +'&name='+this.formItem.name+
+      //   +'&state='+this.formItem.state+
+      //   +'&phone='+this.formItem.phone+
+      //   +'&userName='+this.formItem.userName+'&accessToken='+sessionStorage.getItem('token')
+
+
+      //  console.log(123)
+      //   // var beginDate= this.formItem.beginTime || '1990-06-01';
+      //   // var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
+      var beginTime=this.formItem.beginTime || ""
+      var endTime=this.formItem.endTime || ""
+      var isChange=this.formItem.isChange || ""
+      var workOrderNo=this.formItem.workOrderNo || ""
+      var name=this.formItem.name || ""
+      var state=this.formItem.state || ""
+      var phone=this.formItem.phone || ""
+      var userName=this.formItem.userName || ""
+      var token=sessionStorage.getItem("token")
+        // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
+        // +'&endTime='+endTime+
+        // +'&isChange='+isChange+
         
-        window.open(url);
+        // +'&workOrderNo='+workOrderNo+
+        // +'&name='+name+
+        // +'&state='+state+
+        // +'&phone='+phone+
+        // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
+        // console.log(url)
+        // window.open(url);     
+
+        var url2=`https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+        &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`
+        // console.log(url2)
+        location.href=url2
+
+      
     },
 
     //搜索
@@ -754,18 +605,6 @@ export default {
           this.$Modal.success({ title: "提示信息", content: "添加备注失败" });
         }
       );
-
-      // this.$request.post("/api/emaint/repairProblem/userAddRemark",qs.stringify(this.viewForm), res => {
-      //   if (res.code === 200) {
-      //     this.$Message.success("搜索成功！")
-      //     this.msgModal = false
-      //     this.$refs.table.init()
-      //   } else {
-      //     this.$Modal.error({title: '提示信息', content: res.responseResult})
-      //   }
-      // }, res => {
-      //   this.$Modal.success({title: '提示信息', content: res.responseResult})
-      // })
     },
     //取消操作
     viewCancel(arg) {

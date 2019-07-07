@@ -167,12 +167,10 @@
                                     },
                                     on: {
                                         click: () => {
+                                            sessionStorage.setItem('paramid',params.row.id)
                                             this.$router.push({
-                                              name:"dispatch",
-                                              params:{
-                                                id:params.row.id
-                                              }
-                                            })
+                                              name: "dispatch",
+                                            });
                                         }
                                     }
                                 }, '派单'),

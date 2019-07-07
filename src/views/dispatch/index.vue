@@ -383,13 +383,8 @@ export default {
       },
       RepairForm: {
         clientId: "",
-       
       }
     };
-  },
-  mounted() {
- 
-    
   },
   created() {
     this.search();
@@ -463,8 +458,6 @@ export default {
             this.formItem.clientId = data.id;
 
             this.RepairForm.clientId = data.id;
-           
-            
           } 
         }
       );
@@ -473,12 +466,11 @@ export default {
     repairSubmit() {
       if (this.viewForm.id != "") {
         if(this.formItem.userId!=""&&this.formItem.userId!=null){
-          console.log(this.userlist)
-          console.log(this.formItem.participatorids)
-          this.formItem.participatorids=this.formItem.participatorids==null?'':this.formItem.participatorids.toString()
-        this.$request.post(
+          var participatorids=""
+          participatorids=this.formItem.participatorids==null?'':this.formItem.participatorids.toString()
+          this.$request.post(
           "/api/emaint/repairProblem/updateUser",
-          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId,participatorids:this.formItem.participatorids.toString(),changeDescription:"" }),
+          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId,participatorids:participatorids,changeDescription:"" }),
           res => {},
           res => {
             this.$Message.success(res.responseResult);
@@ -674,7 +666,7 @@ export default {
     },
     // 历史报修数据
     clientRepairList() {
-      // console.log(this.RepairForm.clientId);
+    //   // console.log(this.RepairForm.clientId);
       if (this.RepairForm.clientId==''||this.RepairForm.clientId==null) {
         this.$Message.error("请先输入手机号!");
       }else{
