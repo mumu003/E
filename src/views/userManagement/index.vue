@@ -197,7 +197,7 @@ import qs from "qs";
   export default {
     data () {
       return {
-        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
+        auth:JSON.parse(sessionStorage.auth), //登录用户的角色权限
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
         delId:"",//删除用户id
