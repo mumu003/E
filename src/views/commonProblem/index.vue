@@ -178,6 +178,7 @@ import qs from 'qs';
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         updateModel:false,
         modal1:false,
         yxj:[],
@@ -246,6 +247,7 @@ import qs from 'qs';
                                     props: {
                                         type: 'primary',
                                         size: 'small',
+                                        disabled:!this.auth.tf_problem_balse_edit,
                                     },
                                     style:{
                                       marginRight:"5px",
@@ -277,7 +279,8 @@ import qs from 'qs';
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_problem_balse_delete,
                                     },
                                     style:{
                                       marginRight:"5px",
@@ -285,7 +288,6 @@ import qs from 'qs';
                                     on: {
                                         click: () => {
                                             this.deleteProject(params.row.id)
-                                          
                                         }
                                     }
                                 }, '删除'),

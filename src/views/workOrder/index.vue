@@ -86,8 +86,8 @@
         <div class="search-row">
           <Row>
             <Col>
-            <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
-            <Button type="primary" icon="ios-redo" @click="exportProject">导出</Button>
+            <Button type="primary" icon="plus-round" @click="addProject" v-if="auth.tf_repair_problem_edit">新增</Button>
+            <Button type="primary" icon="ios-redo" @click="exportProject"  v-if="auth.tf_repair_problem_data_export">导出</Button>
             </Col>
             <Col>
             </Col>
@@ -170,6 +170,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
       files: [],
       imglist: [""],
       visible: false,
@@ -216,6 +217,11 @@ export default {
         endTime: "",
         beginTime: ""
       },
+      // start: {
+      //   disabledDate: function(date) {
+      //     return date.valueOf() > new Date(this.formItem.endTime);
+      //   }.bind(this)
+      // },
       // 设置结束时间大于开始时间
       end: {
         disabledDate: function(date) {
@@ -244,6 +250,7 @@ export default {
                     props: {
                       type: "primary",
                       size: "small",
+                      disabled:!this.auth.tf_repair_problem_add_user 
                       // disabled: params.row.state == "待派单" ? false : true
                     },
                     style: {
@@ -265,7 +272,8 @@ export default {
                   {
                     props: {
                       type: "primary",
-                      size: "small"
+                      size: "small",
+                      disabled:!this.auth.tf_repair_problem_add_remark 
                     },
                     style: {
                       marginRight: "5px"
@@ -535,7 +543,7 @@ export default {
         // console.log(url)
         // window.open(url);     
 
-        var url2=`https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+        var url2=`${axios.defaults.baseURL}/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
         &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`
         // console.log(url2)
         location.href=url2

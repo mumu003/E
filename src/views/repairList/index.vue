@@ -70,15 +70,15 @@
 
 
     <!-- 查看评价 -->
-      <Modal v-model="evaluatModal" title="查看评价"
+      <Modal v-model="evaluatModal" :title="'给'+toUserName+'的评价'"
             width="400"
             @on-cancel="cancel">
-          <Row style="text-align: center;margin:5px 0;margin-bottom:10px;">
+          <!-- <Row style="text-align: center;margin:5px 0;margin-bottom:10px;">
             <Col span="24">
                <span style="font-size:16px">给{{toUserName}}的评价</span>
             </Col>
-          </Row>
-          <Row style="text-align: center;margin:5px 0;padding:5px 0;border-top:1px solid grey">
+          </Row> -->
+          <Row style="text-align: center;margin:5px 0;padding:5px 0">
             <Col span="24">
                 <!-- <div class="evaluationRate"> -->
                     <Rate disabled :value="modalStar"></Rate>

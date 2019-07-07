@@ -6,7 +6,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
               
               </Col>
               <Col>
@@ -86,9 +86,11 @@
 </style>
 <script type="text/ecmascript-6">
   import index from "../../router"
+  import axios from 'axios'
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         isFirst:false,
         loading: true, //加载
         modal_loading: false, //延迟
@@ -171,7 +173,7 @@
         let end=new Date(this.formItem.endDate)
         let endM=end.getMonth()+1
         end=end.getFullYear()+"-"+endM+"-"+end.getDate()
-        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemDetailsData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token+"&companyName="+this.$route.params.companyName
+        let url=axios.defaults.baseURL+"/api/emaint/repairProblem/exportCompanyProblemDetailsData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token+"&companyName="+this.$route.params.companyName
         location.href=url
       },
       //开始时间

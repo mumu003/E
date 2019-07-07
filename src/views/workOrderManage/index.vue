@@ -716,6 +716,8 @@ export default {
                   setTimeout(()=>{
                     this.$router.push({name:'workOrder'})
                   },1000)
+                }else{
+                  this.$Modal.error({title: "提示信息",content:resdata.data.responseResult});
                 }
               },
               (err) =>{

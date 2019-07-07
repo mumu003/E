@@ -51,7 +51,8 @@
                   <Col span="16"  >
                   <div @click="openList(item,index)" class="tableName">
                     <span>
-                      {{item.name+'-----'+item.code}}
+                      <!-- +'****'+item.code -->
+                      {{item.name}}
                     </span>
                     <Icon type="chevron-down"  ref="iconDown" class="iconDown"  v-show="item.childs.length>0"></Icon>
                     <Icon type="chevron-up" ref="iconUp" class="iconUp"  v-show="item.childs.length>0"></Icon>

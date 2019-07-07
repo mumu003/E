@@ -169,8 +169,8 @@
     created(){
       this.head = headImg
       this.username=sessionStorage.loginName
-      
-      this.menuList = [
+
+      var list=[
             {
               "id": 4,
               "name": "工单受理",
@@ -271,14 +271,133 @@
               ]
             }
       ]
-      // if("销售总/副总经理" == sessionStorage.roleName){
-      //   this.menuList.push({
-      //     "id": 2,
-      //     "name": "流程配置",
-      //     "url": "/procedure",
-      //     "icon": "network"
-      //   });
-      // }
+      
+      var auth=JSON.stringify(JSON.parse(sessionStorage.getItem("auth")))
+      list.forEach((v,i)=>{
+        if(v.childList){
+          var flag=false
+          var ary=[]
+          v.childList.forEach(v2=>{
+            if(auth.indexOf(v2.code)!=-1){
+              flag=true
+              ary.push(v2)
+            }            
+          })
+          v.childList=ary
+          if(flag){
+            this.menuList.push(v)
+          }
+        }else{
+          if(v.code){
+            this.menuList.push(v)
+          }
+        }
+      })
+      // console.log(this.menuList)
+      
+      
+      // this.menuList = [
+      //       {
+      //         "id": 4,
+      //         "name": "工单受理",
+      //         "url": "/questionAcceptance",
+      //         "code":"tf_repair_problem_appointer_list",
+      //       },
+      //       {
+      //         "id": 5,
+      //         "name": "工单管理",
+      //         "childList": [
+      //           {
+      //           "id": 6,
+      //           "name": "工单列表",
+      //           "url": "/workOrder",
+      //           "code":"tf_repair_problem_list",
+      //           },
+      //           {
+      //             "id": 10,
+      //             "name": "评价列表",
+      //             "url": "evaluationList",
+      //             "code":"tf_repair_eveluate_list",
+      //           },
+      //         ]
+      //       },
+      //       {
+      //         "id": 7,
+      //         "name": "客户管理",
+      //         // "url": "/customerManagement",
+      //         "childList": [
+      //           {
+      //           "id": 6,
+      //           "name": "客户列表",
+      //           "url": "/customerManagement",
+      //           "code":"tf_client_list",
+      //           },
+      //           {
+      //             "id": 11,
+      //             "name": "登录历史",
+      //             "url": "/loginHistory",
+      //             "code":"tf_login_record_list",
+      //           },
+      //         ]
+      //       },
+      //       {
+      //         "id": 6,
+      //         "name": "运维设置",
+      //         // "url": "/operationSetting",
+      //         "childList": [
+      //           {
+      //           "id": 81,
+      //           "name": "问题配置",
+      //           "url": "/problemConfiguration",
+      //           "code":"tf_problem_balse_level3_list",
+      //           },
+      //           {
+      //           "id": 82,
+      //           "name": "常见问题",
+      //           "url": "/commonProblem",
+      //           "code":"tf_problem_balse_list",
+      //           },
+      //           {
+      //             "id": 11,
+      //             "name": "逾期设置",
+      //             "url": "/operationSetting",
+      //             "code":"tf_system_settting_list",
+      //           },
+      //         ]
+      //       },
+      //       {
+      //         "id": 9,
+      //         "name": "数据报表",
+      //         "url": "/dataReport",
+      //         "code":"tf_company_problem_data",
+      //       },
+      //       {
+      //         "id": 12,
+      //         "name": "系统管理",
+      //         // "url": "/agreement",
+      //         "childList": [
+      //           {
+      //           "id": 121,
+      //           "name": "用户管理",
+      //           "url": "/userManagement",
+      //           "code":"tf_user_list",
+      //           },
+      //           {
+      //           "id": 122,
+      //           "name": "角色管理",
+      //           "url": "/roleManagement",
+      //           "code":"tf_role_list",
+      //           },
+      //           {
+      //           "id": 123,
+      //           "name": "数据字典",
+      //           "url": "/dataDictionary",
+      //           "code":"tf_dictionary_list",
+      //           }
+      //         ]
+      //       }
+      // ]
+     
     },
     methods: {
       goHome(){

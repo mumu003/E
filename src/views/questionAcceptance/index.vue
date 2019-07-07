@@ -77,7 +77,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="plus-round" @click="addProject">新增</Button>
+                <Button type="primary" icon="plus-round" v-if="auth.tf_repair_problem_appointer_list_add" @click="addProject">新增</Button>
               </Col>
               <Col>
               </Col>
@@ -97,6 +97,7 @@
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         passDisable: false,//防止通过双击事件
         isDisable: false,//防止驳回双击事件
         reject_loading: false, //驳回
@@ -108,9 +109,7 @@
         statusModal: false, //状态模态框
         endModal: false,//终止模态框
         noteModal: false, //弹窗
-        buildingList: [], //工单号
-        unitList: [], //单元
-        roomsList: [], //房间
+       
         addData: [], //新增模态框表格数据
         viewData: [], //审核模态框表格数据
         nodesList: [], //处理进度
@@ -163,7 +162,8 @@
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_repair_problem_appointer_list_assign
                                     },
                                     on: {
                                         click: () => {

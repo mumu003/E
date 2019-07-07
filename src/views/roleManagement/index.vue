@@ -48,8 +48,8 @@
           <div class="search-row">
             <Row>
               <Col>
-              <Button type="primary" @click="addMaterialModal=true" icon="plus-round">新增</Button>
-              <Button type="error" icon="close" @click="delModal">删除</Button>
+              <Button type="primary" @click="addMaterialModal=true" v-if="auth.tf_role_edit" icon="plus-round">新增</Button>
+              <Button type="error" icon="close" v-if="auth.tf_role_delete" @click="delModal">删除</Button>
               </Col>
               <Col>
               </Col>
@@ -156,6 +156,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         unDeleteModal:false,//无法删除
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
@@ -207,7 +208,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_role_edit
                                 },
                                 style:{
                                   margin:"5px 0px"
@@ -225,7 +227,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_role_per
                                 },
                                 style:{
                                   margin:"5px 0px"
@@ -243,7 +246,8 @@ import qs from "qs";
                             h('Button',{
                                 props: {
                                         type: 'error',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_role_delete
                                 },
                                 style:{
                                   margin:"5px 0px"

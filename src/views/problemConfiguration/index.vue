@@ -8,9 +8,9 @@
              <Row type="flex" justify="end" class="code-row-bg">
                   <Button type="primary"  @click="controlmodal=!controlmodal" >操作<Icon type="arrow-up-b" color="white" style="margin-left:17px;"></Icon></Button>
                   <div v-if="controlmodal"  class="controlbutton">
-                      <div><Button  @click="addquestion" >新增下一级</Button></div> 
-                      <div><Button   @click="updatequestion" >编辑</Button></div> 
-                      <div><Button   @click="delquestion">删除</Button></div> 
+                      <div><Button  @click="addquestion" v-if="auth.tf_problem_balse_level3_list_edit ">新增下一级</Button></div> 
+                      <div><Button  @click="updatequestion" v-if="auth.tf_problem_balse_level3_list_edit ">编辑</Button></div> 
+                      <div><Button  @click="delquestion" v-if="auth.tf_problem_balse_level3_list_delete">删除</Button></div> 
                   </div>
               <!-- modal1 = true;controlmodal=false; -->
             </Row>
@@ -117,6 +117,7 @@ import qs from "qs";
 export default {
   data() {
     return {
+      auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
       addmodel: true,
       updatemodel: false,
       modal1: false,

@@ -4,7 +4,8 @@
         <Menu ref="sideMenu" active-name="" :open-names="['1']" theme="dark" width="auto">
             <template v-for="(item,index) in menuList">
                 
-                <MenuItem v-if="item.childList==null&&(auths.indexOf(item.code)!=-1)" :name="(index+1)" :key="item.id" @click.native="routeTo(item.url)"  :id="item.url">
+                <!-- &&(auths.indexOf(item.code)!=-1) -->
+                <MenuItem v-if="item.childList==null" :name="(index+1)" :key="item.id" @click.native="routeTo(item.url)"  :id="item.url">
                     <Icon :type="item.icon"  :key="'menuicon' + item.id"></Icon>
                     <span class="layout-text" :key="'title' + item.id">{{item.name}}</span>
                 </MenuItem>

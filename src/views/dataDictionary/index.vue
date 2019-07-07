@@ -7,7 +7,7 @@
           <!-- <div class="search-row"> -->
             <Row>
               <Col span="2">
-              <Button type="primary" @click="addMaterialModal=true" icon="plus-round">新增</Button>
+              <Button type="primary" v-if="auth.tf_dictionary_edit" @click="addMaterialModal=true" icon="plus-round" >新增</Button>
               </Col>
             </Row>
           <!-- </div> -->
@@ -164,6 +164,7 @@ import qs from "qs";
 export default {
   data() {
     return {
+      auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
       type:"",
       deleteModal:false,
       delModal:false,
@@ -277,7 +278,8 @@ export default {
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_dictionary_edit
                                 },
                                 style:{
                                   margin:"5px 0px"
@@ -294,7 +296,8 @@ export default {
                             h('Button',{
                                 props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_dictionary_edit
                                 },
                                 style:{
                                   margin:"5px 0px"
@@ -303,6 +306,7 @@ export default {
                                     click: () => {
                                           this.setting=true
                                           this.setForm.id=params.row.id
+                                          this.$refs.keytable.init()
                                           this.type=params.row.code
                                           this.addkeyForm.dictionaryCategoryId=params.row.id
                                           this.updatekeyForm.dictionaryCategoryId=params.row.id
@@ -312,7 +316,8 @@ export default {
                             h('Button',{
                                 props: {
                                         type: 'error',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled:!this.auth.tf_dictionary_delete
                                 },
                                 style:{
                                   margin:"5px 0px"

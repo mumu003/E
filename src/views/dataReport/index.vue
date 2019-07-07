@@ -18,7 +18,7 @@
                 <Col span="6">
                   <FormItem >
                     <!-- :options="end" -->
-                    <DatePicker format="yyyy-MM-dd" type="date"  placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
+                    <DatePicker format="yyyy-MM-dd" type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -42,7 +42,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
               </Col>
               <Col>
               </Col>
@@ -122,12 +122,13 @@
   }
 </style>
 <script type="text/ecmascript-6">
-import qs from "qs";
+  import qs from "qs";
+  import axios from 'axios'
   import index from "../../router"
   export default {
     data () {
       return {
-        bt:"",
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         isFirst: false, //首页.
         loading: true, //加载
         //表单
@@ -136,11 +137,11 @@ import qs from "qs";
           endDate:"",
         },
         // 设置结束时间大于开始时间
-        // end:{
-        //     disabledDate :(function(date){
-        //       return date.valueOf() < new Date( this.formItem.beginDate)
-        //     }).bind(this)
-        // },
+        end:{
+            disabledDate :(function(date){
+              return date.valueOf() < new Date( this.formItem.beginDate)
+            }).bind(this)
+        },
         //表格
         tableConfig:{
           url:"/api/emaint/repairProblem/totalComapnyCountList",
@@ -219,15 +220,41 @@ import qs from "qs";
       }
     },
     created(){
-      let today=new Date();
-      let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
-      let M=Number(WeekFirstDay.getMonth())+1;    
-      this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+WeekFirstDay.getDate();
-      // this.getStartDate(this.formItem.beginDate)
-      let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
-      let N=Number(WeekLastDay.getMonth())+1     
-      this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+WeekLastDay.getDate();
+      var dd=new Date()
+      var ff=new Date()
+        var week = dd.getDay(); //获取时间的星期数
+        var minus = week ? week - 1 : 6;
+        dd.setDate(dd.getDate() - minus); //获取minus天前的日期
+        var y = dd.getFullYear();
+        var m = (dd.getMonth()+1) < 10 ? "0"+(dd.getMonth() + 1):(dd.getMonth()+1); //获取月份
+        var d = dd.getDate() < 10 ?( '0' + dd.getDate()):dd.getDate()
+        this.formItem.beginDate=(y + "-" + m + "-" + d)
+        // console.log(this.formItem.beginDate)
+
+        var week = ff.getDay(); //获取时间的星期数
+        var maxus = week ? 7 - week : 0;
+        ff.setDate(ff.getDate() + maxus); //获取minus天前的日期
+        var a = ff.getFullYear();
+        var b = (ff.getMonth()+1) < 10 ? "0"+(ff.getMonth() + 1):(ff.getMonth()+1); //获取月份
+        var c = ff.getDate() < 10 ?( '0' + ff.getDate()):ff.getDate()
+        this.formItem.endDate=(a + "-" + b + "-" + c)
+        // console.log(this.formItem.endDate)
+
+
+      // let today=new Date();
+      // let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
+      // let M=Number(WeekFirstDay.getMonth())+1;    
+      // this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+(WeekFirstDay.getDate());
+      // console.log(WeekFirstDay)
+      // console.log(WeekFirstDay.getDay())
+      // // this.getStartDate(this.formItem.beginDate)
+      // let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
+      // let N=Number(WeekLastDay.getMonth())+1     
+      // this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+(WeekLastDay.getDate());
       // this.getEndDate(this.formItem.endDate)
+
+      // if(WeekFirstDay.getDay()=='')
+
     },
     methods: {
       // 导出
@@ -238,7 +265,7 @@ import qs from "qs";
         let end=new Date(this.formItem.endDate)
         let endM=end.getMonth()+1
         end=end.getFullYear()+"-"+endM+"-"+end.getDate()
-        let url="https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
+        let url=axios.defaults.baseURL+"/api/emaint/repairProblem/exportCompanyProblemData?beginDate="+begin+"&endDate="+end+"&accessToken="+sessionStorage.token
         location.href=url
       },
       //搜索
@@ -262,8 +289,6 @@ import qs from "qs";
         let now=new Date(this.formItem.endDate)
         let nowM=now.getMonth()+1
         this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
-        console.log(this.formItem.beginDate)
-        console.log(this.formItem.endDate)
       },
       // 结束时间
       getEndDate(endDate){
@@ -271,8 +296,6 @@ import qs from "qs";
         let now=new Date(this.formItem.beginDate)
         let nowM=now.getMonth()+1
         this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
-        console.log(this.formItem.beginDate)
-        console.log(this.formItem.endDate)
       }
     }
   }

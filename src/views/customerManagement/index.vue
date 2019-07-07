@@ -64,8 +64,8 @@
         <div class="search-row">
           <Row>
             <Col>
-            <Button type="primary" icon="plus-round" @click="addClient">新增</Button>
-            <Button type="primary" icon="ios-loop-strong" @click="syncClient">同步客户</Button>
+            <Button type="primary" icon="plus-round" @click="addClient" v-if="auth.tf_client_edit">新增</Button>
+            <Button type="primary" icon="ios-loop-strong" @click="syncClient" v-if="auth.tf_client_sync">同步客户</Button>
             </Col>
             <Col>
             </Col>
@@ -224,6 +224,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
         passDisable: false,//防止通过双击事件
         isDisable: false,//防止驳回双击事件
         modal_loading: false, //延迟
@@ -485,7 +486,7 @@ import qs from "qs";
                   // this.$Message.success({title: '提示信息', content: "加载成功"})
               } else {
                 this.modal_loading = false
-                this.$Modal.error({title: '提示信息', content: res.resMessage})
+                // this.$Modal.error({title: '提示信息', content: res.resMessage})
           }
       })
     },
@@ -519,7 +520,7 @@ import qs from "qs";
       addSubmit(){
         this.modal_loading = true
         if(this.addForm.companyName!=""&&this.addForm.name!=""&&
-          this.addForm.phone!=""&&this.addForm.priority!=""){
+          this.addForm.phone!=""&&this.addForm.priority!=""&&this.addForm.priority!=undefined){
 
             // 处理手机号
             var reg=/^[1][3,4,5,7,8][0-9]{9}$/
