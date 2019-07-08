@@ -240,7 +240,7 @@ export default {
           {
             title: "操作",
             key: "currentNodeName",
-            width: 150,
+            width: 200,
             align: "center",
             render: (h, params) => {
               return h("div", [
@@ -281,11 +281,41 @@ export default {
                     on: {
                       click: () => {
                         this.msgModal = true;
+                        this.viewForm={
+                          id: "",
+                          remark: ""
+                        };
+                        this.files= []
+                        this.imglist= [""]
+
                         this.viewForm.id = params.row.id;
                       }
                     }
                   },
                   "备注"
+                ),
+                 h(
+                  "Button",
+                  {
+                    props: {
+                      type: "primary",
+                      size: "small",
+                      disabled:!this.auth.tf_repair_problem_add_user 
+                      // disabled: params.row.state == "待派单" ? false : true
+                    },
+                    style: {
+                      marginRight: "5px"
+                    },
+                    on: {
+                      click: () => {
+                        sessionStorage.setItem('paramid',params.row.id)
+                        this.$router.push({
+                          name: "WorkDetail",
+                        });
+                      }
+                    }
+                  },
+                  "工单详情"
                 ),
                 // h(
                 //   "Button",
@@ -594,7 +624,7 @@ export default {
 
     // 备注提交
     msgOk() {
-      this.msgModal = false;
+      
 
       var data = new FormData();
       for (var i in this.viewForm) {
@@ -607,10 +637,16 @@ export default {
       let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
       axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
         resdata => {
-          this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
+          if(resdata.data.statusCode==200){
+            this.msgModal = false;
+            this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
+          }else{
+            this.$Modal.error({title: "提示信息", content: resdata.data.responseResult});
+          }
+          
         },
         err => {
-          this.$Modal.success({ title: "提示信息", content: "添加备注失败" });
+          this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
         }
       );
     },

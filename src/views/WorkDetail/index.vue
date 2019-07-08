@@ -1,5 +1,5 @@
 <template>
-<!-- 派单 -->
+<!-- 工单详情 -->
   <div>
     <Row :gutter="10">
       <Col span="24">
@@ -162,7 +162,7 @@
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
               <Col span="8" >
                 <FormItem label="执行人" prop="executor">
-                    <Input  class="buttoninput" :disabled="!state_show" :style="{'pointer-events':!state_show?'none':'all'}" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
+                    <Input  class="buttoninput"  @on-click="choosemodel=true" disabled  v-model="formItem.userName"  :maxlength=20 ></Input>
                 </FormItem>
               </Col>
              </Row>
@@ -170,8 +170,8 @@
               <Col span="8">
                 <FormItem label="参与者">
                     <!-- <Input v-model="formItem.participators" ></Input>  -->
-                    <Select v-model="formItem.participatorids"  multiple  style="width:100%;" :disabled="!state_show">
-                      <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
+                    <Select v-model="formItem.participatorids" disabled  multiple  style="width:100%;" >
+                      <Option :value="item.id" :label="item.name"  v-for="(item,index) in userlist" :key="index">
                           <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
                           <span>{{item.problemNum==null?0:item.problemNum}}单</span>
                       </Option>
@@ -185,11 +185,47 @@
       </Col>
     </Row>
 
+    <Row :gutter="10">
+      <Col span="24">
+      <Card class="search-card">
+        <p slot="title">
+         进度详情
+          <collapse-icon foldPart="search-body"></collapse-icon>
+        </p>
+       <template>
+    <Timeline style="text-align:left">
+        <TimelineItem v-for="(item,index) in recordEntityList"  :color="item.state?'#2d8cf0':'#2c3e50'" :style="{color:item.state?'#2d8cf0':''}" :key="index">
+            <p class="time">{{item.gmtCreate}}</p>
+            <p class="content">{{item.subject}}</p>
+            <p class="content">{{item.title}}</p>
+        </TimelineItem>
+        <!-- <TimelineItem>
+            <p class="time">1984年</p>
+            <p class="content">发布 Macintosh</p>
+        </TimelineItem>
+        <TimelineItem>
+            <p class="time">2007年</p>
+            <p class="content">发布 iPhone</p>
+        </TimelineItem>
+        <TimelineItem>
+            <p class="time">2010年</p>
+            <p class="content">发布 iPad</p>
+        </TimelineItem>
+        <TimelineItem>
+            <p class="time">2011年10月5日</p>
+            <p class="content">史蒂夫·乔布斯去世</p>
+        </TimelineItem> -->
+    </Timeline>
+</template> 
+      </Card>
+      </Col>
+    </Row>
+
     <div slot="footer" style="text-align:center;">
       <Row>
         <Col span="24">
           <Button size="default" @click="goback" >上一步</Button>
-          <Button v-if="state_show" type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button>
+          <!-- <Button v-if="state_show" type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button> -->
          </Col>
       </Row>
     </div>
@@ -235,6 +271,7 @@ export default {
     return {
       choosemodel: false,
       choosemodel1: false,
+      recordEntityList:[],
       participatorids: [],
       userindex: "",
       userlist: [],
@@ -388,6 +425,22 @@ export default {
   },
   created() {
     this.search();
+if (sessionStorage.getItem('paramid')) {
+      
+    this.$request.post(
+        '/api/emaint/repairProblem/view',
+        qs.stringify({id:sessionStorage.getItem('paramid')}),res=>{},
+        res=>{
+            
+            if(res.statusCode==200){
+                this.recordEntityList=res.responseResult.recordEntityList
+                this.recordEntityList.sort(util.compare("gmtCreate"));
+            }
+        }
+    
+    )
+   }
+   
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -746,4 +799,11 @@ div.addimg .ivu-icon {
   border: #2d8cf0;
   color: #fff;
 }
+ .time{
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .content{
+        padding-left: 5px;
+    }
 </style>

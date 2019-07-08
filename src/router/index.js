@@ -60,6 +60,14 @@ export default new Router({
           },
           component: resolve => require(['@/views/dispatch/index.vue'], resolve),
         },
+        {
+          path: '/WorkDetail',
+          name: 'WorkDetail',
+          meta: {
+            title: '工单详情'
+          },
+          component: resolve => require(['@/views/WorkDetail/index.vue'], resolve),
+        },
 
         {
           path: '/operationSetting',

@@ -473,7 +473,7 @@ export default {
         if (res.statusCode == 200) {
         
           this.userlist = res.responseResult.list;
-           this.userlist.sort(util.compare("problemNum"));
+          this.userlist.sort(util.compare1("problemNum"));
         }
       }
     );
