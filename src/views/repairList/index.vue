@@ -342,9 +342,9 @@ import qs from "qs";
 .evaluationcontent{
   padding: 10px 0px;
 }
-.ivu-modal-footer{
+/* .ivu-modal-footer{
   display: none;
-}
+} */
 </style>
 
 
