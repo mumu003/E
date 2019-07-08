@@ -288,9 +288,9 @@
             this.menuList.push(v)
           }
         }else{
-          if(v.code){
-            this.menuList.push(v)
-          }
+          if(auth.indexOf(v.code)!=-1){
+              this.menuList.push(v)
+            }            
         }
       })
       // console.log(this.menuList)

@@ -67,7 +67,8 @@
                       </Col>
                       <Col span="18" style="display:flex;justify-content:space-between;">
                         <span>
-                          {{v.name+'---'+v.code}}
+                          <!-- +'***'+v.code -->
+                          {{v.name}}
                         </span>
                       </Col>
                   </div>
