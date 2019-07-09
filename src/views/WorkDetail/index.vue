@@ -193,12 +193,24 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
        <template>
-    <Timeline style="text-align:left">
+      <Timeline style="text-align:left">
         <TimelineItem v-for="(item,index) in recordEntityList"  :color="item.state?'#2d8cf0':'#2c3e50'" :style="{color:item.state?'#2d8cf0':''}" :key="index">
             <p class="time">{{item.gmtCreate}}</p>
             <p class="content">{{item.subject}}</p>
             <p class="content">{{item.title}}</p>
+            <div style="max-height: 110px;" >
+              <div style="display:inline-block;width:80px;height:70px;overflow:hidden" v-for="(item1,index1) in item.progress_img" :key="index1">
+                  <img style="width:80px;height:80px"  :src="item1" alt="" v-if="item1!=''"  @click="showtheimg1(item1,index,index1)">
+              </div>
+            </div>
         </TimelineItem>
+
+        <Modal 
+          title="View Image" 
+          v-model="visible1"
+          :closable="false">
+          <img :src="progressary[showimg1]" v-if="visible1" style="width: 100%">
+        </Modal>
         <!-- <TimelineItem>
             <p class="time">1984年</p>
             <p class="content">发布 Macintosh</p>
@@ -309,6 +321,8 @@ export default {
       upindex: "",
       files: [],
       showimg: "",
+      showimg1:"",
+      progressary:[],
       // 处理报修提交按钮
       state_show:false,
       //表单
@@ -349,11 +363,14 @@ export default {
       ques_list: [],
       question_ary: [],
       visible: false,
+      visible1: false,
       viewForm: {
         id: ""
       },
       // 历史报修数据模态框
       RepairList_show: false,
+      // 进度详情图片列表
+      progress_img:[],
       //表格
       tableConfig: {
        url: "",
@@ -431,10 +448,48 @@ if (sessionStorage.getItem('paramid')) {
         '/api/emaint/repairProblem/view',
         qs.stringify({id:sessionStorage.getItem('paramid')}),res=>{},
         res=>{
-            
             if(res.statusCode==200){
                 this.recordEntityList=res.responseResult.recordEntityList
                 this.recordEntityList.sort(util.compare("gmtCreate"));
+
+                this.recordEntityList.forEach(v=>{
+                  v.progress_img=[]
+                  if(v.imgs){
+                    if(v.imgs.indexOf("|~|")!=-1){
+                      // 多图
+                      var ary=v.imgs.split("|~|")
+                      ary.forEach(v2=>{
+                        if(v2.indexOf("|")!=-1){
+                          v2=v2.match(/(\S*)\|/)[1]
+                        }
+                        v.progress_img.push(v2)
+                      })
+                    }else if(v.imgs.indexOf("|")!=-1){
+                      // 一张图
+                      v.progress_img.push(v.imgs.split("|")[0])
+                    }else{
+                      v.progress_img.push(v.imgs)
+                    }
+                  }
+                })
+
+                // if(this.recordEntityList.imgs){
+                //   if(this.recordEntityList.imgs.indexOf("|~|")!=-1){
+                //     // 多图
+                //       var ary=this.recordEntityList.imgs.split("|~|")
+                //       ary.forEach(v=>{
+                //         if(v.indexOf("|")!=-1){
+                //           v=v.match(/(\S*)\|/)[1]
+                //         }
+                //         this.progress_img.push(v)
+                //       })
+                //   }else if(this.recordEntityList.imgs.indexOf("|")!=-1){
+                //     // 一张图
+                //     this.imglist.push(this.recordEntityList.imgs.split("|")[0])
+                //   }else{
+                //     this.progress_img.push(this.recordEntityList.imgs)
+                //   }
+                // }
             }
         }
     
@@ -472,6 +527,7 @@ if (sessionStorage.getItem('paramid')) {
     // }
   },
   methods: {
+    
     changefile(e) {
       var file = e.target.files[0];
 
@@ -687,15 +743,10 @@ if (sessionStorage.getItem('paramid')) {
             }else{
               this.question_ary=[]
             }
-            
-            
-          // 处理是否代报修
-          if(this.formItem.replacementRepair!=null){
-            this.formItem.replacementRepair=this.formItem.replacementRepair.toString()
-          } 
-         
-
-
+            // 处理是否代报修
+            if(this.formItem.replacementRepair!=null){
+              this.formItem.replacementRepair=this.formItem.replacementRepair.toString()
+            } 
           } else {
             this.$Modal.error("网络错误,请重试！");
           }
@@ -709,6 +760,11 @@ if (sessionStorage.getItem('paramid')) {
     showtheimg(index) {
       this.showimg = index;
       this.visible = true;
+    },
+    showtheimg1(item,index,index1) {
+      this.showimg1 = index1;
+      this.visible1 = true;
+      this.progressary=this.recordEntityList[index].progress_img
     },
     choose_question(item, index) {
       if (this.question_ary.indexOf(index) == -1) {
