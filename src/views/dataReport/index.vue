@@ -281,6 +281,8 @@
       searchCancel(){
         this.formItem.beginDate=""
         this.formItem.endDate=""
+        this.beginDate=""
+        this.endDate=""
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()
