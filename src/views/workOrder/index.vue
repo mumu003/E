@@ -624,8 +624,6 @@ export default {
 
     // 备注提交
     msgOk() {
-      
-
       var data = new FormData();
       for (var i in this.viewForm) {
         data.append(i, this.viewForm[i]);
@@ -634,21 +632,26 @@ export default {
         data.append("imgs", this.files[i]);
       }
 
-      let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
-      axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
-        resdata => {
-          if(resdata.data.statusCode==200){
-            this.msgModal = false;
-            this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
-          }else{
-            this.$Modal.error({title: "提示信息", content: resdata.data.responseResult});
+      if(this.viewForm.remark){
+        let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+        axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
+          resdata => {
+            if(resdata.data.statusCode==200){
+              this.msgModal = false;
+              this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
+            }else{
+              this.$Modal.error({title: "提示信息", content: resdata.data.responseResult});
+            }
+            
+          },
+          err => {
+            this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
           }
-          
-        },
-        err => {
-          this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
-        }
-      );
+        );
+      }else{
+        this.$Modal.error({ title: "提示信息", content: "备注内容不能为空" });
+      }
+      
     },
     //取消操作
     viewCancel(arg) {

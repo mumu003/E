@@ -136,6 +136,8 @@
           beginDate:"",
           endDate:"",
         },
+        endDate:"",
+        beginDate:"",
         // 设置结束时间大于开始时间
         end:{
             disabledDate :(function(date){
@@ -230,6 +232,7 @@
         var d = dd.getDate() < 10 ?( '0' + dd.getDate()):dd.getDate()
         this.formItem.beginDate=(y + "-" + m + "-" + d)
         // console.log(this.formItem.beginDate)
+        this.beginDate=this.formItem.beginDate
 
         var week = ff.getDay(); //获取时间的星期数
         var maxus = week ? 7 - week : 0;
@@ -239,6 +242,7 @@
         var c = ff.getDate() < 10 ?( '0' + ff.getDate()):ff.getDate()
         this.formItem.endDate=(a + "-" + b + "-" + c)
         // console.log(this.formItem.endDate)
+        this.endDate=this.formItem.endDate
 
 
       // let today=new Date();
@@ -286,16 +290,20 @@
        // 开始时间
       getStartDate(startDate){
         this.formItem.beginDate=startDate
-        let now=new Date(this.formItem.endDate)
-        let nowM=now.getMonth()+1
-        this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
+        this.formItem.endDate=this.endDate
+        this.beginDate=this.formItem.beginDate
+        // let now=new Date(this.formItem.endDate)
+        // let nowM=now.getMonth()+1
+        // this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
       },
       // 结束时间
       getEndDate(endDate){
         this.formItem.endDate=endDate
-        let now=new Date(this.formItem.beginDate)
-        let nowM=now.getMonth()+1
-        this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
+        this.endDate=this.formItem.endDate
+        this.formItem.beginDate=this.beginDate
+        // let now=new Date(this.formItem.beginDate)
+        // let nowM=now.getMonth()+1
+        // this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
       }
     }
   }
