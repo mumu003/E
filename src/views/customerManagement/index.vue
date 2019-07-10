@@ -310,7 +310,7 @@ import qs from "qs";
                                             // this.editPhone=params.row.phone
                                             // this.editId=params.row.id
                                             if(params.row.id){
-                                                this.$request.post('/api/emaint/client/phone',qs.stringify({phone:params.row.phone}),res=>{
+                                                this.$request.post('/api/emaint/client/info',qs.stringify({id:params.row.id}),res=>{
                                                   this.$Message.error("网络出错，请重试！")
                                                 },res=>{
                                                   if(res.statusCode==200){
@@ -418,7 +418,7 @@ import qs from "qs";
               width:150
             },
             {
-              title: '公司类型',
+              title: '公司名称',
               key: 'companyName',
               width:150
             },
