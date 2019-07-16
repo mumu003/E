@@ -2,7 +2,27 @@
 <!-- 客户列表 -->
   <div>
     <Row :gutter="10">
-      <Col span="24">
+      <Col span="6" style="overflow-y: auto; height: 800px;">
+
+        <Card style="text-align: left; font-weight: bold;font-size: 13px;">
+          {{$route.meta.title_1}}
+        <!--<p slot="title">
+          {{$route.meta.title_1}}
+        </p>-->
+
+          <Button type="primary" icon="ios-loop-strong" @click="syncClient" v-if="auth.tf_client_sync" style="float: right;">同步客户</Button>
+        </Card>
+
+        <Card>
+        <template>
+          <Tree :data="groupTree"
+                @on-select-change="showchildren"
+                :empty-text="'加载中...'">
+          </Tree>
+        </template>
+        </Card>
+      </Col>
+      <Col span="18">
       <Card class="search-card">
         <p slot="title">
           {{$route.meta.title}}
@@ -55,28 +75,31 @@
           </div>
         </div>
       </Card>
+
+
+        <Card  style="margin-top: 5px;">
+          <div class="search-row">
+            <Row>
+              <Col>
+                <Button type="primary" icon="plus-round" @click="addClient" v-if="auth.tf_client_edit">新增</Button>
+              </Col>
+              <Col>
+              </Col>
+            </Row>
+          </div>
+          <Row class="searchable-table-con">
+            <Col span="24">
+              <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime" :isFirst="isFirst"></m-table>
+            </Col>
+          </Row>
+        </Card>
       </Col>
     </Row>
 
-    <Row :gutter="10" class="mt10">
+    <!--<Row :gutter="10" class="mt10">
       <Col span="24">
-      <Card>
-        <div class="search-row">
-          <Row>
-            <Col>
-            <Button type="primary" icon="plus-round" @click="addClient" v-if="auth.tf_client_edit">新增</Button>
-            <Button type="primary" icon="ios-loop-strong" @click="syncClient" v-if="auth.tf_client_sync">同步客户</Button>
-            </Col>
-            <Col>
-            </Col>
-          </Row>
-        </div>
-        <Row class="searchable-table-con">
-          <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime" :isFirst="isFirst"></m-table>
-        </Row>
-      </Card>
       </Col>
-    </Row>
+    </Row>-->
 
     <!-- 客户新增 -->
     <Modal v-model="addModal" title="客户新增"
@@ -221,6 +244,8 @@
 </template>
 <script>
 import qs from "qs";
+import util from "@/assets/js/util";
+
   export default {
     data () {
       return {
@@ -230,6 +255,7 @@ import qs from "qs";
         modal_loading: false, //延迟
         reject_loading: false, //驳回
         isFirst: false, //首页
+        groupTree: [],
         addModal: false, //新增模态框
         editModal: false, //编辑模态框
         statusModal: false, //状态模态框
@@ -243,7 +269,12 @@ import qs from "qs";
           tStartTime:"",
           tEndTime:"",
         },
-        
+
+        activeli: {
+          id: "",
+          parentId: "",
+          treeCode: ''
+        },
         // 处理禁用启用弹窗
         enable:false,
         disable:false,
@@ -259,6 +290,7 @@ import qs from "qs";
           beginTime:'',
           endTime:'',
           priority:'',
+          treeCode:'',
         },
         // 设置结束时间大于开始时间
         end:{
@@ -473,6 +505,7 @@ import qs from "qs";
       }
     },
     created(){
+      this.getlist();
       // 优先级下拉列表
       this.$request.post("/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
               this.modal_loading = false
@@ -506,6 +539,28 @@ import qs from "qs";
       getEndDate(endDate){
         this.formItem.endUpdateTime=endDate
       },
+
+      showchildren(v) {
+        this.activeli.id = v[0].id;
+        this.activeli.parentId = v[0].parentId;
+        this.activeli.treeCode = v[0].code;
+        this.initTreeClinet();
+      },
+
+      getlist() {
+        //  查询一级问题
+        this.$request.post(
+          "/api/emaint/client/groupTree",
+          {},
+          data => {},
+          data => {
+            if (data.statusCode == 200) {
+              this.groupTree = data.responseResult;
+            }
+          }
+        );
+      },
+
       //新增按钮
       addClient(){
         this.addModal = true
@@ -569,11 +624,45 @@ import qs from "qs";
         this.$refs.table.init()
       },
 
+      initTreeClinet(){
+
+        this.formItem={
+          status: '',
+          buildingId: '',
+          roomId: '',
+          areaId: '',
+          startUpdateTime: '',
+          endUpdateTime: '',
+          treeCode:''
+        }
+
+        this.isFirst = true;
+        this.formItem.pageNo=1;
+        this.formItem.limit=10;
+        if(this.activeli.treeCode != ''){
+          this.formItem.treeCode = this.activeli.treeCode;
+        }
+        this.$request.post("/api/emaint/client/page",qs.stringify(this.formItem), res => {
+          this.$Modal.error({title: '提示信息', content: res.resMessage})
+        }, res => {
+          if (res.statusCode === 200) {
+            this.$Message.success("搜索成功！")
+            this.isFirst = false
+            this.$refs.table.init()
+          } else {
+            this.$Modal.error({title: '提示信息', content: res.resMessage})
+          }
+        })
+      },
+
       //搜索
       searchSubmit () {
         this.isFirst = true
         this.formItem.pageNo=1;
         this.formItem.limit=10;
+        if(this.activeli.treeCode != ''){
+          this.formItem.treeCode = this.activeli.treeCode;
+        }
         this.$request.post("/api/emaint/client/page",qs.stringify(this.formItem), res => {
             this.$Modal.error({title: '提示信息', content: res.resMessage})
         }, res => {
@@ -594,7 +683,8 @@ import qs from "qs";
           roomId: '',
           areaId: '',
           startUpdateTime: '',
-          endUpdateTime: ''
+          endUpdateTime: '',
+          treeCode: ''
         }
         this.isFirst = true
         setTimeout(()=>{
@@ -650,4 +740,16 @@ import qs from "qs";
     }
   }
 </script>
+<style>
+
+
+  /* 树形列表 */
+  .ivu-tree ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    text-align: left;
+  }
+</style>
 

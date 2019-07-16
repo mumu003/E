@@ -450,7 +450,9 @@ if (sessionStorage.getItem('paramid')) {
         res=>{
             if(res.statusCode==200){
                 this.recordEntityList=res.responseResult.recordEntityList
-                this.recordEntityList.sort(util.compare("gmtCreate"));
+                this.recordEntityList.reverse()
+               
+                // this.recordEntityList.sort(util.compare("gmtCreate"));
 
                 this.recordEntityList.forEach(v=>{
                   v.progress_img=[]

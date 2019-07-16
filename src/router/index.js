@@ -81,7 +81,8 @@ export default new Router({
           path: '/customerManagement',
           name: 'customerManagement',
           meta: {
-            title: '客户列表'
+            title: '客户列表',
+            title_1: '组织机构树'
           },
           component: resolve => require(['@/views/customerManagement/index.vue'], resolve),
         },
