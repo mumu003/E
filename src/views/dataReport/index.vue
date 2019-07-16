@@ -276,7 +276,10 @@
       searchSubmit () {
         if(this.formItem.beginDate!="" && this.formItem.endDate !=""){
           this.isFirst = true
-          this.$refs.table.init()
+          setTimeout(()=>{
+            this.$refs.table.init()
+            this.isFirst = false
+          },200)
         }else{
           this.$Modal.error({title: '提示信息', content: "请输入进行检索的完整起始时间"})
         }
@@ -289,10 +292,10 @@
         this.beginDate=""
         this.endDate=""
         this.isFirst = true
-        // setTimeout(()=>{
-        //   this.$refs.table.init()
-        //   this.isFirst = false
-        // },200)
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
        // 开始时间
       getStartDate(startDate){

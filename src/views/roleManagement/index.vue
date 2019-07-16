@@ -394,23 +394,27 @@ import qs from "qs";
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/api/emaint/role/page",qs.stringify(this.formItem), res => {
-          if (res.statusCode === 200) {
-            // this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.responseResult})
-          }
-        }, res => {
-          if (res.statusCode === 200) {
-            // this.$Message.success("搜索成功！")
-            this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.responseResult})
-          }
-        })
+        setTimeout(()=>{
+          this.isFirst = false
+          this.$refs.table.init()
+        },200)
+        // this.$request.post("/api/emaint/role/page",qs.stringify(this.formItem), res => {
+        //   if (res.statusCode === 200) {
+        //     // this.$Message.success("搜索成功！")
+        //     this.isFirst = false
+        //     this.$refs.table.init()
+        //   } else {
+        //     this.$Modal.error({title: '提示信息', content: res.responseResult})
+        //   }
+        // }, res => {
+        //   if (res.statusCode === 200) {
+        //     // this.$Message.success("搜索成功！")
+        //     this.isFirst = false
+        //     this.$refs.table.init()
+        //   } else {
+        //     this.$Modal.error({title: '提示信息', content: res.responseResult})
+        //   }
+        // })
       },
       //搜索重置
       searchReset(){
@@ -422,6 +426,7 @@ import qs from "qs";
           page:1,
           limit:10
         }
+        this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()
           this.isFirst = false

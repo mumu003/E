@@ -17,12 +17,12 @@
                   </Col>
                   <Col span="6">
                     <FormItem label="执行人">
-                      <Input v-model="formItem.fromClientName" :maxlength=20 placeholder="请输入执行人"/>
+                      <Input v-model="formItem.toUserName" :maxlength=20 placeholder="请输入执行人"/>
                     </FormItem>
                   </Col>
                   <Col span="6">
                     <FormItem label="评价人">
-                      <Input v-model="formItem.toUserName" :maxlength=20 placeholder="请输入评价人"/>
+                      <Input v-model="formItem.fromClientName" :maxlength=20 placeholder="请输入评价人"/>
                     </FormItem>
                   </Col>
                 </Row>
@@ -231,8 +231,13 @@
       },
       // 搜索
       searchSubmit(){
+        // this.isFirst = true
+        // this.$refs.table.init()
         this.isFirst = true
-        this.$refs.table.init()
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       // 重置
       searchCancel(){
@@ -241,11 +246,11 @@
           this.formItem.fromClientName="",
           this.formItem.beginTime="",
           this.formItem.endTime=""
-        this.isFirst = true
-        setTimeout(()=>{
-          this.$refs.table.init()
-          this.isFirst = false
-        },200)
+          this.isFirst = true
+          setTimeout(()=>{
+            this.$refs.table.init()
+            this.isFirst = false
+          },200)
       }
     }
   }

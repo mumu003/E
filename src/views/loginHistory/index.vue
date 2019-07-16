@@ -132,8 +132,14 @@
       },
       // 搜索
       searchSubmit(){
+        // this.isFirst = false
+        // this.$refs.table.init()
+
         this.isFirst = true
-        this.$refs.table.init()
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       // 重置
       searchCancel(){

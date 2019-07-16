@@ -480,21 +480,10 @@ import qs from "qs";
       //搜索提交
       searchSubmit(){
         this.isFirst = true
-        this.$request.post("/api/user/data",qs.stringify(this.formItem), res => {
-          if (res.statusCode === 200) {
-            // this.$Message.success("搜索成功！")
-            // this.isFirst = false
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.responseResult})
-          }
-        }, res => {
-          if (res.statusCode === 200) {
-            this.$refs.table.init()
-          } else {
-            this.$Modal.error({title: '提示信息', content: res.responseResult})
-          }
-        })
+        setTimeout(()=>{
+          this.$refs.table.init()
+          this.isFirst = false
+        },200)
       },
       //搜索重置
       searchReset(){
@@ -503,8 +492,9 @@ import qs from "qs";
           beginTime: '',
           endTime: ''
         }
+        this.isFirst = true
         setTimeout(()=>{
-          this.isFirst = true
+          this.isFirst = false
           this.$refs.table.init()
         },200)
         
