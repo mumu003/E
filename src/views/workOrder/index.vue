@@ -209,7 +209,7 @@ export default {
       //表单
       formItem: {
         workOrderNo: "",
-        state: "",
+        state: sessionStorage.status,
         name: "",
         phone: "",
         isChange: "",

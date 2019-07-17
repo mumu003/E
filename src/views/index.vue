@@ -65,7 +65,8 @@
       v-model="modal1"
       title="修改密码"
       :loading="loading"
-      @on-ok="handleSubmit('formValidate')">
+      @on-ok="handleSubmit('formValidate')"
+      @on-cancel="cancel">
       <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
         <Form-item label="原密码" prop="oldPwd">
           <Input v-model="formValidate.oldPwd" placeholder="请输入原密码" type="password" />
@@ -451,42 +452,51 @@
               url: "/api/user/updatePassword",
               data: param,
               crossDomain: true
-            })
-              .then(res => {
-                // if (res.statusCode == "200") {
+            }).then(res => {
+
+              console.log(res)
+                if (res.data.statusCode == 200) {
+                  // this.changeLoading()
+                  this.modal1 = false
+                  this.formValidate.oldPwd = ""
+                  this.formValidate.newPwd = ""
+                  this.formValidate.correctPwd = ""
+                  this.$Message.success({content:'修改成功！'})
+                } else {
+                  // this.$Message.error(res.responseResult);
                   this.changeLoading()
+                  this.$Message.error({content:res.data.responseResult})
+                }
+              }).catch(res => {
+                console.log("5165111595959595")
+                // this.changeLoading()
+                if (res.statusCode == 200) {
+                  // this.changeLoading()
                   this.modal1 = false
                   this.formValidate.oldPwd = ""
                   this.formValidate.newPwd = ""
                   this.formValidate.correctPwd = ""
                   this.$Message.success('修改成功！')
-                // } else {
-                  // this.changeLoading()
-                  // this.$Message.error(res.responseResult)
-                // }
-              })
-              .catch(error => {
-                // this.changeLoading()
-                // if (res.statusCode == "200") {
-                  // this.changeLoading()
-                  // this.modal1 = false
-                  // this.formValidate.oldPwd = ""
-                  // this.formValidate.newPwd = ""
-                  // this.formValidate.correctPwd = ""
-                  // this.$Message.success('修改成功！')
-                // } else {
+                } else {
                   this.changeLoading()
-                  this.$Message.error(res.responseResult)
-                // }
+                  // this.$Message.error(res.responseResult);
+                  this.$Message.error({content:res.data.responseResult})
+                }
               })
           } else {
             this.changeLoading()
-            this.$Message.error('表单验证失败!')
+            this.$Message.error({content:'表单验证失败!'})
           }
-          setTimeout(() => {
-            this.changeLoading()
-          }, 800)
+          // setTimeout(() => {
+          //   this.changeLoading()
+          // }, 800)
         })
+      },
+      cancel(){
+        this.formValidate.oldPwd = ""
+        this.formValidate.newPwd = ""
+        this.formValidate.correctPwd = ""
+        this.$refs.formValidate.resetFields()
       },
       changeLoading() {
         this.loading = false
@@ -507,22 +517,9 @@
         this.$router.push('/login')
       },
       getCompany(){
-        this.$request.post(
-          "/api/repairMessage/userUnreadData",
-          {
-            limit:10,
-            page:1
-          },
-          res => {
-            this.msg_badge=res.responseResult.total
-            // console.log(111)
-          },
-          res => {
-            // this.$Modal.error({ title: "提示信息", content: res.resMessage });
-            this.msg_badge=res.responseResult.total
-            // console.log(111)
-          }
-        );
+        Bus.$on("msgEmit", num => {
+          this.msg_badge=num
+        });
       },
       changeOrg(){
           // console.log(""+this.companyPId)
