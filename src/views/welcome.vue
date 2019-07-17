@@ -1,11 +1,11 @@
 <template>
     <div class="content">
       <Card class="rows">
-        <div class="col" @click="goWork">
+        <div class="col" @click="goWork('待派单')">
           <h1>{{waitingList_num}}</h1>
           <p>待派单</p>
         </div>
-        <div class="col">
+        <div class="col" @click="goWork('待维修')">
           <h1>{{maintain_num}}</h1>
           <p>待维修</p>
         </div>
@@ -13,7 +13,8 @@
       <Card >
           <p slot="title">消息提醒</p>
           <div class="msg-list">
-              <Card class="msg-row" v-for="(item,index) in msg_list" :key="index">
+            <div v-for="(item,index) in msg_list" :key="index" @click="setting(item.id,item.workOrderNo)">
+                <Card class="msg-row" >
                 <div class="msg-content">
                     {{item.content}}
                 </div>
@@ -21,6 +22,8 @@
                     {{item.gmtCreate}}
                 </div>
               </Card>
+            </div>
+              
           </div>
       </Card>
     <div class="page-tool">
@@ -100,6 +103,7 @@
 
 <script type="text/ecmascript-6">
 import qs from "qs";
+import Bus from './../bus.js'
 export default {
   data() {
     const validateActualNum = (rule, value, callback) => {
@@ -180,6 +184,7 @@ export default {
               this.msg_list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
             })
             this.total = res.responseResult.total || res.responseResult.length
+            Bus.$emit("msgEmit",this.total)
             this.currentPage = res.responseResult.pageNum === 0 ? 1 : res.responseResult.pageNum
           }
         );
@@ -203,10 +208,76 @@ export default {
       this.currentPage = page
       this.getAgency(page)
     },
-    goWork(){
-      if(this.auth.tf_repair_problem_list){
+    goWork(status){
+      // if(this.auth.tf_repair_problem_list){
         this.$router.push("/workOrder")
+        sessionStorage.setItem("status",status)
+      // }
+    },
+    setting(id,workOrderNo){
+        this.$request.post(
+          "/api/repairMessage/read",
+          qs.stringify({id:id}),
+          // {id:id},
+          res => {
+            // if(res.statusCode==200){
+            //   this.$Message.success(res.responseResult)
+            // }else{
+            //   this.$Modal.error({ title: "提示信息", content: res.responseResult});
+            // } 
+            this.getAgency(1); //获取角标
+            // this.getCount()
+            // sessionStorage.setItem("msgTotal",this.total)
+          },
+          res => {
+            // if(res.statusCode==200){
+            //   this.$Message.success(res.responseResult)
+            // }else{
+            //   this.$Modal.error({ title: "提示信息", content: res.responseResult});
+            // }     
+            this.getAgency(1); //获取角标
+            // sessionStorage.setItem("msgTotal",this.total)
+            // this.getCount()       
+            
+          }
+        );
+        let param={
+        workOrderNo: workOrderNo,
+        state: "",
+        name: "",
+        phone: "",
+        isChange: "",
+        userName: "",
+        endTime: "",
+        beginTime: ""
       }
+        this.$request.post(
+          "/api/emaint/repairProblem/repairProblemList",
+          qs.stringify(param),
+          // {id:id},
+          res => {
+            if(res.statusCode==200){
+              sessionStorage.setItem('paramid',res.responseResult.list[0].id)
+              this.$router.push({
+                name: "WorkDetail",
+              });
+            }else{
+              this.$Modal.error({ title: "提示信息", content: res.responseResult});
+            } 
+          },
+          res => {
+            if(res.statusCode==200){
+              sessionStorage.setItem('paramid',res.responseResult.list[0].id)
+              this.$router.push({
+                name: "WorkDetail",
+              });
+            }else{
+              this.$Modal.error({ title: "提示信息", content: res.responseResult});
+            }        
+            
+          }
+        );
+        
     }
   }
 };
