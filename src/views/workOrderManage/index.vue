@@ -12,12 +12,18 @@
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
             <Row type="flex" justify="start">
               <Col span="7">
-              <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" icon="search" @input="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入手机号"></Input>
+              <FormItem label="来电号码" prop="callID">
+                <Input v-model="formItem.callID" icon="search" @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入来电号码"></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="办公位" :label-width="100">
+             
+              <Col span="4">
+                <Button type="primary" @click="clientRepairList">历史报修数据</Button>
+              </Col>
+              </Row>
+              <Row>
+                 <Col span="7">
+              <FormItem label="办公位" :label-width="80">
                 <AutoComplete
                   v-model="formItem.officeLocation"
                   :data="newarr"
@@ -26,25 +32,6 @@
                   >
                 </AutoComplete>
               </FormItem>
-              </Col>
-              <Col span="4">
-                <Button type="primary" @click="clientRepairList">历史报修数据</Button>
-              </Col>
-              </Row>
-
-
-              <!-- 联系人号码 -->
-              <Row type="flex" justify="start">
-              <Col span="7">
-                <FormItem label="联系人手机号" :label-width="127" prop="contactPhone">
-                  <AutoComplete
-                    v-model="formItem.contactPhone"
-                    :data="newarr2"
-                    @on-search="handleSearch2"
-                    placeholder="请输入联系人手机号"
-                    >
-                    </AutoComplete>
-                </FormItem>
               </Col>
               <Col span="7">
                 <FormItem label="是否代为报修" :label-width="127" >
@@ -58,7 +45,44 @@
                   </RadioGroup>
                 </FormItem>
               </Col>
+             
               </Row>
+
+
+              <!-- 联系人号码 -->
+              <Row type="flex" justify="start">
+                 <Col span="7">
+              <FormItem label="手机号" >
+                <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
+              </FormItem>
+              </Col>
+             
+              <Col span="7">
+                <FormItem label="联系人手机号" :label-width="110" prop="contactPhone">
+                  <AutoComplete
+                    v-model="formItem.contactPhone"
+                    :data="newarr2"
+                    @on-search="handleSearch2"
+                    placeholder="请输入联系人手机号"
+                    >
+                    </AutoComplete>
+                </FormItem>
+              </Col>
+              
+              </Row>
+              <Row>
+ <Col span="7">
+              <FormItem label="内线号码" :label-width="80">
+                    <Input v-model="formItem.undef" disabled :maxlength=12></Input>
+              </FormItem>
+              </Col>
+               <Col span="7">
+              <FormItem label="座机" :label-width="100">
+                    <Input v-model="formItem.tel" disabled :maxlength=12 ></Input>
+              </FormItem>
+              </Col>
+               
+                </Row>
 
               <Row>
               <Col span="7">
@@ -244,6 +268,7 @@
 import qs from "qs";
 import axios from "axios";
 import util from "@/assets/js/util";
+import Bus from '@/bus'
 export default {
   data() {
     return {
@@ -295,6 +320,9 @@ export default {
       formItem: {
         clientId: "",
         phone: "",
+        undef:"",
+        tel:"",
+        callID:"",
         officeLocation: "",
         contactPhone:"",
         name: "",
@@ -316,13 +344,17 @@ export default {
       treeList: [],
       // 设置表单验证
       ruleValidate: {
-        phone: [
+       callID: [
           {
             required: true,
-            message: "请输入正确的手机号",
+            message: "请输入正确的来电号码",
             trigger: "blur",
             transform(value) {
-              var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              // var reg=/^\d{11}$/
+              var reg=/[0-9\-]/
+              // var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              // var landLine_reg=/0\d{2,3}-\d{7,8}/;
+              //  && !landLine_reg.test(value)
               if (!reg.test(value)) {
                 return false;
               } else {
@@ -449,12 +481,18 @@ export default {
   },
   mounted() {
     //方法
-    if (this.$route.params.phone) {
-      this.formItem.phone=this.$route.params.phone
-      this.search(this.$route.params.phone);
+    if (this.$route.params.callID) {
+      this.formItem.callID=this.$route.params.callID
+      this.search(this.$route.params.callID);
     }
   },
+  created(){
+    Bus.$on('changephone',value=>{
+      this.formItem.callID=value
+    })
+  },
   beforeCreate() {
+   
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -505,6 +543,7 @@ export default {
           }
       })
     },
+    
     changefile(e) {
       var file = e.target.files[0];
 
@@ -555,16 +594,21 @@ export default {
 
     // 输入手机号进行检索
     search(e) {
-      if (this.formItem.phone.length == 11) {
+      // if (this.formItem.phone.length == 11) {
+        var reg=/[0-9\-]/;
+        if(!reg.test(this.formItem.callID))
+        return
       this.$request.post(
         "/api/emaint/client/phone",
-        qs.stringify({ phone: this.formItem.phone }),
+        qs.stringify({ phone: this.formItem.callID }),
         res => {},
         res => {
           if (res.statusCode == 200 && res.responseResult != null) {
             this.$Message.success("查询成功!");
             var data = res.responseResult;
             this.formItem.phone = data.phone;
+            this.formItem.undef=data.undef;
+            this.formItem.tel=data.tel
             this.formItem.contactPhone=data.contactPhone
             this.formItem.officeLocation = data.officeLocation;
             this.formItem.name = data.name;
@@ -607,11 +651,15 @@ export default {
               default : break;
             }
           } else {
+            
                 this.$Message.error("客户信息不存在");
                 this.RepairForm.clientId=''
                 this.formItem={
                   clientId: "",
-                  phone: "",
+                  phone:'',
+                  callID:this.formItem.callID,
+                  undef:"",
+                  tel:"",
                   officeLocation: "",
                   contactPhone:"",
                   name: "",
@@ -632,28 +680,30 @@ export default {
           }
         }
       );
-      }else{
-        this.formItem={
-                  clientId: "",
-                  phone: "",
-                  officeLocation: "",
-                  contactPhone:"",
-                  name: "",
-                  companyName: "",
-                  priority: "",
-                  sex: "",
-                  problemClass: "",
-                  problemType: "",
-                  remark: "",
-                  participatorids: [],
-                  problem: "",
-                  problemImgs: "",
-                  participators: [],
-                  userId:'',
-                  userName:"",
-                  replacementRepair:""
-                } 
-      }
+      // }else{
+      //   this.formItem={
+      //             clientId: "",
+      //             phone: this.formItem.phone,
+      //             undef:"",
+      //             tel:"",
+      //             officeLocation: "",
+      //             contactPhone:"",
+      //             name: "",
+      //             companyName: "",
+      //             priority: "",
+      //             sex: "",
+      //             problemClass: "",
+      //             problemType: "",
+      //             remark: "",
+      //             participatorids: [],
+      //             problem: "",
+      //             problemImgs: "",
+      //             participators: [],
+      //             userId:'',
+      //             userName:"",
+      //             replacementRepair:""
+      //           } 
+      // }
     },
     // 报修提交
     repairSubmit() {

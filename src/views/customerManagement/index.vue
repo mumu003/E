@@ -123,6 +123,16 @@
           </FormItem>
           </Col>
           <Col span="16">
+          <FormItem label="座机" prop="tel">
+            <Input v-model="addForm.tel" :maxlength=12 placeholder="请输入座机号码"></Input>
+          </FormItem>
+          </Col>
+          <Col span="16">
+          <FormItem label="内线号码" prop="undef">
+            <Input v-model="addForm.undef" :maxlength=12 placeholder="请输入内线号码"></Input>
+          </FormItem>
+          </Col>
+          <Col span="16">
           <FormItem label="优先级" prop="priority">
             <Select v-model="addForm.priority" placeholder="请选择优先级">
               <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
@@ -175,6 +185,16 @@
           <Col span="16">
           <FormItem label="手机号" prop="phone">
             <Input v-model="addForm.phone" :maxlength=20 placeholder="请输入手机号"></Input>
+          </FormItem>
+          </Col>
+          <Col span="16">
+          <FormItem label="座机" prop="tel">
+            <Input v-model="addForm.tel" :maxlength=12 placeholder="请输入座机号码"></Input>
+          </FormItem>
+          </Col>
+          <Col span="16">
+          <FormItem label="内线号码" prop="undef">
+            <Input v-model="addForm.undef" :maxlength=12 placeholder="请输入内线号码"></Input>
           </FormItem>
           </Col>
           <Col span="16">
@@ -352,6 +372,10 @@ import util from "@/assets/js/util";
                                                     this.addForm.companyName=data.companyName
                                                     this.addForm.name=data.name
                                                     this.addForm.phone=data.phone
+
+                                                    this.addForm.undef=data.undef
+                                                    this.addForm.tel=data.tel
+
                                                     this.addForm.officeLocation=data.officeLocation
                                                     this.addForm.priority=data.priority
                                                     this.addForm.sex=data.sex
@@ -463,6 +487,8 @@ import util from "@/assets/js/util";
           companyName:'',
           name:'',
           phone:'',
+          undef:"",
+          tel:"",
           priority:'',
           officeLocation:'',
           sex:'女',
@@ -477,6 +503,26 @@ import util from "@/assets/js/util";
           phone: [
             { required: true, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
                   var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
+          ],
+          tel:[
+            { required: true, message: '请输入正确的座机号码',  trigger: 'blur' , transform(value){
+                  var reg=/0\d{2,3}-\d{7,8}/
+                  if(!reg.test(value)){
+                    return false
+                  }else{
+                    return value
+                  }
+            }}
+          ],
+           undef:[
+            { required: true, message: '请输入正确的内线号码',  trigger: 'blur' , transform(value){
+                  var reg= /^\d+$/; 
                   if(!reg.test(value)){
                     return false
                   }else{
@@ -567,6 +613,8 @@ import util from "@/assets/js/util";
         this.addForm.companyName=""
         this.addForm.name=""
         this.addForm.phone=""
+        this.addForm.undef=""
+        this.addForm.tel=""
         this.addForm.priority=""
         this.addForm.officeLocation=""
         this.addForm.sex=""

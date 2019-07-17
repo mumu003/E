@@ -46,7 +46,7 @@ export default {
           "wss://emaint.ahjarzeng.com/api/websocket/" +
             sessionStorage.getItem("userID")
         );
-
+   
         this.ws.onopen = this.onopen; // 连接成功后执行的方法
         this.ws.onerror = this.onerror; // 连接出错后执行的方法
         this.ws.onclose = this.onclose; // 连接关闭后执行的方法
@@ -56,22 +56,32 @@ export default {
       }
     },
     message(e) {
+           this.reset(); //收到消息重置心跳
+     
+      if(e.data=='heartCheck'){
+        return;
+      }
+      var data=JSON.parse(e.data)
+      
       // e.data是收到的消息内容，会以json字符串的形式传过来
-      this.reset(); //收到消息重置心跳
+
       // 收到消息后弹窗
-      if (e.data != "连接成功" && e.data != "heartCheck") {
+      if (data.type==2 && e.data != "heartCheck") {
         this.$Modal.info({
           title: "来电通知",
-          content: "<h1>" + e.data + "</h1>",
+          content: "<h1>" + data.message + "</h1>",
           okText: "去新增工单",
           closable: true,
           onOk: () => {
+            
+            Bus.$emit('changephone',data.message)
             this.$router.push({
               name: "workOrderManage",
               params: {
-                phone: e.data
+                callID: data.message
               }
             });
+             
           }
         });
       }
