@@ -10,16 +10,22 @@
           <div id="search-body">
             <Form :label-width="80">
               <Row>
-               <Col span="6">
+               <!-- <Col span="6">
                   <FormItem label="时间">
                     <DatePicker format="yyyy-MM-dd"  type="date" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginDate" class="widthp100"></DatePicker>
                   </FormItem>
                 </Col>
                 <Col span="6">
                   <FormItem >
-                    <!-- :options="end" -->
                     <DatePicker format="yyyy-MM-dd" type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endDate" class="widthp100"></DatePicker>
                   </FormItem>
+                </Col> -->
+
+                <Col span="6">
+                <FormItem label="时间">
+                  <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                  <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
+                </FormItem>
                 </Col>
               </Row>
             </Form>
@@ -144,6 +150,7 @@
               return date.valueOf() < new Date( this.formItem.beginDate)
             }).bind(this)
         },
+        createdTime:[],
         //表格
         tableConfig:{
           url:"/api/emaint/repairProblem/totalComapnyCountList",
@@ -233,6 +240,7 @@
         this.formItem.beginDate=(y + "-" + m + "-" + d)
         // console.log(this.formItem.beginDate)
         this.beginDate=this.formItem.beginDate
+        this.createdTime.push(this.beginDate)
 
         var week = ff.getDay(); //获取时间的星期数
         var maxus = week ? 7 - week : 0;
@@ -243,21 +251,7 @@
         this.formItem.endDate=(a + "-" + b + "-" + c)
         // console.log(this.formItem.endDate)
         this.endDate=this.formItem.endDate
-
-
-      // let today=new Date();
-      // let WeekFirstDay=new Date(today-(today.getDay()-1)*86400000);     
-      // let M=Number(WeekFirstDay.getMonth())+1;    
-      // this.formItem.beginDate=WeekFirstDay.getFullYear()+"-"+M+"-"+(WeekFirstDay.getDate());
-      // console.log(WeekFirstDay)
-      // console.log(WeekFirstDay.getDay())
-      // // this.getStartDate(this.formItem.beginDate)
-      // let WeekLastDay=new Date((WeekFirstDay/1000+6*86400)*1000);     
-      // let N=Number(WeekLastDay.getMonth())+1     
-      // this.formItem.endDate=WeekLastDay.getFullYear()+"-"+N+"-"+(WeekLastDay.getDate());
-      // this.getEndDate(this.formItem.endDate)
-
-      // if(WeekFirstDay.getDay()=='')
+        this.createdTime.push(this.endDate)
 
     },
     methods: {
@@ -292,29 +286,30 @@
         this.beginDate=""
         this.endDate=""
         this.isFirst = true
+        this.createdTime=[]
         setTimeout(()=>{
           this.$refs.table.init()
           this.isFirst = false
         },200)
       },
-       // 开始时间
-      getStartDate(startDate){
-        this.formItem.beginDate=startDate
-        this.formItem.endDate=this.endDate
-        this.beginDate=this.formItem.beginDate
-        // let now=new Date(this.formItem.endDate)
-        // let nowM=now.getMonth()+1
-        // this.formItem.endDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
+      //  // 开始时间
+      // getStartDate(startDate){
+      //   this.formItem.beginDate=startDate
+      //   this.formItem.endDate=this.endDate
+      //   this.beginDate=this.formItem.beginDate
+      // },
+      // // 结束时间
+      // getEndDate(endDate){
+      //   this.formItem.endDate=endDate
+      //   this.endDate=this.formItem.endDate
+      //   this.formItem.beginDate=this.beginDate
+      // }
+
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginDate=createdTime[0]
+        this.formItem.endDate=createdTime[1]
       },
-      // 结束时间
-      getEndDate(endDate){
-        this.formItem.endDate=endDate
-        this.endDate=this.formItem.endDate
-        this.formItem.beginDate=this.beginDate
-        // let now=new Date(this.formItem.beginDate)
-        // let nowM=now.getMonth()+1
-        // this.formItem.beginDate=now.getFullYear()+"-"+nowM+"-"+now.getDate()
-      }
     }
   }
 </script>

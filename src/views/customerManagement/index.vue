@@ -51,18 +51,23 @@
               </Col>
               </Row>
               <Row>
-              <Col span="8">
+              <!-- <Col span="8">
               <FormItem label="创建时间">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getEndDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
-                <!-- <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
               <Col span="8">
               <FormItem>
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
-                <!-- <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
-              </Col>
+              </Col> -->
+
+
+              <Col span="6">
+                  <FormItem label="更新时间">
+                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                  </FormItem>
+                </Col>
             </Row>
           </Form>
           <div class="search-row">
@@ -289,6 +294,7 @@ import util from "@/assets/js/util";
           tStartTime:"",
           tEndTime:"",
         },
+        createdTime:[],
 
         activeli: {
           id: "",
@@ -578,13 +584,18 @@ import util from "@/assets/js/util";
     },
     
     methods: {
-      //开始时间
-      getStartDate(startDate){
-        this.formItem.startUpdateTime=startDate
-      },
-      //结束时间
-      getEndDate(endDate){
-        this.formItem.endUpdateTime=endDate
+      // //开始时间
+      // getStartDate(startDate){
+      //   this.formItem.startUpdateTime=startDate
+      // },
+      // //结束时间
+      // getEndDate(endDate){
+      //   this.formItem.endUpdateTime=endDate
+      // },
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginTime=createdTime[0]
+        this.formItem.endTime=createdTime[1]
       },
 
       showchildren(v) {
@@ -735,6 +746,7 @@ import util from "@/assets/js/util";
           endUpdateTime: '',
           treeCode: ''
         }
+        this.createdTime=[]
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()

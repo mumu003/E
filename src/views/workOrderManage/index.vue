@@ -51,11 +51,11 @@
 
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
-                 <!-- <Col span="7">
+                 <Col span="7">
                   <FormItem label="手机号" >
                     <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
                   </FormItem>
-                  </Col> -->
+                  </Col>
               <Col span="7">
                 <FormItem label="联系人手机号" :label-width="110" prop="contactPhone">
                   <AutoComplete
@@ -706,7 +706,7 @@ export default {
     },
     // 报修提交
     repairSubmit() {
-      
+      this.modal_loading=true
       // 派单
       if (this.viewForm.id != "") {
         this.$request.post(
@@ -761,19 +761,23 @@ export default {
             .then(
                 (resdata)=> {
                 if (resdata.data.statusCode == 200) {
+                  this.modal_loading=false
                   this.$Message.success('新增成功！');
                   setTimeout(()=>{
                     this.$router.push({name:'workOrder'})
                   },1000)
                 }else{
+                  this.modal_loading=false
                   this.$Modal.error({title: "提示信息",content:resdata.data.responseResult});
                 }
               },
               (err) =>{
-                this.$Message.success(err);
+                this.modal_loading=false
+                this.$Message.error("网络出错，请稍后再试");
               }
             )
         }else{
+          this.modal_loading=false
           this.$Message.error("输入不能为空")
         }
         // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头

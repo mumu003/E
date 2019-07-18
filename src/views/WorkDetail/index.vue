@@ -479,7 +479,62 @@ export default {
           this.getinfo();
         }
     })
- 
+  //   if (sessionStorage.getItem('paramid')) {
+      
+  //   this.$request.post(
+  //       '/api/emaint/repairProblem/view',
+  //       qs.stringify({id:sessionStorage.getItem('paramid')}),res=>{},
+  //       res=>{
+  //           if(res.statusCode==200){
+  //               this.recordEntityList=res.responseResult.recordEntityList
+  //               this.recordEntityList.reverse()
+               
+  //               // this.recordEntityList.sort(util.compare("gmtCreate"));
+
+  //               this.recordEntityList.forEach(v=>{
+  //                 v.progress_img=[]
+  //                 if(v.imgs){
+  //                   if(v.imgs.indexOf("|~|")!=-1){
+  //                     // 多图
+  //                     var ary=v.imgs.split("|~|")
+  //                     ary.forEach(v2=>{
+  //                       if(v2.indexOf("|")!=-1){
+  //                         v2=v2.match(/(\S*)\|/)[1]
+  //                       }
+  //                       v.progress_img.push(v2)
+  //                     })
+  //                   }else if(v.imgs.indexOf("|")!=-1){
+  //                     // 一张图
+  //                     v.progress_img.push(v.imgs.split("|")[0])
+  //                   }else{
+  //                     v.progress_img.push(v.imgs)
+  //                   }
+  //                 }
+  //               })
+
+  //               // if(this.recordEntityList.imgs){
+  //               //   if(this.recordEntityList.imgs.indexOf("|~|")!=-1){
+  //               //     // 多图
+  //               //       var ary=this.recordEntityList.imgs.split("|~|")
+  //               //       ary.forEach(v=>{
+  //               //         if(v.indexOf("|")!=-1){
+  //               //           v=v.match(/(\S*)\|/)[1]
+  //               //         }
+  //               //         this.progress_img.push(v)
+  //               //       })
+  //               //   }else if(this.recordEntityList.imgs.indexOf("|")!=-1){
+  //               //     // 一张图
+  //               //     this.imglist.push(this.recordEntityList.imgs.split("|")[0])
+  //               //   }else{
+  //               //     this.progress_img.push(this.recordEntityList.imgs)
+  //               //   }
+  //               // }
+  //           }
+  //       }
+    
+  //   )
+  //  }
+   
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -637,6 +692,31 @@ export default {
                 this.state_show=false;break;
                 default:break;
             }
+      this.recordEntityList=res.responseResult.recordEntityList
+                this.recordEntityList.reverse()
+               
+                // this.recordEntityList.sort(util.compare("gmtCreate"));
+
+                this.recordEntityList.forEach(v=>{
+                  v.progress_img=[]
+                  if(v.imgs){
+                    if(v.imgs.indexOf("|~|")!=-1){
+                      // 多图
+                      var ary=v.imgs.split("|~|")
+                      ary.forEach(v2=>{
+                        if(v2.indexOf("|")!=-1){
+                          v2=v2.match(/(\S*)\|/)[1]
+                        }
+                        v.progress_img.push(v2)
+                      })
+                    }else if(v.imgs.indexOf("|")!=-1){
+                      // 一张图
+                      v.progress_img.push(v.imgs.split("|")[0])
+                    }else{
+                      v.progress_img.push(v.imgs)
+                    }
+                  }
+                })
 
             //  处理参与者id
             if(this.formItem.participatorids){

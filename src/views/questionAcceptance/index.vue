@@ -46,7 +46,7 @@
               </Row> -->
 
               <Row>
-                <Col span="6">
+                <!-- <Col span="6">
                   <FormItem label="更新时间">
                     <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
@@ -54,6 +54,11 @@
                 <Col span="6">
                   <FormItem>
                     <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col> -->
+                <Col span="6">
+                  <FormItem label="更新时间">
+                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -120,6 +125,7 @@
         checkButton: false, //验证
         startButton: false, //发起
         buttons:{ }, //按钮
+        createdTime:[],
         //搜索时间
         searchTime:{
           tStartTime:"",
@@ -229,7 +235,8 @@
          ruleAdd:{
           phone: [
             { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
-                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  // var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  var reg=/[0-9\-]/
                   if(!reg.test(value)){
                     return false
                   }else{
@@ -253,21 +260,22 @@
         },
       }
     },
-    // created(){
-    //   // console.log(this.$route.params.status)
-    //   if(this.$route.params.status){
-    //     this.formItem.state=this.$route.params.status
-    //   }
-    // },
     methods: {
-      //开始时间
-      getStartDate(startDate){
-        this.formItem.beginTime=startDate
-      },
-      //结束时间
-      getEndDate(endDate){
-        this.formItem.endTime=endDate
+      // //开始时间
+      // getStartDate(startDate){
+      //   this.formItem.beginTime=startDate
+      // },
+      // //结束时间
+      // getEndDate(endDate){
+      //   this.formItem.endTime=endDate
         
+      // },
+
+
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginTime=createdTime[0]
+        this.formItem.endTime=createdTime[1]
       },
       // 问题受理 / 新增
       addProject(){
@@ -304,6 +312,7 @@
           beginTime: '',
           endTime: ''
         }
+        this.createdTime=[]
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()

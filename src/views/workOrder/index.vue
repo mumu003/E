@@ -54,7 +54,7 @@
                 <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>
               </FormItem>
               </Col>
-              <Col span="6">
+              <!-- <Col span="6">
               <FormItem label="创建时间">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
@@ -62,7 +62,13 @@
               <Col span="6">
               <FormItem>
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
-              
+              </FormItem>
+              </Col> -->
+
+              <Col span="6">
+              <FormItem label="创建时间">
+                <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
             </Row>
@@ -207,6 +213,7 @@ export default {
         tStartTime: "",
         tEndTime: ""
       },
+      createdTime:[],
       //表单
       formItem: {
         workOrderNo: "",
@@ -527,13 +534,18 @@ export default {
         }
       );
     },
-    //开始时间
-    getStartDate(startDate) {
-      this.formItem.beginTime = startDate;
-    },
-    //结束时间
-    getEndDate(endDate) {
-      this.formItem.endTime = endDate;
+    // //开始时间
+    // getStartDate(startDate) {
+    //   this.formItem.beginTime = startDate;
+    // },
+    // //结束时间
+    // getEndDate(endDate) {
+    //   this.formItem.endTime = endDate;
+    // },
+    getcreatedTime(createdTime) {
+      // Array [ "2019-07-20", "2019-08-14" ]
+      this.formItem.beginTime=createdTime[0]
+      this.formItem.endTime=createdTime[1]
     },
     //新增
     addProject() {
@@ -622,6 +634,7 @@ export default {
         endTime: "",
         beginTime: ""
       };
+      this.createdTime=[]
       this.isFirst = true;
       setTimeout(() => {
         this.$refs.table.init();
@@ -631,6 +644,7 @@ export default {
 
     // 备注提交
     msgOk() {
+      this.modal_loading=true
       var data = new FormData();
       for (var i in this.viewForm) {
         data.append(i, this.viewForm[i]);
@@ -644,18 +658,21 @@ export default {
         axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
           resdata => {
             if(resdata.data.statusCode==200){
+              this.modal_loading=false
               this.msgModal = false;
               this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
             }else{
+              this.modal_loading=false
               this.$Modal.error({title: "提示信息", content: resdata.data.responseResult});
             }
-            
           },
           err => {
+            this.modal_loading=false
             this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
           }
         );
       }else{
+        this.modal_loading=false
         this.$Modal.error({ title: "提示信息", content: "备注内容不能为空" });
       }
       
