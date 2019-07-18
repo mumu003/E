@@ -12,26 +12,21 @@
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
             <Row type="flex" justify="start">
               <Col span="7">
-              <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" icon="search"  :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+              <FormItem label="来电号码" prop="callID">
+                <Input v-model="formItem.callID"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="办公位" :label-width="100">
-                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
-              </FormItem>
-              </Col>
+              
+             
               <Col span="4">
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col>
               </Row>
 
-
-              <!-- 联系人号码 -->
-              <Row type="flex" justify="start">
-              <Col span="7">
-              <FormItem label="联系人手机号" :label-width="127">
-                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              <Row>
+                 <Col span="7">
+              <FormItem label="办公位" :label-width="80">
+                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
               </Col>
               <Col span="7">
@@ -46,7 +41,38 @@
                   </RadioGroup>
                 </FormItem>
               </Col>
+              
+              
               </Row>
+              
+              <!-- 联系人号码 -->
+              <Row type="flex" justify="start">
+                <Col span="7">
+              <FormItem label="手机号" prop="phone">
+                <Input v-model="formItem.phone"   :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+              </FormItem>
+              </Col>
+              <Col span="7">
+              <FormItem label="联系人手机号" :label-width="127">
+                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
+             
+              </Row>
+
+              <Row>
+                
+                <Col span="7">
+              <FormItem label="内线号码" :label-width="80">
+                    <Input v-model="formItem.undef" :disabled="viewForm.id!=''?true:false" :maxlength=11></Input>
+              </FormItem>
+              </Col>
+               <Col span="7">
+              <FormItem label="座机" :label-width="100"> 
+                    <Input v-model="formItem.tel" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
+                </Row>
 
               <Row>
               <Col span="7">
@@ -329,6 +355,9 @@ export default {
       formItem: {
         clientId: "",
         phone: "",
+        callID:'',
+        undef:"",
+        tel:"",
         officeLocation: "",
         contactPhone:"",
         name: "",
@@ -441,7 +470,7 @@ export default {
     };
   },
   created() {
-    this.search();
+    // this.search();
 if (sessionStorage.getItem('paramid')) {
       
     this.$request.post(
@@ -617,6 +646,9 @@ if (sessionStorage.getItem('paramid')) {
             this.formItem = {
               clientId: data.clientId,
               phone: data.phone,
+              undef:data.undef,
+              tel:data.tel,
+              callID:data.callID,
               officeLocation: data.officeLocation,
               contactPhone: data.contactPhone,
               name: data.name,

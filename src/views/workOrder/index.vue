@@ -20,7 +20,8 @@
               </Col>              
               <Col span="6">
               <FormItem label="状态">
-                 <Select v-model="formItem.state" placeholder="待派单">
+                 <Select v-model="formItem.state" placeholder="全部">
+                   <Option value="">全部</Option>
                       <Option value="待派单">待派单</Option>
                       <Option value="待维修">待维修</Option>
                       <Option value="待评价">待评价</Option>

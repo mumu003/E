@@ -3,7 +3,7 @@
   <div>
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+     <Card class="search-card">
         <p slot="title">
           客户信息
           <collapse-icon foldPart="search-body"></collapse-icon>
@@ -12,26 +12,21 @@
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
             <Row type="flex" justify="start">
               <Col span="7">
-              <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" icon="search"  :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+              <FormItem label="来电号码" prop="callID">
+                <Input v-model="formItem.callID"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="办公位" :label-width="100">
-                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
-              </FormItem>
-              </Col>
+              
+             
               <Col span="4">
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col>
               </Row>
 
-
-              <!-- 联系人号码 -->
-              <Row type="flex" justify="start">
-              <Col span="7">
-              <FormItem label="联系人手机号" :label-width="127">
-                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              <Row>
+                 <Col span="7">
+              <FormItem label="办公位" :label-width="80">
+                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
               </Col>
               <Col span="7">
@@ -46,7 +41,38 @@
                   </RadioGroup>
                 </FormItem>
               </Col>
+              
+              
               </Row>
+              
+              <!-- 联系人号码 -->
+              <Row type="flex" justify="start">
+                <Col span="7">
+              <FormItem label="手机号" prop="phone">
+                <Input v-model="formItem.phone"   :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+              </FormItem>
+              </Col>
+              <Col span="7">
+              <FormItem label="联系人手机号" :label-width="127">
+                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
+             
+              </Row>
+
+              <Row>
+                
+                <Col span="7">
+              <FormItem label="内线号码" :label-width="80">
+                    <Input v-model="formItem.undef" :disabled="viewForm.id!=''?true:false" :maxlength=11></Input>
+              </FormItem>
+              </Col>
+               <Col span="7">
+              <FormItem label="座机" :label-width="100"> 
+                    <Input v-model="formItem.tel" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
+                </Row>
 
               <Row>
               <Col span="7">
@@ -281,6 +307,9 @@ export default {
         officeLocation: "",
         contactPhone:"",
         name: "",
+        callID:'',
+        undef:'',
+        tel:'',
         companyName: "",
         priority: "",
         sex: "",
@@ -387,7 +416,11 @@ export default {
     };
   },
   created() {
-    this.search();
+    if (sessionStorage.getItem('paramid')) {
+      this.viewForm.id =sessionStorage.getItem('paramid');
+      this.getinfo();
+    }
+    // this.search();
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -409,10 +442,7 @@ export default {
         }
       }
     );
-     if (sessionStorage.getItem('paramid')) {
-      this.viewForm.id =sessionStorage.getItem('paramid');
-      this.getinfo();
-    }
+     
     // if (this.$route.params.id) {
     //   this.viewForm.id = this.$route.params.id;
     //   this.getinfo();
@@ -441,27 +471,28 @@ export default {
       this.imglist.pop("");
     },
 
-    search() {
-      this.$request.post(
-        "/api/emaint/client/phone",
-        qs.stringify({ phone: this.formItem.phone }),
-        res => {},
-        res => {
-          if (res.statusCode == 200 && res.responseResult != null) {
-            var data = res.responseResult;
-            this.formItem.phone = data.phone;
-            this.formItem.officeLocation = data.officeLocation;
-            this.formItem.name = data.name;
-            this.formItem.companyName = data.companyName;
-            this.formItem.priority = data.priority;
-            this.formItem.sex = data.sex;
-            this.formItem.clientId = data.id;
+    // search() {
+    //     console.log(this.formItem)
+    //   this.$request.post(
+    //     "/api/emaint/client/phone",
+    //     qs.stringify({ phone: this.formItem.phone }),
+    //     res => {},
+    //     res => {
+    //       if (res.statusCode == 200 && res.responseResult != null) {
+    //         var data = res.responseResult;
+    //         this.formItem.phone = data.phone;
+    //         this.formItem.officeLocation = data.officeLocation;
+    //         this.formItem.name = data.name;
+    //         this.formItem.companyName = data.companyName;
+    //         this.formItem.priority = data.priority;
+    //         this.formItem.sex = data.sex;
+    //         this.formItem.clientId = data.id;
 
-            this.RepairForm.clientId = data.id;
-          } 
-        }
-      );
-    },
+    //         this.RepairForm.clientId = data.id;
+    //       } 
+    //     }
+    //   );
+    // },
     // 报修提交
     repairSubmit() {
       if (this.viewForm.id != "") {
@@ -509,6 +540,9 @@ export default {
               officeLocation: data.officeLocation,
               contactPhone: data.contactPhone,
               name: data.name,
+              callID:data.callID,
+              undef:data.undef,
+              tel:data.tel,
               companyName: data.companyName,
               priority: data.priority,
               sex: data.sex,

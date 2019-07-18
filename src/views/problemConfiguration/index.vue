@@ -23,7 +23,7 @@
               <template>
           <Tree :data="questionlis" 
           @on-select-change="showchildren"
-          :empty-text="'加载中...'"
+          :empty-text="'暂无数据'"
           ></Tree>
         </template>
               <!-- <div class="first" v-for="(item,index) in questionlis" :key="index">
