@@ -22,7 +22,7 @@
                 </Col>
               </Row>
               <Row>
-                <Col span="6">
+                <!-- <Col span="6">
                   <FormItem label="创建时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
@@ -30,6 +30,11 @@
                 <Col span="6">
                   <FormItem>
                     <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col> -->
+                <Col span="6">
+                  <FormItem label="更新时间">
+                  <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -197,6 +202,7 @@ import qs from "qs";
   export default {
     data () {
       return {
+        createdTime:[],
         auth:JSON.parse(sessionStorage.auth), //登录用户的角色权限
         deleteAllModal:false,//删除所有模态框
         noteModal: false, //提示弹窗
@@ -404,6 +410,13 @@ import qs from "qs";
       this.getRoleList()//获取角色
     },
     methods:{
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginTime=createdTime[0]
+        this.formItem.endTime=createdTime[1]
+        console.log(this.formItem.beginTime)
+        console.log(this.formItem.endTime)
+      },
       // 批量删除弹出框处理
       delModal(){
         console.log(this.selection)
@@ -492,6 +505,7 @@ import qs from "qs";
           beginTime: '',
           endTime: ''
         }
+        this.createdTime=[]
         this.isFirst = true
         setTimeout(()=>{
           this.isFirst = false
