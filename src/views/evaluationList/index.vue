@@ -27,7 +27,7 @@
                   </Col>
                 </Row>
                 <Row>
-                  <Col span="6">
+                  <!-- <Col span="6">
                   <FormItem label="更新时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
@@ -35,6 +35,11 @@
                 <Col span="6">
                   <FormItem>
                     <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col> -->
+                <Col span="6">
+                  <FormItem label="更新时间">
+                  <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
                 </Row>
@@ -52,7 +57,7 @@
       </Col>
 
     </Row>
-    <Card class="search-card">
+    <Card class="search-card" style="margin-top:10px;">
       <!-- <Row class="searchable-table-con"> -->
           <m-table :config="tableConfig" :searchParams="formItem" ref="table" :isFirst="isFirst"></m-table>
       <!-- </Row> -->
@@ -104,6 +109,7 @@
   export default {
     data () {
       return {
+        createdTime:[],
         isShowEvaluation:false,//是否显示评价
         evaluationTitle:"",//评价标题
         modalStar:0,//星级
@@ -221,6 +227,13 @@
       }
     },
     methods: {
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginTime=createdTime[0]
+        this.formItem.endTime=createdTime[1]
+        console.log(this.formItem.beginTime)
+        console.log(this.formItem.endTime)
+      },
       // 开始时间
       getStartDate(startDate){
         this.formItem.beginTime=startDate
@@ -246,6 +259,7 @@
           this.formItem.fromClientName="",
           this.formItem.beginTime="",
           this.formItem.endTime=""
+          this.createdTime=[]
           this.isFirst = true
           setTimeout(()=>{
             this.$refs.table.init()

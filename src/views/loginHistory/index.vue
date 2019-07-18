@@ -32,7 +32,7 @@
                 </Row>
                   
                 <Row>
-                  <Col span="6">
+                  <!-- <Col span="6">
                   <FormItem label="更新时间">
                     <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker>
                   </FormItem>
@@ -40,6 +40,11 @@
                 <Col span="6">
                   <FormItem>
                     <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
+                  </FormItem>
+                </Col> -->
+                <Col span="6">
+                  <FormItem label="更新时间">
+                  <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
                 </Row>
@@ -75,6 +80,7 @@
       return {
         isFirst: false, //是否是首页
         loading: true, //
+        createdTime:[],
         //查询表单
         formItem: {
           phone:'',
@@ -122,6 +128,11 @@
       }
     },
     methods: {
+      getcreatedTime(createdTime) {
+        // Array [ "2019-07-20", "2019-08-14" ]
+        this.formItem.beginTime=createdTime[0]
+        this.formItem.endTime=createdTime[1]
+      },
       // 开始时间
       getStartDate(startDate){
         this.formItem.beginTime=startDate
@@ -148,6 +159,7 @@
         this.formItem.phone="";
         this.formItem.name="",
         this.formItem.loginChannel=""
+        this.createdTime=[]
         this.isFirst = true
         setTimeout(()=>{
           this.$refs.table.init()

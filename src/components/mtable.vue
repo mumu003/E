@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%;padding: 15px;">
+  <div style="height: 100%;">
     <!-- :loading="loading" -->
     <Table border stripe  :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
     <div class="page-tool">
