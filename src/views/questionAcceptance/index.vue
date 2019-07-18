@@ -253,6 +253,12 @@
         },
       }
     },
+    // created(){
+    //   // console.log(this.$route.params.status)
+    //   if(this.$route.params.status){
+    //     this.formItem.state=this.$route.params.status
+    //   }
+    // },
     methods: {
       //开始时间
       getStartDate(startDate){

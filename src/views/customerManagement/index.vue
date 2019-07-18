@@ -4,7 +4,7 @@
     <Row :gutter="10">
       <Col span="6" style="overflow-y: auto; height: 800px;">
 
-        <Card style="text-align: left; font-weight: bold;font-size: 13px;">
+        <Card style="text-align: left; font-weight: bold;font-size: 13px; line-height: 32px;">
           {{$route.meta.title_1}}
         <!--<p slot="title">
           {{$route.meta.title_1}}
@@ -32,17 +32,17 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleSearch">
             <Row type="flex" justify="start">
-              <Col span="6">
+              <Col span="8">
               <FormItem label="姓名">
                 <Input v-model="formItem.name" :maxlength=20 placeholder="请输入姓名"></Input>
               </FormItem>
               </Col>
-              <Col span="6">
+              <Col span="8">
               <FormItem label="电话" prop="phone">
                 <Input v-model="formItem.phone" :maxlength=11 placeholder="请输入电话"></Input>
               </FormItem>
               </Col>
-              <Col span="6">
+              <Col span="8">
               <FormItem label="优先级">
                 <Select v-model="formItem.priority" placeholder="请选择优先级">
                   <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
@@ -51,13 +51,13 @@
               </Col>
               </Row>
               <Row>
-              <Col span="6">
+              <Col span="8">
               <FormItem label="创建时间">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getEndDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
                 <!-- <DatePicker type="date" placeholder="请选择开始时间" @on-change="getStartDate" v-model="formItem.beginTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
-              <Col span="6">
+              <Col span="8">
               <FormItem>
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
                 <!-- <DatePicker type="date" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
@@ -502,7 +502,8 @@ import util from "@/assets/js/util";
           ],
           phone: [
             { required: true, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
-                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  // var reg=/^[1][3,4,5,7,8][0-9]{9}$/
+                  var reg=/[0-9\-]/
                   if(!reg.test(value)){
                     return false
                   }else{
@@ -511,7 +512,7 @@ import util from "@/assets/js/util";
             }}
           ],
           tel:[
-            { required: true, message: '请输入正确的座机号码',  trigger: 'blur' , transform(value){
+            {  message: '请输入正确的座机号码',  trigger: 'blur' , transform(value){
                   var reg=/0\d{2,3}-\d{7,8}/
                   if(!reg.test(value)){
                     return false
@@ -521,7 +522,7 @@ import util from "@/assets/js/util";
             }}
           ],
            undef:[
-            { required: true, message: '请输入正确的内线号码',  trigger: 'blur' , transform(value){
+            { message: '请输入正确的内线号码',  trigger: 'blur' , transform(value){
                   var reg= /^\d+$/; 
                   if(!reg.test(value)){
                     return false
@@ -537,17 +538,17 @@ import util from "@/assets/js/util";
         // 检索表单的验证
         ruleSearch:{
             phone: [
-            { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value){
-                  var reg=/^[1][3,4,5,7,8][0-9]{9}$/
-                  if(!reg.test(value)){
-                    return false
-                  }else{
-                    return value
-                  }
-            }}
+            { required: false, message: '请输入正确的手机号',  trigger: 'blur' , transform(value) {
+              var reg=/[0-9\-]/
+              if (!reg.test(value)) {
+                return false;
+              } else {
+                return value;
+              }
+            }
+            }
           ],
         }
-        
       }
     },
     created(){

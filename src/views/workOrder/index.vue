@@ -55,7 +55,7 @@
               </FormItem>
               </Col>
               <Col span="6">
-              <FormItem label="更新时间">
+              <FormItem label="创建时间">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
               </Col>
@@ -210,7 +210,7 @@ export default {
       //表单
       formItem: {
         workOrderNo: "",
-        state: sessionStorage.status,
+        state: "",
         name: "",
         phone: "",
         isChange: "",
@@ -364,19 +364,19 @@ export default {
             key: "state",
             width: 120
           },
-          {
-            title: "变更状态",
-            key: " orderChange",
-            width: 120,
-            render:(h,params)=>{
-                switch(params.row.orderChange){
-                  case 0:
-                    return h('div',"否")
-                  case 1:
-                    return h('div',"是")
-                }
-              }
-          },
+  //         {
+  //           title: "变更状态",
+  //           key: " orderChange",
+  //           width: 120,
+  //           render:(h,params)=>{
+  //               switch(params.row.orderChange){
+  //                 case 0:
+  //                   return h('div',"否")
+  //                 case 1:
+  //                   return h('div',"是")
+  //               }
+  //             }
+  //         },
           {
             title: "办公位",
             key: "officeLocation",
@@ -398,7 +398,7 @@ export default {
             width: 150
           },
           {
-            title: "更新时间",
+            title: "创建时间",
             key: "gmtModified",
             width: 200
           }
@@ -459,6 +459,12 @@ export default {
         }
       }
     );
+  },
+  created(){
+    // console.log(this.$route.params.status)
+    if(this.$route.params.status){
+      this.formItem.state=this.$route.params.status
+    }
   },
   methods: {
     // 选择文件
@@ -668,7 +674,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
 div.addimg {
   display: inline-block;
 

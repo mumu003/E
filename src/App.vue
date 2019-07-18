@@ -56,13 +56,12 @@ export default {
       }
     },
     message(e) {
-           this.reset(); //收到消息重置心跳
-     
+      this.reset(); //收到消息重置心跳
       if(e.data=='heartCheck'){
         return;
       }
       var data=JSON.parse(e.data)
-      
+      console.log(data)
       // e.data是收到的消息内容，会以json字符串的形式传过来
 
       // 收到消息后弹窗
@@ -84,6 +83,74 @@ export default {
              
           }
         });
+      }else if(data.type==1 && e.data != "heartCheck"){
+
+          //       this.$Notice.warning({
+          //           title: '小程序报修',
+          //           desc: 'The desc will hide when you set render.',
+          //           duration: 0,
+          //           render: h => {
+          //               return h("div", [
+          //             h("Button", {
+          //                 props: {
+          //                   type: "primary",
+          //                   size: "small",
+          //                 },
+          //                 style: {
+          //                   float: "right"
+          //                 },
+          //                 on: {
+          //                   click: () => {
+          //                     Bus.$emit('changephone',data.message)
+          //                     this.$router.push({
+          //                       name: "workOrderManage",
+          //                       params: {
+          //                         callID: data.message
+          //                       }
+          //                     });
+          //                   }
+          //                 }
+          //               },
+          //               "查看工单详情"
+          //             ),
+          //         ]);
+          //       }
+          // });
+
+           this.$Notice.warning({
+                    title: '小程序报修',
+                    duration:0,
+                     render: h => {
+                        return h('span', [
+                            data.message,
+                            h('br'),
+                            h(
+                            "Button",
+                            {
+                              props: {
+                                type: "primary",
+                                size: "small",
+                              },
+                              style: {
+                                marginTop:"10px",
+                                float: "right"
+                              },
+                              on: {
+                                click: () => {
+                                  sessionStorage.setItem("paramid",data.repairProblemId)
+                                  Bus.$emit('changeparamid',data.repairProblemId)
+                                  this.$router.push({
+                                    name: "WorkDetail",
+                                  });
+                                }
+                              }
+                            },
+                            "立即处理"
+                          ),
+                        ])
+                    }
+                });
+            
       }
     },
     send() {

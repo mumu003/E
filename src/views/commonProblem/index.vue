@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page1">
     <Row :gutter="10" class="mt10">
       <Col span="24">
         <Card>
@@ -981,47 +981,47 @@ export default {
   }
 };
 </script>
-<style >
-div.page {
+<style scoped>
+div.page1 {
   width: 100%;
   display: flex;
 }
-div.page > div {
+div.page1 > div {
   margin-top: 0px;
   margin-right: 5px !important;
   margin-left: 0px !important;
 }
-div.page > div:first-of-type {
+div.page1 > div:first-of-type {
   width: 30% !important;
 }
-div.page > div.mt10 div.ivu-row > div.ivu-col:first-of-type {
+div.page1 > div.mt10 div.ivu-row > div.ivu-col:first-of-type {
   margin-left: 80px;
 }
-div.page > div.mt10 div.ivu-row > div.ivu-col:last-of-type {
+div.page1 > div.mt10 div.ivu-row > div.ivu-col:last-of-type {
   margin-top: 10px;
   /* border: 1px solid #eee; */
   /* background-color: rgba(240, 240, 240, 1); */
   padding-left: 15%;
   text-align: left;
 }
-div.page div.ivu-card-body {
+div.page1 div.ivu-card-body {
   padding: 0px;
 }
-div.page div.ivu-row {
+div.page1 div.ivu-row {
   width: 100%;
 }
 
-div.page div.first,
+div.page1 div.first,
 div.two {
   line-height: 30px;
 }
-div.page div.first {
+div.page1 div.first {
   background-color: rgba(204, 204, 204, 1);
 }
-div.page div.two {
+div.page1 div.two {
   background-color: rgba(240, 240, 240, 1);
 }
-div.page div.lastmt10 div.ivu-row {
+div.page1 div.lastmt10 div.ivu-row {
   width: unset;
 }
 .mt11 div.ivu-card {

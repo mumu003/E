@@ -210,9 +210,26 @@ export default {
     },
     goWork(status){
       // if(this.auth.tf_repair_problem_list){
-        this.$router.push("/workOrder")
-        sessionStorage.setItem("status",status)
+        if(status=="待派单"){
+          this.$router.push({
+            name: "questionAcceptance",
+            // params:{
+            //   status:status
+            // }
+          });
+        }else if(status=="待维修"){
+          this.$router.push({
+            name: "workOrder",
+            params:{
+              status:status
+            }
+          });
+        }
+        
+        // this.$router.push("/workOrder")
+        // sessionStorage.setItem("status",status)
       // }
+      console.log(status)
     },
     setting(id,workOrderNo){
         this.$request.post(

@@ -1,11 +1,11 @@
 <template>
   <div class="page">
-    <Row :gutter="10" class="mt10">
+    <Row :gutter="10" class="mt10" style="width: 50% !important;">
       <Col span="24">
         <Card>
           <div class="search-row">
             <Row>
-             <Row type="flex" justify="end" class="code-row-bg">
+             <Row type="flex" justify="end" class="code-row-bg" style="border-bottom:1px solid #ccc;padding-bottom:15px;">
                   <Button type="primary"  @click="controlmodal=!controlmodal" >操作<Icon type="arrow-up-b" color="white" style="margin-left:17px;"></Icon></Button>
                   <div v-if="controlmodal"  class="controlbutton">
                       <div><Button  @click="addquestion" v-if="auth.tf_problem_balse_level3_list_edit ">新增下一级</Button></div> 
@@ -20,12 +20,12 @@
                   
                   <div class="two" v-for="(v,i) in item.childList" :key="i" @click="activeli.id==v.id?activeli.id='':activeli.id=v.id;" :style="{backgroundColor:activeli.id==v.id?'#2b85e4':''}">{{v.problem}}</div>
               </div> -->
-              <template>
-          <Tree :data="questionlis" 
-          @on-select-change="showchildren"
-          :empty-text="'暂无数据'"
-          ></Tree>
-        </template>
+              <template >
+                <Tree :data="questionlis" 
+                @on-select-change="showchildren"
+                :empty-text="'暂无数据'"
+                ></Tree>
+              </template>
               <!-- <div class="first" v-for="(item,index) in questionlis" :key="index">
                 <div @click="activeli.id=item.id;activeli.parentId=item.parentId" :style="{color:activeli.id==item.id?'#2b85e4':''}">{{item.problem}}</div> 
                 
@@ -41,7 +41,7 @@
     </Row>
 
     <!-- 问题新增 -->
-    <Row :gutter="10" v-if="addmodel">
+    <Row :gutter="10" v-if="addmodel" >
       <Col span="24">
         <Card class="search-card">
           <p slot="title">

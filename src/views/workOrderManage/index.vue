@@ -51,12 +51,11 @@
 
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
-                 <Col span="7">
-              <FormItem label="手机号" >
-                <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
-              </FormItem>
-              </Col>
-             
+                 <!-- <Col span="7">
+                  <FormItem label="手机号" >
+                    <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
+                  </FormItem>
+                  </Col> -->
               <Col span="7">
                 <FormItem label="联系人手机号" :label-width="110" prop="contactPhone">
                   <AutoComplete
@@ -71,7 +70,7 @@
               
               </Row>
               <Row>
- <Col span="7">
+              <Col span="7">
               <FormItem label="内线号码" :label-width="80">
                     <Input v-model="formItem.undef" disabled :maxlength=12></Input>
               </FormItem>
