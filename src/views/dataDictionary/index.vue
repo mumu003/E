@@ -17,16 +17,15 @@
         </Card>
       </Col>
     </Row>
-    <Row :gutter="10" v-if="setting">
+    <Row :gutter="10" v-show="setting">
       <Col span="24">
         <Card class="search-card">
           <div class="search-row">
             <Row>
-              <Col span="4">
-                所属类型:              
+              <Col span="14" style="text-align:left;">
+                所属类型:  {{typeCode}}       
               </Col>
-              <Col span="20">
-                {{type}}           
+              <Col span="10">                
               </Col>
             </Row>
             <Row>
@@ -165,7 +164,7 @@ export default {
   data() {
     return {
       auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
-      type:"",
+      typeCode:"",
       deleteModal:false,
       delModal:false,
       delkeyId:"",
@@ -307,7 +306,7 @@ export default {
                                           this.setting=true
                                           this.setForm.id=params.row.id
                                           this.$refs.keytable.init()
-                                          this.type=params.row.code
+                                          this.typeCode=params.row.code
                                           this.addkeyForm.dictionaryCategoryId=params.row.id
                                           this.updatekeyForm.dictionaryCategoryId=params.row.id
                                     }
@@ -341,6 +340,12 @@ export default {
                 {
                   title: '描述',
                   key: 'name',
+                  width:200,
+                  align:"center"
+                },
+                {
+                  title: '创建时间',
+                  key: 'gmtCreate',
                   width:200,
                   align:"center"
                 }
@@ -422,6 +427,11 @@ export default {
               ],
       }
     };
+  },
+  watch:{
+    typeCode(){
+      return this.typeCode
+    }
   },
   methods: {
     //新增
