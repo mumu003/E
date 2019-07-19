@@ -1,6 +1,10 @@
 <template>
 <!-- 派单 -->
   <div>
+    <Tabs type="card" @on-click="clientRepairList">
+        <TabPane  label="派单">
+          <div style="display:flex;justify-content: space-between;background-color:white" >
+            <div style="width:49.5%;">
     <Row :gutter="10" id="dispatchinput">
       <Col span="24">
      <Card class="search-card">
@@ -9,29 +13,25 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
-            <Row type="flex" justify="start">
-              <Col span="7">
+          <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
+           <Row type="flex" justify="start" v-show="formItem.callID" >
+              <Col span="15">
               <FormItem label="来电号码" prop="callID">
-                
-                <Input v-model="formItem.callID"  @on-blur="search"  :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+                <Input v-model="formItem.callID"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入来电号码"></Input>
               </FormItem>
               </Col>
-              
-             
-              <Col span="4">
-                <Button type="primary" @click="clientRepairList">历史报修数据</Button>
-              </Col>
-              </Row>
+             </Row>
 
-              <Row>
-                 <Col span="7">
-              <FormItem label="办公位" :label-width="80">
+              <Row   v-show="formItem.officeLocation">
+                 <Col span="15">
+              <FormItem label="办公位" >
                 <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-                <FormItem label="是否代为报修" :label-width="127" >
+               </Row>
+                <Row v-show="formItem.replacementRepair">
+              <Col span="10">
+                <FormItem label="是否代为报修"  >
                    <RadioGroup v-model="formItem.replacementRepair" >
                     <Radio label="1" :disabled="viewForm.id!=''?true:false">
                         <span>是</span>
@@ -47,54 +47,62 @@
               </Row>
               
               <!-- 联系人号码 -->
-              <Row type="flex" justify="start">
-                <Col span="7">
+              <Row type="flex" justify="start" v-show="formItem.phone">
+                <Col span="15">
               <FormItem label="手机号" prop="phone">
                 <Input v-model="formItem.phone"   :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="联系人手机号" :label-width="127">
+               </Row>
+                <Row v-show="formItem.contactPhone">
+              <Col span="15">
+              <FormItem label="联系人手机号" >
                 <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
               </FormItem>
               </Col>
              
               </Row>
 
-              <Row>
+              <Row  v-show="formItem.undef">
                 
-                <Col span="7">
-              <FormItem label="内线号码" :label-width="80">
+                <Col span="15">
+              <FormItem label="内线号码" >
                     <Input v-model="formItem.undef" :disabled="viewForm.id!=''?true:false" :maxlength=11></Input>
               </FormItem>
               </Col>
-               <Col span="7">
-              <FormItem label="座机" :label-width="100"> 
+               </Row>
+                <Row v-show="formItem.tel">
+               <Col span="15">
+              <FormItem label="座机"> 
                     <Input v-model="formItem.tel" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
               </FormItem>
               </Col>
                 </Row>
 
-              <Row>
-              <Col span="7">
+              <Row v-show="formItem.name">
+              <Col span="15">
               <FormItem label="姓名">
                     <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="公司" :label-width="100">
+               </Row>
+                <Row v-show="formItem.companyName">
+              <Col span="15">
+              <FormItem label="公司" >
                     <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
-              <Row>
-              <Col span="7">
+              <Row v-show="formItem.priority">
+              <Col span="15">
               <FormItem label="优先级">
                     <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="性别" :label-width="100">
+               </Row>
+                <Row v-show="formItem.sex">
+              <Col span="15">
+              <FormItem label="性别" >
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
@@ -104,7 +112,8 @@
       </Card>
       </Col>
     </Row>
-
+    </div>
+    <div style="width:49.5%;">
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card">
@@ -114,8 +123,8 @@
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="110" :rules="ruleValidate">
-             <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="5">
+             <Row type="flex"  justify="start">
+              <Col span="12">
                 <FormItem label="报修类型" >
                  <Input v-model="formItem.problemClass" disabled></Input> 
                   <!-- <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
@@ -123,7 +132,8 @@
                   </Select> -->
                 </FormItem>
               </Col>
-              <Col span="3">
+             
+              <Col span="7">
                 <FormItem  :label-width="5">
                   <Input v-model="formItem.problemType" disabled ></Input> 
                   <!-- <Select v-model="formItem.problemType" :disabled="viewForm.id!=''?true:false" @on-change="findchildren2" >
@@ -131,8 +141,21 @@
                   </Select> -->
                 </FormItem>
               </Col>
-
-              <Col span="7">
+              </Row>
+              <Row>
+                <Col span="24">
+                <FormItem label="常见问题">
+                    <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
+                    <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
+                    <!-- <Button type="ghost" size="large">Ghost</Button>
+                    <Button type="ghost" size="large">Ghost</Button>
+                    <Button type="ghost" size="large">Ghost</Button>
+                    <Button type="ghost" size="large">Ghost</Button> -->
+                </FormItem>
+                </Col>
+                  </Row>
+              <Row style="margin-bottom:25px">
+              <Col span="24">
                 <FormItem label="图片描述"  >
                     <!-- @on-cancel="imgcancel" -->
                     <Modal 
@@ -150,21 +173,13 @@
                         <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
                     </FormItem>
                 </Col>
+               
                 <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
                 </Row>
 
-              <Row>
-                <Col span="8">
-                <FormItem label="常见问题">
-                    <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
-                    <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
-                    <!-- <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button>
-                    <Button type="ghost" size="large">Ghost</Button> -->
-                </FormItem>
-                </Col>
-                <Col span="7">
+              
+                  <Row>
+                <Col span="24">
                 <FormItem label="备注">
                     <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" ></Input>
                 </FormItem>
@@ -187,14 +202,14 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="8" >
+              <Col span="13" >
                 <FormItem label="执行人" prop="executor">
                     <Input  class="buttoninput" :disabled="!state_show" :style="{'pointer-events':!state_show?'none':'all'}" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
               </Col>
              </Row>
              <Row>
-              <Col span="8">
+              <Col span="20">
                 <FormItem label="参与者">
                     <!-- <Input v-model="formItem.participators" ></Input>  -->
                     <Select v-model="formItem.participatorids"  multiple  style="width:100%;" :disabled="!state_show">
@@ -211,8 +226,9 @@
       </Card>
       </Col>
     </Row>
-
-    <div slot="footer" style="text-align:center;">
+    </div>
+    </div>
+    <div slot="" style="text-align:center;">
       <Row>
         <Col span="24">
           <Button size="default" @click="goback" >上一步</Button>
@@ -220,6 +236,24 @@
          </Col>
       </Row>
     </div>
+    </TabPane>
+        
+             <TabPane  label="历史报修数据" >
+
+           <div style="background-color:white;">
+      <m-table  :config="tableConfig" :searchParams="RepairForm"    ref="table"  :isFirst="isFirst"></m-table>    
+      <div slot="footer" style="text-align:right;">
+        <Row>
+          <Col span="24" v-if="this.viewTabs === 'remark'">
+            <Button size="default" >取消</Button>
+            <Button type="primary" size="default"  :loading="modal_loading">确定</Button>
+          </Col>
+        </Row>
+      </div>
+
+      </div>
+        </TabPane>
+    </Tabs>
 
     <Modal v-model="choosemodel" title="执行人选择" width="500"
           @on-cancel="choosemodel=false">
@@ -237,7 +271,7 @@
 
     <!-- 历史报修数据 -->
     <!-- v-if="RepairList_show" -->
-    <Modal v-model="RepairList_show"  width="800"
+    <!-- <Modal v-model="RepairList_show"  width="800"
       title="历史报修数据"
       >
 
@@ -250,7 +284,7 @@
           </Col>
         </Row>
       </div>
-    </Modal>
+    </Modal> -->
 
   </div>
 </template>
@@ -260,6 +294,7 @@ import util from "@/assets/js/util";
 export default {
   data() {
     return {
+      isok : false,
       choosemodel: false,
       choosemodel1: false,
       participatorids: [],
@@ -496,6 +531,10 @@ export default {
     // },
     // 报修提交
     repairSubmit() {
+      if (this.isok) {
+        return;
+      } else this.isok = true;
+
       if (this.viewForm.id != "") {
         if(this.formItem.userId!=""&&this.formItem.userId!=null){
           var participatorids=""
@@ -505,6 +544,7 @@ export default {
           qs.stringify({ id: this.formItem.id, userId: this.formItem.userId,participatorids:participatorids,changeDescription:"" }),
           res => {},
           res => {
+            this.isok = false;
             this.$Message.success(res.responseResult);
             setTimeout(() => {
               this.$router.push({
@@ -513,6 +553,7 @@ export default {
             }, 800);
           })
         }else{
+          this.isok = false;
           this.$Message.error("请选择执行人")
         }
       } 
@@ -700,7 +741,9 @@ export default {
       }
     },
     // 历史报修数据
-    clientRepairList() {
+    clientRepairList(e) {
+      if(e!=1)
+      return;
     //   // console.log(this.RepairForm.clientId);
       if (this.RepairForm.clientId==''||this.RepairForm.clientId==null) {
         this.$Message.error("请先输入手机号!");

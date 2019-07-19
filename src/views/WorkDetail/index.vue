@@ -450,9 +450,7 @@ export default {
       treeList: [],
       // 设置表单验证
       ruleValidate: {
-        executor: [
-          {  message: "该选项不能为空", trigger: "input" }
-        ]
+        executor: [{ message: "该选项不能为空", trigger: "input" }]
       },
       // 设置结束时间大于开始时间
       end: {

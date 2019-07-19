@@ -172,10 +172,12 @@
       </div>
 
 
-      <Modal v-model="selectTreeModal" class-name="my-modal"  title="选择塔楼公司"
-             width="600" height="600" style="overflow-y: auto; height: 600px;"
+     
+    </Modal>
+     <Modal v-model="selectTreeModal" class-name="my-modal"  title="选择塔楼公司"
+             width="600" height="600" style="overflow-y: auto; height: 600px;position:relative;"
              @on-cancel="cancelSelect">
-        <template style="z-index: 2000;">
+        <template >
           <Tree :data="groupTlTree"
                 @on-select-change="selectCompany"
                 :empty-text="'暂无数据'">
@@ -187,7 +189,6 @@
           <Button type="primary"  @click="selectCompanyConFirm" :loading="modal_loading">确定</Button>
         </div>
       </Modal>
-    </Modal>
 
     <!-- 客户编辑 -->
     <Modal v-model="editModal" title="客户编辑"
@@ -917,7 +918,7 @@ import util from "@/assets/js/util";
   }
 
 
-  .my-modal{z-index:2000}
+  .my-modal{z-index:2000 !important}
 
 
   .my-modal .ivu-modal-content{
