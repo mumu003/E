@@ -146,10 +146,12 @@
         },
         ruleValidate: {
           groupNo: [
-            {required: true, message: "组织编号不能为空", trigger: "blur"}
+            {required: true, message: "组织编号不能为空", trigger: "blur"},
+            { type: 'string', max: 15, message: '组织编号不能超过15个字符', trigger: 'blur' }
           ],
           groupName: [
-            {required: true, message: "组织名称不能为空", trigger: "blur"}
+            {required: true, message: "组织名称不能为空", trigger: "blur"},
+            { type: 'string', max: 15, message: '组织名称不能超过15个字符', trigger: 'blur' }
           ],
           type: [
             {required: true, message: "类型不能为空", trigger: "blur"}
@@ -199,6 +201,27 @@
       },
       save(type) {
         if (type == "add") {
+          if(!this.addformdata.groupNo){
+            this.$Modal.error({
+                  title: "提示信息",
+                  content: "组织编号不能为空"
+            });
+            return
+          }
+          if(!this.addformdata.groupName){
+            this.$Modal.error({
+                  title: "提示信息",
+                  content: "组织名称不能为空"
+            });
+            return
+          }
+          if(!this.addformdata.type){
+            this.$Modal.error({
+                  title: "提示信息",
+                  content: "类型不能为空"
+            });
+            return
+          }
           this.$request.post(
             "/api/emaint/client/saveClientGroup",
             this.addformdata,
