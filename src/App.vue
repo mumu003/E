@@ -239,4 +239,16 @@ export default {
 .ivu-tree-title {
   font-size: 14px !important;
 }
+.ivu-input[disabled], fieldset[disabled] .ivu-input{
+  border: none;
+  background-color: unset;
+  color: black;
+  cursor: default;
+}
+.ivu-table-border td, .ivu-table-border th{
+  text-align: center;
+}
+.ivu-tabs-bar{
+  margin-bottom: 0px;
+}
 </style>

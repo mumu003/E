@@ -114,7 +114,8 @@
         <Row>
           <Col span="16">
           <FormItem label="公司名称"  prop="companyName">
-              <Input v-model="addForm.companyName" :maxlength="30" placeholder="请输入公司名称"></Input>
+            <Input v-model="addForm.companyName" :maxlength="30" placeholder="请选择公司" readonly="readonly"></Input>
+            <Button type="primary"  @click="showSelect" :loading="modal_loading">选择塔楼公司</Button>
           </FormItem>
           </Col>
           <Col span="16">
@@ -169,6 +170,23 @@
         <Button @click="cancel">取消</Button>
         <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
+
+
+      <Modal v-model="selectTreeModal" class-name="my-modal"  title="选择塔楼公司"
+             width="600" height="600" style="overflow-y: auto; height: 600px;"
+             @on-cancel="cancelSelect">
+        <template style="z-index: 2000;">
+          <Tree :data="groupTlTree"
+                @on-select-change="selectCompany"
+                :empty-text="'暂无数据'">
+          </Tree>
+        </template>
+
+        <div slot="footer" style="text-align: right;">
+          <Button @click="cancelSelect">取消</Button>
+          <Button type="primary"  @click="selectCompanyConFirm" :loading="modal_loading">确定</Button>
+        </div>
+      </Modal>
     </Modal>
 
     <!-- 客户编辑 -->
@@ -179,7 +197,9 @@
         <Row>
           <Col span="16">
           <FormItem label="公司名称"  prop="companyName">
-              <Input v-model="addForm.companyName" placeholder="请输入公司名称"></Input>
+              <!--<Input v-model="addForm.companyName" placeholder="请输入公司名称"></Input>-->
+            <Input v-model="addForm.companyName" :maxlength="30" placeholder="请选择公司" readonly="readonly"></Input>
+            <Button type="primary"  @click="showEditSelect" :loading="modal_loading"  v-if="this.endClientType == '塔楼客户'">选择塔楼公司</Button>
           </FormItem>
           </Col>
           <Col span="16">
@@ -232,6 +252,22 @@
         <Button @click="cancel">取消</Button>
         <Button type="primary"  @click="addSubmit" :loading="modal_loading">确定</Button>
       </div>
+
+      <Modal v-model="selectTreeModal_edit" class-name="my-modal"  title="选择塔楼公司"
+             width="600" style="overflow-y: auto; height: 600px;"
+             @on-cancel="cancelEditSelect">
+        <template style="z-index: 2000;">
+          <Tree :data="groupTlTree_edit"
+                @on-select-change="selectCompany"
+                :empty-text="'暂无数据'">
+          </Tree>
+        </template>
+
+        <div slot="footer" style="text-align: right;">
+          <Button @click="cancelEditSelect">取消</Button>
+          <Button type="primary"  @click="editSelectCompanyConFirm" :loading="modal_loading">确定</Button>
+        </div>
+      </Modal>
     </Modal>
    
 
@@ -281,10 +317,15 @@ import util from "@/assets/js/util";
         reject_loading: false, //驳回
         isFirst: false, //首页
         groupTree: [],
+        groupTlTree: [],
+        groupTlTree_edit: [],
         addModal: false, //新增模态框
         editModal: false, //编辑模态框
+        selectTreeModal: false, //选择树模态框
+        selectTreeModal_edit: false, //选择树模态框
         statusModal: false, //状态模态框
         endModal: false, //终止模态框
+        endClientType: false, //当前编辑客户类型
         noteModal: false, //弹窗
         isShow: false, //新增-资料抓取显示
         loading: true, //加载
@@ -301,6 +342,11 @@ import util from "@/assets/js/util";
           parentId: "",
           treeCode: ''
         },
+
+        selectActiveli: {
+          groupCode: "",
+          groupName: ''
+        },
         // 处理禁用启用弹窗
         enable:false,
         disable:false,
@@ -310,7 +356,6 @@ import util from "@/assets/js/util";
 
         //表单
         formItem: {
-          
           name:'',
           phone:'',
           beginTime:'',
@@ -376,8 +421,10 @@ import util from "@/assets/js/util";
                                                     var data=res.responseResult
                                                     this.addForm.id=data.id
                                                     this.addForm.companyName=data.companyName
+                                                    this.addForm.companyCode=data.companyCode
                                                     this.addForm.name=data.name
                                                     this.addForm.phone=data.phone
+                                                    this.endClientType=data.type
 
                                                     this.addForm.undef=data.undef
                                                     this.addForm.tel=data.tel
@@ -491,6 +538,7 @@ import util from "@/assets/js/util";
         addForm:{
           id:"",
           companyName:'',
+          companyCode:'',
           name:'',
           phone:'',
           undef:"",
@@ -501,7 +549,7 @@ import util from "@/assets/js/util";
         },
         ruleAdd:{
           companyName: [
-            { required: true, message: '请输入公司名称', trigger: 'blur' }
+            { required: true, message: '请选择公司', trigger: 'blur' }
           ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -559,6 +607,7 @@ import util from "@/assets/js/util";
     },
     created(){
       this.getlist();
+      this.getTlTree();
       // 优先级下拉列表
       this.$request.post("/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
               this.modal_loading = false
@@ -614,6 +663,39 @@ import util from "@/assets/js/util";
           data => {
             if (data.statusCode == 200) {
               this.groupTree = data.responseResult;
+            }
+          }
+        );
+      },
+
+
+      selectCompany(v) {
+        this.selectActiveli.groupCode = v[0].code;
+        this.selectActiveli.groupName = v[0].title;
+      },
+
+      selectCompanyConFirm(){
+        this.addForm.companyName = this.selectActiveli.groupName;
+        this.addForm.companyCode = this.selectActiveli.groupCode;
+        this.cancelSelect();
+      },
+
+      editSelectCompanyConFirm(){
+        this.addForm.companyName = this.selectActiveli.groupName;
+        this.addForm.companyCode = this.selectActiveli.groupCode;
+        this.cancelEditSelect();
+      },
+
+      getTlTree() {
+        //  查询一级问题
+        this.$request.post(
+          "/api/emaint/client/taLouGroupTree",
+          {},
+          data => {},
+          data => {
+            if (data.statusCode == 200) {
+              this.groupTlTree = data.responseResult;
+              this.groupTlTree_edit = data.responseResult;
             }
           }
         );
@@ -715,6 +797,27 @@ import util from "@/assets/js/util";
         })
       },
 
+
+      //打开树形选择框
+      showEditSelect() {
+        this.selectTreeModal_edit =true;
+      },
+
+      //取消
+      cancelEditSelect() {
+        this.selectTreeModal_edit = false;
+      },
+
+      //打开树形选择框
+      showSelect() {
+        this.selectTreeModal = true
+      },
+
+      //取消
+      cancelSelect() {
+        this.selectTreeModal = false
+      },
+
       //搜索
       searchSubmit () {
         this.isFirst = true
@@ -811,6 +914,15 @@ import util from "@/assets/js/util";
     padding: 0;
     font-size: 14px;
     text-align: left;
+  }
+
+
+  .my-modal{z-index:2000}
+
+
+  .my-modal .ivu-modal-content{
+    z-index: 2000;
+    border: 1px solid black;
   }
 </style>
 

@@ -212,10 +212,10 @@ export default {
       // if(this.auth.tf_repair_problem_list){
         if(status=="待派单"){
           this.$router.push({
-            name: "questionAcceptance",
-            // params:{
-            //   status:status
-            // }
+            name: "workOrder",
+            params:{
+              status:status
+            }
           });
         }else if(status=="待维修"){
           this.$router.push({

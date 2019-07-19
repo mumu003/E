@@ -1,7 +1,7 @@
 <template>
 <!-- 派单 -->
   <div>
-    <Row :gutter="10">
+    <Row :gutter="10" id="dispatchinput">
       <Col span="24">
      <Card class="search-card">
         <p slot="title">
@@ -13,7 +13,8 @@
             <Row type="flex" justify="start">
               <Col span="7">
               <FormItem label="来电号码" prop="callID">
-                <Input v-model="formItem.callID"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+                
+                <Input v-model="formItem.callID"  @on-blur="search"  :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
               
@@ -116,7 +117,7 @@
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
               <Col span="5">
                 <FormItem label="报修类型" >
-                 <Input v-model="formItem.problemClass" disabled ></Input> 
+                 <Input v-model="formItem.problemClass" disabled></Input> 
                   <!-- <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
                         <Option v-for="(item,index) in treeList" :value="item.parentProblem" :key="index">{{ item.parentProblem}}</Option>
                   </Select> -->
@@ -780,4 +781,5 @@ div.addimg .ivu-icon {
   border: #2d8cf0;
   color: #fff;
 }
+
 </style>

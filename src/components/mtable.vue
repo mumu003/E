@@ -174,4 +174,5 @@ export default {
   margin-top: 20px;
   text-align: right;
 }
+
 </style>

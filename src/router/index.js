@@ -175,6 +175,14 @@ export default new Router({
           },
           component: resolve => require(['@/views/dataDictionary/index.vue'], resolve),
         },
+        {
+          path: '/clientGroup',
+          name: 'clientGroup',
+          meta: {
+            title: '客户组织'
+          },
+          component: resolve => require(['@/views/clientGroup/index.vue'], resolve),
+        }
         
         
         

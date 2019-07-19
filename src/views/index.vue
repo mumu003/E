@@ -172,12 +172,12 @@
       this.username=sessionStorage.loginName
 
       var list=[
-            {
-              "id": 4,
-              "name": "工单受理",
-              "url": "/questionAcceptance",
-              "code":"tf_repair_problem_appointer_list",
-            },
+            // {
+            //   "id": 4,
+            //   "name": "工单受理",
+            //   "url": "/questionAcceptance",
+            //   "code":"tf_repair_problem_appointer_list",
+            // },
             {
               "id": 5,
               "name": "工单管理",
@@ -207,12 +207,14 @@
                 "url": "/customerManagement",
                 "code":"tf_client_list",
                 },
-                {
-                  "id": 11,
-                  "name": "登录历史",
-                  "url": "/loginHistory",
-                  "code":"tf_login_record_list",
+                 {
+                  "id": 16,
+                  "name": "客户组织",
+                  "url": "/clientGroup",
+                  "code":"tf_client_group_list",
                 },
+
+                
               ]
             },
             {
@@ -268,7 +270,13 @@
                 "name": "数据字典",
                 "url": "/dataDictionary",
                 "code":"tf_dictionary_list",
-                }
+                },
+                {
+                  "id": 11,
+                  "name": "登录历史",
+                  "url": "/loginHistory",
+                  "code":"tf_login_record_list",
+                },
               ]
             }
       ]

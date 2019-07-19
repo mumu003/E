@@ -1,6 +1,11 @@
 <template>
 <!-- 新增工单 -->
   <div>
+  <Tabs type="card" @on-click="clientRepairList">
+        <TabPane  label="新增工单">
+          <div style="display:flex;justify-content: space-between;background-color:white" >
+
+    <div style="width:49.5%;">
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card">
@@ -9,21 +14,22 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
+          <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
             <Row type="flex" justify="start">
-              <Col span="7">
+              <Col span="15">
               <FormItem label="来电号码" prop="callID">
                 <Input v-model="formItem.callID" icon="search" @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入来电号码"></Input>
               </FormItem>
               </Col>
-             
-              <Col span="4">
+             </Row>
+             <!-- <Row>
+              <Col span="15">
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col>
-              </Row>
+              </Row> -->
               <Row>
-                 <Col span="7">
-              <FormItem label="办公位" :label-width="80">
+                 <Col span="15">
+              <FormItem label="办公位" >
                 <AutoComplete
                   v-model="formItem.officeLocation"
                   :data="newarr"
@@ -33,8 +39,10 @@
                 </AutoComplete>
               </FormItem>
               </Col>
-              <Col span="7">
-                <FormItem label="是否代为报修" :label-width="127" >
+              </Row>
+              <Row>
+              <Col span="15">
+                <FormItem label="是否代为报修">
                    <RadioGroup v-model="formItem.replacementRepair">
                     <Radio label="1">
                         <span>是</span>
@@ -51,13 +59,9 @@
 
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
-                 <Col span="7">
-                  <FormItem label="手机号" >
-                    <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
-                  </FormItem>
-                  </Col>
-              <Col span="7">
-                <FormItem label="联系人手机号" :label-width="110" prop="contactPhone">
+                
+              <Col span="15">
+                <FormItem label="联系人手机号"  prop="contactPhone">
                   <AutoComplete
                     v-model="formItem.contactPhone"
                     :data="newarr2"
@@ -67,42 +71,54 @@
                     </AutoComplete>
                 </FormItem>
               </Col>
-              
               </Row>
-              <Row>
-              <Col span="7">
-              <FormItem label="内线号码" :label-width="80">
+              <Row v-show="formItem.phone">
+               <Col span="15">
+                  <FormItem label="手机号" >
+                    <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
+                  </FormItem>
+                  </Col>
+              </Row>
+              <Row v-show="formItem.undef">
+              <Col span="15">
+              <FormItem label="内线号码" >
                     <Input v-model="formItem.undef" disabled :maxlength=12></Input>
               </FormItem>
               </Col>
-               <Col span="7">
-              <FormItem label="座机" :label-width="100">
+              </Row>
+               <Row v-show="formItem.tel"> 
+               <Col span="15">
+              <FormItem label="座机" >
                     <Input v-model="formItem.tel" disabled :maxlength=12 ></Input>
               </FormItem>
               </Col>
                
                 </Row>
 
-              <Row>
-              <Col span="7">
+              <Row v-show="formItem.name">
+              <Col span="15">
               <FormItem label="姓名">
                     <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="公司" :label-width="100">
+              </Row>
+              <Row v-show="formItem.companyName">
+              <Col span="15">
+              <FormItem label="公司" >
                     <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
-              <Row>
-              <Col span="7">
+              <Row v-show="formItem.priority">
+              <Col span="15">
               <FormItem label="优先级">
                     <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
-              <Col span="7">
-              <FormItem label="性别" :label-width="100">
+               </Row>
+              <Row  v-show="formItem.sex">
+              <Col span="15">
+              <FormItem label="性别">
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
@@ -112,7 +128,8 @@
       </Card>
       </Col>
     </Row>
-
+    </div>
+    <div style="width:49.5%;">
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card">
@@ -121,9 +138,9 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="110" :rules="ruleValidate">
-             <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="5">
+          <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
+             <Row type="flex" justify="start">
+              <Col span="12">
                 <FormItem label="报修类型" prop="one_type">
                   <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
                         <Option v-for="(item,index) in treeList" :value="item.parentProblem" :key="index">{{ item.parentProblem}}</Option>
@@ -132,7 +149,8 @@
                   </Select>
                 </FormItem>
               </Col>
-              <Col span="3">
+             
+              <Col span="7">
                 <FormItem  :label-width="5">
                   <Select v-model="formItem.problemType" :disabled="viewForm.id!=''?true:false" @on-change="findchildren2" >
                         <Option  v-for="(item,i) in childList" :value="item.problem" :key="i">{{ item.problem}}</Option>
@@ -141,8 +159,17 @@
                   </Select>
                 </FormItem>
               </Col>
-
-              <Col span="7">
+              </Row>
+                <Row>
+                <Col span="24">
+                <FormItem label="常见问题">
+                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
+                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
+                </FormItem>
+                </Col>
+                </Row>
+              <Row style="margin-bottom:20px;">
+              <Col span="24">
                 <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
@@ -163,14 +190,9 @@
                 <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
                 </Row>
 
-              <Row>
-                <Col span="8">
-                <FormItem label="常见问题">
-                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
-                    <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
-                </FormItem>
-                </Col>
-                <Col span="7">
+            
+                <Row>
+                <Col span="24">
                 <FormItem label="备注">
                     <Input type='textarea' :rows='3'  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" placeholder="300字以内"></Input>
                 </FormItem>
@@ -191,17 +213,17 @@
           <collapse-icon foldPart="search-body"></collapse-icon>
         </p>
         <div id="search-body">
-          <Form  :model="formItem" :label-width="80" :rules="ruleValidate">
+          <Form  :model="formItem" :label-width="90" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
               <!-- v-if="viewForm.id!=''" -->
-              <Col span="7" >
+              <Col span="18" >
                 <FormItem label="执行人">
                     <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="formItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
               </Col>
              </Row>
              <Row>
-              <Col span="7">
+              <Col span="18">
               <!--表单验证 prop='participatorids' -->
                 <FormItem label="参与者"  >
                     <Select v-model="formItem.participatorids" multiple  style="width:100%;">
@@ -220,8 +242,9 @@
       </Card>
       </Col>
     </Row>
-
-    <div slot="footer" style="text-align:center;">
+    </div>
+    </div>
+    <div  style="text-align:center;margin-top:20px;">
       <Row>
         <Col span="24">
           <Button size="default" @click="goback" >上一步</Button>
@@ -229,6 +252,24 @@
          </Col>
       </Row>
     </div>
+        </TabPane>
+        <TabPane  label="历史报修数据" >
+
+           <div style="background-color:white;">
+      <m-table  :config="tableConfig" :searchParams="RepairForm"    ref="table"  :isFirst="isFirst"></m-table>    
+      <div slot="footer" style="text-align:right;">
+        <Row>
+          <Col span="24" v-if="this.viewTabs === 'remark'">
+            <Button size="default" >取消</Button>
+            <Button type="primary" size="default"  :loading="modal_loading">确定</Button>
+          </Col>
+        </Row>
+      </div>
+
+      </div>
+        </TabPane>
+    </Tabs>
+    
 
 
  <Modal v-model="choosemodel" title="执行人选择" width="500"
@@ -245,20 +286,11 @@
     </Modal>
 
     <!-- 历史报修数据 -->
-    <Modal v-model="RepairList_show"  width="800"
+    <!-- <Modal v-model="RepairList_show"  width="800"
       title="历史报修数据"
-      >
-
-      <m-table  :config="tableConfig" :searchParams="RepairForm"    ref="table"  :isFirst="isFirst"></m-table>    
-      <div slot="footer" style="text-align:right;">
-        <Row>
-          <Col span="24" v-if="this.viewTabs === 'remark'">
-            <Button size="default" >取消</Button>
-            <Button type="primary" size="default"  :loading="modal_loading">确定</Button>
-          </Col>
-        </Row>
-      </div>
-    </Modal>
+      > -->
+     
+    <!-- </Modal> -->
 
 
   </div>
@@ -267,11 +299,12 @@
 import qs from "qs";
 import axios from "axios";
 import util from "@/assets/js/util";
-import Bus from '@/bus'
+import Bus from "@/bus";
 export default {
   data() {
     return {
-      table_show:false,
+      isok: false,
+      table_show: false,
       choosemodel: false,
       choosemodel1: false,
       participatorids: [],
@@ -310,20 +343,20 @@ export default {
       imglist: [""],
       upindex: "",
       files: [],
-      newarr:[],
-      newarr2:[],
-      officeLocations:[],
-      contactPhones:[],
+      newarr: [],
+      newarr2: [],
+      officeLocations: [],
+      contactPhones: [],
       showimg: "",
       //表单
       formItem: {
         clientId: "",
         phone: "",
-        undef:"",
-        tel:"",
-        callID:"",
+        undef: "",
+        tel: "",
+        callID: "",
         officeLocation: "",
-        contactPhone:"",
+        contactPhone: "",
         name: "",
         companyName: "",
         priority: "",
@@ -336,21 +369,21 @@ export default {
         problem: "",
         problemImgs: "",
         participators: [],
-        userId:'',
-        userName:"",
-        replacementRepair:""
+        userId: "",
+        userName: "",
+        replacementRepair: ""
       },
       treeList: [],
       // 设置表单验证
       ruleValidate: {
-       callID: [
+        callID: [
           {
             required: true,
             message: "请输入正确的来电号码",
             trigger: "blur",
             transform(value) {
               // var reg=/^\d{11}$/
-              var reg=/[0-9\-]/
+              var reg = /[0-9\-]/;
               // var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
               // var landLine_reg=/0\d{2,3}-\d{7,8}/;
               //  && !landLine_reg.test(value)
@@ -362,7 +395,7 @@ export default {
             }
           }
         ],
-         contactPhone: [
+        contactPhone: [
           {
             required: true,
             message: "请输入正确的手机号",
@@ -386,7 +419,7 @@ export default {
         executor: [
           { required: true, message: "该选项不能为空", trigger: "input" }
         ],
-        participatorids:[
+        participatorids: [
           { required: true, message: "该选项不能为空", trigger: "blur" }
         ]
       },
@@ -410,7 +443,7 @@ export default {
       //表格
       tableConfig: {
         url: "",
-        columns: [
+         columns: [
           {
             title: "工单号码 ",
             key: "workOrderNo",
@@ -426,72 +459,96 @@ export default {
             key: "state",
             width: 120
           },
-          {
-            // PS:暂无该字段
-            title: "变更状态",
-            key: " orderChange",
-            width: 120,
-            render:(h,params)=>{
-                switch(params.row.orderChange){
-                  case 0:
-                    return h('div',"否")
-                  case 1:
-                    return h('div',"是")
-                }
-              }
+           {
+            title: "报修来源",
+            key: "repairSource",
+            width: 150
           },
-          {
+            {
             title: "办公位",
             key: "officeLocation",
             width: 120
           },
-          {
-            title: "姓名",
-            key: "name",
+           {
+            title: "报修类型",
+            key: "problemClass",
             width: 120
           },
           {
-            title: "手机号",
-            key: "phone",
-            width: 150
+            title: "常见问题",
+            key: "problem",
+            width: 120
           },
+           {
+            title: "备注",
+            key: "remark",
+            width: 120
+          },
+          // {
+          //   title: "变更状态",
+          //   key: " orderChange",
+          //   width: 120,
+          //   render: (h, params) => {
+          //     switch (params.row.orderChange) {
+          //       case 0:
+          //         return h("div", "否");
+          //       case 1:
+          //         return h("div", "是");
+          //     }
+          //   }
+          // },
+        
+          // {
+          //   title: "姓名",
+          //   key: "name",
+          //   width: 120
+          // },
+          // {
+          //   title: "手机号",
+          //   key: "phone",
+          //   width: 150
+          // },
           {
             title: "执行人",
             key: "userName",
             width: 120
           },
+             {
+            title: "参与者",
+            key: "participators",
+            width: 120
+          },
+         
           {
-            title: "来源",
-            key: "repairSource",
-            width: 150
+            title: "创建时间",
+            key: "gmtCreate",
+            width: 200
           },
           {
-            title: "更新时间",
-            key: "gmtCreate",
+            title: "完成时间",
+            key: "completionTime",
             width: 200
           }
         ]
       },
       RepairForm: {
-        clientId: "",
-       
+        clientId: ""
       }
     };
   },
   mounted() {
     //方法
     if (this.$route.params.callID) {
-      this.formItem.callID=this.$route.params.callID
+      this.formItem.callID = this.$route.params.callID;
       this.search(this.$route.params.callID);
     }
   },
-  created(){
-    Bus.$on('changephone',value=>{
-      this.formItem.callID=value
-    })
+  created() {
+    Bus.$on("changephone", value => {
+      this.formItem.callID = value;
+    });
   },
   beforeCreate() {
-   
     this.$request.post(
       "/api/emaint/problem-base/treeList",
       {},
@@ -508,7 +565,6 @@ export default {
       res => {},
       res => {
         if (res.statusCode == 200) {
-        
           this.userlist = res.responseResult.list;
           this.userlist.sort(util.compare1("problemNum"));
         }
@@ -525,24 +581,24 @@ export default {
       this.imglist.pop("");
     },
     // 办公位自动检索
-    handleSearch1(value){
-      this.newarr=[];
-      this.officeLocations.forEach((v)=>{
-          if(v.indexOf(value)!=-1){
-            this.newarr.push(v)
-          }
-      })
+    handleSearch1(value) {
+      this.newarr = [];
+      this.officeLocations.forEach(v => {
+        if (v.indexOf(value) != -1) {
+          this.newarr.push(v);
+        }
+      });
     },
     // 联系人号码自动检索
-    handleSearch2(value){
-      this.newarr2=[];
-      this.contactPhones.forEach((v)=>{
-          if(v.indexOf(value)!=-1){
-            this.newarr2.push(v)
-          }
-      })
+    handleSearch2(value) {
+      this.newarr2 = [];
+      this.contactPhones.forEach(v => {
+        if (v.indexOf(value) != -1) {
+          this.newarr2.push(v);
+        }
+      });
     },
-    
+
     changefile(e) {
       var file = e.target.files[0];
 
@@ -594,9 +650,8 @@ export default {
     // 输入手机号进行检索
     search(e) {
       // if (this.formItem.phone.length == 11) {
-        var reg=/[0-9\-]/;
-        if(!reg.test(this.formItem.callID))
-        return
+      var reg = /[0-9\-]/;
+      if (!reg.test(this.formItem.callID)) return;
       this.$request.post(
         "/api/emaint/client/phone",
         qs.stringify({ phone: this.formItem.callID }),
@@ -606,9 +661,9 @@ export default {
             this.$Message.success("查询成功!");
             var data = res.responseResult;
             this.formItem.phone = data.phone;
-            this.formItem.undef=data.undef;
-            this.formItem.tel=data.tel
-            this.formItem.contactPhone=data.contactPhone
+            this.formItem.undef = data.undef;
+            this.formItem.tel = data.tel;
+            this.formItem.contactPhone = data.contactPhone;
             this.formItem.officeLocation = data.officeLocation;
             this.formItem.name = data.name;
             this.formItem.companyName = data.companyName;
@@ -616,17 +671,27 @@ export default {
             this.formItem.sex = data.sex;
             this.formItem.clientId = data.id;
             // 获取办公位记录
-            this.$request.post('/api/emaint/repairProblem/clientOfficeLocation',qs.stringify({clientId:data.id}),res=>{},res=>{
-             if(res.statusCode==200){
-               this.officeLocations=res.responseResult
-             }
-            })
+            this.$request.post(
+              "/api/emaint/repairProblem/clientOfficeLocation",
+              qs.stringify({ clientId: data.id }),
+              res => {},
+              res => {
+                if (res.statusCode == 200) {
+                  this.officeLocations = res.responseResult;
+                }
+              }
+            );
             // 获取联系人手机号
-            this.$request.post('/api/emaint/repairProblem/clientPhone',qs.stringify({clientId:data.id}),res=>{},res=>{
-             if(res.statusCode==200){
-               this.contactPhones=res.responseResult
-             }
-            })
+            this.$request.post(
+              "/api/emaint/repairProblem/clientPhone",
+              qs.stringify({ clientId: data.id }),
+              res => {},
+              res => {
+                if (res.statusCode == 200) {
+                  this.contactPhones = res.responseResult;
+                }
+              }
+            );
 
             this.RepairForm.clientId = data.id;
             // this.RepairForm.beginTime = data.beginTime || "";
@@ -640,42 +705,46 @@ export default {
 
             switch (data.sex) {
               case "男":
-                 (this.formItem.sex = "男") ;break; 
+                this.formItem.sex = "男";
+                break;
               case "male":
-                 (this.formItem.sex = "男");break;
+                this.formItem.sex = "男";
+                break;
               case "女":
-                 (this.formItem.sex = "女");break;
+                this.formItem.sex = "女";
+                break;
               case "female":
-                 (this.formItem.sex = "女");break;
-              default : break;
+                this.formItem.sex = "女";
+                break;
+              default:
+                break;
             }
           } else {
-            
-                this.$Message.error("客户信息不存在");
-                this.RepairForm.clientId=''
-                this.formItem={
-                  clientId: "",
-                  phone:'',
-                  callID:this.formItem.callID,
-                  undef:"",
-                  tel:"",
-                  officeLocation: "",
-                  contactPhone:"",
-                  name: "",
-                  companyName: "",
-                  priority: "",
-                  sex: "",
-                  problemClass: "",
-                  problemType: "",
-                  remark: "",
-                  participatorids: [],
-                  problem: "",
-                  problemImgs: "",
-                  participators: [],
-                  userId:'',
-                  userName:"",
-                  replacementRepair:""
-                }           
+            this.$Message.error("客户信息不存在");
+            this.RepairForm.clientId = "";
+            this.formItem = {
+              clientId: "",
+              phone: "",
+              callID: this.formItem.callID,
+              undef: "",
+              tel: "",
+              officeLocation: "",
+              contactPhone: "",
+              name: "",
+              companyName: "",
+              priority: "",
+              sex: "",
+              problemClass: "",
+              problemType: "",
+              remark: "",
+              participatorids: [],
+              problem: "",
+              problemImgs: "",
+              participators: [],
+              userId: "",
+              userName: "",
+              replacementRepair: ""
+            };
           }
         }
       );
@@ -701,12 +770,15 @@ export default {
       //             userId:'',
       //             userName:"",
       //             replacementRepair:""
-      //           } 
+      //           }
       // }
     },
     // 报修提交
     repairSubmit() {
-      this.modal_loading=true
+      this.modal_loading = true;
+      if (this.isok) {
+        return;
+      } else this.isok = true;
       // 派单
       if (this.viewForm.id != "") {
         this.$request.post(
@@ -726,25 +798,26 @@ export default {
         // 新增
         if (this.question_ary.length > 0)
           this.formItem.problem = this.question_ary.toString();
-        
-        this.formItem.problemImgs = this.files;
-        var newarr=[]
-        this.userlist.forEach(v=>{
-          if(this.formItem.participatorids.indexOf(v.id) != -1){
-              newarr.push(v.name)
-          }
-        })
-        this.formItem.participatorids = this.formItem.participatorids.toString();
-        this.formItem.participators =newarr.toString();
 
-        if(this.formItem.replacementRepair!=""){
-          this.formItem.replacementRepair=parseInt(this.formItem.replacementRepair)
+        this.formItem.problemImgs = this.files;
+        var newarr = [];
+        this.userlist.forEach(v => {
+          if (this.formItem.participatorids.indexOf(v.id) != -1) {
+            newarr.push(v.name);
+          }
+        });
+        this.formItem.participatorids = this.formItem.participatorids.toString();
+        this.formItem.participators = newarr.toString();
+
+        if (this.formItem.replacementRepair != "") {
+          this.formItem.replacementRepair = parseInt(
+            this.formItem.replacementRepair
+          );
         }
-        
 
         //  把this.formItem转为FormData数据用来传递文件
         var data = new FormData(); //重点在这里 如果使用 var data = {}; data.inputfile=... 这样的方式不能正常上传
-        this.formItem.userId==""?delete this.formItem.userId:'';
+        this.formItem.userId == "" ? delete this.formItem.userId : "";
 
         // formData添加formItem的键值对
         for (var i in this.formItem) {
@@ -754,31 +827,39 @@ export default {
           data.append("problemImgs", this.files[i]);
         }
 
-        if(this.formItem.phone!=""&&this.formItem.problemClass!="" && this.formItem.problemType!=""){
-          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头 
-         axios
-            .post("/api/emaint/repairProblem/save", data, headers)
-            .then(
-                (resdata)=> {
-                if (resdata.data.statusCode == 200) {
-                  this.modal_loading=false
-                  this.$Message.success('新增成功！');
-                  setTimeout(()=>{
-                    this.$router.push({name:'workOrder'})
-                  },1000)
-                }else{
-                  this.modal_loading=false
-                  this.$Modal.error({title: "提示信息",content:resdata.data.responseResult});
-                }
-              },
-              (err) =>{
-                this.modal_loading=false
-                this.$Message.error("网络出错，请稍后再试");
+        if (
+          this.formItem.phone != "" &&
+          this.formItem.problemClass != "" &&
+          this.formItem.problemType != ""
+        ) {
+          let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+          axios.post("/api/emaint/repairProblem/save", data, headers).then(
+            resdata => {
+              this.isok = false;
+              if (resdata.data.statusCode == 200) {
+                this.modal_loading = false;
+                this.$Message.success("新增成功！");
+                setTimeout(() => {
+                  this.$router.push({ name: "workOrder" });
+                }, 1000);
+              } else {
+                this.modal_loading = false;
+                this.$Modal.error({
+                  title: "提示信息",
+                  content: resdata.data.responseResult
+                });
               }
-            )
-        }else{
-          this.modal_loading=false
-          this.$Message.error("输入不能为空")
+            },
+            err => {
+              this.isok = false;
+              this.modal_loading = false;
+              this.$Message.error("网络出错，请稍后再试");
+            }
+          );
+        } else {
+          this.isok = false;
+          this.modal_loading = false;
+          this.$Message.error("输入不能为空");
         }
         // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
         // axios
@@ -820,17 +901,20 @@ export default {
       this.visible = true;
     },
     // 历史报修数据
-    clientRepairList() {
+    clientRepairList(e) {
+      if(e==0)
+      return;
       // console.log(this.RepairForm.clientId);
-      if (this.RepairForm.clientId==''||this.RepairForm.clientId==null) {
+      if (this.RepairForm.clientId == "" || this.RepairForm.clientId == null) {
         this.$Message.error("请先输入手机号!");
-      }else{
+      } else {
         this.RepairList_show = true;
-        this.tableConfig.url='/api/emaint/repairProblem/clientRepairProblemList'
+        this.tableConfig.url =
+          "/api/emaint/repairProblem/clientRepairProblemList";
         this.$refs.table.init();
       }
     },
-   
+
     // 选择常见问题
     choose_question(item, index) {
       if (this.question_ary.indexOf(item.problem) == -1) {
@@ -838,8 +922,7 @@ export default {
       } else {
         this.question_ary.splice(this.question_ary.indexOf(item.problem), 1);
       }
-    },
-    
+    }
   }
 };
 </script>
@@ -910,6 +993,14 @@ div.addimg .ivu-icon {
   background-color: #2d8cf0;
   border: #2d8cf0;
   color: #fff;
+}
+p.addbutton {
+  text-align: left;
+  padding-left: 1px;
+}
+p.addbutton > button {
+  padding: 10px 20px;
+  border: none;
 }
 </style>
 

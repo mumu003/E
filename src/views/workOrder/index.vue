@@ -5,9 +5,18 @@
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card">
-        <p slot="title">
-            {{$route.meta.title}}
+        <p slot="title" id="labels">
+            <!-- {{$route.meta.title}} -->
+           <template >
+          <label  @click="formItem.state=''" :style="{color:!formItem.state?'#57a3f3':''}">全部工单</label>
+          <label  @click="formItem.state='待派单'" :style="{color:formItem.state=='待派单'?'#57a3f3':''}">待派单</label>
+          <label  @click="formItem.state='待维修'" :style="{color:formItem.state=='待维修'?'#57a3f3':''}">待维修</label>
+          <label  @click="formItem.state='待评价'" :style="{color:formItem.state=='待评价'?'#57a3f3':''}">待评价</label>
+          <label  @click="formItem.state='已评价'" :style="{color:formItem.state=='已评价'?'#57a3f3':''}">已评价</label>
+           </template>
           <collapse-icon foldPart="search-body"></collapse-icon>
+         
+         
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleAdd">
@@ -18,7 +27,7 @@
                 <Input v-model="formItem.workOrderNo" :maxlength=20 placeholder="请输入工单号"></Input>
               </FormItem>
               </Col>              
-              <Col span="6">
+              <!-- <Col span="6">
               <FormItem label="状态">
                  <Select v-model="formItem.state" placeholder="全部">
                    <Option value="">全部</Option>
@@ -28,7 +37,7 @@
                       <Option value="已评价">已评价</Option>
                     </Select>
               </FormItem>
-              </Col>
+              </Col> -->
               
               <Col span="6">
               <FormItem label="姓名">
@@ -94,7 +103,8 @@
           <Row>
             <Col>
             <Button type="primary" icon="plus-round" @click="addProject" v-if="auth.tf_repair_problem_edit">新增</Button>
-            <Button type="primary" icon="ios-redo" @click="exportProject"  v-if="auth.tf_repair_problem_data_export">导出</Button>
+            <Button type="primary" icon="ios-redo" @click="exportProject"  v-if="auth.tf_repair_problem_data_export">导出工单明细excel</Button>
+            <Button type="primary" icon="ios-redo" @click="exportProject_1"  v-if="auth.tf_repair_problem_data_export">导出客户回访excel</Button>
             </Col>
             <Col>
             </Col>
@@ -177,7 +187,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      auth:JSON.parse(sessionStorage.auth),//登录用户的角色权限
+      isok: false,
+      auth: JSON.parse(sessionStorage.auth), //登录用户的角色权限
       files: [],
       imglist: [""],
       visible: false,
@@ -207,13 +218,13 @@ export default {
       addUnitNameIsNo: "", //新增名字空的
       viewTabs: "remark", //Tabs
       buttons: {}, //按钮
-      
+
       //搜索时间
       searchTime: {
         tStartTime: "",
         tEndTime: ""
       },
-      createdTime:[],
+      createdTime: [],
       //表单
       formItem: {
         workOrderNo: "",
@@ -223,7 +234,8 @@ export default {
         isChange: "",
         userName: "",
         endTime: "",
-        beginTime: ""
+        beginTime: "",
+        watch: true
       },
       // start: {
       //   disabledDate: function(date) {
@@ -258,7 +270,7 @@ export default {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled:!this.auth.tf_repair_problem_add_user 
+                      disabled: !this.auth.tf_repair_problem_add_user
                       // disabled: params.row.state == "待派单" ? false : true
                     },
                     style: {
@@ -266,9 +278,9 @@ export default {
                     },
                     on: {
                       click: () => {
-                        sessionStorage.setItem('paramid',params.row.id)
+                        sessionStorage.setItem("paramid", params.row.id);
                         this.$router.push({
-                          name: "dispatch",
+                          name: "dispatch"
                         });
                       }
                     }
@@ -281,7 +293,7 @@ export default {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled:!this.auth.tf_repair_problem_add_remark 
+                      disabled: !this.auth.tf_repair_problem_add_remark
                     },
                     style: {
                       marginRight: "5px"
@@ -289,12 +301,12 @@ export default {
                     on: {
                       click: () => {
                         this.msgModal = true;
-                        this.viewForm={
+                        this.viewForm = {
                           id: "",
                           remark: ""
                         };
-                        this.files= []
-                        this.imglist= [""]
+                        this.files = [];
+                        this.imglist = [""];
 
                         this.viewForm.id = params.row.id;
                       }
@@ -302,13 +314,13 @@ export default {
                   },
                   "备注"
                 ),
-                 h(
+                h(
                   "Button",
                   {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled:!this.auth.tf_repair_problem_add_user 
+                      disabled: !this.auth.tf_repair_problem_add_user
                       // disabled: params.row.state == "待派单" ? false : true
                     },
                     style: {
@@ -316,15 +328,15 @@ export default {
                     },
                     on: {
                       click: () => {
-                        sessionStorage.setItem('paramid',params.row.id)
+                        sessionStorage.setItem("paramid", params.row.id);
                         this.$router.push({
-                          name: "WorkDetail",
+                          name: "WorkDetail"
                         });
                       }
                     }
                   },
                   "工单详情"
-                ),
+                )
                 // h(
                 //   "Button",
                 //   {
@@ -354,60 +366,60 @@ export default {
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 180
+            width: 150
           },
           {
             title: "姓名",
             key: "name",
-            width: 120
+            width: 100
           },
           {
             title: "优先级",
             key: "priority",
-            width: 120
+            width: 100
           },
           {
             title: "状态",
             key: "state",
-            width: 120
+            width: 100
           },
-  //         {
-  //           title: "变更状态",
-  //           key: " orderChange",
-  //           width: 120,
-  //           render:(h,params)=>{
-  //               switch(params.row.orderChange){
-  //                 case 0:
-  //                   return h('div',"否")
-  //                 case 1:
-  //                   return h('div',"是")
-  //               }
-  //             }
-  //         },
+          //         {
+          //           title: "变更状态",
+          //           key: " orderChange",
+          //           width: 120,
+          //           render:(h,params)=>{
+          //               switch(params.row.orderChange){
+          //                 case 0:
+          //                   return h('div',"否")
+          //                 case 1:
+          //                   return h('div',"是")
+          //               }
+          //             }
+          //         },
           {
             title: "办公位",
             key: "officeLocation",
-            width: 120
+            width: 100
           },
           {
             title: "手机号",
             key: "phone",
-            width: 150
+            width: 120
           },
           {
             title: "执行人",
             key: "userName",
-            width: 120
+            width: 100
           },
           {
             title: "来源",
             key: "repairSource",
-            width: 150
+            width: 120
           },
           {
             title: "创建时间",
             key: "gmtModified",
-            width: 200
+            width: 180
           }
         ]
       },
@@ -440,13 +452,12 @@ export default {
           }
         ]
       },
-      
+
       //备注表单
       viewForm: {
         id: "",
         remark: ""
-      },
- 
+      }
     };
   },
   computed: {
@@ -467,10 +478,10 @@ export default {
       }
     );
   },
-  created(){
+  created() {
     // console.log(this.$route.params.status)
-    if(this.$route.params.status){
-      this.formItem.state=this.$route.params.status
+    if (this.$route.params.status) {
+      this.formItem.state = this.$route.params.status;
     }
   },
   methods: {
@@ -544,8 +555,8 @@ export default {
     // },
     getcreatedTime(createdTime) {
       // Array [ "2019-07-20", "2019-08-14" ]
-      this.formItem.beginTime=createdTime[0]
-      this.formItem.endTime=createdTime[1]
+      this.formItem.beginTime = createdTime[0];
+      this.formItem.endTime = createdTime[1];
     },
     //新增
     addProject() {
@@ -554,10 +565,8 @@ export default {
       });
     },
 
-
     // 导出
-     exportProject() {
-       
+    exportProject() {
       // location.href='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+this.formItem.beginTime
       //   +'&endTime='+this.formItem.endTime+
       //   +'&isChange='+this.formItem.isChange+
@@ -567,43 +576,85 @@ export default {
       //   +'&phone='+this.formItem.phone+
       //   +'&userName='+this.formItem.userName+'&accessToken='+sessionStorage.getItem('token')
 
+      //  console.log(123)
+      //   // var beginDate= this.formItem.beginTime || '1990-06-01';
+      //   // var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
+      var beginTime = this.formItem.beginTime || "";
+      var endTime = this.formItem.endTime || "";
+      var isChange = this.formItem.isChange || "";
+      var workOrderNo = this.formItem.workOrderNo || "";
+      var name = this.formItem.name || "";
+      var state = this.formItem.state || "";
+      var phone = this.formItem.phone || "";
+      var userName = this.formItem.userName || "";
+      var token = sessionStorage.getItem("token");
+      // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
+      // +'&endTime='+endTime+
+      // +'&isChange='+isChange+
+
+      // +'&workOrderNo='+workOrderNo+
+      // +'&name='+name+
+      // +'&state='+state+
+      // +'&phone='+phone+
+      // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
+      // console.log(url)
+      // window.open(url);
+
+      var url2 = `${
+        axios.defaults.baseURL
+      }/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+        &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`;
+      // console.log(url2)
+      location.href = url2;
+    },
+
+    // 导出
+    exportProject_1() {
+      // location.href='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+this.formItem.beginTime
+      //   +'&endTime='+this.formItem.endTime+
+      //   +'&isChange='+this.formItem.isChange+
+      //   +'&workOrderNo='+this.formItem.workOrderNo+
+      //   +'&name='+this.formItem.name+
+      //   +'&state='+this.formItem.state+
+      //   +'&phone='+this.formItem.phone+
+      //   +'&userName='+this.formItem.userName+'&accessToken='+sessionStorage.getItem('token')
 
       //  console.log(123)
       //   // var beginDate= this.formItem.beginTime || '1990-06-01';
       //   // var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
-      var beginTime=this.formItem.beginTime || ""
-      var endTime=this.formItem.endTime || ""
-      var isChange=this.formItem.isChange || ""
-      var workOrderNo=this.formItem.workOrderNo || ""
-      var name=this.formItem.name || ""
-      var state=this.formItem.state || ""
-      var phone=this.formItem.phone || ""
-      var userName=this.formItem.userName || ""
-      var token=sessionStorage.getItem("token")
-        // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
-        // +'&endTime='+endTime+
-        // +'&isChange='+isChange+
-        
-        // +'&workOrderNo='+workOrderNo+
-        // +'&name='+name+
-        // +'&state='+state+
-        // +'&phone='+phone+
-        // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
-        // console.log(url)
-        // window.open(url);     
+      var beginTime = this.formItem.beginTime || "";
+      var endTime = this.formItem.endTime || "";
+      var isChange = this.formItem.isChange || "";
+      var workOrderNo = this.formItem.workOrderNo || "";
+      var name = this.formItem.name || "";
+      var state = this.formItem.state || "";
+      var phone = this.formItem.phone || "";
+      var userName = this.formItem.userName || "";
+      var token = sessionStorage.getItem("token");
+      // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
+      // +'&endTime='+endTime+
+      // +'&isChange='+isChange+
 
-        var url2=`${axios.defaults.baseURL}/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
-        &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`
-        // console.log(url2)
-        location.href=url2
+      // +'&workOrderNo='+workOrderNo+
+      // +'&name='+name+
+      // +'&state='+state+
+      // +'&phone='+phone+
+      // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
+      // console.log(url)
+      // window.open(url);
 
-      
+      var url2 = `${
+        axios.defaults.baseURL
+      }/api/emaint/repairProblem/exportCustomersPayAReturnVisitData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+        &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`;
+      // console.log(url2)
+      location.href = url2;
     },
 
     //搜索
     searchSubmit() {
       this.isFirst = true;
-      this.$refs.table.init()
+      this.$refs.table.init();
       this.isFirst = false;
       // this.$request.post(
       //   "/api/emaint/repairProblem/repairProblemList",
@@ -634,7 +685,7 @@ export default {
         endTime: "",
         beginTime: ""
       };
-      this.createdTime=[]
+      this.createdTime = [];
       this.isFirst = true;
       setTimeout(() => {
         this.$refs.table.init();
@@ -644,7 +695,10 @@ export default {
 
     // 备注提交
     msgOk() {
-      this.modal_loading=true
+      this.modal_loading = true;
+      if (this.isok) {
+        return;
+      } else this.isok = true;
       var data = new FormData();
       for (var i in this.viewForm) {
         data.append(i, this.viewForm[i]);
@@ -653,33 +707,44 @@ export default {
         data.append("imgs", this.files[i]);
       }
 
-      if(this.viewForm.remark){
+      if (this.viewForm.remark) {
         let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
-        axios.post("/api/emaint/repairProblem/userAddRemark", data, headers).then(
-          resdata => {
-            if(resdata.data.statusCode==200){
-              this.modal_loading=false
-              this.msgModal = false;
-              this.$Modal.success({title: "提示信息", content: resdata.data.responseResult});
-            }else{
-              this.modal_loading=false
-              this.$Modal.error({title: "提示信息", content: resdata.data.responseResult});
+        axios
+          .post("/api/emaint/repairProblem/userAddRemark", data, headers)
+          .then(
+            resdata => {
+              if (resdata.data.statusCode == 200) {
+                this.modal_loading = false;
+                this.msgModal = false;
+                this.$Modal.success({
+                  title: "提示信息",
+                  content: resdata.data.responseResult
+                });
+              } else {
+                this.modal_loading = false;
+                this.$Modal.error({
+                  title: "提示信息",
+                  content: resdata.data.responseResult
+                });
+              }
+              this.isok = false;
+            },
+            err => {
+              this.modal_loading = false;
+              this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
+              this.isok = false;
             }
-          },
-          err => {
-            this.modal_loading=false
-            this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
-          }
-        );
-      }else{
-        this.modal_loading=false
+          );
+      } else {
+        this.modal_loading = false;
         this.$Modal.error({ title: "提示信息", content: "备注内容不能为空" });
+        this.isok = false;
       }
-      
     },
     //取消操作
     viewCancel(arg) {
       this.msgModal = false;
+      this.modal_loading = false;
       this.$Message.info("你取消了操作");
       this.$refs.table.init();
       setTimeout(() => {
@@ -687,7 +752,12 @@ export default {
         this.historysList = [];
         this.nodesList = [];
       }, 1000);
-    },
+    }
+  },
+  watch: {
+    selectlabel: function(n, o) {
+      console.log(n);
+    }
   }
 };
 </script>
@@ -727,6 +797,10 @@ div.showtheimg .ivu-modal-body {
 div.showtheimg .ivu-modal-body img {
   height: 22rem;
   width: 74%;
+}
+p#labels > label {
+  cursor: pointer;
+  margin: 0px 10px;
 }
 </style>
 
