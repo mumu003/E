@@ -201,28 +201,8 @@
       },
       save(type) {
         if (type == "add") {
-          if(!this.addformdata.groupNo){
-            this.$Modal.error({
-                  title: "提示信息",
-                  content: "组织编号不能为空"
-            });
-            return
-          }
-          if(!this.addformdata.groupName){
-            this.$Modal.error({
-                  title: "提示信息",
-                  content: "组织名称不能为空"
-            });
-            return
-          }
-          if(!this.addformdata.type){
-            this.$Modal.error({
-                  title: "提示信息",
-                  content: "类型不能为空"
-            });
-            return
-          }
-          this.$request.post(
+          if(this.addformdata.groupNo!=""&&this.addformdata.groupName!=""&&this.addformdata.type!=""){
+            this.$request.post(
             "/api/emaint/client/saveClientGroup",
             this.addformdata,
             data => {
@@ -243,20 +223,56 @@
                   parentCode: ""
                 };
               }
-              this.getlist();
-            }
-          );
+                this.getlist();
+              }
+            );
+          }else{
+            this.$Message.error("必填项不能为空")
+          }
+          // if(!this.addformdata.groupNo){
+          //   this.$Modal.error({
+          //         title: "提示信息",
+          //         content: "组织编号不能为空"
+          //   });
+          //   return
+          // }
+          // if(!this.addformdata.groupName){
+          //   this.$Modal.error({
+          //         title: "提示信息",
+          //         content: "组织名称不能为空"
+          //   });
+          //   return
+          // }
+          // if(!this.addformdata.type){
+          //   this.$Modal.error({
+          //         title: "提示信息",
+          //         content: "类型不能为空"
+          //   });
+          //   return
+          // }
+          
         } else {
-          this.$request.post(
-            "/api/emaint/client/saveClientGroup",
-            this.updatedata,
-            data => {
-            },
-            data => {
-              if (data.statusCode == 200) this.$Message.success("修改成功");
-              this.getlist();
+            if(this.updatedata.groupNo!=""&&this.updatedata.groupName!=""&&this.updatedata.type!=""){
+               this.$request.post(
+                "/api/emaint/client/saveClientGroup",
+                this.updatedata,
+                data => {
+                },
+                data => {
+                  if (data.statusCode == 200){
+                    this.$Message.success("修改成功");
+                    this.updatedata = {
+                    
+                    };
+                  } 
+                  this.getlist();
+                }
+              );
+            }else{
+              this.$Message.error("必填项不能为空")
             }
-          );
+
+         
         }
       },
       addquestion() {
