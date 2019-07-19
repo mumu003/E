@@ -42,6 +42,8 @@ export default {
     },
     methods: {
     routeTo(url){
+        if(url=='/workOrder')
+        sessionStorage.removeItem('paramsstatus')
         for(let value of document.getElementsByClassName("ivu-menu-vertical")[0].querySelectorAll('.ivu-menu-item')){
            if (value.classList.contains("ivu-menu-item-active")) {
                 value.classList.remove('ivu-menu-item-active');

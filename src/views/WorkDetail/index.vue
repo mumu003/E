@@ -74,7 +74,7 @@
                 </Col>
                  </Row>
                 
-              <Row v-show="imglist.length>0" style="margin-bottom: 25px;">
+              <Row v-show="imglist.length>0" >
              <Col span="24">
                 <FormItem label="图片描述"  >
                     <!-- @on-cancel="imgcancel" -->
@@ -566,15 +566,20 @@ export default {
       }
     };
   },
-  created() {
-    // this.search();
-    Bus.$on("changeparamid", value => {
+  beforeCreate(){
+      Bus.$on("changeparamid", value => {
       // sessionStorage.setItem("paramid",value)
       if (sessionStorage.getItem("paramid")) {
+        
         this.viewForm.id = sessionStorage.getItem("paramid");
         this.getinfo();
+       
       }
     });
+  },
+  created() {
+    // this.search();
+    
     //   if (sessionStorage.getItem('paramid')) {
 
     //   this.$request.post(
@@ -1016,7 +1021,7 @@ div.addimg {
   line-height: 58px;
   border: 1px solid #eee;
   border-radius: 5px;
-  position: absolute;
+  /* position: absolute; */
 }
 div.addimg img {
   width: 100%;

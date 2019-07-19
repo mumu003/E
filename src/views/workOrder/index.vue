@@ -8,11 +8,11 @@
         <p slot="title" id="labels">
             <!-- {{$route.meta.title}} -->
            <template >
-          <label  @click="formItem.state=''" :style="{color:!formItem.state?'#57a3f3':''}">全部工单</label>
-          <label  @click="formItem.state='待派单'" :style="{color:formItem.state=='待派单'?'#57a3f3':''}">待派单</label>
-          <label  @click="formItem.state='待维修'" :style="{color:formItem.state=='待维修'?'#57a3f3':''}">待维修</label>
-          <label  @click="formItem.state='待评价'" :style="{color:formItem.state=='待评价'?'#57a3f3':''}">待评价</label>
-          <label  @click="formItem.state='已评价'" :style="{color:formItem.state=='已评价'?'#57a3f3':''}">已评价</label>
+          <label  @click="setstate('')" :style="{color:!formItem.state?'#57a3f3':''}">全部工单</label>
+          <label  @click="setstate('待派单')" :style="{color:formItem.state=='待派单'?'#57a3f3':''}">待派单</label>
+          <label  @click="setstate('待维修')" :style="{color:formItem.state=='待维修'?'#57a3f3':''}">待维修</label>
+          <label  @click="setstate('待评价')" :style="{color:formItem.state=='待评价'?'#57a3f3':''}">待评价</label>
+          <label  @click="setstate('已评价')" :style="{color:formItem.state=='已评价'?'#57a3f3':''}">已评价</label>
            </template>
           <collapse-icon foldPart="search-body"></collapse-icon>
          
@@ -166,7 +166,7 @@
     </Modal>
 
     <!-- 变更执行人 -->
-    <Modal v-model="choosemodel" title="执行人选择" width="500"
+    <Modal v-model="choosemodel" title="执行人选择" width="500" style="z-index:1001 !important;position:relative !important"
       @on-cancel="choosemodel=false">
         <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
           <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
@@ -175,8 +175,36 @@
           </Radio>
         </RadioGroup>
       <div slot="footer" style="text-align: right;">
-        <Button type="primary" size="default" @click="bgzxr" :loading="modal_loading">确定</Button>
+        <!-- @click="bgzxr" -->
+        <Button type="primary" size="default" @click="dispatchItem.userName=userlist[userindex].name;dispatchItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
       </div>
+    </Modal>
+
+    <!-- 派单 -->
+    <Modal v-model="dispatchModel" title="派单信息" width="500"
+      @on-ok="repairSubmit" @on-cancel="dispatchModel=false">
+      <Form  :model="dispatchItem" :label-width="80" :rules="ruleValidate">
+             <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
+              <Col span="13" >
+                <FormItem label="执行人" prop="executor">
+                    <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="dispatchItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
+                </FormItem>
+              </Col>
+             </Row>
+             <Row>
+              <Col span="20">
+                <FormItem label="参与者">
+                    <!-- <Input v-model="formItem.participators" ></Input>  -->
+                    <Select v-model="dispatchItem.participatorids"  multiple  style="width:100%;" >
+                      <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
+                          <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
+                          <span>{{item.problemNum==null?0:item.problemNum}}单</span>
+                      </Option>
+                  </Select>
+                </FormItem>
+              </Col>
+            </Row>
+          </Form>
     </Modal>
 
   </div>
@@ -196,6 +224,7 @@ export default {
       userlist: [],
       chooseindex: "",
       choosemodel: false,
+      dispatchModel:false,
       passDisable: false, //防止通过双击事件
       isDisable: false, //防止驳回双击事件
       loading: true, //延迟
@@ -237,6 +266,11 @@ export default {
         beginTime: "",
         watch: true
       },
+      // 派单表单
+      dispatchItem:{
+        userName:"",
+        participatorids:""
+      },
       // start: {
       //   disabledDate: function(date) {
       //     return date.valueOf() > new Date(this.formItem.endTime);
@@ -270,33 +304,41 @@ export default {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled: !this.auth.tf_repair_problem_add_user
-                      // disabled: params.row.state == "待派单" ? false : true
+                      disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_user?true:false
                     },
                     style: {
-                      marginRight: "5px"
+                      marginRight: "5px",
                     },
                     on: {
                       click: () => {
-                        sessionStorage.setItem("paramid", params.row.id);
-                        this.$router.push({
-                          name: "dispatch"
-                        });
+                        // sessionStorage.setItem("paramid", params.row.id);
+                        // this.$router.push({
+                        //   name: "dispatch"
+                        // });
+
+                        this.dispatchModel = true;
+                        this.chooseindex = params.row.id;
+
+                        // this.userlist.forEach((v,i)=>{
+                        //   if(v.id==params.row.userId){
+                        //     this.userindex=i;
+                        //   }
+                        // })
                       }
                     }
                   },
                   "派单"
                 ),
-                h(
-                  "Button",
+                h( "Button",
                   {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled: !this.auth.tf_repair_problem_add_remark
+                      disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_remark?true:false
                     },
                     style: {
-                      marginRight: "5px"
+                      marginRight: "5px",
+                      // display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':'inline'
                     },
                     on: {
                       click: () => {
@@ -307,7 +349,6 @@ export default {
                         };
                         this.files = [];
                         this.imglist = [""];
-
                         this.viewForm.id = params.row.id;
                       }
                     }
@@ -452,6 +493,12 @@ export default {
           }
         ]
       },
+      // 派单表单验证
+      ruleValidate: {
+        executor: [
+          { required: true, message: "该选项不能为空", trigger: "input" }
+        ],
+      },
 
       //备注表单
       viewForm: {
@@ -480,11 +527,15 @@ export default {
   },
   created() {
     // console.log(this.$route.params.status)
-    if (this.$route.params.status) {
-      this.formItem.state = this.$route.params.status;
+    if ( sessionStorage.getItem('paramsstatus')) {
+      this.formItem.state = sessionStorage.getItem('paramsstatus')
     }
   },
   methods: {
+    setstate(value){
+        this.formItem.state=value;
+        sessionStorage.setItem('paramsstatus',value)
+    },
     // 选择文件
     uploadfile(index) {
       document.querySelector("#upfile").click();
@@ -545,6 +596,35 @@ export default {
         }
       );
     },
+
+    repairSubmit() {
+      if (this.isok) {
+        return;
+      } else this.isok = true;
+      // this.modal_loading=true
+        if(this.dispatchItem.userId!=""&&this.dispatchItem.userId!=null){
+          var participatorids=""
+          participatorids=this.dispatchItem.participatorids==null?'':this.dispatchItem.participatorids.toString()
+          this.$request.post(
+          "/api/emaint/repairProblem/updateUser",
+          qs.stringify({ id: this.chooseindex, userId: this.dispatchItem.userId,participatorids:participatorids,changeDescription:"" }),
+          res => {},
+          res => {
+            this.isok = false;
+            this.$Message.success(res.responseResult);
+            setTimeout(() => {
+              // this.$router.push({
+              //   name: "workOrder"
+              // });
+              this.$refs.table.init()
+            }, 800);
+          })
+        }else{
+          this.isok = false;
+          this.$Message.error("请选择执行人")
+        }
+      
+    },
     // //开始时间
     // getStartDate(startDate) {
     //   this.formItem.beginTime = startDate;
@@ -567,18 +647,7 @@ export default {
 
     // 导出
     exportProject() {
-      // location.href='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+this.formItem.beginTime
-      //   +'&endTime='+this.formItem.endTime+
-      //   +'&isChange='+this.formItem.isChange+
-      //   +'&workOrderNo='+this.formItem.workOrderNo+
-      //   +'&name='+this.formItem.name+
-      //   +'&state='+this.formItem.state+
-      //   +'&phone='+this.formItem.phone+
-      //   +'&userName='+this.formItem.userName+'&accessToken='+sessionStorage.getItem('token')
-
-      //  console.log(123)
-      //   // var beginDate= this.formItem.beginTime || '1990-06-01';
-      //   // var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
+     
       var beginTime = this.formItem.beginTime || "";
       var endTime = this.formItem.endTime || "";
       var isChange = this.formItem.isChange || "";
@@ -588,17 +657,7 @@ export default {
       var phone = this.formItem.phone || "";
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
-      // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
-      // +'&endTime='+endTime+
-      // +'&isChange='+isChange+
-
-      // +'&workOrderNo='+workOrderNo+
-      // +'&name='+name+
-      // +'&state='+state+
-      // +'&phone='+phone+
-      // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
-      // console.log(url)
-      // window.open(url);
+    
 
       var url2 = `${
         axios.defaults.baseURL
@@ -610,18 +669,7 @@ export default {
 
     // 导出
     exportProject_1() {
-      // location.href='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+this.formItem.beginTime
-      //   +'&endTime='+this.formItem.endTime+
-      //   +'&isChange='+this.formItem.isChange+
-      //   +'&workOrderNo='+this.formItem.workOrderNo+
-      //   +'&name='+this.formItem.name+
-      //   +'&state='+this.formItem.state+
-      //   +'&phone='+this.formItem.phone+
-      //   +'&userName='+this.formItem.userName+'&accessToken='+sessionStorage.getItem('token')
-
-      //  console.log(123)
-      //   // var beginDate= this.formItem.beginTime || '1990-06-01';
-      //   // var endDate=this.formItem.endTime || new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDay()
+    
       var beginTime = this.formItem.beginTime || "";
       var endTime = this.formItem.endTime || "";
       var isChange = this.formItem.isChange || "";
@@ -631,18 +679,7 @@ export default {
       var phone = this.formItem.phone || "";
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
-      // var url='https://emaint.ahjarzeng.com/api/emaint/repairProblem/exportRepairProblemData?beginTime='+beginTime
-      // +'&endTime='+endTime+
-      // +'&isChange='+isChange+
-
-      // +'&workOrderNo='+workOrderNo+
-      // +'&name='+name+
-      // +'&state='+state+
-      // +'&phone='+phone+
-      // +'&userName='+userName+'&accessToken='+sessionStorage.getItem('token');
-      // console.log(url)
-      // window.open(url);
-
+    
       var url2 = `${
         axios.defaults.baseURL
       }/api/emaint/repairProblem/exportCustomersPayAReturnVisitData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}

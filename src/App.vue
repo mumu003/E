@@ -13,6 +13,7 @@ export default {
   data() {
     return {
       ws: "",
+      isok:false,
       lockReconnect: false, //是否真正建立连接
       timeout: 28 * 1000, //30秒一次心跳
       timeoutObj: null, //心跳心跳倒计时
@@ -117,9 +118,10 @@ export default {
           //       }
           // });
 
-           this.$Notice.warning({
+       this.$Notice.warning({
                     title: '小程序报修',
                     duration:0,
+                    name:'xcxtc',
                      render: h => {
                         return h('span', [
                             data.message,
@@ -137,11 +139,20 @@ export default {
                               },
                               on: {
                                 click: () => {
-                                  sessionStorage.setItem("paramid",data.repairProblemId)
+                                  if(this.isok)
+                                  return;
+                                  else this.isok=true;
+                                    sessionStorage.setItem("paramid",data.repairProblemId)
+                                  if(this.$route.name=='WorkDetail'){
                                   Bus.$emit('changeparamid',data.repairProblemId)
+
+                                  }
+                                  else{
                                   this.$router.push({
                                     name: "WorkDetail",
                                   });
+                                  }
+                                  this.$Notice.close('xcxtc')
                                 }
                               }
                             },
@@ -240,15 +251,15 @@ export default {
   font-size: 14px !important;
 }
 .ivu-input[disabled], fieldset[disabled] .ivu-input{
-  border: none;
-  background-color: unset;
-  color: black;
-  cursor: default;
+  border: none !important;
+  background-color: unset  !important;
+  color: black  !important;
+  cursor: default  !important;
 }
 .ivu-table-border td, .ivu-table-border th{
-  text-align: center;
+  text-align: center  !important;
 }
 .ivu-tabs-bar{
-  margin-bottom: 0px;
+  margin-bottom: 0px  !important;
 }
 </style>

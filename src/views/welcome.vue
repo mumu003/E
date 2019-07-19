@@ -210,7 +210,9 @@ export default {
     },
     goWork(status){
       // if(this.auth.tf_repair_problem_list){
+        sessionStorage.setItem('paramsstatus',status)
         if(status=="待派单"){
+          
           this.$router.push({
             name: "workOrder",
             params:{

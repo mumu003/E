@@ -399,7 +399,7 @@ export default {
           {
             required: true,
             message: "请输入正确的手机号",
-            trigger: "blur",
+            trigger: "change",
             transform(value) {
               var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
               if (!reg.test(value)) {
@@ -546,6 +546,8 @@ export default {
   created() {
     Bus.$on("changephone", value => {
       this.formItem.callID = value;
+      this.search();
+    
     });
   },
   beforeCreate() {
