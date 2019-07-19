@@ -57,10 +57,10 @@
           </p>
           <i-form :model="addformdata" :rules="ruleValidate" :label-width="90" class="addform">
             <Form-item label="组织编号" prop="groupNo">
-              <i-input placeholder="请输入组织编号" v-model="addformdata.groupNo"></i-input>
+              <i-input placeholder="请输入组织编号" v-model="addformdata.groupNo" :maxlength="15"></i-input>
             </Form-item>
             <Form-item label="组织名称" prop="groupName">
-              <i-input placeholder="请输入组织名称" v-model="addformdata.groupName"></i-input>
+              <i-input placeholder="请输入组织名称" v-model="addformdata.groupName" :maxlength="15"></i-input>
             </Form-item>
             <Form-item label="类型" prop="type">
               <i-select placeholder="请选择类型" v-model="addformdata.type">
@@ -90,10 +90,10 @@
           </p>
           <i-form :model="updatedata" :rules="ruleValidate" :label-width="90" class="addform">
             <Form-item label="组织编号" prop="groupNo">
-              <i-input placeholder="请输入组织编号" v-model="updatedata.groupNo"></i-input>
+              <i-input placeholder="请输入组织编号" v-model="updatedata.groupNo" :maxlength="15"></i-input>
             </Form-item>
             <Form-item label="组织名称" prop="groupName">
-              <i-input placeholder="请输入组织名称" v-model="updatedata.groupName"></i-input>
+              <i-input placeholder="请输入组织名称" v-model="updatedata.groupName" :maxlength="15"></i-input>
             </Form-item>
             <Form-item label="类型" prop="type">
               <i-select placeholder="请选择类型" v-model="updatedata.type">
