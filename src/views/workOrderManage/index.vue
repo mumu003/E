@@ -8,10 +8,10 @@
     <div style="width:49.5%;">
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card" dis-hover>
         <p slot="title">
           客户信息
-          <collapse-icon foldPart="search-body"></collapse-icon>
+          <!-- <collapse-icon foldPart="search-body"></collapse-icon> -->
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
@@ -132,10 +132,10 @@
     <div style="width:49.5%;">
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card"  dis-hover>
         <p slot="title">
           报修信息
-          <collapse-icon foldPart="search-body"></collapse-icon>
+          <!-- <collapse-icon foldPart="search-body"></collapse-icon> -->
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
@@ -207,10 +207,10 @@
 
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card"  dis-hover>
         <p slot="title">
         派单信息
-          <collapse-icon foldPart="search-body"></collapse-icon>
+          <!-- <collapse-icon foldPart="search-body"></collapse-icon> -->
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="90" :rules="ruleValidate">
@@ -690,7 +690,11 @@ export default {
               res => {},
               res => {
                 if (res.statusCode == 200) {
-                  this.contactPhones = res.responseResult;
+                  if(res.responseResult){
+                    this.contactPhones = res.responseResult;
+                  }else{
+                    this.contactPhones.push(this.formItem.phone)
+                  }
                 }
               }
             );

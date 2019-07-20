@@ -126,8 +126,7 @@
           <Form  :model="viewForm" :label-width="80">
             <Row>
               <Col span="24">
-                <FormItem label="图片描述"  >
-                    
+                <FormItem label="图片描述"  style="margin-top: 12px;">
                         <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
                             <img :src="item" alt="" v-if="item!=''"   @click="showtheimg(index)">
                             <i class="ivu-icon ivu-icon-ios-plus-empty"  v-else @click="uploadfile(index)"></i>
@@ -264,7 +263,7 @@ export default {
         userName: "",
         endTime: "",
         beginTime: "",
-        watch: true
+        // watch: true
       },
       // 派单表单
       dispatchItem:{
@@ -533,8 +532,10 @@ export default {
   },
   methods: {
     setstate(value){
+      // console.log(value)
         this.formItem.state=value;
         sessionStorage.setItem('paramsstatus',value)
+        this.$refs.table.init()
     },
     // 选择文件
     uploadfile(index) {
@@ -714,7 +715,7 @@ export default {
     searchCancel() {
       this.formItem = {
         workOrderNo: "",
-        state: "",
+        state: sessionStorage.getItem("paramsstatus"),
         name: "",
         phone: "",
         isChange: "",

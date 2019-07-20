@@ -109,6 +109,7 @@
     <!-- 客户新增 -->
     <Modal v-model="addModal" title="客户新增"
            width="600"
+           style="position:absolute"
            @on-cancel="cancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
@@ -175,7 +176,7 @@
      
     </Modal>
      <Modal v-model="selectTreeModal" class-name="my-modal"  title="选择塔楼公司"
-             width="600" height="600" style="overflow-y: auto; height: 600px;position:relative;"
+             width="600" height="600" style="overflow-y: auto; height: 600px;position:absolute"
              @on-cancel="cancelSelect">
         <template >
           <Tree :data="groupTlTree"
@@ -193,6 +194,7 @@
     <!-- 客户编辑 -->
     <Modal v-model="editModal" title="客户编辑"
            width="600"
+           style="position:absolute"
            @on-cancel="cancel">
       <Form ref="addForm" :model="addForm"  :label-width="100" :rules="ruleAdd">
         <Row>
@@ -918,7 +920,9 @@ import util from "@/assets/js/util";
   }
 
 
-  .my-modal{z-index:2000 !important}
+  .my-modal{z-index:2000 !important;
+  
+}
 
 
   .my-modal .ivu-modal-content{

@@ -121,7 +121,7 @@ export default {
        this.$Notice.warning({
                     title: '小程序报修',
                     duration:0,
-                    name:'xcxtc',
+                    name:data.repairProblemId,
                      render: h => {
                         return h('span', [
                             data.message,
@@ -145,14 +145,16 @@ export default {
                                     sessionStorage.setItem("paramid",data.repairProblemId)
                                   if(this.$route.name=='WorkDetail'){
                                   Bus.$emit('changeparamid',data.repairProblemId)
-
+                                        this.isok=false;
                                   }
                                   else{
                                   this.$router.push({
                                     name: "WorkDetail",
+                                    
                                   });
+                                   this.isok=false;
                                   }
-                                  this.$Notice.close('xcxtc')
+                                  this.$Notice.close(data.repairProblemId)
                                 }
                               }
                             },
@@ -261,5 +263,9 @@ export default {
 }
 .ivu-tabs-bar{
   margin-bottom: 0px  !important;
+}
+
+.mt10 div.ivu-card-body {
+  padding-top: 10px !important;
 }
 </style>

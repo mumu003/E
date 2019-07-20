@@ -5,7 +5,7 @@
         <Card>
           <div class="search-row">
             <Row>
-             <Row type="flex" justify="end" class="code-row-bg" style="border-bottom:1px solid #ccc;padding-bottom:15px;">
+             <Row type="flex" justify="end" class="code-row-bg" style="border-bottom:1px solid #e9eaec;padding-bottom:10px;">
                   <Button type="primary"  @click="controlmodal=!controlmodal" >操作<Icon type="arrow-up-b" color="white" style="margin-left:17px;"></Icon></Button>
                   <div v-if="controlmodal"  class="controlbutton">
                       <div><Button  @click="addquestion" v-if="auth.tf_problem_balse_level3_list_edit ">新增下一级</Button></div> 
@@ -322,8 +322,8 @@ div.page > div.mt10 div.ivu-row > div.ivu-col:last-of-type {
   padding-left: 15%;
   text-align: left;
 }
-div.ivu-card-body {
-  padding: 0px;
+.mt10 div.ivu-card-body {
+  padding-top: 10px !important;
 }
 div.ivu-row {
   width: 100%;
@@ -334,7 +334,6 @@ div.two {
 }
 div.first {
   background-color: rgba(204, 204, 204, 1);
-
   text-align: left;
 }
 div.two {

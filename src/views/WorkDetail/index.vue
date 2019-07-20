@@ -1,17 +1,23 @@
 <template>
 <!-- 工单详情 -->
   <div>
-    <p  style="text-align:left;padding:10px;font-size:16px;">
-      工单详情
-    </p>
+   
+    <div style="display:flex;justify-content: space-between;">
+      <p style="text-align:left;padding:10px;font-size:16px;">工单详情</p>
+      <div style="padding: 10px;">
+        <Button type="primary"  :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_user?true:false"
+            @click=" dispatchModel = true; chooseindex = formItem.id;">派单</Button>
+        <Button type="primary" :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_remark?true:false"
+        @click="remark_btn">备注</Button>
+      </div>
+    </div>
      <div style="display:flex;justify-content: space-between;background-color:white" >
      <div style="width:30%;">
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card" dis-hover>
         <p slot="title">
          单号： {{formItem.workOrderNo}}
-         
         </p>
         <div id="search-body">
           <Form  :model="formItem" :label-width="90" :rules="ruleValidate">
@@ -46,17 +52,11 @@
               <Col span="13">
                 <FormItem label="报修类型" >
                  <Input v-model="formItem.problemClass" disabled ></Input> 
-                  <!-- <Select v-model="formItem.problemClass" :disabled="viewForm.id!=''?true:false" @on-change="findchildren">
-                        <Option v-for="(item,index) in treeList" :value="item.parentProblem" :key="index">{{ item.parentProblem}}</Option>
-                  </Select> -->
                 </FormItem>
               </Col>
               <Col span="7">
                 <FormItem  :label-width="5">
                   <Input v-model="formItem.problemType" disabled ></Input> 
-                  <!-- <Select v-model="formItem.problemType" :disabled="viewForm.id!=''?true:false" @on-change="findchildren2" >
-                        <Option  v-for="(item,i) in childList" :value="item.problem" :key="i">{{ item.problem}}</Option>
-                  </Select> -->
                 </FormItem>
               </Col>
               </Row>
@@ -144,7 +144,7 @@
 
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card" dis-hover>
        
        <template>
       <Timeline style="text-align:left">
@@ -165,22 +165,6 @@
           :closable="false">
           <img :src="progressary[showimg1]" v-if="visible1" style="width: 100%">
         </Modal>
-        <!-- <TimelineItem>
-            <p class="time">1984年</p>
-            <p class="content">发布 Macintosh</p>
-        </TimelineItem>
-        <TimelineItem>
-            <p class="time">2007年</p>
-            <p class="content">发布 iPhone</p>
-        </TimelineItem>
-        <TimelineItem>
-            <p class="time">2010年</p>
-            <p class="content">发布 iPad</p>
-        </TimelineItem>
-        <TimelineItem>
-            <p class="time">2011年10月5日</p>
-            <p class="content">史蒂夫·乔布斯去世</p>
-        </TimelineItem> -->
     </Timeline>
     </template> 
       </Card>
@@ -190,7 +174,7 @@
         <TabPane label="客户信息">
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
+      <Card class="search-card" dis-hover>
       
         <div id="search-body">
           <Form  :model="formItem" :label-width="90" :rules="ruleValidate">
@@ -224,14 +208,14 @@
               </FormItem>
               </Col>
               </Row>
-              <!-- <Row v-show="formItem.contactPhone">
+              <Row v-show="formItem.contactPhone">
               <Col span="20">
               <FormItem label="联系人手机号" >
                 <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
               </FormItem>
               </Col>
              
-              </Row> -->
+              </Row>
                 <Row v-show="formItem.tel">
                <Col span="20">
               <FormItem label="办公电话" > 
@@ -347,38 +331,121 @@
       </Row>
     </div>
 
-    <Modal v-model="choosemodel" title="执行人选择" width="500"
-          @on-cancel="choosemodel=false">
-          <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
-          <Radio  style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
+     <Modal v-model="choosemodel" title="执行人选择" width="500" style="z-index:1001 !important;position:relative !important"
+      @on-cancel="choosemodel=false">
+        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
+          <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
               <span style="margin-left:15px;">{{item.name}}</span>
               <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
           </Radio>
-      </RadioGroup>
+        </RadioGroup>
       <div slot="footer" style="text-align: right;">
-      
-        <Button type="primary" size="default" @click="formItem.userName=userlist[userindex].name;formItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
+        <!-- @click="bgzxr" -->
+        <Button type="primary" size="default" @click="dispatchItem.userName=userlist[userindex].name;dispatchItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
 
-    <!-- 历史报修数据 -->
-    <!-- v-if="RepairList_show" -->
-    <!-- <Modal v-model="RepairList_show"  width="800"
-      title="历史报修数据"
-      >
 
-     
-    </Modal> -->
+    <!-- 派单 -->
+    <Modal v-model="dispatchModel" title="派单信息" width="500"
+      @on-ok="repairSubmit" @on-cancel="dispatchModel=false">
+      <Form  :model="dispatchItem" :label-width="80" :rules="ruleValidate">
+             <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
+              <Col span="13" >
+                <FormItem label="执行人" prop="executor">
+                    <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="dispatchItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
+                </FormItem>
+              </Col>
+             </Row>
+             <Row>
+              <Col span="20">
+                <FormItem label="参与者">
+                    <!-- <Input v-model="formItem.participators" ></Input>  -->
+                    <Select v-model="dispatchItem.participatorids"  multiple  style="width:100%;" >
+                      <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
+                          <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
+                          <span>{{item.problemNum==null?0:item.problemNum}}单</span>
+                      </Option>
+                  </Select>
+                </FormItem>
+              </Col>
+            </Row>
+          </Form>
+    </Modal>
+
+
+    <!-- 备注 -->
+    <Modal v-model="msgModal" width="800"
+      title="备注"
+      @on-ok="msgOk"
+      @on-cancel="viewCancel('remark')">
+          <Form  :model="viewForm" :label-width="80">
+            <Row>
+              <Col span="24">
+                <FormItem label="图片描述"  >
+                    <Modal 
+                        title="View Image" 
+                        v-model="visible2"
+                         :closable="false" style="position:relative !important;z-index:1001 !important">
+                        <img :src="remark_img[showimg2]" v-if="visible2" style="width: 100%;">
+                    </Modal>
+                        <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in remark_img" :key="index">
+                            <img :src="item" alt="" v-if="item!=''"  @click="showtheimg2(index)">
+                            <i class="ivu-icon ivu-icon-ios-plus-empty" v-else @click="uploadfile(index)"></i>
+                        </div>
+                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+                    </FormItem>
+                     <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
+                </Col>
+              <Col span="24">
+                <FormItem label="备注">
+                    <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+          </Form>
+      <div slot="footer" style="text-align:right;">
+        <Row>
+          <Col span="24" v-if="this.viewTabs === 'remark'">
+            <Button size="default" @click="viewCancel('remark')" >取消</Button>
+            <Button type="primary" size="default" @click="msgOk" :loading="modal_loading">确定</Button>
+          </Col>
+        </Row>
+      </div>
+    </Modal>
+
 
   </div>
 </template>
 <script>
 import Bus from "@/bus.js";
 import qs from "qs";
+import axios from "axios";
 import util from "@/assets/js/util";
 export default {
   data() {
     return {
+      auth: JSON.parse(sessionStorage.auth), //登录用户的角色权限
+      state:"",
+      // 处理派单
+      dispatchModel:false,
+      chooseindex:"",
+      // 派单表单
+      dispatchItem:{
+        userName:"",
+        participatorids:""
+      },
+      // 备注
+      msgModal:false,
+      //备注表单
+      viewForm: {
+        id: "",
+        remark: ""
+      },
+      files: [],
+      remark_img: [""],
+
       choosemodel: false,
       choosemodel1: false,
       recordEntityList: [],
@@ -408,7 +475,7 @@ export default {
       historysList: [], //进度详情
       currentNodeId: "", //处理进度节点
       addUnitNameIsNo: "", //新增名字空的
-      viewTabs: "name1", //Tabs
+      viewTabs: "remark", //Tabs
       buttons: {}, //按钮
       //搜索时间
       searchTime: {
@@ -420,6 +487,7 @@ export default {
       files: [],
       showimg: "",
       showimg1: "",
+      showimg2:"",
       progressary: [],
       // 处理报修提交按钮
       state_show: false,
@@ -462,7 +530,8 @@ export default {
       ques_list: [],
       question_ary: [],
       visible: false,
-      visible1: false,
+      visible1:false,
+      visible2:false,
       viewForm: {
         id: ""
       },
@@ -676,19 +745,21 @@ export default {
       reader.readAsDataURL(file);
       var that = this;
       reader.onload = function() {
-        that.imglist[that.upindex] = this.result;
+        that.remark_img[that.upindex] = this.result;
 
         that.files.push(file);
+        if (that.remark_img.length < 6) that.remark_img.push("");
 
-        that.imglist.push("");
-        that.imglist.pop();
+        that.remark_img.push("");
+        that.remark_img.pop("");
+        // that.imglist.push(this.result);
       };
     },
     imgcancel() {
-      this.imglist[this.showimg] = "";
+      this.remark_img[this.showimg] = "";
       this.files.splice(this.showimg, 1);
-      this.imglist.push("");
-      this.imglist.pop("");
+      this.remark_img.push("");
+      this.remark_img.pop("");
     },
 
     search() {
@@ -714,35 +785,33 @@ export default {
     },
     // 报修提交
     repairSubmit() {
-      if (this.viewForm.id != "") {
-        if (this.formItem.userId != "" && this.formItem.userId != null) {
-          var participatorids = "";
-          participatorids =
-            this.formItem.participatorids == null
-              ? ""
-              : this.formItem.participatorids.toString();
+      if (this.isok) {
+        return;
+      } else this.isok = true;
+      // this.modal_loading=true
+        if(this.dispatchItem.userId!=""&&this.dispatchItem.userId!=null){
+          var participatorids=""
+          participatorids=this.dispatchItem.participatorids==null?'':this.dispatchItem.participatorids.toString()
           this.$request.post(
-            "/api/emaint/repairProblem/updateUser",
-            qs.stringify({
-              id: this.formItem.id,
-              userId: this.formItem.userId,
-              participatorids: participatorids,
-              changeDescription: ""
-            }),
-            res => {},
-            res => {
-              this.$Message.success(res.responseResult);
-              setTimeout(() => {
-                this.$router.push({
-                  name: "workOrder"
-                });
-              }, 800);
-            }
-          );
-        } else {
-          this.$Message.error("请选择执行人");
+          "/api/emaint/repairProblem/updateUser",
+          qs.stringify({ id: this.chooseindex, userId: this.dispatchItem.userId,participatorids:participatorids,changeDescription:"" }),
+          res => {},
+          res => {
+            this.isok = false;
+            this.$Message.success(res.responseResult);
+            setTimeout(() => {
+              // this.$router.push({
+              //   name: "workOrder"
+              // });
+              this.$refs.table.init()
+              this.getinfo()
+            }, 800);
+          })
+        }else{
+          this.isok = false;
+          this.$Message.error("请选择执行人")
         }
-      }
+      
     },
     // 上一步
     goback() {
@@ -761,6 +830,7 @@ export default {
             this.$Message.success("查询成功！");
 
             var data = res.responseResult;
+            this.state=data.state
             this.formItem = {
               workOrderNo: data.workOrderNo,
               repairSource: data.repairSource,
@@ -941,14 +1011,22 @@ export default {
       document.querySelector("#upfile").click();
       this.upindex = index;
     },
+    // 信息图片
     showtheimg(index) {
       this.showimg = index;
       this.visible = true;
     },
+    // 进度图片
     showtheimg1(item, index, index1) {
       this.showimg1 = index1;
       this.visible1 = true;
       this.progressary = this.recordEntityList[index].progress_img;
+    },
+    // 备注图片
+    showtheimg2(index) {
+      console.log(12)
+      this.showimg2 = index;
+      this.visible2 = true;
     },
     choose_question(item, index) {
       if (this.question_ary.indexOf(index) == -1) {
@@ -969,7 +1047,84 @@ export default {
           "/api/emaint/repairProblem/clientRepairProblemList";
         this.$refs.table.init();
       }
+    },
+
+    // 备注按钮
+    remark_btn(){
+      this.msgModal = true;
+      this.viewForm = {
+        id: "",
+        remark: ""
+      };
+      this.files = [];
+      this.remark_img = [""];
+      this.viewForm.id = this.formItem.id;
+      console.log(this.viewForm)
+    },
+    // 备注提交
+    msgOk() {
+      console.log(this.files)
+      this.modal_loading = true;
+      if (this.isok) {
+        return;
+      } else this.isok = true;
+      var data = new FormData();
+      for (var i in this.viewForm) {
+        data.append(i, this.viewForm[i]);
+      }
+      for (var i = 0; i < this.files.length; i++) {
+        data.append("imgs", this.files[i]);
+      }
+
+      if (this.viewForm.remark) {
+        let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
+        axios
+          .post("/api/emaint/repairProblem/userAddRemark", data, headers)
+          .then(
+            resdata => {
+              if (resdata.data.statusCode == 200) {
+                this.modal_loading = false;
+                this.msgModal = false;
+                this.$Modal.success({
+                  title: "提示信息",
+                  content: resdata.data.responseResult
+                });
+                this.getinfo()
+              } else {
+                this.modal_loading = false;
+                this.$Modal.error({
+                  title: "提示信息",
+                  content: resdata.data.responseResult
+                });
+              }
+              this.isok = false;
+            },
+            err => {
+              this.modal_loading = false;
+              this.$Modal.error({ title: "提示信息", content: "添加备注失败" });
+              this.isok = false;
+            }
+          );
+      } else {
+        this.modal_loading = false;
+        this.$Modal.error({ title: "提示信息", content: "备注内容不能为空" });
+        this.isok = false;
+      }
+    },
+    //取消操作
+    viewCancel(arg) {
+      this.msgModal = false;
+      this.modal_loading = false;
+      this.$Message.info("你取消了操作");
+      this.$refs.table.init();
+      setTimeout(() => {
+        this.viewTabs = arg;
+        this.historysList = [];
+        this.nodesList = [];
+      }, 1000);
     }
+
+
   }
 };
 </script>
@@ -1021,7 +1176,9 @@ div.addimg {
   line-height: 58px;
   border: 1px solid #eee;
   border-radius: 5px;
-  /* position: absolute; */
+  position: absolute;
+  text-align: center;
+  top: -15px;
 }
 div.addimg img {
   width: 100%;
@@ -1030,6 +1187,22 @@ div.addimg img {
 div.addimg .ivu-icon {
   font-size: 40px;
   line-height: 1.5;
+}
+div.showtheimg .ivu-modal-mask {
+  z-index: 800;
+}
+div.showtheimg .ivu-modal-wrap {
+  z-index: 1200;
+}
+div.showtheimg .ivu-modal {
+  top: 30px;
+}
+div.showtheimg .ivu-modal-body {
+  text-align: center;
+}
+div.showtheimg .ivu-modal-body img {
+  height: 22rem;
+  width: 74%;
 }
 .question {
   margin: 5px;
