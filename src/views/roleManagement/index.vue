@@ -39,10 +39,17 @@
                       class="widthp100"
                     ></DatePicker>
                   </FormItem>
-                </Col> -->
+                </Col>-->
                 <Col span="6">
                   <FormItem label="更新时间">
-                  <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                    <DatePicker
+                      type="daterange"
+                      v-model="createdTime"
+                      split-panels
+                      placeholder="请选择起始时间"
+                      style="width: 200px"
+                      @on-change="getcreatedTime"
+                    ></DatePicker>
                   </FormItem>
                 </Col>
               </Row>
@@ -258,7 +265,7 @@ import qs from "qs";
 export default {
   data() {
     return {
-      createdTime:[],
+      createdTime: [],
       isLoading: false,
       roleModal: false,
       auth: JSON.parse(sessionStorage.auth), //登录用户的角色权限
@@ -475,11 +482,11 @@ export default {
   },
   methods: {
     getcreatedTime(createdTime) {
-        // Array [ "2019-07-20", "2019-08-14" ]
-        this.formItem.beginTime=createdTime[0]
-        this.formItem.endTime=createdTime[1]
-        console.log(this.formItem.beginTime)
-        console.log(this.formItem.endTime)
+      // Array [ "2019-07-20", "2019-08-14" ]
+      this.formItem.beginTime = createdTime[0];
+      this.formItem.endTime = createdTime[1];
+      console.log(this.formItem.beginTime);
+      console.log(this.formItem.endTime);
     },
     //遍历选中
     getChecked(arr) {
@@ -523,8 +530,12 @@ export default {
           //   // item.indeterminate = true;
           //   item.checked = false;
           // }
-          if (item.id == sitem && !item.children ) {
-            item.checked = true;
+          if (item.id == sitem) {
+            if (item.children && item.children.length == 0) {
+              item.checked = true;
+            } else if (!item.children) {
+              item.checked = true;
+            }
           }
 
           if (item.children && item.children.length > 0) {
@@ -627,7 +638,6 @@ export default {
             res.responseResult.list.map(item => {
               this.selectList.push(item.id);
             });
-            console.log(this.selectList, "sl");
             this.showOwnRole(this.tableData, this.selectList);
           }
         },
@@ -638,7 +648,7 @@ export default {
             res.responseResult.list.map(item => {
               this.selectList.push(item.id);
             });
-            console.log(this.selectList, "sl");
+
             this.showOwnRole(this.tableData, this.selectList);
           }
         }
@@ -747,7 +757,7 @@ export default {
         page: 1,
         limit: 10
       };
-      this.createdTime=[]
+      this.createdTime = [];
       this.isFirst = true;
       setTimeout(() => {
         this.$refs.table.init();
