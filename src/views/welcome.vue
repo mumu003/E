@@ -23,12 +23,12 @@
                 </div>
               </Card>
             </div>
-              
+              <div class="page-tool">
+                <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
+              </div>
           </div>
       </Card>
-    <div class="page-tool">
-      <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
-    </div>
+    
     </div>
 </template>
 <style>

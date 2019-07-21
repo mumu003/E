@@ -1,19 +1,20 @@
 <template>
 <!-- 工单详情 -->
-  <div>
+  <div >
    
-    <div style="display:flex;justify-content: space-between;background-color: #fff;">
-      <p style="text-align:left;padding:10px;font-size:16px;">工单详情</p>
+    <div class="bigBox" >
+      <p style="text-align:left;padding:15px;font-size:14px;color: #1c2438;font-weight: 700;">工单详情</p>
       <div style="padding: 10px;">
         <Button type="primary"  :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_user?true:false"
             @click=" dispatchModel = true; chooseindex = formItem.id;">派单</Button>
         <Button type="primary" :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_remark?true:false"
         @click="remark_btn">备注</Button>
+        <Button type="primary" @click="goback">上一步</Button>
       </div>
     </div>
-     <div style="display:flex;justify-content: space-between;background-color:white" >
+     <div class="bigBox2"  >
      <div style="width:30%;">
-    <Row :gutter="10">
+    <Row :gutter="10" style="margin-left:5px;">
       <Col span="24">
       <Card class="search-card" dis-hover>
         <p slot="title">
@@ -69,7 +70,7 @@
 
                 <Row>
                 <Col span="24">
-                <FormItem label="常见问题" v-show="question_ary.length>0"> 
+                <FormItem label="常见问题" v-show="question_ary.length>0" style="text-align:left"> 
                     <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
                     <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
                     <!-- <Button type="ghost" size="large">Ghost</Button>
@@ -82,7 +83,7 @@
                 
               <Row v-show="imglist.length>0" >
              <Col span="24">
-                <FormItem label="图片描述"  >
+                <FormItem label="图片描述"  style="text-align: left !important;">
                     <!-- @on-cancel="imgcancel" -->
                     <Modal 
                         title="View Image" 
@@ -144,13 +145,13 @@
       </Col>
     </Row>
     </div>
-    <div style="width:69%;">
+    <div style="width:68%;margin-right:10px;">
       <Tabs type="card" @on-click="clientRepairList">
         <TabPane label="进度详情">
-
-    <Row :gutter="10">
-      <Col span="24">
-      <Card class="search-card" dis-hover>
+<div class="tabBox" >
+<Row :gutter="10" style="margin:0px 10px;">
+      <Col span="24" style="margin:20px 0px 0px;">
+      <!-- <Card class="search-card" dis-hover> -->
        
        <template>
       <Timeline style="text-align:left">
@@ -173,14 +174,17 @@
         </Modal>
     </Timeline>
     </template> 
-      </Card>
+      <!-- </Card> -->
       </Col>
     </Row>
+</div>
+    
         </TabPane>
         <TabPane label="客户信息">
-    <Row :gutter="10">
-      <Col span="24">
-      <Card class="search-card" dis-hover>
+          <div class="tabBox" >
+    <Row :gutter="10" style="padding:10px;">
+      <Col span="24" >
+      <!-- <Card class="search-card" dis-hover> -->
       
         <div id="search-body">
           <Form  :model="formItem" :label-width="90" :rules="ruleValidate">
@@ -242,7 +246,7 @@
               </Row> -->
               
               <Row v-show="formItem.replacementRepair">
-              <Col span="6">
+              <Col span="6" style="width: 100%;text-align: left;">
                 <FormItem label="是否代为报修" >
                    <RadioGroup v-model="formItem.replacementRepair" >
                     <Radio label="1" :disabled="viewForm.id!=''?true:false">
@@ -264,13 +268,15 @@
               </Row>
           </Form>
         </div>
-      </Card>
+      <!-- </Card> -->
       </Col>
     </Row>
-
+</div>
         </TabPane>
         <TabPane label="历史报修数据">
+          <div class="tabBox" style="padding:10px">
            <m-table :config="tableConfig" :searchParams="RepairForm"  ref="table"   :isFirst="isFirst"></m-table>    
+          </div>
       <div slot="footer" style="text-align:right;">
         <Row>
           <Col span="24" v-if="this.viewTabs === 'remark'">
@@ -324,7 +330,7 @@
     <div slot="footer" style="text-align:center;">
       <Row>
         <Col span="24">
-          <Button size="default" @click="goback" >上一步</Button>
+          <!-- <Button size="default" @click="goback" >上一步</Button> -->
           <!-- <Button v-if="state_show" type="primary" size="default" @click="repairSubmit" :loading="modal_loading">提交报修</Button> -->
          </Col>
       </Row>
@@ -427,17 +433,17 @@ export default {
   data() {
     return {
       auth: JSON.parse(sessionStorage.auth), //登录用户的角色权限
-      state:"",
+      state: "",
       // 处理派单
-      dispatchModel:false,
-      chooseindex:"",
+      dispatchModel: false,
+      chooseindex: "",
       // 派单表单
-      dispatchItem:{
-        userName:"",
-        participatorids:""
+      dispatchItem: {
+        userName: "",
+        participatorids: ""
       },
       // 备注
-      msgModal:false,
+      msgModal: false,
       //备注表单
       viewForm: {
         id: "",
@@ -487,7 +493,7 @@ export default {
       files: [],
       showimg: "",
       showimg1: "",
-      showimg2:"",
+      showimg2: "",
       progressary: [],
       // 处理报修提交按钮
       state_show: false,
@@ -530,8 +536,8 @@ export default {
       ques_list: [],
       question_ary: [],
       visible: false,
-      visible1:false,
-      visible2:false,
+      visible1: false,
+      visible2: false,
       viewForm: {
         id: ""
       },
@@ -635,20 +641,18 @@ export default {
       }
     };
   },
-  beforeCreate(){
-      Bus.$on("changeparamid", value => {
+  beforeCreate() {
+    Bus.$on("changeparamid", value => {
       // sessionStorage.setItem("paramid",value)
       if (sessionStorage.getItem("paramid")) {
-        
         this.viewForm.id = sessionStorage.getItem("paramid");
         this.getinfo();
-       
       }
     });
   },
   created() {
     // this.search();
-    
+
     //   if (sessionStorage.getItem('paramid')) {
 
     //   this.$request.post(
@@ -756,7 +760,7 @@ export default {
       };
     },
     imgcancel() {
-     if (this.remark_img.indexOf("") == -1) this.remark_img.push("");
+      if (this.remark_img.indexOf("") == -1) this.remark_img.push("");
       this.remark_img.splice(this.showimg2, 1);
       this.files.splice(this.showimg2, 1);
 
@@ -791,12 +795,20 @@ export default {
         return;
       } else this.isok = true;
       // this.modal_loading=true
-        if(this.dispatchItem.userId!=""&&this.dispatchItem.userId!=null){
-          var participatorids=""
-          participatorids=this.dispatchItem.participatorids==null?'':this.dispatchItem.participatorids.toString()
-          this.$request.post(
+      if (this.dispatchItem.userId != "" && this.dispatchItem.userId != null) {
+        var participatorids = "";
+        participatorids =
+          this.dispatchItem.participatorids == null
+            ? ""
+            : this.dispatchItem.participatorids.toString();
+        this.$request.post(
           "/api/emaint/repairProblem/updateUser",
-          qs.stringify({ id: this.chooseindex, userId: this.dispatchItem.userId,participatorids:participatorids,changeDescription:"" }),
+          qs.stringify({
+            id: this.chooseindex,
+            userId: this.dispatchItem.userId,
+            participatorids: participatorids,
+            changeDescription: ""
+          }),
           res => {},
           res => {
             this.isok = false;
@@ -805,15 +817,15 @@ export default {
               // this.$router.push({
               //   name: "workOrder"
               // });
-              this.$refs.table.init()
-              this.getinfo()
+              this.$refs.table.init();
+              this.getinfo();
             }, 800);
-          })
-        }else{
-          this.isok = false;
-          this.$Message.error("请选择执行人")
-        }
-      
+          }
+        );
+      } else {
+        this.isok = false;
+        this.$Message.error("请选择执行人");
+      }
     },
     // 上一步
     goback() {
@@ -832,7 +844,7 @@ export default {
             this.$Message.success("查询成功！");
 
             var data = res.responseResult;
-            this.state=data.state
+            this.state = data.state;
             this.formItem = {
               workOrderNo: data.workOrderNo,
               repairSource: data.repairSource,
@@ -1026,7 +1038,7 @@ export default {
     },
     // 备注图片
     showtheimg2(index) {
-      console.log(12)
+      console.log(12);
       this.showimg2 = index;
       this.visible2 = true;
     },
@@ -1052,7 +1064,7 @@ export default {
     },
 
     // 备注按钮
-    remark_btn(){
+    remark_btn() {
       this.msgModal = true;
       this.viewForm = {
         id: "",
@@ -1061,11 +1073,11 @@ export default {
       this.files = [];
       this.remark_img = [""];
       this.viewForm.id = this.formItem.id;
-      console.log(this.viewForm)
+      console.log(this.viewForm);
     },
     // 备注提交
     msgOk() {
-      console.log(this.files)
+      console.log(this.files);
       this.modal_loading = true;
       if (this.isok) {
         return;
@@ -1091,7 +1103,7 @@ export default {
                   title: "提示信息",
                   content: resdata.data.responseResult
                 });
-                this.getinfo()
+                this.getinfo();
               } else {
                 this.modal_loading = false;
                 this.$Modal.error({
@@ -1125,14 +1137,35 @@ export default {
         this.nodesList = [];
       }, 1000);
     }
-
-
   }
 };
 </script>
 <style scoped>
+.bigBox {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+}
+.bigBox2 {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  padding-bottom: 10px;
+}
+.tabBox {
+  border: 1px solid #dddee1;
+  border-top: none;
+  padding: 10px 0px;
+}
 #username_form .ivu-form-item-content {
   text-align: left !important;
+}
+div.ivu-form-item{
+margin-bottom: 10px !important;
 }
 .demo-upload-list {
   display: inline-block;
@@ -1211,6 +1244,8 @@ div.showtheimg .ivu-modal-body img {
   margin: 5px;
   color: #bbbec4;
   min-width: 100px;
+  /* left: -5px;
+  position:relative; */
 }
 .question_active {
   background-color: #2d8cf0;
@@ -1224,8 +1259,14 @@ div.showtheimg .ivu-modal-body img {
 .content {
   padding-left: 5px;
 }
-.remarkimg{
+.remarkimg {
   position: absolute;
- 
+}
+.question{
+left: -5px;
+position:relative
+}
+div.ivu-form-item{
+margin-bottom: 12px !important;
 }
 </style>
