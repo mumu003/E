@@ -693,10 +693,11 @@ export default {
                 if (res.statusCode == 200) {
                   if(res.responseResult){
                     this.contactPhones = res.responseResult;
+                      if(this.contactPhones[0]!=''&&this.contactPhones[0]!='undefined'&&this.contactPhones[0]!=undefined)
+                      this.formItem.contactPhone=this.contactPhones[0]
+                      else
+                      this.formItem.contactPhone=this.formItem.phone
                     
-                    this.formItem.contactPhone=this.contactPhones[0]
-                    console.log(this.contactPhones)
-                    console.log(this.formItem.contactPhone)
                   }else{
                     this.contactPhones.push(this.formItem.phone)
                   }

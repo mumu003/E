@@ -2,7 +2,7 @@
 <!-- 工单详情 -->
   <div>
    
-    <div style="display:flex;justify-content: space-between;">
+    <div style="display:flex;justify-content: space-between;background-color: #fff;">
       <p style="text-align:left;padding:10px;font-size:16px;">工单详情</p>
       <div style="padding: 10px;">
         <Button type="primary"  :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_user?true:false"
@@ -28,13 +28,13 @@
               </FormItem>
               </Col>
               </Row>
-            <Row type="flex" justify="start" v-show="formItem.callID">
+            <Row type="flex" justify="start" v-show="formItem.phone">
               <Col span="20">
               <FormItem label="手机号" prop="callID" >
-                <Input v-model="formItem.callID"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
+                <Input v-model="formItem.phone"  @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 ></Input>
               </FormItem>
               </Col>
-              
+              </Row>
               <Row v-show="formItem.contactPhone">
               <Col span="20">
               <FormItem label="联系人手机号" >
@@ -46,7 +46,6 @@
               <!-- <Col span="4">
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col> -->
-              </Row>
 
               <Row v-show="formItem.priority">
               <Col span="20">
@@ -380,16 +379,17 @@
       @on-ok="msgOk"
       @on-cancel="viewCancel('remark')">
           <Form  :model="viewForm" :label-width="80">
-            <Row>
+            <Row >
               <Col span="24">
-                <FormItem label="图片描述"  >
+                <FormItem label="图片描述"  style="margin-top:10px;">
                     <Modal 
                         title="View Image" 
                         v-model="visible2"
+                          @on-cancel="imgcancel"
                          :closable="false" style="position:relative !important;z-index:1001 !important">
                         <img :src="remark_img[showimg2]" v-if="visible2" style="width: 100%;">
                     </Modal>
-                        <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in remark_img" :key="index">
+                        <div class="addimg remarkimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in remark_img" :key="index">
                             <img :src="item" alt="" v-if="item!=''"  @click="showtheimg2(index)">
                             <i class="ivu-icon ivu-icon-ios-plus-empty" v-else @click="uploadfile(index)"></i>
                         </div>
@@ -756,8 +756,10 @@ export default {
       };
     },
     imgcancel() {
-      this.remark_img[this.showimg] = "";
-      this.files.splice(this.showimg, 1);
+     if (this.remark_img.indexOf("") == -1) this.remark_img.push("");
+      this.remark_img.splice(this.showimg2, 1);
+      this.files.splice(this.showimg2, 1);
+
       this.remark_img.push("");
       this.remark_img.pop("");
     },
@@ -1221,5 +1223,9 @@ div.showtheimg .ivu-modal-body img {
 }
 .content {
   padding-left: 5px;
+}
+.remarkimg{
+  position: absolute;
+ 
 }
 </style>

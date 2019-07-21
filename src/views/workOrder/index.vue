@@ -293,67 +293,68 @@ export default {
           {
             title: "操作",
             key: "currentNodeName",
-            width: 200,
+            width: 120,
             align: "center",
             render: (h, params) => {
               return h("div", [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "primary",
-                      size: "small",
-                      disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_user?true:false
-                    },
-                    style: {
-                      marginRight: "5px",
-                    },
-                    on: {
-                      click: () => {
-                        // sessionStorage.setItem("paramid", params.row.id);
-                        // this.$router.push({
-                        //   name: "dispatch"
-                        // });
+                // h(
+                //   "Button",
+                //   {
+                //     props: {
+                //       type: "primary",
+                //       size: "small",
+                //       disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_user?true:false
+                //     },
+                //     style: {
+                //       marginRight: "5px",
+                //       //  display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':!this.auth.tf_repair_problem_add_user?'none':'inline'
+                //     },
+                //     on: {
+                //       click: () => {
+                //         // sessionStorage.setItem("paramid", params.row.id);
+                //         // this.$router.push({
+                //         //   name: "dispatch"
+                //         // });
 
-                        this.dispatchModel = true;
-                        this.chooseindex = params.row.id;
+                //         this.dispatchModel = true;
+                //         this.chooseindex = params.row.id;
 
-                        // this.userlist.forEach((v,i)=>{
-                        //   if(v.id==params.row.userId){
-                        //     this.userindex=i;
-                        //   }
-                        // })
-                      }
-                    }
-                  },
-                  "派单"
-                ),
-                h( "Button",
-                  {
-                    props: {
-                      type: "primary",
-                      size: "small",
-                      disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_remark?true:false
-                    },
-                    style: {
-                      marginRight: "5px",
-                      // display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':'inline'
-                    },
-                    on: {
-                      click: () => {
-                        this.msgModal = true;
-                        this.viewForm = {
-                          id: "",
-                          remark: ""
-                        };
-                        this.files = [];
-                        this.imglist = [""];
-                        this.viewForm.id = params.row.id;
-                      }
-                    }
-                  },
-                  "备注"
-                ),
+                //         // this.userlist.forEach((v,i)=>{
+                //         //   if(v.id==params.row.userId){
+                //         //     this.userindex=i;
+                //         //   }
+                //         // })
+                //       }
+                //     }
+                //   },
+                //   "派单"
+                // ),
+                // h( "Button",
+                //   {
+                //     props: {
+                //       type: "primary",
+                //       size: "small",
+                //       disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_remark?true:false
+                //     },
+                //     style: {
+                //       marginRight: "5px",
+                //       // display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':!this.auth.tf_repair_problem_add_remark?'none':'inline'
+                //     },
+                //     on: {
+                //       click: () => {
+                //         this.msgModal = true;
+                //         this.viewForm = {
+                //           id: "",
+                //           remark: ""
+                //         };
+                //         this.files = [];
+                //         this.imglist = [""];
+                //         this.viewForm.id = params.row.id;
+                //       }
+                //     }
+                //   },
+                //   "备注"
+                // ),
                 h(
                   "Button",
                   {
