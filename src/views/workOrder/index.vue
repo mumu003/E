@@ -285,15 +285,15 @@ export default {
       tableConfig: {
         url: "/api/emaint/repairProblem/repairProblemList",
         columns: [
-          {
-            type: "selection",
-            key: "_checked",
-            width: 60
-          },
+          // {
+          //   type: "selection",
+          //   key: "_checked",
+          //   width: 60
+          // },
           {
             title: "操作",
             key: "currentNodeName",
-            width: 120,
+            width: 100,
             align: "center",
             render: (h, params) => {
               return h("div", [

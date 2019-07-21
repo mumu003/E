@@ -6,7 +6,7 @@
         <Card class="search-card">
           <!-- <div class="search-row"> -->
             <Row>
-              <Col span="2">
+              <Col span="1">
               <Button type="primary" v-if="auth.tf_dictionary_edit" @click="addMaterialModal=true" icon="plus-round" >新增</Button>
               </Col>
             </Row>
