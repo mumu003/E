@@ -41,7 +41,7 @@
                   </FormItem>
                 </Col>-->
                 <Col span="6">
-                  <FormItem label="更新时间">
+                  <FormItem label="创建时间">
                     <DatePicker
                       type="daterange"
                       v-model="createdTime"

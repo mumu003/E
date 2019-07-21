@@ -1,11 +1,12 @@
 <template>
 <!-- 新增工单 -->
-  <div>
-  <Tabs type="card" @on-click="clientRepairList">
+  <div style="background-color:white;border-radius:4px;padding:10px;">
+  <Tabs type="card" style="margin:10px 0px;"  @on-click="clientRepairList">
         <TabPane  label="新增工单">
-          <div style="display:flex;justify-content: space-between;background-color:white" >
+          <!-- <div style="border:1px solid #dddee1;border-top:none;padding:10px;" > -->
+          <div style="width:100%;display:flex;justify-content:center;background-color:white;border:1px solid #dddee1;border-top:none;padding:10px;" >
 
-    <div style="width:49.5%;">
+    <div style="width:48%;margin:1%;">
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card" dis-hover>
@@ -129,7 +130,7 @@
       </Col>
     </Row>
     </div>
-    <div style="width:49.5%;">
+    <div style="width:48%;margin:1%;">
     <Row :gutter="10">
       <Col span="24">
       <Card class="search-card"  dis-hover>
@@ -162,8 +163,8 @@
               </Row>
                 <Row >
                 <Col span="24">
-                <FormItem label="常见问题"  style="text-align: left">
-                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;left: -5px;position:relative"  disabled>暂无</Button>
+                <FormItem label="常见问题"  style="text-align:left">
+                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
                     <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
                 </FormItem>
                 </Col>
@@ -205,7 +206,7 @@
     </Row>
 
 
-    <Row :gutter="10">
+    <Row :gutter="10" style="margin-top:10px;">
       <Col span="24">
       <Card class="search-card"  dis-hover>
         <p slot="title">
@@ -255,7 +256,7 @@
         </TabPane>
         <TabPane  label="历史报修数据" >
 
-           <div style="background-color:white;">
+           <div style="background-color:white;border:1px solid #dddee1;border-top:none;padding:10px;">
       <m-table  :config="tableConfig" :searchParams="RepairForm"    ref="table"  :isFirst="isFirst"></m-table>    
       <div slot="footer" style="text-align:right;">
         <Row>
@@ -1000,6 +1001,8 @@ div.addimg .ivu-icon {
   margin: 5px;
   color: #bbbec4;
   min-width: 100px;
+  /* position:relative;
+  left: -5px; */
 }
 .question_active {
   background-color: #2d8cf0;

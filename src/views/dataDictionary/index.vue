@@ -111,7 +111,7 @@
         <Button type="primary" size="default" @click="addkeySubmit" :loading="modal_loading">确定</Button>
       </div>
     </Modal>
-    <Modal title="添加键值" v-model="updatekeyModal" :closable="false" width="400px" @on-cancel="updatekeyCancel">
+    <Modal title="修改键值" v-model="updatekeyModal" :closable="false" width="400px" @on-cancel="updatekeyCancel">
       <Form  ref="updatekeyForm" :model="updatekeyForm" :label-width="100" :rules="ruleupdatekey" >
         <Row>
           <Col span="22" >
