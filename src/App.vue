@@ -57,12 +57,14 @@ export default {
       }
     },
     message(e) {
-      this.reset(); //收到消息重置心跳
+      
       if(e.data=='heartCheck'){
         return;
       }
-      var data=JSON.parse(e.data)
-      console.log(data)
+       var data=JSON.parse(e.data)
+          console.log(data)
+      this.reset(); //收到消息重置心跳
+   
       // e.data是收到的消息内容，会以json字符串的形式传过来
 
       // 收到消息后弹窗

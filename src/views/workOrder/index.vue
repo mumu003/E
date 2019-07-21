@@ -360,7 +360,7 @@ export default {
                     props: {
                       type: "primary",
                       size: "small",
-                      disabled: !this.auth.tf_repair_problem_add_user
+                      // disabled: !this.auth.tf_repair_problem_add_user
                       // disabled: params.row.state == "待派单" ? false : true
                     },
                     style: {

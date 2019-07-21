@@ -599,6 +599,7 @@ export default {
           this.newarr2.push(v);
         }
       });
+      
     },
 
     changefile(e) {
@@ -665,7 +666,7 @@ export default {
             this.formItem.phone = data.phone;
             this.formItem.undef = data.undef;
             this.formItem.tel = data.tel;
-            this.formItem.contactPhone = data.contactPhone;
+            // this.formItem.contactPhone = data.contactPhone;
             this.formItem.officeLocation = data.officeLocation;
             this.formItem.name = data.name;
             this.formItem.companyName = data.companyName;
@@ -692,6 +693,10 @@ export default {
                 if (res.statusCode == 200) {
                   if(res.responseResult){
                     this.contactPhones = res.responseResult;
+                    
+                    this.formItem.contactPhone=this.contactPhones[0]
+                    console.log(this.contactPhones)
+                    console.log(this.formItem.contactPhone)
                   }else{
                     this.contactPhones.push(this.formItem.phone)
                   }

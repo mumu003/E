@@ -35,7 +35,14 @@
               </FormItem>
               </Col>
               
+              <Row v-show="formItem.contactPhone">
+              <Col span="20">
+              <FormItem label="联系人手机号" >
+                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
+              </FormItem>
+              </Col>
              
+              </Row>
               <!-- <Col span="4">
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col> -->
@@ -208,14 +215,7 @@
               </FormItem>
               </Col>
               </Row>
-              <Row v-show="formItem.contactPhone">
-              <Col span="20">
-              <FormItem label="联系人手机号" >
-                <Input v-model="formItem.contactPhone" :disabled="viewForm.id!=''?true:false" :maxlength=11 ></Input>
-              </FormItem>
-              </Col>
              
-              </Row>
                 <Row v-show="formItem.tel">
                <Col span="20">
               <FormItem label="办公电话" > 
@@ -1176,7 +1176,8 @@ div.addimg {
   line-height: 58px;
   border: 1px solid #eee;
   border-radius: 5px;
-  position: absolute;
+  margin: 0px 5px;
+  /* position: absolute; */
   text-align: center;
   top: -15px;
 }

@@ -94,7 +94,7 @@ export default {
                 sessionStorage.setItem("roleName",res.responseResult.name)
                 
                 sessionStorage.setItem("auth",JSON.stringify(res.responseResult.auth))
-                this.$router.push("/")
+               location.href='/'
                 this.$Message.success("登录成功！")
               } else {
                 this.$Modal.error({title: '提示信息', content: res.responseResult})
