@@ -17,7 +17,7 @@
         </Card>
       </Col>
     </Row>
-    <Row :gutter="10" v-show="setting">
+    <!-- <Row :gutter="10" v-show="setting">
       <Col span="24">
         <Card class="search-card">
           <div class="search-row">
@@ -39,8 +39,36 @@
         </Row>
         </Card>
       </Col>
+    </Row> -->
+    <Modal title="设置" v-model="setting" :closable="false" width="550px" @on-cancel="addCancel">
+      <Row :gutter="10" v-show="setting">
+      <Col span="24">
+        <!-- <Card class="search-card"> -->
+          <div class="search-row">
+            <Row>
+              <Col span="14" style="text-align:left;">
+                所属类型:  {{typeCode}}       
+              </Col>
+              <Col span="10">                
+              </Col>
+            </Row>
+            <Row>
+              <Col span="2">
+              <Button type="primary" @click="addkeyModal=true" icon="plus-round">添加键值</Button>
+              </Col>
+            </Row>
+          </div>
+          <Row class="searchable-table-con">
+            <m-table :config="tableRightConfig" :searchParams="setForm" ref="keytable" ></m-table>
+        </Row>
+        <!-- </Card> -->
+      </Col>
     </Row>
-
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="setting=false">关闭</Button>
+        <!-- <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button> -->
+      </div>
+    </Modal>
     <Modal title="新增字典" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
       <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
@@ -281,7 +309,8 @@ export default {
                                         disabled:!this.auth.tf_dictionary_edit
                                 },
                                 style:{
-                                  margin:"5px 0px"
+                                  margin:"5px 0px",
+                                  width: "50px",
                                 },
                                 on: {
                                     click: () => {
@@ -299,7 +328,8 @@ export default {
                                         disabled:!this.auth.tf_dictionary_edit
                                 },
                                 style:{
-                                  margin:"5px 0px"
+                                  margin:"5px 0px",
+                                  width: "50px",
                                 },
                                 on: {
                                     click: () => {
@@ -319,7 +349,8 @@ export default {
                                         disabled:!this.auth.tf_dictionary_delete
                                 },
                                 style:{
-                                  margin:"5px 0px"
+                                  margin:"5px 0px",
+                                  width: "50px",
                                 },
                                 on: {
                                     click: () => {
@@ -472,7 +503,6 @@ export default {
             this.modal_loading = false
           }
         })
-
     },
     //新增取消
     addCancel () {
@@ -489,7 +519,6 @@ export default {
           this.$Modal.error({title: '提示信息', content: "描述不能为空！"})
           return
         }
-
         this.$request.post("/api/dictionary/saveOptionGroup",this.updateForm,res=>{
           if (res.statusCode === 200) {
             setTimeout(() => {
@@ -517,7 +546,6 @@ export default {
             this.modal_loading = false
           }
         })
-
     },
     //修改取消
     updateCancel () {
@@ -567,7 +595,6 @@ export default {
             this.modal_loading = false
           }
         })
-
     },
     //添加取消
     addkeyCancel () {
@@ -616,14 +643,12 @@ export default {
             this.modal_loading = false
           }
         })
-
     },
     //修改取消
     updatekeyCancel () {
         this.updatekeyModal = false
         this.$refs.updatekeyForm.resetFields()
     },
-
     // 删除字典
     del(){
       this.$request.post("/api/dictionary/deleteOptionGroup",qs.stringify({id:this.delId}),res=>{
@@ -695,7 +720,6 @@ div.search-row{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
 }
 div.page {
   width: 100%;
@@ -785,5 +809,3 @@ div.controlbutton button {
   border-bottom:1px solid gainsboro;
 }
 </style>
-
-
