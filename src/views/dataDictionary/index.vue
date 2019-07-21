@@ -6,7 +6,7 @@
         <Card class="search-card">
           <!-- <div class="search-row"> -->
             <Row>
-              <Col span="2">
+              <Col span="1">
               <Button type="primary" v-if="auth.tf_dictionary_edit" @click="addMaterialModal=true" icon="plus-round" >新增</Button>
               </Col>
             </Row>
@@ -17,7 +17,7 @@
         </Card>
       </Col>
     </Row>
-    <Row :gutter="10" v-show="setting">
+    <!-- <Row :gutter="10" v-show="setting">
       <Col span="24">
         <Card class="search-card">
           <div class="search-row">
@@ -39,8 +39,36 @@
         </Row>
         </Card>
       </Col>
+    </Row> -->
+    <Modal title="设置" v-model="setting" :closable="false" width="550px" @on-cancel="addCancel">
+      <Row :gutter="10" v-show="setting">
+      <Col span="24">
+        <!-- <Card class="search-card"> -->
+          <div class="search-row">
+            <Row>
+              <Col span="14" style="text-align:left;">
+                所属类型:  {{typeCode}}       
+              </Col>
+              <Col span="10">                
+              </Col>
+            </Row>
+            <Row>
+              <Col span="2">
+              <Button type="primary" @click="addkeyModal=true" icon="plus-round">添加键值</Button>
+              </Col>
+            </Row>
+          </div>
+          <Row class="searchable-table-con">
+            <m-table :config="tableRightConfig" :searchParams="setForm" ref="keytable" ></m-table>
+        </Row>
+        <!-- </Card> -->
+      </Col>
     </Row>
-
+      <div slot="footer" style="text-align:right;margin:0 auto;">
+        <Button type="ghost" size="default" @click="setting=false">关闭</Button>
+        <!-- <Button type="primary" size="default" @click="addSubmit" :loading="modal_loading">确定</Button> -->
+      </div>
+    </Modal>
     <Modal title="新增字典" v-model="addMaterialModal" :closable="false" width="400px" @on-cancel="addCancel">
       <Form  ref="addForm" :model="addForm" :label-width="100" :rules="ruleAddMaterial" >
         <Row>
