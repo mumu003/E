@@ -169,7 +169,7 @@
                 {
                   title: '执行人',
                   key: 'toUserName',
-                  width:100,
+                  width:90,
                   align:"center"
                 },
                 {
@@ -195,19 +195,19 @@
                 {
                   title: '关联工单号码',
                   key: 'workOrderNo',
-                  width:150,
+                  width:130,
                   align:"center"
                 },
                 {
                   title: '姓名',
                   key: 'fromClientName',
-                  width:100,
+                  width:90,
                   align:"center"
                 },
                 {
                   title: '手机号',
                   key: 'toUserPhone',
-                  width:130,
+                  width:120,
                   align:"center"
                 },
                 {
@@ -219,7 +219,7 @@
                 {
                   title: '更新时间',
                   key: 'gmtCreate',
-                  width:250,
+                  width:170,
                   align:"center"
                 }
               ],

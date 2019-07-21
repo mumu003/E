@@ -285,15 +285,15 @@ export default {
       tableConfig: {
         url: "/api/emaint/repairProblem/repairProblemList",
         columns: [
-          {
-            type: "selection",
-            key: "_checked",
-            width: 60
-          },
+          // {
+          //   type: "selection",
+          //   key: "_checked",
+          //   width: 60
+          // },
           {
             title: "操作",
             key: "currentNodeName",
-            width: 120,
+            width: 100,
             align: "center",
             render: (h, params) => {
               return h("div", [
@@ -303,6 +303,7 @@ export default {
                 //     props: {
                 //       type: "primary",
                 //       size: "small",
+
                 //       disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_user?true:false
                 //     },
                 //     style: {
@@ -407,22 +408,22 @@ export default {
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 150
+            width: 130
           },
           {
             title: "姓名",
             key: "name",
-            width: 100
+            width: 90
           },
           {
             title: "优先级",
             key: "priority",
-            width: 100
+            width: 90
           },
           {
             title: "状态",
             key: "state",
-            width: 100
+            width: 90
           },
           //         {
           //           title: "变更状态",
@@ -440,7 +441,7 @@ export default {
           {
             title: "办公位",
             key: "officeLocation",
-            width: 100
+            width: 90
           },
           {
             title: "手机号",
@@ -450,7 +451,7 @@ export default {
           {
             title: "执行人",
             key: "userName",
-            width: 100
+            width: 90
           },
           {
             title: "来源",
@@ -460,7 +461,7 @@ export default {
           {
             title: "创建时间",
             key: "gmtModified",
-            width: 180
+            width: 170
           }
         ]
       },

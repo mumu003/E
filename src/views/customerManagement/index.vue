@@ -393,11 +393,13 @@ import util from "@/assets/js/util";
                                     },
                                     on: {
                                         click: () => {
+                                          sessionStorage.setItem('repairListid',params.row.id)
                                             this.$router.push({
                                               name:"repairList",
-                                              params:{
-                                                id:params.row.id
-                                              }
+                                              
+                                              // params:{
+                                              //   id:params.row.id
+                                              // }
                                             })
                                         }
                                     }
@@ -482,12 +484,12 @@ import util from "@/assets/js/util";
             {
               title: '姓名',
               key: 'name',
-              width:120
+              width:90
             },
             {
               title: '状态 ',
               key: 'enable',
-              width:120,
+              width:90,
               render:(h,params)=>{
                 return h('div',params.row.enable==1?'启用':'禁用') 
               }
@@ -495,12 +497,12 @@ import util from "@/assets/js/util";
             {
               title: '电话',
               key: 'phone',
-              width:150
+              width:120
             },
             {
               title: '性别',
               key: 'sex',
-              width:150,
+              width:70,
               render:(h,params)=>{
                 switch(params.row.sex){
                   case "male":
@@ -517,22 +519,22 @@ import util from "@/assets/js/util";
             {
               title: '办公位',
               key: 'officeLocation',
-              width:150
+              width:90
             },
             {
               title: '优先级',
               key: 'priority',
-              width:150
+              width:90
             },
             {
               title: '客户类型',
               key: 'type',
-              width:150
+              width:110
             },
             {
               title: '公司名称',
               key: 'companyName',
-              width:150
+              width:120
             },
            
           ],
@@ -552,7 +554,7 @@ import util from "@/assets/js/util";
         },
         ruleAdd:{
           companyName: [
-            { required: true, message: '请选择公司', trigger: 'blur' }
+            { required: true, message: '请选择公司', trigger: 'change' }
           ],
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
@@ -570,7 +572,8 @@ import util from "@/assets/js/util";
           ],
           tel:[
             {  message: '请输入正确的座机号码',  trigger: 'blur' , transform(value){
-                  var reg=/0\d{2,3}-\d{7,8}/
+                  var reg=/[0-9\-]/
+                  // var reg=/0\d{2,3}\-\d{7,8}/
                   if(!reg.test(value)){
                     return false
                   }else{
@@ -929,5 +932,7 @@ import util from "@/assets/js/util";
     z-index: 2000;
     border: 1px solid black;
   }
+
+
 </style>
 

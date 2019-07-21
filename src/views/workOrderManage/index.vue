@@ -43,7 +43,7 @@
               </Row>
               <Row>
               <Col span="15">
-                <FormItem label="是否代为报修">
+                <FormItem label="是否代为报修" style="width: 100%;text-align: left;">
                    <RadioGroup v-model="formItem.replacementRepair">
                     <Radio label="1">
                         <span>是</span>
@@ -161,7 +161,7 @@
                 </FormItem>
               </Col>
               </Row>
-                <Row>
+                <Row >
                 <Col span="24">
                 <FormItem label="常见问题"  style="text-align:left">
                     <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
@@ -448,42 +448,42 @@ export default {
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 180
+            width: 130
           },
           {
             title: "优先级",
             key: "priority",
-            width: 120
+            width: 90
           },
           {
             title: "状态",
             key: "state",
-            width: 120
+            width: 90
           },
            {
             title: "报修来源",
             key: "repairSource",
-            width: 150
+            width: 120
           },
             {
             title: "办公位",
             key: "officeLocation",
-            width: 120
+            width: 90
           },
            {
             title: "报修类型",
             key: "problemClass",
-            width: 120
+            width: 90
           },
           {
             title: "常见问题",
             key: "problem",
-            width: 120
+            width: 110
           },
            {
             title: "备注",
             key: "remark",
-            width: 120
+            width: 110
           },
           // {
           //   title: "变更状态",
@@ -512,23 +512,23 @@ export default {
           {
             title: "执行人",
             key: "userName",
-            width: 120
+            width: 90
           },
              {
             title: "参与者",
             key: "participators",
-            width: 120
+            width: 90
           },
          
           {
             title: "创建时间",
             key: "gmtCreate",
-            width: 200
+            width: 170
           },
           {
             title: "完成时间",
             key: "completionTime",
-            width: 200
+            width: 170
           }
         ]
       },
@@ -1018,11 +1018,11 @@ p.addbutton > button {
   border: none;
 }
 .question{
-left: -5px;
-position:relative
+  left: -5px;
+  position:relative
 }
 div.ivu-form-item{
-margin-bottom: 12px !important;
+  margin-bottom: 12px !important;
 }
 </style>
 

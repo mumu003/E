@@ -11,33 +11,34 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80">
             <Row type="flex" justify="start">
-              <Col span="6">
+              <Col span="6" v-show="formItem.companyName">
                 <FormItem label="公司">
                     <!-- <span>厦门XXX有限公司</span> -->
                         <Input v-model="formItem.companyName" disabled ></Input>
                 </FormItem>
               </Col>
-              <Col span="6">
+              <Col span="6" v-show="formItem.name">
                 <FormItem label="姓名">
                     <!-- <span v-model="name">张三</span> -->
                         <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
                 </FormItem>
               </Col>
-              </Row>
-              <Row>
-              <Col span="6">
+               <Col span="6" v-show="formItem.phone">
               <FormItem label="手机号">
                   <!-- <span>高</span> -->
                     <Input v-model="formItem.phone" disabled ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
+              </Row>
+              <Row>
+             
+              <Col span="6" v-show="formItem.sex">
               <FormItem label="性别">
                   <!-- <span>男</span> -->
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
-              <Col span="6">
+              <Col span="6" v-show="formItem.officeLocation">
               <FormItem label="办公位">
                   <!-- <span>男</span> -->
                     <Input v-model="formItem.officeLocation" disabled :maxlength=11 ></Input>
@@ -135,7 +136,7 @@ import qs from "qs";
             {
                   title: '操作',
                   key: 'options', 
-                  width:200,
+                  width:120,
                   align: 'center',
                   render: (h, params) => {
                             return h('div', [
@@ -199,12 +200,12 @@ import qs from "qs";
             {
               title: '工单号码',
               key: 'workOrderNo',
-              width:120
+              width:130
             },
             {
               title: '变更状态 ',
               key: 'state',
-              width:120,
+              width:90,
             //   render:(h,params)=>{
             //     return h('div',params.row.enable==1?'禁用':'启用')
                
@@ -213,36 +214,38 @@ import qs from "qs";
             {
               title: '办公位',
               key: 'officeLocation',
-              width:150
+              width:90
             },
             {
               title: '姓名',
               key: 'name',
-              width:150
+              width:90
             },
             {
               title: '手机号',
               key: 'phone',
-              width:150
+              width:120
             },
             {
               title: '执行人',
               key: 'userName',
-              width:120
+              width:90
             },
             {
               title: '更新时间',
               key: 'gmtModified',
-              width:220
+              width:170
             },
           ],
         },
       }
     },
     created(){//方法
-      this.searchparam.clientId=this.$route.params.id;
+    if(!sessionStorage.getItem('repairListid'))
+    return;
+      this.searchparam.clientId=sessionStorage.getItem('repairListid');
    
-      this.$request.post('/api/emaint/client/info',qs.stringify({id:this.$route.params.id}),res=>{},res=>{
+      this.$request.post('/api/emaint/client/info',qs.stringify({id:sessionStorage.getItem('repairListid')}),res=>{},res=>{
         if(res.statusCode==200){
           this.formItem=res.responseResult;
           switch(res.responseResult.sex){
