@@ -67,9 +67,9 @@
               </Col>
               </Row>
 
-                <Row>
-                <Col span="24">
-                <FormItem label="常见问题" v-show="question_ary.length>0"> 
+                <Row >
+                <Col span="24" >
+                <FormItem label="常见问题" v-show="question_ary.length>0" style="text-align:left"> 
                     <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
                     <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
                     <!-- <Button type="ghost" size="large">Ghost</Button>
@@ -82,7 +82,7 @@
                 
               <Row v-show="imglist.length>0" >
              <Col span="24">
-                <FormItem label="图片描述"  >
+                <FormItem label="图片描述"  style="text-align: left !important;">
                     <!-- @on-cancel="imgcancel" -->
                     <Modal 
                         title="View Image" 
@@ -242,8 +242,8 @@
               </Row> -->
               
               <Row v-show="formItem.replacementRepair">
-              <Col span="6">
-                <FormItem label="是否代为报修" >
+              <Col span="6" style="width: 100%;text-align: left;">
+                <FormItem label="是否代为报修" style="">
                    <RadioGroup v-model="formItem.replacementRepair" >
                     <Radio label="1" :disabled="viewForm.id!=''?true:false">
                         <span>是</span>
@@ -542,46 +542,46 @@ export default {
       //表格
       tableConfig: {
         url: "",
-        columns: [
+         columns: [
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 180
+            width: 130
           },
           {
             title: "优先级",
             key: "priority",
-            width: 120
+            width: 90
           },
           {
             title: "状态",
             key: "state",
-            width: 120
+            width: 90
           },
-          {
+           {
             title: "报修来源",
             key: "repairSource",
-            width: 150
+            width: 120
           },
-          {
+            {
             title: "办公位",
             key: "officeLocation",
-            width: 120
+            width: 90
           },
-          {
+           {
             title: "报修类型",
             key: "problemClass",
-            width: 120
+            width: 90
           },
           {
             title: "常见问题",
             key: "problem",
-            width: 120
+            width: 110
           },
-          {
+           {
             title: "备注",
             key: "remark",
-            width: 120
+            width: 110
           },
           // {
           //   title: "变更状态",
@@ -596,7 +596,7 @@ export default {
           //     }
           //   }
           // },
-
+        
           // {
           //   title: "姓名",
           //   key: "name",
@@ -610,23 +610,23 @@ export default {
           {
             title: "执行人",
             key: "userName",
-            width: 120
+            width: 90
           },
-          {
+             {
             title: "参与者",
             key: "participators",
-            width: 120
+            width: 90
           },
-
+         
           {
             title: "创建时间",
             key: "gmtCreate",
-            width: 200
+            width: 170
           },
           {
             title: "完成时间",
             key: "completionTime",
-            width: 200
+            width: 170
           }
         ]
       },
@@ -1134,6 +1134,9 @@ export default {
 #username_form .ivu-form-item-content {
   text-align: left !important;
 }
+div.ivu-form-item{
+  margin-bottom: 12px !important;
+}
 .demo-upload-list {
   display: inline-block;
   width: 60px;
@@ -1226,6 +1229,9 @@ div.showtheimg .ivu-modal-body img {
 }
 .remarkimg{
   position: absolute;
- 
+}
+.question{
+  left: -5px;
+  position:relative
 }
 </style>

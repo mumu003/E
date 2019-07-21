@@ -157,7 +157,7 @@
               columns:[
                 {
                   title: '操作',
-                  width:90,
+                  width:70,
                   align:"center",
                   render:(h,params)=>{
                         return h('Button', {
@@ -179,43 +179,43 @@
                 {
                   title: '公司',
                   key: 'companyName',
-                  width:150,
+                  width:120,
                   align:"center"
                 },
                 {
                   title: '硬件单数',
                   key: 'yjCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 {
                   title: '软件单数',
                   key: 'rjCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 {
                   title: '其他',
                   key: 'otherCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 {
                   title: '总数',
                   key: 'totalCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 {
                   title: '已完成单数',
                   key: 'completeCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 {
                   title: '待维修单数',
                   key: 'uncompleteCount',
-                  width:100,
+                  width:70,
                   align:"center"
                 },
                 // {

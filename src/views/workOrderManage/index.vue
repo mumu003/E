@@ -42,7 +42,7 @@
               </Row>
               <Row>
               <Col span="15">
-                <FormItem label="是否代为报修">
+                <FormItem label="是否代为报修" style="width: 100%;text-align: left;">
                    <RadioGroup v-model="formItem.replacementRepair">
                     <Radio label="1">
                         <span>是</span>
@@ -160,15 +160,15 @@
                 </FormItem>
               </Col>
               </Row>
-                <Row>
+                <Row >
                 <Col span="24">
-                <FormItem label="常见问题">
-                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
+                <FormItem label="常见问题"  style="text-align: left">
+                    <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;left: -5px;position:relative"  disabled>暂无</Button>
                     <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
                 </FormItem>
                 </Col>
                 </Row>
-              <Row style="margin-bottom:20px;">
+              <Row style="margin-bottom:30px;">
               <Col span="24">
                 <FormItem label="图片描述"  >
                     <Modal 
@@ -447,42 +447,42 @@ export default {
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 180
+            width: 130
           },
           {
             title: "优先级",
             key: "priority",
-            width: 120
+            width: 90
           },
           {
             title: "状态",
             key: "state",
-            width: 120
+            width: 90
           },
            {
             title: "报修来源",
             key: "repairSource",
-            width: 150
+            width: 120
           },
             {
             title: "办公位",
             key: "officeLocation",
-            width: 120
+            width: 90
           },
            {
             title: "报修类型",
             key: "problemClass",
-            width: 120
+            width: 90
           },
           {
             title: "常见问题",
             key: "problem",
-            width: 120
+            width: 110
           },
            {
             title: "备注",
             key: "remark",
-            width: 120
+            width: 110
           },
           // {
           //   title: "变更状态",
@@ -511,23 +511,23 @@ export default {
           {
             title: "执行人",
             key: "userName",
-            width: 120
+            width: 90
           },
              {
             title: "参与者",
             key: "participators",
-            width: 120
+            width: 90
           },
          
           {
             title: "创建时间",
             key: "gmtCreate",
-            width: 200
+            width: 170
           },
           {
             title: "完成时间",
             key: "completionTime",
-            width: 200
+            width: 170
           }
         ]
       },
@@ -1013,6 +1013,13 @@ p.addbutton {
 p.addbutton > button {
   padding: 10px 20px;
   border: none;
+}
+.question{
+  left: -5px;
+  position:relative
+}
+div.ivu-form-item{
+  margin-bottom: 12px !important;
 }
 </style>
 
