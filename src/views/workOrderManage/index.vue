@@ -17,19 +17,28 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="120" :rules="ruleValidate">
             <Row type="flex" justify="start">
-              <Col span="15">
-              <FormItem label="来电号码" prop="callID">
-                <Input v-model="formItem.callID" icon="search" @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="请输入来电号码"></Input>
+              <Col span="17">
+              <FormItem label="客户" prop="callID">
+                <Select
+                  v-model="formItem.callID"
+                  filterable
+                  ref="callidselect"
+                  remote
+                
+                  @on-query-change="remoteMethod1"
+                  :loading="modal_loading"
+                  icon="search"
+                  @on-change="search"
+                  :maxlength=20 placeholder="手机号 / 座机 / 内线号码 / 客户姓名"
+                  >
+                  <Option v-for="(option, index) in callIDoptions" :value="option" :key="index">{{option}}</Option>
+                </Select>
+                <!-- <Input v-model="formItem.callID" icon="search" @on-blur="search" :disabled="viewForm.id!=''?true:false" :maxlength=20 placeholder="手机号 / 座机 / 内线号码 / 客户姓名"></Input> -->
               </FormItem>
               </Col>
              </Row>
-             <!-- <Row>
-              <Col span="15">
-                <Button type="primary" @click="clientRepairList">历史报修数据</Button>
-              </Col>
-              </Row> -->
               <Row>
-                 <Col span="15">
+                 <Col span="17">
               <FormItem label="办公位" >
                 <AutoComplete
                   v-model="formItem.officeLocation"
@@ -42,8 +51,10 @@
               </Col>
               </Row>
               <Row>
-              <Col span="15">
+              <Col span="17">
                 <FormItem label="是否代为报修" style="width: 100%;text-align: left;">
+                  <!-- <input type="radio" name="isrepair" style="margin-right:5px">是
+                  <input type="radio" name="isrepair" style="margin-right:5px">否 -->
                    <RadioGroup v-model="formItem.replacementRepair">
                     <Radio label="1">
                         <span>是</span>
@@ -61,7 +72,7 @@
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
                 
-              <Col span="15">
+              <Col span="17">
                 <FormItem label="联系人手机号"  prop="contactPhone">
                   <AutoComplete
                     v-model="formItem.contactPhone"
@@ -74,21 +85,21 @@
               </Col>
               </Row>
               <Row v-show="formItem.phone">
-               <Col span="15">
+               <Col span="17">
                   <FormItem label="手机号" >
                     <Input v-model="formItem.phone"  disabled :maxlength=20 ></Input>
                   </FormItem>
                   </Col>
               </Row>
               <Row v-show="formItem.undef">
-              <Col span="15">
+              <Col span="17">
               <FormItem label="内线号码" >
                     <Input v-model="formItem.undef" disabled :maxlength=12></Input>
               </FormItem>
               </Col>
               </Row>
                <Row v-show="formItem.tel"> 
-               <Col span="15">
+               <Col span="17">
               <FormItem label="座机" >
                     <Input v-model="formItem.tel" disabled :maxlength=12 ></Input>
               </FormItem>
@@ -97,28 +108,28 @@
                 </Row>
 
               <Row v-show="formItem.name">
-              <Col span="15">
+              <Col span="17">
               <FormItem label="姓名">
                     <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
               </FormItem>
               </Col>
               </Row>
               <Row v-show="formItem.companyName">
-              <Col span="15">
+              <Col span="17">
               <FormItem label="公司" >
                     <Input v-model="formItem.companyName" disabled ></Input>
               </FormItem>
               </Col>
               </Row>
               <Row v-show="formItem.priority">
-              <Col span="15">
+              <Col span="17">
               <FormItem label="优先级">
                     <Input v-model="formItem.priority" disabled ></Input>
               </FormItem>
               </Col>
                </Row>
               <Row  v-show="formItem.sex">
-              <Col span="15">
+              <Col span="17">
               <FormItem label="性别">
                     <Input v-model="formItem.sex" disabled :maxlength=11 ></Input>
               </FormItem>
@@ -163,7 +174,7 @@
               </Row>
                 <Row >
                 <Col span="24">
-                <FormItem label="常见问题"  style="text-align:left">
+                <FormItem label="问题项"  style="text-align:left">
                     <Button class="question" v-if="this.ques_list.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button>
                     <Button class="question" v-for="(item,index) in ques_list" type="ghost" size="large" style="white-space: normal;" :class="question_ary.indexOf(item.problem)!=-1?'question_active':''" :key="index" @click='choose_question(item,index)'>{{item.problem}}</Button>
                 </FormItem>
@@ -309,6 +320,8 @@ export default {
       choosemodel: false,
       choosemodel1: false,
       participatorids: [],
+      callIDoptions: [],
+      callID_list:[],
       userindex: "",
       userlist: [],
       childList: [],
@@ -400,7 +413,7 @@ export default {
           {
             required: true,
             message: "请输入正确的手机号",
-            trigger: "change",
+            trigger: "blur",
             transform(value) {
               var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
               if (!reg.test(value)) {
@@ -444,7 +457,7 @@ export default {
       //表格
       tableConfig: {
         url: "",
-         columns: [
+        columns: [
           {
             title: "工单号码 ",
             key: "workOrderNo",
@@ -460,17 +473,17 @@ export default {
             key: "state",
             width: 90
           },
-           {
+          {
             title: "报修来源",
             key: "repairSource",
             width: 120
           },
-            {
+          {
             title: "办公位",
             key: "officeLocation",
             width: 90
           },
-           {
+          {
             title: "报修类型",
             key: "problemClass",
             width: 90
@@ -480,7 +493,7 @@ export default {
             key: "problem",
             width: 110
           },
-           {
+          {
             title: "备注",
             key: "remark",
             width: 110
@@ -498,7 +511,7 @@ export default {
           //     }
           //   }
           // },
-        
+
           // {
           //   title: "姓名",
           //   key: "name",
@@ -514,12 +527,12 @@ export default {
             key: "userName",
             width: 90
           },
-             {
+          {
             title: "参与者",
             key: "participators",
             width: 90
           },
-         
+
           {
             title: "创建时间",
             key: "gmtCreate",
@@ -548,7 +561,6 @@ export default {
     Bus.$on("changephone", value => {
       this.formItem.callID = value;
       this.search();
-    
     });
   },
   beforeCreate() {
@@ -575,6 +587,78 @@ export default {
     );
   },
   methods: {
+   
+    remoteMethod1(query) {
+      // console.log(query)
+      if (query !== "") {
+        
+        this.modal_loading = true;
+        setTimeout(() => {
+          this.callID_list=[]
+        this.callIDoptions=[]
+          this.modal_loading = false;
+          this.$request.post(
+            "/api/emaint/client/keyword",
+            qs.stringify({ keyword: query }),
+            res => {},
+            res => {
+              if (res) {
+                if (res.statusCode == 200) {
+                  
+                  // callIDoptions 用来存放所有数据的数组
+                  this.callID_list = res.responseResult.data;
+                  this.callID_list.forEach(v=>{
+                    if(v.phone&&v.phone.indexOf(query)!=-1){
+                      this.callIDoptions.push(v.phone)
+                    }if(v.tel&&v.tel.indexOf(query)!=-1){
+                      this.callIDoptions.push(v.tel)
+                    }
+                    if(v.undef&&v.undef.indexOf(query)!=-1){
+                      this.callIDoptions.push(v.undef)
+                    }
+                    if(v.name&&v.name.indexOf(query)!=-1){
+                      this.callIDoptions.push(v.name)
+                    }
+                  })
+                  this.callIDoptions=(this.uniq(this.callIDoptions))
+                }
+              }
+            }
+          );
+        }, 300);
+      } else {
+    
+        this.callIDoptions = [];
+        this.callID_list=[];
+        this.formItem.callID='';
+        this.formItem = {
+          clientId: "",
+          phone: "",
+          callID: this.formItem.callID,
+          undef: "",
+          tel: "",
+          officeLocation: "",
+          contactPhone: "",
+          name: "",
+          companyName: "",
+          priority: "",
+          sex: "",
+          problemClass: "",
+          problemType: "",
+          remark: "",
+          participatorids: [],
+          problem: "",
+          problemImgs: "",
+          participators: [],
+          userId: "",
+          userName: "",
+          replacementRepair: ""
+        };
+        // this.search();
+          this.$refs.callidselect.clearSingleSelect();
+        }
+    },
+    
     imgcancel() {
       if (this.imglist.indexOf("") == -1) this.imglist.push("");
       this.imglist.splice(this.showimg, 1);
@@ -600,7 +684,6 @@ export default {
           this.newarr2.push(v);
         }
       });
-      
     },
 
     changefile(e) {
@@ -650,117 +733,125 @@ export default {
         this.findchildren2();
       });
     },
-
+    // 数组去重
+uniq(array){
+    var temp = []; //一个新的临时数组
+    for(var i = 0; i < array.length; i++){
+        if(temp.indexOf(array[i]) == -1){
+            temp.push(array[i]);
+        }
+    }
+    return temp;
+},
     // 输入手机号进行检索
     search(e) {
-      // if (this.formItem.phone.length == 11) {
-      var reg = /[0-9\-]/;
-      if (!reg.test(this.formItem.callID)) return;
-      this.$request.post(
-        "/api/emaint/client/phone",
-        qs.stringify({ phone: this.formItem.callID }),
-        res => {},
-        res => {
-          if (res.statusCode == 200 && res.responseResult != null) {
-            this.$Message.success("查询成功!");
-            var data = res.responseResult;
-            this.formItem.phone = data.phone;
-            this.formItem.undef = data.undef;
-            this.formItem.tel = data.tel;
-            // this.formItem.contactPhone = data.contactPhone;
-            this.formItem.officeLocation = data.officeLocation;
-            this.formItem.name = data.name;
-            this.formItem.companyName = data.companyName;
-            this.formItem.priority = data.priority;
-            this.formItem.sex = data.sex;
-            this.formItem.clientId = data.id;
-            // 获取办公位记录
-            this.$request.post(
-              "/api/emaint/repairProblem/clientOfficeLocation",
-              qs.stringify({ clientId: data.id }),
-              res => {},
-              res => {
-                if (res.statusCode == 200) {
-                  this.officeLocations = res.responseResult;
-                }
+      var flag = false;
+      this.callID_list.forEach(v => {
+        if (v.phone == this.formItem.callID || v.tel == this.formItem.callID  ||
+        v.undef == this.formItem.callID || v.name == this.formItem.callID ) {
+          flag = true;
+          this.formItem.phone = v.phone;
+          this.formItem.undef = v.undef;
+          this.formItem.tel = v.tel;
+          // this.formItem.contactPhone = data.contactPhone;
+          // this.formItem.officeLocation = data.officeLocation;
+          this.formItem.name = v.name;
+          this.formItem.companyName = v.companyName;
+          this.formItem.priority = v.priority;
+          this.formItem.sex = v.sex;
+          this.formItem.clientId = v.id;
+          // 获取办公位记录
+          this.$request.post(
+            "/api/emaint/repairProblem/clientOfficeLocation",
+            qs.stringify({ clientId: v.id }),
+            res => {},
+            res => {
+              if (res.statusCode == 200) {
+                this.officeLocations = res.responseResult;
+                console.log(this.officeLocations);
+                this.formItem.officeLocation = this.officeLocations[0];
+                console.log(this.formItem.officeLocation);
               }
-            );
-            // 获取联系人手机号
-            this.$request.post(
-              "/api/emaint/repairProblem/clientPhone",
-              qs.stringify({ clientId: data.id }),
-              res => {},
-              res => {
-                if (res.statusCode == 200) {
-                  if(res.responseResult){
-                    this.contactPhones = res.responseResult;
-                      if(this.contactPhones[0]!=''&&this.contactPhones[0]!='undefined'&&this.contactPhones[0]!=undefined)
-                      this.formItem.contactPhone=this.contactPhones[0]
-                      else
-                      this.formItem.contactPhone=this.formItem.phone
-                    
-                  }else{
-                    this.contactPhones.push(this.formItem.phone)
-                  }
-                }
-              }
-            );
-
-            this.RepairForm.clientId = data.id;
-            // this.RepairForm.beginTime = data.beginTime || "";
-            // this.RepairForm.endTime = data.endTime || "";
-            // this.RepairForm.isChange = data.isChange || "";
-            // this.RepairForm.workOrderNo = data.workOrderNo || "";
-            // this.RepairForm.name = data.name;
-            // this.RepairForm.state = data.state;
-            // this.RepairForm.phone = data.phone;
-            // this.RepairForm.userName = data.userName || "";
-
-            switch (data.sex) {
-              case "男":
-                this.formItem.sex = "男";
-                break;
-              case "male":
-                this.formItem.sex = "男";
-                break;
-              case "女":
-                this.formItem.sex = "女";
-                break;
-              case "female":
-                this.formItem.sex = "女";
-                break;
-              default:
-                break;
             }
-          } else {
-            this.$Message.error("客户信息不存在");
-            this.RepairForm.clientId = "";
-            this.formItem = {
-              clientId: "",
-              phone: "",
-              callID: this.formItem.callID,
-              undef: "",
-              tel: "",
-              officeLocation: "",
-              contactPhone: "",
-              name: "",
-              companyName: "",
-              priority: "",
-              sex: "",
-              problemClass: "",
-              problemType: "",
-              remark: "",
-              participatorids: [],
-              problem: "",
-              problemImgs: "",
-              participators: [],
-              userId: "",
-              userName: "",
-              replacementRepair: ""
-            };
+          );
+          // 获取联系人手机号
+          this.$request.post(
+            "/api/emaint/repairProblem/clientPhone",
+            qs.stringify({ clientId: v.id }),
+            res => {},
+            res => {
+              if (res.statusCode == 200) {
+                if (res.responseResult) {
+                  this.contactPhones = res.responseResult;
+                  if (
+                    this.contactPhones[0] != "" &&
+                    this.contactPhones[0] != "undefined" &&
+                    this.contactPhones[0] != undefined
+                  )
+                    this.formItem.contactPhone = this.contactPhones[0];
+                  else this.formItem.contactPhone = this.formItem.phone;
+                } else {
+                  this.contactPhones.push(this.formItem.phone);
+                }
+              }
+            }
+          );
+
+          this.RepairForm.clientId = v.id;
+          // this.RepairForm.beginTime = data.beginTime || "";
+          // this.RepairForm.endTime = data.endTime || "";
+          // this.RepairForm.isChange = data.isChange || "";
+          // this.RepairForm.workOrderNo = data.workOrderNo || "";
+          // this.RepairForm.name = data.name;
+          // this.RepairForm.state = data.state;
+          // this.RepairForm.phone = data.phone;
+          // this.RepairForm.userName = data.userName || "";
+
+          switch (v.sex) {
+            case "男":
+              this.formItem.sex = "男";
+              break;
+            case "male":
+              this.formItem.sex = "男";
+              break;
+            case "女":
+              this.formItem.sex = "女";
+              break;
+            case "female":
+              this.formItem.sex = "女";
+              break;
+            default:
+              break;
           }
         }
-      );
+      });
+      if (!flag) {
+        this.$Message.error("客户信息不存在");
+        this.RepairForm.clientId = "";
+        this.formItem = {
+          clientId: "",
+          phone: "",
+          callID: this.formItem.callID,
+          undef: "",
+          tel: "",
+          officeLocation: "",
+          contactPhone: "",
+          name: "",
+          companyName: "",
+          priority: "",
+          sex: "",
+          problemClass: "",
+          problemType: "",
+          remark: "",
+          participatorids: [],
+          problem: "",
+          problemImgs: "",
+          participators: [],
+          userId: "",
+          userName: "",
+          replacementRepair: ""
+        };
+      }
       // }else{
       //   this.formItem={
       //             clientId: "",
@@ -915,8 +1006,7 @@ export default {
     },
     // 历史报修数据
     clientRepairList(e) {
-      if(e==0)
-      return;
+      if (e == 0) return;
       // console.log(this.RepairForm.clientId);
       if (this.RepairForm.clientId == "" || this.RepairForm.clientId == null) {
         this.$Message.error("请先输入手机号!");
@@ -1017,12 +1107,12 @@ p.addbutton > button {
   padding: 10px 20px;
   border: none;
 }
-.question{
+.question {
   left: -5px;
-  position:relative
+  position: relative;
 }
-div.ivu-form-item{
-  margin-bottom: 12px !important;
+div.ivu-form-item {
+  margin-bottom: 20px !important;
 }
 </style>
 

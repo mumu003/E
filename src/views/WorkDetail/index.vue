@@ -6,7 +6,7 @@
       <p style="text-align:left;padding:15px;font-size:14px;color: #1c2438;font-weight: 700;">工单详情</p>
       <div style="padding: 10px;">
         <Button type="primary"  :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_user?true:false"
-            @click=" dispatchModel = true; chooseindex = formItem.id;">派单</Button>
+            @click="openModal">{{state=="待维修"?'变更执行人':'派单'}}</Button>
         <Button type="primary" :disabled="state=='待评价'?true:state=='已评价'?true:!auth.tf_repair_problem_add_remark?true:false"
         @click="remark_btn">备注</Button>
         <Button type="primary" @click="goback">上一步</Button>
@@ -70,7 +70,7 @@
 
                 <Row >
                 <Col span="24" >
-                <FormItem label="常见问题" v-show="question_ary.length>0" style="text-align:left"> 
+                <FormItem label="问题项" v-show="question_ary.length>0" style="text-align:left"> 
                     <!-- <Button class="question" v-if="this.question_ary.length==0" type="ghost" size="large" style="white-space: normal;"  disabled>暂无</Button> -->
                     <Button class="question" v-for="(item,index) in question_ary" type="ghost" size="large" style="white-space: normal;" :key="index">{{item}}</Button>
                     <!-- <Button type="ghost" size="large">Ghost</Button>
@@ -104,7 +104,7 @@
                   <Row>
                 <Col span="24">
                 <FormItem label="备注" v-show="formItem.remark">
-                    <Input  :disabled="viewForm.id!=''?true:false" v-model="formItem.remark" ></Input>
+                    <div style="text-align:left;color:black;">{{formItem.remark}}</div>
                 </FormItem>
                 </Col>
                 
@@ -119,7 +119,7 @@
              <Row v-show="formItem.participators" style="text-align:left">
                  <Col span="20">
               <FormItem label="参与者" >
-                <label style="word-wrap:break-word;word-break:break-all ">{{formItem.participators}}</label>
+                <label style="padding: 4px 7px;color: black;word-wrap:break-word;word-break:break-all ">{{formItem.participators}}</label>
                 <!-- <Input type="textarea"  style=""  v-model="formItem.participators" :disabled="viewForm.id!=''?true:false" :maxlength=11></Input> -->
               </FormItem>
               </Col>
@@ -352,7 +352,7 @@
 
 
     <!-- 派单 -->
-    <Modal v-model="dispatchModel" title="派单信息" width="500"
+    <Modal v-model="dispatchModel" :title="state=='待维修'?'变更执行人':'派单信息'" width="500"
       @on-ok="repairSubmit" @on-cancel="dispatchModel=false">
       <Form  :model="dispatchItem" :label-width="80" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
@@ -362,7 +362,7 @@
                 </FormItem>
               </Col>
              </Row>
-             <Row>
+             <Row style="margin:20px 0px">
               <Col span="20">
                 <FormItem label="参与者">
                     <!-- <Input v-model="formItem.participators" ></Input>  -->
@@ -375,6 +375,13 @@
                 </FormItem>
               </Col>
             </Row>
+            <Row v-if="state=='待维修'">
+              <Col span="24">
+                <FormItem label="变更说明">
+                    <Input v-model="dispatchItem.changeDescription" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
+                </FormItem>
+              </Col>
+              </Row>
           </Form>
     </Modal>
 
@@ -386,8 +393,8 @@
       @on-cancel="viewCancel('remark')">
           <Form  :model="viewForm" :label-width="80">
             <Row >
-              <Col span="24">
-                <FormItem label="图片描述"  style="margin-top:10px;">
+              <Col span="24" style="margin:10px 0">
+                <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
                         v-model="visible2"
@@ -439,8 +446,10 @@ export default {
       chooseindex: "",
       // 派单表单
       dispatchItem: {
+        userId: "",
         userName: "",
-        participatorids: ""
+        participatorids: "",
+        changeDescription: ""
       },
       // 备注
       msgModal: false,
@@ -524,7 +533,9 @@ export default {
       treeList: [],
       // 设置表单验证
       ruleValidate: {
-        executor: [{ message: "该选项不能为空", trigger: "input" }]
+        executor: [
+          { required: true, message: "该选项不能为空", trigger: "input" }
+        ]
       },
       // 设置结束时间大于开始时间
       end: {
@@ -548,7 +559,7 @@ export default {
       //表格
       tableConfig: {
         url: "",
-         columns: [
+        columns: [
           {
             title: "工单号码 ",
             key: "workOrderNo",
@@ -564,17 +575,17 @@ export default {
             key: "state",
             width: 90
           },
-           {
+          {
             title: "报修来源",
             key: "repairSource",
             width: 120
           },
-            {
+          {
             title: "办公位",
             key: "officeLocation",
             width: 90
           },
-           {
+          {
             title: "报修类型",
             key: "problemClass",
             width: 90
@@ -584,7 +595,7 @@ export default {
             key: "problem",
             width: 110
           },
-           {
+          {
             title: "备注",
             key: "remark",
             width: 110
@@ -602,7 +613,7 @@ export default {
           //     }
           //   }
           // },
-        
+
           // {
           //   title: "姓名",
           //   key: "name",
@@ -618,12 +629,12 @@ export default {
             key: "userName",
             width: 90
           },
-             {
+          {
             title: "参与者",
             key: "participators",
             width: 90
           },
-         
+
           {
             title: "创建时间",
             key: "gmtCreate",
@@ -740,7 +751,16 @@ export default {
     // }
   },
   methods: {
-    getData() {},
+    openModal() {
+      this.dispatchModel = true;
+      this.chooseindex = this.formItem.id;
+      if (this.state == "待维修") {
+        this.dispatchItem.userId = this.formItem.userId;
+        this.dispatchItem.userName = this.formItem.userName;
+        this.dispatchItem.participatorids = this.formItem.participatorids;
+        this.dispatchItem.changeDescription = this.formItem.changeDescription;
+      }
+    },
 
     changefile(e) {
       var file = e.target.files[0];
@@ -796,32 +816,37 @@ export default {
       } else this.isok = true;
       // this.modal_loading=true
       if (this.dispatchItem.userId != "" && this.dispatchItem.userId != null) {
-        var participatorids = "";
-        participatorids =
-          this.dispatchItem.participatorids == null
-            ? ""
-            : this.dispatchItem.participatorids.toString();
-        this.$request.post(
-          "/api/emaint/repairProblem/updateUser",
-          qs.stringify({
-            id: this.chooseindex,
-            userId: this.dispatchItem.userId,
-            participatorids: participatorids,
-            changeDescription: ""
-          }),
-          res => {},
-          res => {
-            this.isok = false;
-            this.$Message.success(res.responseResult);
-            setTimeout(() => {
-              // this.$router.push({
-              //   name: "workOrder"
-              // });
-              this.$refs.table.init();
-              this.getinfo();
-            }, 800);
-          }
-        );
+        if (this.formItem.userId != this.dispatchItem.userId) {
+          var participatorids = "";
+          participatorids =
+            this.dispatchItem.participatorids == null
+              ? ""
+              : this.dispatchItem.participatorids.toString();
+          this.$request.post(
+            "/api/emaint/repairProblem/updateUser",
+            qs.stringify({
+              id: this.chooseindex,
+              userId: this.dispatchItem.userId,
+              participatorids: participatorids,
+              changeDescription: this.dispatchItem.changeDescription
+            }),
+            res => {},
+            res => {
+              this.isok = false;
+              this.$Message.success(res.responseResult);
+              setTimeout(() => {
+                // this.$router.push({
+                //   name: "workOrder"
+                // });
+                this.$refs.table.init();
+                this.getinfo();
+              }, 800);
+            }
+          );
+        }else{
+          this.isok=false
+          this.$Message.error("请变更执行人");
+        }
       } else {
         this.isok = false;
         this.$Message.error("请选择执行人");
@@ -866,6 +891,7 @@ export default {
               userName: data.userName,
               userId: data.userId,
               problem: data.problem,
+              changeDescription: data.changeDescription,
               problemImgs: data.problemImgs,
               participators: data.participators,
               replacementRepair: data.replacementRepair,
@@ -954,31 +980,12 @@ export default {
                   if (v.indexOf("|") != -1) {
                     v = v.match(/(\S*)\|/)[1];
                   }
-
-                  // if(v.indexOf("|IMG")!=-1){
-                  //   v=v.match(/(\S*)\|IMG/)[1]
-                  // }else if(v.indexOf("|wx")!=-1){
-                  //   v=v.match(/(\S*)\|wx/)[1]
-                  // }else if(v.indexOf("|tmp")!=-1){
-                  //   v=v.match(/(\S*)\|tmp/)[1]
-                  // }
-
                   this.imglist.push(v);
                 });
               } else if (data.problemImgs.indexOf("|") != -1) {
                 // 只有一张图
                 this.imglist.push(data.problemImgs.split("|")[0]);
               } else {
-                // else if(data.problemImgs.indexOf("|IMG")!=-1){
-                //   // 只有一张图
-                //   this.imglist.push(data.problemImgs.split("|IMG")[0])
-                // }else if(data.problemImgs.indexOf("|wx")!=-1){
-                //   // 只有一张图
-                //   this.imglist.push(data.problemImgs.split("|wx")[0])
-                // }else if(data.problemImgs.indexOf("|tmp")!=-1){
-                //   // 只有一张图
-                //   this.imglist.push(data.problemImgs.split("|tmp")[0])
-                // }
                 this.imglist.push(data.problemImgs);
               }
             }
@@ -1003,6 +1010,7 @@ export default {
 
             // 处理常见问题
             if (this.formItem.problem) {
+              this.question_ary=[]
               if (this.formItem.problem.indexOf(",") != -1) {
                 this.question_ary = this.formItem.problem.split(",");
               } else {
@@ -1164,8 +1172,8 @@ export default {
 #username_form .ivu-form-item-content {
   text-align: left !important;
 }
-div.ivu-form-item{
-margin-bottom: 10px !important;
+div.ivu-form-item {
+  margin-bottom: 10px !important;
 }
 .demo-upload-list {
   display: inline-block;
@@ -1262,8 +1270,8 @@ div.showtheimg .ivu-modal-body img {
 .remarkimg {
   position: absolute;
 }
-.question{
+.question {
   left: -5px;
-  position:relative
+  position: relative;
 }
 </style>

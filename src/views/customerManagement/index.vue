@@ -63,9 +63,9 @@
               </Col> -->
 
 
-              <Col span="6">
+              <Col span="8">
                   <FormItem label="更新时间">
-                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 185px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
             </Row>
@@ -257,7 +257,7 @@
       </div>
 
       <Modal v-model="selectTreeModal_edit" class-name="my-modal"  title="选择塔楼公司"
-             width="600" style="overflow-y: auto; height: 600px;"
+             width="600" style="overflow-y: auto; height: 600px;position:absolute"
              @on-cancel="cancelEditSelect">
         <template style="z-index: 2000;">
           <Tree :data="groupTlTree_edit"
@@ -924,6 +924,7 @@ import util from "@/assets/js/util";
 
 
   .my-modal{z-index:2000 !important;
+  
   
 }
 

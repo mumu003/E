@@ -49,7 +49,7 @@
                 <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"/>
               </FormItem>
               </Col>
-              <Col span="6">
+              <!-- <Col span="6">
               <FormItem label="是否变更">
                  <Select v-model="formItem.isChange" placeholder="全部">
                       <Option value="">全部</Option>
@@ -57,7 +57,7 @@
                       <Option value="否">未变更</Option>
                     </Select>
               </FormItem>
-              </Col>
+              </Col> -->
               <Col span="6">
               <FormItem label="执行人">
                 <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>

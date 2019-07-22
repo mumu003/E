@@ -224,7 +224,7 @@
               "childList": [
                 {
                 "id": 81,
-                "name": "问题配置",
+                "name": "问题类别",
                 "url": "/problemConfiguration",
                 "code":"tf_problem_balse_level3_list",
                 },
@@ -246,6 +246,12 @@
               "id": 9,
               "name": "数据报表",
               "url": "/dataReport",
+              "code":"tf_company_problem_data",
+            },
+            {
+              "id": 15,
+              "name": "运维接单报表",
+              "url": "/operationData",
               "code":"tf_company_problem_data",
             },
             {

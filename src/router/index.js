@@ -99,7 +99,7 @@ export default new Router({
           path: '/problemConfiguration',
           name: 'problemConfiguration',
           meta: {
-            title: '问题配置'
+            title: '问题类别'
           },
           component: resolve => require(['@/views/problemConfiguration/index.vue'], resolve),
         },
@@ -118,6 +118,13 @@ export default new Router({
             title: '数据报表'
           },
           component: resolve => require(['@/views/dataReport/index.vue'], resolve),
+        },{
+          path: '/operationData',
+          name: 'operationData',
+          meta: {
+            title: '运维接单报表'
+          },
+          component: resolve => require(['@/views/operationData/index.vue'], resolve),
         },
         {
           path: '/reportDetail',

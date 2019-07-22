@@ -20,7 +20,7 @@
               <Col span="6" v-show="formItem.name">
                 <FormItem label="姓名">
                     <!-- <span v-model="name">张三</span> -->
-                        <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
+                      <Input v-model="formItem.name" disabled :maxlength=11 ></Input>
                 </FormItem>
               </Col>
                <Col span="6" v-show="formItem.phone">
