@@ -135,6 +135,14 @@ export default new Router({
           component: resolve => require(['@/views/reportDetail/index.vue'], resolve),
         },
         {
+          path: '/operationDetail',
+          name: 'operationDetail',
+          meta: {
+            title: '运维接单报表明细'
+          },
+          component: resolve => require(['@/views/operationDetail/index.vue'], resolve),
+        },
+        {
           path: '/evaluationList',
           name: 'evaluationList',
           meta: {

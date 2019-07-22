@@ -159,10 +159,11 @@
                                     },
                           on: {
                               click: () => {
-                                sessionStorage.setItem("companyName",params.row.companyName)
                                 sessionStorage.setItem("beginDate",this.formItem.beginDate)
                                 sessionStorage.setItem("endDate",this.formItem.endDate)
-                                this.$router.push({name:"reportDetail",params:{companyName:params.row.companyName}})
+                                sessionStorage.setItem("operationDetailUserId",params.row.userId)
+                                this.$router.push("operationDetail")
+
                               }
                           }
                         },"详情")
