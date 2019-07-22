@@ -973,6 +973,7 @@ export default {
 
             // 图片回显
             if (data.problemImgs) {
+              this.imglist=[]
               if (data.problemImgs.indexOf("|~|") != -1) {
                 // 多张图
                 var ary = data.problemImgs.split("|~|");
