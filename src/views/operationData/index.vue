@@ -235,6 +235,7 @@
         if(this.formItem.beginDate!="" && this.formItem.endDate !=""){
           this.isFirst = true
           setTimeout(()=>{
+              
             this.$refs.table.init()
             this.isFirst = false
           },200)
