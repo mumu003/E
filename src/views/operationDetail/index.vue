@@ -6,7 +6,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_user_problem_data_details_list_export" @click="exportTabel()">导出</Button>
               
               </Col>
               <Col>

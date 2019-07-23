@@ -37,7 +37,7 @@
           <div class="search-row">
             <Row>
               <Col>
-                <Button type="primary" icon="ios-redo" v-if="auth.tf_company_problem_data_export" @click="exportTabel()">导出</Button>
+                <Button type="primary" icon="ios-redo" v-if="auth.tf_user_problem_data_list_export" @click="exportTabel()">导出</Button>
               </Col>
               <Col>
               </Col>
@@ -152,7 +152,8 @@
                         return h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled: !this.auth.tf_user_problem_data_details_list
                                     },
                                     style:{
                                         width:"60px"
@@ -258,19 +259,6 @@
           this.isFirst = false
         },200)
       },
-      //  // 开始时间
-      // getStartDate(startDate){
-      //   this.formItem.beginDate=startDate
-      //   this.formItem.endDate=this.endDate
-      //   this.beginDate=this.formItem.beginDate
-      // },
-      // // 结束时间
-      // getEndDate(endDate){
-      //   this.formItem.endDate=endDate
-      //   this.endDate=this.formItem.endDate
-      //   this.formItem.beginDate=this.beginDate
-      // }
-
       getcreatedTime(createdTime) {
         // Array [ "2019-07-20", "2019-08-14" ]
         this.formItem.beginDate=createdTime[0]

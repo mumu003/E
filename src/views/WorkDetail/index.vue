@@ -56,14 +56,17 @@
               </Col>
               </Row>
               <Row type="flex"  >
-              <Col span="13">
+              <Col span="15">
                 <FormItem label="报修类型" >
-                 <Input v-model="formItem.problemClass" disabled ></Input> 
+                   <!-- v-model="formItem.problemClass"  -->
+                 <div style="text-align:left">{{formItem.problemClass}}</div> 
                 </FormItem>
               </Col>
-              <Col span="7">
+              
+              <Col span="9">
                 <FormItem  :label-width="5">
-                  <Input v-model="formItem.problemType" disabled ></Input> 
+                  <div style="text-align:left">{{formItem.problemType}}</div> 
+                  <!-- <Input v-model="formItem.problemType" disabled ></Input>  -->
                 </FormItem>
               </Col>
               </Row>

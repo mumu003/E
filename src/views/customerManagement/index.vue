@@ -64,7 +64,7 @@
 
 
               <Col span="8">
-                  <FormItem label="更新时间">
+                  <FormItem label="创建时间">
                     <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 185px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>

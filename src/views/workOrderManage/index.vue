@@ -29,7 +29,7 @@
                   :loading="modal_loading"
                   icon="search"
                   @on-change="search"
-                  :maxlength=20 placeholder="手机号 / 座机 / 内线号码 / 客户姓名"
+                  :maxlength=20 placeholder="客户姓名 / 手机号 / 座机 / 内线号码 "
                   >
                   <Option v-for="(option, index) in callIDoptions" :value="option" :key="index">{{option}}</Option>
                 </Select>
@@ -238,7 +238,7 @@
               <Col span="18">
               <!--表单验证 prop='participatorids' -->
                 <FormItem label="参与者"  >
-                    <Select v-model="formItem.participatorids" multiple  style="width:100%;">
+                    <Select v-model="formItem.participatorids" multiple  style="width:100%;text-align: left;">
                   <!-- :disabled="viewForm.id!=''?true:false" -->
                       <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index" >
                           <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
@@ -595,7 +595,7 @@ export default {
         this.modal_loading = true;
         setTimeout(() => {
           this.callID_list=[]
-        this.callIDoptions=[]
+          this.callIDoptions=[]
           this.modal_loading = false;
           this.$request.post(
             "/api/emaint/client/keyword",
@@ -606,6 +606,7 @@ export default {
                 if (res.statusCode == 200) {
                   
                   // callIDoptions 用来存放所有数据的数组
+                  // callID_list 处理展示数组
                   this.callID_list = res.responseResult.data;
                   this.callID_list.forEach(v=>{
                     if(v.phone&&v.phone.indexOf(query)!=-1){
@@ -630,32 +631,19 @@ export default {
     
         this.callIDoptions = [];
         this.callID_list=[];
-        this.formItem.callID='';
-        this.formItem = {
-          clientId: "",
-          phone: "",
-          callID: this.formItem.callID,
-          undef: "",
-          tel: "",
-          officeLocation: "",
-          contactPhone: "",
-          name: "",
-          companyName: "",
-          priority: "",
-          sex: "",
-          problemClass: "",
-          problemType: "",
-          remark: "",
-          participatorids: [],
-          problem: "",
-          problemImgs: "",
-          participators: [],
-          userId: "",
-          userName: "",
-          replacementRepair: ""
-        };
-        // this.search();
-          this.$refs.callidselect.clearSingleSelect();
+          this.formItem.callID="";
+         this.formItem.phone="";
+          this.formItem.undef ="";
+          this.formItem.tel ="";
+          this.formItem.contactPhone ="";
+          this.formItem.officeLocation="";
+          this.formItem.name ="";
+          this.formItem.companyName="";
+          this.formItem.priority ="";
+          this.formItem.sex="";
+          this.formItem.clientId="";
+       this.RepairForm.clientId ="";
+       console.log(this.formItem)
         }
     },
     
@@ -734,17 +722,20 @@ export default {
       });
     },
     // 数组去重
-uniq(array){
-    var temp = []; //一个新的临时数组
-    for(var i = 0; i < array.length; i++){
-        if(temp.indexOf(array[i]) == -1){
-            temp.push(array[i]);
+    uniq(array){
+        var temp = []; //一个新的临时数组
+        for(var i = 0; i < array.length; i++){
+            if(temp.indexOf(array[i]) == -1){
+                temp.push(array[i]);
+            }
         }
-    }
-    return temp;
-},
+        return temp;
+    },
     // 输入手机号进行检索
     search(e) {
+      console.log(this.formItem.callID)
+      if(this.formItem.callID==''||this.formItem.callID=='undefined'||this.formItem.callID==undefined)
+      return;
       var flag = false;
       this.callID_list.forEach(v => {
         if (v.phone == this.formItem.callID || v.tel == this.formItem.callID  ||
@@ -768,9 +759,7 @@ uniq(array){
             res => {
               if (res.statusCode == 200) {
                 this.officeLocations = res.responseResult;
-                console.log(this.officeLocations);
                 this.formItem.officeLocation = this.officeLocations[0];
-                console.log(this.formItem.officeLocation);
               }
             }
           );
@@ -880,24 +869,25 @@ uniq(array){
     // 报修提交
     repairSubmit() {
       this.modal_loading = true;
+      
       if (this.isok) {
         return;
       } else this.isok = true;
       // 派单
       if (this.viewForm.id != "") {
-        this.$request.post(
-          "/api/emaint/repairProblem/updateUser",
-          qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
-          res => {},
-          res => {
-            this.$Message.success(res.responseResult);
-            setTimeout(() => {
-              this.$router.push({
-                name: "workOrder"
-              });
-            }, 800);
-          }
-        );
+        // this.$request.post(
+        //   "/api/emaint/repairProblem/updateUser",
+        //   qs.stringify({ id: this.formItem.id, userId: this.formItem.userId }),
+        //   res => {},
+        //   res => {
+        //     this.$Message.success(res.responseResult);
+        //     setTimeout(() => {
+        //       this.$router.push({
+        //         name: "workOrder"
+        //       });
+        //     }, 800);
+        //   }
+        // );
       } else {
         // 新增
         if (this.question_ary.length > 0)
@@ -913,7 +903,7 @@ uniq(array){
         this.formItem.participatorids = this.formItem.participatorids.toString();
         this.formItem.participators = newarr.toString();
 
-        if (this.formItem.replacementRepair != "") {
+        if (this.formItem.replacementRepair != ""&&this.formItem.replacementRepair !=undefined) {
           this.formItem.replacementRepair = parseInt(
             this.formItem.replacementRepair
           );
@@ -934,7 +924,7 @@ uniq(array){
         if (
           this.formItem.phone != "" &&
           this.formItem.problemClass != "" &&
-          this.formItem.problemType != ""
+          this.formItem.problemType != ""&&this.formItem.phone != undefined&&  this.formItem.problemClass !=undefined&& this.formItem.problemType !=undefined
         ) {
           let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
           axios.post("/api/emaint/repairProblem/save", data, headers).then(
@@ -965,29 +955,6 @@ uniq(array){
           this.modal_loading = false;
           this.$Message.error("输入不能为空");
         }
-        // let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
-        // axios
-        //   .post("/api/emaint/repairProblem/save", data, headers)
-        //   .then(
-        //     function(data) {
-        //       if (data.statusCode == 200) {
-        //         this.$Message.success(res.resMessage);
-        //       }
-        //     },
-        //     function(err) {
-        //       this.$Message.success(err);
-        //     }
-        //   );
-
-        // this.$request.post('/api/file/uploads',this.files,res=>{},res=>{
-        //   console.log(res);
-        // })
-
-        //     this.$request.post('/api/emaint/repairProblem/save',qs.stringify(this.formItem),res=>{},res=>{
-        //     if(res.statusCode==200){
-        //       this.$Message.success(res.resMessage)
-        //     }
-        //  })
       }
     },
     // 上一步
