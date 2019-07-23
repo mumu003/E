@@ -18,37 +18,7 @@ export default {
   data () {
     return {
       tableData: [
-        // 测试用数据
-        // {
-        //                 status: 'John Brown',
-        //                 currentNodeName: 18,
-        //                 currentName: 'New York No. 1 Lake Park',
-        //                 fileType: '2016-10-03',
-        //                 gongdanhao: 'John Brown',
-        //                 shoujihao: 18,
-        //                 xingming: 'New York No. 1 Lake Park',
-        //                 updatedAt: '2016-10-03'
-        //             },
-        //             {
-        //                 status: 'Jim Green',
-        //                 currentNodeName: 24,
-        //                 currentName: 'London No. 1 Lake Park',
-        //                 fileType: '2016-10-01',
-        //                 gongdanhao: 'John Brown',
-        //                 shoujihao: 18,
-        //                 xingming: 'New York No. 1 Lake Park',
-        //                 updatedAt: '2016-10-03'
-        //             },
-        //             {
-        //                 status: 'Jim Green',
-        //                 currentNodeName: 24,
-        //                 currentName: 'London No. 1 Lake Park',
-        //                 fileType: '2016-10-01',
-        //                 gongdanhao: 'John Brown',
-        //                 shoujihao: 18,
-        //                 xingming: 'New York No. 1 Lake Park',
-        //                 updatedAt: '2016-10-03'
-        //             },
+      
       ],
       selection: [],
       total: 0,

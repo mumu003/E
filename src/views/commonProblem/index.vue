@@ -1,7 +1,7 @@
 <template>
   <div class="page1">
     <Row :gutter="10" class="mt10">
-      <Col span="24">
+      <Col span="24" style="overflow-y: auto; height: 500px;">
         <Card>
           <div class="search-row">
             <Row>
@@ -102,8 +102,8 @@
           </Col>
           <Col span="20">
             <Form-item label="父级类目" >
-            <Input v-model="parentname" readonly></Input>
-        </Form-item>   
+              <Input v-model="parentname" readonly ></Input>
+          </Form-item>   
           </Col>
          
          
@@ -137,7 +137,7 @@
           </Col>
           <Col span="20">
             <Form-item label="父级类目" >
-            <i-select  placeholder="请选择父级" v-model="updateForm.parentId">
+            <i-select  placeholder="请选择父级" v-model="updateForm.parentId" style="text-align:left">
                
                 <i-option :value="item.id" v-for="(item,index) in fjlm" :key="index">{{item.problem}}</i-option>
                

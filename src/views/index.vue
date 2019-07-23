@@ -245,15 +245,23 @@
             {
               "id": 9,
               "name": "数据报表",
-              "url": "/dataReport",
-              "code":"tf_company_problem_data",
+              "childList": [
+                {
+                  "id": 14,
+                  "name": "公司数据报表",
+                  "url": "/dataReport",
+                  "code":"tf_company_problem_data",
+                },
+                {
+                  "id": 15,
+                  "name": "运维接单报表",
+                  "url": "/operationData",
+                  "code":"tf_user_problem_data_list",
+                },
+              ]
+              
             },
-            {
-              "id": 15,
-              "name": "运维接单报表",
-              "url": "/operationData",
-              "code":"tf_user_problem_data_list",
-            },
+            
             {
               "id": 12,
               "name": "系统管理",

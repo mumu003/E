@@ -19,6 +19,7 @@ import axios from './assets/js/axiosInterCeptor'
 
 
 import Request from './assets/js/request'
+import utils from './assets/js/util'
 
 Vue.use(iView)
 Vue.component('route-bar', routeBar)
@@ -28,6 +29,7 @@ Vue.component('m-table', mTable)
 
 
 Vue.prototype.$request = Request
+Vue.prototype.$getcreatedTime=utils.getcreatedTime
 Vue.prototype.$Vue = Vue
 Vue.config.productionTip = false
 

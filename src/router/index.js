@@ -73,7 +73,7 @@ export default new Router({
           path: '/operationSetting',
           name: 'operationSetting',
           meta: {
-            title: '运维设置'
+            title: '逾期设置'
           },
           component: resolve => require(['@/views/operationSetting/index.vue'], resolve),
         },
@@ -115,7 +115,7 @@ export default new Router({
           path: '/dataReport',
           name: 'dataReport',
           meta: {
-            title: '数据报表'
+            title: '公司数据报表'
           },
           component: resolve => require(['@/views/dataReport/index.vue'], resolve),
         },{

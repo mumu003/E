@@ -63,7 +63,7 @@
               <i-input placeholder="请输入组织名称" v-model="addformdata.groupName" :maxlength="15"></i-input>
             </Form-item>
             <Form-item label="类型" prop="type">
-              <i-select placeholder="请选择类型" v-model="addformdata.type">
+              <i-select placeholder="请选择类型" v-model="addformdata.type" style="text-align: left;">
                 <i-option :value="item.value" v-for="(item,index) in groupType" :key="index">{{item.name}}</i-option>
               </i-select>
             </Form-item>

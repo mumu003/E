@@ -359,7 +359,7 @@
       @on-ok="repairSubmit" @on-cancel="dispatchModel=false">
       <Form  :model="dispatchItem" :label-width="80" :rules="ruleValidate">
              <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="13" >
+              <Col span="20" >
                 <FormItem label="执行人" prop="executor">
                     <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="dispatchItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
                 </FormItem>
@@ -379,7 +379,7 @@
               </Col>
             </Row>
             <Row v-if="state=='待维修'">
-              <Col span="24">
+              <Col span="20">
                 <FormItem label="变更说明">
                     <Input v-model="dispatchItem.changeDescription" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
                 </FormItem>
@@ -396,7 +396,7 @@
       @on-cancel="viewCancel('remark')">
           <Form  :model="viewForm" :label-width="80">
             <Row >
-              <Col span="24" style="margin:10px 0">
+              <Col span="24" style="margin:15px 0">
                 <FormItem label="图片描述"  >
                     <Modal 
                         title="View Image" 
@@ -414,7 +414,7 @@
                     </FormItem>
                      <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
                 </Col>
-              <Col span="24">
+              <Col span="20">
                 <FormItem label="备注">
                     <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
                 </FormItem>

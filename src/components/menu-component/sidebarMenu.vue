@@ -51,8 +51,8 @@ export default {
            };
         };
         if (document.getElementById(url.split("?")[0])!=null) {
-          document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-selected");
-          document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-active");
+            document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-selected");
+            document.getElementById(url.split("?")[0]).classList.add("ivu-menu-item-active");
         }
         this.$router.push(url)
     },

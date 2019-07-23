@@ -53,7 +53,7 @@
         </Form-item>
         
         <Form-item label="父级类目">
-            <i-select  placeholder="请选择父级" v-model="addformdata.parentId">
+            <i-select  placeholder="请选择父级"  v-model="addformdata.parentId" style="text-align:left">
                 <i-option value="">无</i-option>
                 <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
                
@@ -82,7 +82,7 @@
         </Form-item>
         
         <Form-item label="父级类目" >
-            <i-select placeholder="请选择父级类目"  v-model="updatedata.parentId" :disabled="updatedata.treeLevel==1?true:false">
+            <i-select :placeholder="updatedata.treeLevel==1?'已属于顶级类目':'请选择父级类目'" style="text-align:left" v-model="updatedata.parentId" :disabled="updatedata.treeLevel==1?true:false">
                 <i-option value="">无</i-option>
                 <i-option :value="item.parentId" v-for="(item,index) in questionlis" :key="index">{{item.parentProblem}}</i-option>
             </i-select>

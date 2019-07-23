@@ -76,7 +76,7 @@
 
               <Col span="6">
               <FormItem label="创建时间">
-                <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 200px" @on-change="getcreatedTime"></DatePicker>
+                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 280px" @on-change="getcreatedTime"></DatePicker>
                 <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
@@ -418,7 +418,16 @@ export default {
           {
             title: "优先级",
             key: "priority",
-            width: 90
+            width: 90,
+            render:(h,params)=>{
+              switch(params.row.priority){
+                case "null":
+                  return h('div',"") 
+                case "undefined":
+                  return h('div',"")
+                default :return h('div',params.row.priority)
+              }
+            }
           },
           {
             title: "状态",
@@ -441,7 +450,16 @@ export default {
           {
             title: "办公位",
             key: "officeLocation",
-            width: 90
+            width: 90,
+            render:(h,params)=>{
+             switch(params.row.officeLocation){
+               case "null":
+                  return h('div',"")
+               case "undefined":
+                  return h('div',"")
+              default :return h('div',params.row.officeLocation)
+              }
+            }
           },
           {
             title: "手机号",
@@ -696,22 +714,6 @@ export default {
       this.isFirst = true;
       this.$refs.table.init();
       this.isFirst = false;
-      // this.$request.post(
-      //   "/api/emaint/repairProblem/repairProblemList",
-      //   qs.stringify(this.formItem),
-      //   res => {
-      //     this.$Modal.error({ title: "提示信息", content: res.resMessage });
-      //   },
-      //   res => {
-      //     if (res.statusCode === 200) {
-      //       this.$Message.success("搜索成功！");
-      //       this.isFirst = false;
-      //       this.$refs.table.init();
-      //     } else {
-      //       this.$Modal.error({ title: "提示信息", content: res.resMessage });
-      //     }
-      //   }
-      // );
     },
     //重置
     searchCancel() {
@@ -794,11 +796,6 @@ export default {
       }, 1000);
     }
   },
-  watch: {
-    selectlabel: function(n, o) {
-      console.log(n);
-    }
-  }
 };
 </script>
 <style scoped>

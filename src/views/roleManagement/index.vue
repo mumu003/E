@@ -15,8 +15,8 @@
                     <Input v-model="formItem.name" :maxlength="20" placeholder="请输入角色名称"></Input>
                   </FormItem>
                 </Col>
-              </Row>
-              <Row>
+              <!-- </Row> -->
+              <!-- <Row> -->
                 <!-- <Col span="6">
                   <FormItem label="创建时间">
                     <DatePicker
@@ -47,7 +47,7 @@
                       v-model="createdTime"
                       split-panels
                       placeholder="请选择起始时间"
-                      style="width: 200px"
+                      style="width: 190px"
                       @on-change="getcreatedTime"
                     ></DatePicker>
                   </FormItem>
@@ -127,7 +127,7 @@
                 v-model="addDataForm.code"
                 style="width: 100%"
                 placeholder="请输入角色编码"
-                :maxlength="11"
+                :maxlength="30"
               ></Input>
             </FormItem>
           </Col>
@@ -482,12 +482,9 @@ export default {
   },
   methods: {
     getcreatedTime(createdTime) {
-      // Array [ "2019-07-20", "2019-08-14" ]
-      this.formItem.beginTime = createdTime[0];
-      this.formItem.endTime = createdTime[1];
-      console.log(this.formItem.beginTime);
-      console.log(this.formItem.endTime);
-    },
+       this.formItem.beginTime=this.$getcreatedTime(createdTime,this.formItem.beginTime,this.formItem.endTime).beginTime
+       this.formItem.endTime=this.$getcreatedTime(createdTime,this.formItem.beginTime,this.formItem.endTime).endTime
+      },
     //遍历选中
     getChecked(arr) {
       arr.forEach(item => {

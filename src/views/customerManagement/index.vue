@@ -65,7 +65,7 @@
 
               <Col span="8">
                   <FormItem label="创建时间">
-                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 185px" @on-change="getcreatedTime"></DatePicker>
+                    <DatePicker type="daterange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 190px" @on-change="getcreatedTime"></DatePicker>
                   </FormItem>
                 </Col>
             </Row>
@@ -648,9 +648,8 @@ import util from "@/assets/js/util";
       //   this.formItem.endUpdateTime=endDate
       // },
       getcreatedTime(createdTime) {
-        // Array [ "2019-07-20", "2019-08-14" ]
-        this.formItem.beginTime=createdTime[0]
-        this.formItem.endTime=createdTime[1]
+       this.formItem.beginTime=this.$getcreatedTime(createdTime,this.formItem.beginTime,this.formItem.endTime).beginTime
+       this.formItem.endTime=this.$getcreatedTime(createdTime,this.formItem.beginTime,this.formItem.endTime).endTime
       },
 
       showchildren(v) {
