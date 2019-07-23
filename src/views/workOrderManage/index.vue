@@ -321,7 +321,7 @@ export default {
       choosemodel1: false,
       participatorids: [],
       callIDoptions: [],
-      callID_list:[],
+      callID_list: [],
       userindex: "",
       userlist: [],
       childList: [],
@@ -587,15 +587,13 @@ export default {
     );
   },
   methods: {
-   
     remoteMethod1(query) {
       // console.log(query)
       if (query !== "") {
-        
         this.modal_loading = true;
         setTimeout(() => {
-          this.callID_list=[]
-          this.callIDoptions=[]
+          this.callID_list = [];
+          this.callIDoptions = [];
           this.modal_loading = false;
           this.$request.post(
             "/api/emaint/client/keyword",
@@ -604,49 +602,48 @@ export default {
             res => {
               if (res) {
                 if (res.statusCode == 200) {
-                  
                   // callIDoptions 用来存放所有数据的数组
                   // callID_list 处理展示数组
                   this.callID_list = res.responseResult.data;
-                  this.callID_list.forEach(v=>{
-                    if(v.phone&&v.phone.indexOf(query)!=-1){
-                      this.callIDoptions.push(v.phone)
-                    }if(v.tel&&v.tel.indexOf(query)!=-1){
-                      this.callIDoptions.push(v.tel)
+                  this.callID_list.forEach(v => {
+                    if (v.phone && v.phone.indexOf(query) != -1) {
+                      this.callIDoptions.push(v.phone);
                     }
-                    if(v.undef&&v.undef.indexOf(query)!=-1){
-                      this.callIDoptions.push(v.undef)
+                    if (v.tel && v.tel.indexOf(query) != -1) {
+                      this.callIDoptions.push(v.tel);
                     }
-                    if(v.name&&v.name.indexOf(query)!=-1){
-                      this.callIDoptions.push(v.name)
+                    if (v.undef && v.undef.indexOf(query) != -1) {
+                      this.callIDoptions.push(v.undef);
                     }
-                  })
-                  this.callIDoptions=(this.uniq(this.callIDoptions))
+                    if (v.name && v.name.indexOf(query) != -1) {
+                      this.callIDoptions.push(v.name);
+                    }
+                  });
+                  this.callIDoptions = this.uniq(this.callIDoptions);
                 }
               }
             }
           );
         }, 300);
       } else {
-    
         this.callIDoptions = [];
-        this.callID_list=[];
-          this.formItem.callID="";
-         this.formItem.phone="";
-          this.formItem.undef ="";
-          this.formItem.tel ="";
-          this.formItem.contactPhone ="";
-          this.formItem.officeLocation="";
-          this.formItem.name ="";
-          this.formItem.companyName="";
-          this.formItem.priority ="";
-          this.formItem.sex="";
-          this.formItem.clientId="";
-       this.RepairForm.clientId ="";
-       console.log(this.formItem)
-        }
+        this.callID_list = [];
+        this.formItem.callID = "";
+        this.formItem.phone = "";
+        this.formItem.undef = "";
+        this.formItem.tel = "";
+        this.formItem.contactPhone = "";
+        this.formItem.officeLocation = "";
+        this.formItem.name = "";
+        this.formItem.companyName = "";
+        this.formItem.priority = "";
+        this.formItem.sex = "";
+        this.formItem.clientId = "";
+        this.RepairForm.clientId = "";
+        console.log(this.formItem);
+      }
     },
-    
+
     imgcancel() {
       if (this.imglist.indexOf("") == -1) this.imglist.push("");
       this.imglist.splice(this.showimg, 1);
@@ -722,24 +719,32 @@ export default {
       });
     },
     // 数组去重
-    uniq(array){
-        var temp = []; //一个新的临时数组
-        for(var i = 0; i < array.length; i++){
-            if(temp.indexOf(array[i]) == -1){
-                temp.push(array[i]);
-            }
+    uniq(array) {
+      var temp = []; //一个新的临时数组
+      for (var i = 0; i < array.length; i++) {
+        if (temp.indexOf(array[i]) == -1) {
+          temp.push(array[i]);
         }
-        return temp;
+      }
+      return temp;
     },
     // 输入手机号进行检索
     search(e) {
-      console.log(this.formItem.callID)
-      if(this.formItem.callID==''||this.formItem.callID=='undefined'||this.formItem.callID==undefined)
-      return;
+      console.log(this.formItem.callID);
+      if (
+        this.formItem.callID == "" ||
+        this.formItem.callID == "undefined" ||
+        this.formItem.callID == undefined
+      )
+        return;
       var flag = false;
       this.callID_list.forEach(v => {
-        if (v.phone == this.formItem.callID || v.tel == this.formItem.callID  ||
-        v.undef == this.formItem.callID || v.name == this.formItem.callID ) {
+        if (
+          v.phone == this.formItem.callID ||
+          v.tel == this.formItem.callID ||
+          v.undef == this.formItem.callID ||
+          v.name == this.formItem.callID
+        ) {
           flag = true;
           this.formItem.phone = v.phone;
           this.formItem.undef = v.undef;
@@ -869,7 +874,7 @@ export default {
     // 报修提交
     repairSubmit() {
       this.modal_loading = true;
-      
+
       if (this.isok) {
         return;
       } else this.isok = true;
@@ -890,42 +895,49 @@ export default {
         // );
       } else {
         // 新增
-        if (this.question_ary.length > 0)
-          this.formItem.problem = this.question_ary.toString();
-
-        this.formItem.problemImgs = this.files;
-        var newarr = [];
-        this.userlist.forEach(v => {
-          if (this.formItem.participatorids.indexOf(v.id) != -1) {
-            newarr.push(v.name);
-          }
-        });
-        this.formItem.participatorids = this.formItem.participatorids.toString();
-        this.formItem.participators = newarr.toString();
-
-        if (this.formItem.replacementRepair != ""&&this.formItem.replacementRepair !=undefined) {
-          this.formItem.replacementRepair = parseInt(
-            this.formItem.replacementRepair
-          );
-        }
-
-        //  把this.formItem转为FormData数据用来传递文件
-        var data = new FormData(); //重点在这里 如果使用 var data = {}; data.inputfile=... 这样的方式不能正常上传
-        this.formItem.userId == "" ? delete this.formItem.userId : "";
-
-        // formData添加formItem的键值对
-        for (var i in this.formItem) {
-          data.append(i, this.formItem[i]);
-        }
-        for (var i = 0; i < this.files.length; i++) {
-          data.append("problemImgs", this.files[i]);
-        }
 
         if (
           this.formItem.phone != "" &&
           this.formItem.problemClass != "" &&
-          this.formItem.problemType != ""&&this.formItem.phone != undefined&&  this.formItem.problemClass !=undefined&& this.formItem.problemType !=undefined
+          this.formItem.problemType != "" &&
+          this.formItem.phone != undefined &&
+          this.formItem.problemClass != undefined &&
+          this.formItem.problemType != undefined
         ) {
+          if (this.question_ary.length > 0)
+            this.formItem.problem = this.question_ary.toString();
+
+          this.formItem.problemImgs = this.files;
+          var newarr = [];
+          this.userlist.forEach(v => {
+            if (this.formItem.participatorids.indexOf(v.id) != -1) {
+              newarr.push(v.name);
+            }
+          });
+          this.formItem.participatorids = this.formItem.participatorids.toString();
+          this.formItem.participators = newarr.toString();
+
+          if (
+            this.formItem.replacementRepair != "" &&
+            this.formItem.replacementRepair != undefined
+          ) {
+            this.formItem.replacementRepair = parseInt(
+              this.formItem.replacementRepair
+            );
+          }
+
+          //  把this.formItem转为FormData数据用来传递文件
+          var data = new FormData(); //重点在这里 如果使用 var data = {}; data.inputfile=... 这样的方式不能正常上传
+          this.formItem.userId == "" ? delete this.formItem.userId : "";
+
+          // formData添加formItem的键值对
+          for (var i in this.formItem) {
+            data.append(i, this.formItem[i]);
+          }
+          for (var i = 0; i < this.files.length; i++) {
+            data.append("problemImgs", this.files[i]);
+          }
+
           let headers = { headers: { "Content-Type": "multipart/form-data" } }; //修改成文件上传的请求头
           axios.post("/api/emaint/repairProblem/save", data, headers).then(
             resdata => {

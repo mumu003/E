@@ -48,7 +48,7 @@
                 <Button type="primary" @click="clientRepairList">历史报修数据</Button>
               </Col> -->
 
-              <Row v-show="formItem.priority">
+              <Row v-show="formItem.priority&&formItem.priority!='null'&&formItem.priority!='undefined'">
               <Col span="20">
               <FormItem label="优先级" >
                     <Input v-model="formItem.priority" disabled ></Input>
@@ -56,19 +56,23 @@
               </Col>
               </Row>
               <Row type="flex"  >
-              <Col span="15">
-                <FormItem label="报修类型" >
-                   <!-- v-model="formItem.problemClass"  -->
-                 <div style="text-align:left">{{formItem.problemClass}}</div> 
+              <Col span="24">
+                <FormItem label="报修类型" :label-width="95" style="text-align:left">
+                  <Tooltip style="width:100%" :content="formItem.problemClass + ' - ' + formItem.problemType" placement="top" id="workDetailtooltip">
+                    <div style="text-align:left;color: black;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;">
+                      {{formItem.problemClass }} - {{formItem.problemType}}
+                    </div> 
+                  </Tooltip>
                 </FormItem>
               </Col>
               
-              <Col span="9">
-                <FormItem  :label-width="5">
-                  <div style="text-align:left">{{formItem.problemType}}</div> 
-                  <!-- <Input v-model="formItem.problemType" disabled ></Input>  -->
+              <!-- <Col span="9">
+                <FormItem  :label-width="5"  style="text-align:left">
+                  <Tooltip  :content="formItem.problemType" placement="top" id="workDetailtooltip">
+                    <div style="text-align:left;color: black;margin-left:5px;">{{formItem.problemType}}</div> 
+                  </Tooltip>
                 </FormItem>
-              </Col>
+              </Col> -->
               </Row>
 
                 <Row >
@@ -206,8 +210,8 @@
               </Col>
               </Row>
 
-                <Row v-show="formItem.officeLocation">
-                 <Col span="20">
+              <Row v-show="formItem.officeLocation&&formItem.officeLocation!='null'&&formItem.officeLocation!='undefined'">
+              <Col span="20">
               <FormItem label="办公位" >
                 <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
               </FormItem>
@@ -262,7 +266,7 @@
                 </FormItem>
               </Col>
               </Row>
-              <Row v-show="formItem.priority">
+              <Row v-show="formItem.priority&&formItem.priority!='null'&&formItem.priority!='undefined'">
               <Col span="20">
               <FormItem label="优先级" >
                     <Input v-model="formItem.priority" disabled ></Input>
@@ -846,8 +850,8 @@ export default {
               }, 800);
             }
           );
-        }else{
-          this.isok=false
+        } else {
+          this.isok = false;
           this.$Message.error("请变更执行人");
         }
       } else {
@@ -976,7 +980,7 @@ export default {
 
             // 图片回显
             if (data.problemImgs) {
-              this.imglist=[]
+              this.imglist = [];
               if (data.problemImgs.indexOf("|~|") != -1) {
                 // 多张图
                 var ary = data.problemImgs.split("|~|");
@@ -1014,7 +1018,7 @@ export default {
 
             // 处理常见问题
             if (this.formItem.problem) {
-              this.question_ary=[]
+              this.question_ary = [];
               if (this.formItem.problem.indexOf(",") != -1) {
                 this.question_ary = this.formItem.problem.split(",");
               } else {

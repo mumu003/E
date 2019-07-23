@@ -270,4 +270,7 @@ export default {
 .mt10 div.ivu-card-body {
   padding-top: 10px !important;
 }
+#workDetailtooltip .ivu-tooltip-rel{
+  max-width: 100%!important;
+}
 </style>

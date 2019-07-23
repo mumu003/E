@@ -223,7 +223,7 @@ export default {
       userlist: [],
       chooseindex: "",
       choosemodel: false,
-      dispatchModel:false,
+      dispatchModel: false,
       passDisable: false, //防止通过双击事件
       isDisable: false, //防止驳回双击事件
       loading: true, //延迟
@@ -262,13 +262,13 @@ export default {
         isChange: "",
         userName: "",
         endTime: "",
-        beginTime: "",
+        beginTime: ""
         // watch: true
       },
       // 派单表单
-      dispatchItem:{
-        userName:"",
-        participatorids:""
+      dispatchItem: {
+        userName: "",
+        participatorids: ""
       },
       // start: {
       //   disabledDate: function(date) {
@@ -361,7 +361,7 @@ export default {
                   {
                     props: {
                       type: "primary",
-                      size: "small",
+                      size: "small"
                       // disabled: !this.auth.tf_repair_problem_add_user
                       // disabled: params.row.state == "待派单" ? false : true
                     },
@@ -419,14 +419,15 @@ export default {
             title: "优先级",
             key: "priority",
             width: 90,
-            render:(h,params)=>{
-              switch(params.row.priority){
-                case "null":
-                  return h('div',"") 
-                case "undefined":
-                  return h('div',"")
-                default :return h('div',params.row.priority)
-              }
+            render: (h, params) => {
+              switch (params.row.priority) {
+                case "null":
+                  return h("div", "");
+                case "undefined":
+                  return h("div", "");
+                default:
+                  return h("div", params.row.priority);
+              }
             }
           },
           {
@@ -451,14 +452,15 @@ export default {
             title: "办公位",
             key: "officeLocation",
             width: 90,
-            render:(h,params)=>{
-             switch(params.row.officeLocation){
-               case "null":
-                  return h('div',"")
-               case "undefined":
-                  return h('div',"")
-              default :return h('div',params.row.officeLocation)
-              }
+            render: (h, params) => {
+              switch (params.row.officeLocation) {
+                case "null":
+                  return h("div", "");
+                case "undefined":
+                  return h("div", "");
+                default:
+                  return h("div", params.row.officeLocation);
+              }
             }
           },
           {
@@ -516,7 +518,7 @@ export default {
       ruleValidate: {
         executor: [
           { required: true, message: "该选项不能为空", trigger: "input" }
-        ],
+        ]
       },
 
       //备注表单
@@ -546,16 +548,16 @@ export default {
   },
   created() {
     // console.log(this.$route.params.status)
-    if ( sessionStorage.getItem('paramsstatus')) {
-      this.formItem.state = sessionStorage.getItem('paramsstatus')
+    if (sessionStorage.getItem("paramsstatus")) {
+      this.formItem.state = sessionStorage.getItem("paramsstatus");
     }
   },
   methods: {
-    setstate(value){
+    setstate(value) {
       // console.log(value)
-        this.formItem.state=value;
-        sessionStorage.setItem('paramsstatus',value)
-        this.$refs.table.init()
+      this.formItem.state = value;
+      sessionStorage.setItem("paramsstatus", value);
+      this.$refs.table.init();
     },
     // 选择文件
     uploadfile(index) {
@@ -623,12 +625,20 @@ export default {
         return;
       } else this.isok = true;
       // this.modal_loading=true
-        if(this.dispatchItem.userId!=""&&this.dispatchItem.userId!=null){
-          var participatorids=""
-          participatorids=this.dispatchItem.participatorids==null?'':this.dispatchItem.participatorids.toString()
-          this.$request.post(
+      if (this.dispatchItem.userId != "" && this.dispatchItem.userId != null) {
+        var participatorids = "";
+        participatorids =
+          this.dispatchItem.participatorids == null
+            ? ""
+            : this.dispatchItem.participatorids.toString();
+        this.$request.post(
           "/api/emaint/repairProblem/updateUser",
-          qs.stringify({ id: this.chooseindex, userId: this.dispatchItem.userId,participatorids:participatorids,changeDescription:"" }),
+          qs.stringify({
+            id: this.chooseindex,
+            userId: this.dispatchItem.userId,
+            participatorids: participatorids,
+            changeDescription: ""
+          }),
           res => {},
           res => {
             this.isok = false;
@@ -637,14 +647,14 @@ export default {
               // this.$router.push({
               //   name: "workOrder"
               // });
-              this.$refs.table.init()
+              this.$refs.table.init();
             }, 800);
-          })
-        }else{
-          this.isok = false;
-          this.$Message.error("请选择执行人")
-        }
-      
+          }
+        );
+      } else {
+        this.isok = false;
+        this.$Message.error("请选择执行人");
+      }
     },
     // //开始时间
     // getStartDate(startDate) {
@@ -668,7 +678,6 @@ export default {
 
     // 导出
     exportProject() {
-     
       var beginTime = this.formItem.beginTime || "";
       var endTime = this.formItem.endTime || "";
       var isChange = this.formItem.isChange || "";
@@ -678,7 +687,6 @@ export default {
       var phone = this.formItem.phone || "";
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
-    
 
       var url2 = `${
         axios.defaults.baseURL
@@ -690,7 +698,6 @@ export default {
 
     // 导出
     exportProject_1() {
-    
       var beginTime = this.formItem.beginTime || "";
       var endTime = this.formItem.endTime || "";
       var isChange = this.formItem.isChange || "";
@@ -700,7 +707,7 @@ export default {
       var phone = this.formItem.phone || "";
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
-    
+
       var url2 = `${
         axios.defaults.baseURL
       }/api/emaint/repairProblem/exportCustomersPayAReturnVisitData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
@@ -795,7 +802,7 @@ export default {
         this.nodesList = [];
       }, 1000);
     }
-  },
+  }
 };
 </script>
 <style scoped>
