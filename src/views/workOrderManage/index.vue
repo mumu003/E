@@ -551,31 +551,25 @@ export default {
     };
   },
   mounted() {
-    
     //方法
     if (this.$route.params.callID) {
-   
-     
       // this.$refs.callidselect.setQuery(this.$route.params.callID)
-      this.remoteMethod1(this.$route.params.callID,true)
-        // setTimeout(()=>{
-        //      this.formItem.callID = this.$route.params.callID;
-        //     this.search(this.$route.params.callID)
-        // },1000)  
+      this.remoteMethod1(this.$route.params.callID, true);
+      // setTimeout(()=>{
+      //      this.formItem.callID = this.$route.params.callID;
+      //     this.search(this.$route.params.callID)
+      // },1000)
     }
   },
   created() {
     Bus.$on("changephone", value => {
-    
       //  this.$refs.callidselect.setQuery(value)
-       
-       console.log(this.formItem.callID)
-       this.remoteMethod1(value,true)
+      //  console.log(this.formItem.callID)
+      this.remoteMethod1(value, true);
       //  setTimeout(()=>{
       //      this.formItem.callID = value;
       //       this.search(value)
-      //   },1000)  
-       
+      //   },1000)
     });
   },
   beforeCreate() {
@@ -602,8 +596,7 @@ export default {
     );
   },
   methods: {
-    remoteMethod1(query,type) {
-      
+    remoteMethod1(query, type) {
       if (query !== "") {
         this.modal_loading = true;
         setTimeout(() => {
@@ -635,23 +628,21 @@ export default {
                     }
                   });
                   this.callIDoptions = this.uniq(this.callIDoptions);
-                    
-                  if(type){
-                setTimeout(()=>{
-                     this.formItem.callID=query;
-                  
-                    this.search(query);
-                },200)
-                  
+                  if (this.callIDoptions.length == 0) {
+                    this.callIDoptions.push(query);
                   }
+                  if (type) {
+                    setTimeout(() => {
+                      this.formItem.callID = query;
+                      this.search(query);
+                    }, 200);
+                  }
+                }
               }
-              }
-
             }
           );
         }, 100);
       } else {
-        
         this.callIDoptions = [];
         this.callID_list = [];
         this.formItem.callID = "";
@@ -756,11 +747,7 @@ export default {
     },
     // 输入手机号进行检索
     search(e) {
-      // console.log(e)
-      // if(e)
-      // this.formItem.callID=e;
-      console.log(this.formItem.callID)
-      console.log(this.callID_list)
+      // console.log(this.callID_list)
       if (
         this.formItem.callID == "" ||
         this.formItem.callID == "undefined" ||
@@ -876,30 +863,6 @@ export default {
           replacementRepair: ""
         };
       }
-      // }else{
-      //   this.formItem={
-      //             clientId: "",
-      //             phone: this.formItem.phone,
-      //             undef:"",
-      //             tel:"",
-      //             officeLocation: "",
-      //             contactPhone:"",
-      //             name: "",
-      //             companyName: "",
-      //             priority: "",
-      //             sex: "",
-      //             problemClass: "",
-      //             problemType: "",
-      //             remark: "",
-      //             participatorids: [],
-      //             problem: "",
-      //             problemImgs: "",
-      //             participators: [],
-      //             userId:'',
-      //             userName:"",
-      //             replacementRepair:""
-      //           }
-      // }
     },
     // 报修提交
     repairSubmit() {

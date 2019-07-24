@@ -575,7 +575,17 @@ export default {
           {
             title: "优先级",
             key: "priority",
-            width: 90
+            width: 90,
+            render: (h, params) => {
+              switch (params.row.priority) {
+                case "null":
+                  return h("div", "");
+                case "undefined":
+                  return h("div", "");
+                default:
+                  return h("div", params.row.priority);
+              }
+            }
           },
           {
             title: "状态",
@@ -590,7 +600,17 @@ export default {
           {
             title: "办公位",
             key: "officeLocation",
-            width: 90
+            width: 90,
+             render: (h, params) => {
+              switch (params.row.officeLocation) {
+                case "null":
+                  return h("div", "");
+                case "undefined":
+                  return h("div", "");
+                default:
+                  return h("div", params.row.officeLocation);
+              }
+            }
           },
           {
             title: "报修类型",
