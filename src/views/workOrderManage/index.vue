@@ -551,16 +551,31 @@ export default {
     };
   },
   mounted() {
+    
     //方法
     if (this.$route.params.callID) {
-      this.formItem.callID = this.$route.params.callID;
-      this.search(this.$route.params.callID);
+   
+     
+      // this.$refs.callidselect.setQuery(this.$route.params.callID)
+      this.remoteMethod1(this.$route.params.callID,true)
+        // setTimeout(()=>{
+        //      this.formItem.callID = this.$route.params.callID;
+        //     this.search(this.$route.params.callID)
+        // },1000)  
     }
   },
   created() {
     Bus.$on("changephone", value => {
-      this.formItem.callID = value;
-      this.search();
+    
+      //  this.$refs.callidselect.setQuery(value)
+       
+       console.log(this.formItem.callID)
+       this.remoteMethod1(value,true)
+      //  setTimeout(()=>{
+      //      this.formItem.callID = value;
+      //       this.search(value)
+      //   },1000)  
+       
     });
   },
   beforeCreate() {
@@ -587,8 +602,8 @@ export default {
     );
   },
   methods: {
-    remoteMethod1(query) {
-      // console.log(query)
+    remoteMethod1(query,type) {
+      
       if (query !== "") {
         this.modal_loading = true;
         setTimeout(() => {
@@ -620,12 +635,23 @@ export default {
                     }
                   });
                   this.callIDoptions = this.uniq(this.callIDoptions);
-                }
+                    
+                  if(type){
+                setTimeout(()=>{
+                     this.formItem.callID=query;
+                  
+                    this.search(query);
+                },200)
+                  
+                  }
               }
+              }
+
             }
           );
-        }, 300);
+        }, 100);
       } else {
+        
         this.callIDoptions = [];
         this.callID_list = [];
         this.formItem.callID = "";
@@ -640,7 +666,7 @@ export default {
         this.formItem.sex = "";
         this.formItem.clientId = "";
         this.RepairForm.clientId = "";
-        console.log(this.formItem);
+        // console.log(this.formItem);
       }
     },
 
@@ -730,7 +756,11 @@ export default {
     },
     // 输入手机号进行检索
     search(e) {
-      console.log(this.formItem.callID);
+      // console.log(e)
+      // if(e)
+      // this.formItem.callID=e;
+      console.log(this.formItem.callID)
+      console.log(this.callID_list)
       if (
         this.formItem.callID == "" ||
         this.formItem.callID == "undefined" ||
