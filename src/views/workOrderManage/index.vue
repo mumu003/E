@@ -39,12 +39,12 @@
              </Row>
               <Row>
                  <Col span="17">
-              <FormItem label="办公位" >
+              <FormItem label="位置" >
                 <AutoComplete
                   v-model="formItem.officeLocation"
                   :data="newarr"
                   @on-search="handleSearch1"
-                  placeholder="请输入办公位"
+                  placeholder="请输入位置"
                   >
                 </AutoComplete>
               </FormItem>
@@ -67,7 +67,15 @@
               </Col>
              
               </Row>
-
+                <Row >
+              <Col span="17">
+                <FormItem label="优先级">
+                <Select v-model="formItem.priority" placeholder="请选择优先级">
+                  <Option v-for="(item,index) in priority" :value="item.value" :key="index">{{item.name}}</Option>
+                </Select>
+              </FormItem>
+              </Col>
+               </Row>
 
               <!-- 联系人号码 -->
               <Row type="flex" justify="start">
@@ -121,13 +129,7 @@
               </FormItem>
               </Col>
               </Row>
-              <Row v-show="formItem.priority">
-              <Col span="17">
-              <FormItem label="优先级">
-                    <Input v-model="formItem.priority" disabled ></Input>
-              </FormItem>
-              </Col>
-               </Row>
+              
               <Row  v-show="formItem.sex">
               <Col span="17">
               <FormItem label="性别">
@@ -362,6 +364,7 @@ export default {
       officeLocations: [],
       contactPhones: [],
       showimg: "",
+      priority:[],
       //表单
       formItem: {
         clientId: "",
@@ -479,7 +482,7 @@ export default {
             width: 120
           },
           {
-            title: "办公位",
+            title: "位置",
             key: "officeLocation",
             width: 90
           },
@@ -562,6 +565,22 @@ export default {
     }
   },
   created() {
+     // 优先级下拉列表
+      this.$request.post("/api/dictionary/optionsByGroupCode",qs.stringify({groupCode:"problem_priority"}),res=>{
+              this.modal_loading = false
+              this.$Message.error("网络出错，请重试！")
+            } , res => {
+              if (res.statusCode === 200) {
+                var data=res.responseResult
+                data.forEach((v)=>{
+                    this.priority.push(v)
+                })
+                  // this.$Message.success({title: '提示信息', content: "加载成功"})
+              } else {
+                this.modal_loading = false
+                // this.$Modal.error({title: '提示信息', content: res.resMessage})
+          }
+      })
     Bus.$on("changephone", value => {
       //  this.$refs.callidselect.setQuery(value)
       //  console.log(this.formItem.callID)
@@ -669,7 +688,7 @@ export default {
       this.imglist.push("");
       this.imglist.pop("");
     },
-    // 办公位自动检索
+    // 位置自动检索
     handleSearch1(value) {
       this.newarr = [];
       this.officeLocations.forEach(v => {
@@ -773,7 +792,7 @@ export default {
           this.formItem.priority = v.priority;
           this.formItem.sex = v.sex;
           this.formItem.clientId = v.id;
-          // 获取办公位记录
+          // 获取位置记录
           this.$request.post(
             "/api/emaint/repairProblem/clientOfficeLocation",
             qs.stringify({ clientId: v.id }),

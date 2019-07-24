@@ -199,7 +199,7 @@
                   width:120
                 },
                 {
-                  title: '办公位',
+                  title: '位置',
                   key: 'officeLocation',
                   width:120
                 },

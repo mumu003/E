@@ -149,8 +149,8 @@
           </FormItem>
           </Col>
           <Col span="16">
-          <FormItem label="办公位">
-            <Input v-model="addForm.officeLocation" :maxlength="30" placeholder="请输入办公位"></Input>
+          <FormItem label="位置">
+            <Input v-model="addForm.officeLocation" :maxlength="30" placeholder="请输入位置"></Input>
           </FormItem>
           </Col>
           <Col span="16">
@@ -233,8 +233,8 @@
           </FormItem>
           </Col>
           <Col span="16">
-          <FormItem label="办公位">
-            <Input v-model="addForm.officeLocation" placeholder="请输入办公位"></Input>
+          <FormItem label="位置">
+            <Input v-model="addForm.officeLocation" placeholder="请输入位置"></Input>
           </FormItem>
           </Col>
           <Col span="16">
@@ -517,7 +517,7 @@ import util from "@/assets/js/util";
               }
             },
             {
-              title: '办公位',
+              title: '位置',
               key: 'officeLocation',
               width:90
             },

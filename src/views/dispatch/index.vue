@@ -24,8 +24,8 @@
 
               <Row   v-show="formItem.officeLocation">
                  <Col span="15">
-              <FormItem label="办公位" >
-                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
+              <FormItem label="位置" >
+                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入位置"></Input>
               </FormItem>
               </Col>
                </Row>
@@ -415,7 +415,7 @@ export default {
               }
           },
           {
-            title: "办公位",
+            title: "位置",
             key: "officeLocation",
             width: 120
           },

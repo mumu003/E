@@ -171,23 +171,39 @@
                   }
                 },
                 {
-                  title: '执行人',
+                  title:'姓名',
                   key: 'userName',
                   width:90,
                 },
                 {
-                  title: '总数',
+                  title: '执行总数',
                   key: 'totalCount',
                   width:70,
                 },
+                 
                 {
-                  title: '已完成单数',
+                  title: '执行已完成',
                   key: 'completeCount',
                   width:70,
                 },
                 {
-                  title: '待维修单数',
+                  title: '执行待维修',
                   key: 'uncompleteCount',
+                  width:70,
+                },
+                {
+                  title: '参与总数',
+                  key: 'cyTotalCount',
+                  width:70,
+                },
+                 {
+                  title: '参与已完成',
+                  key: 'cyCompleteCount',
+                  width:70,
+                },
+                {
+                  title: '参与待维修',
+                  key: 'cyUncompleteCount',
                   width:70,
                 },
               ],

@@ -273,4 +273,7 @@ export default {
 #workDetailtooltip .ivu-tooltip-rel{
   max-width: 100%!important;
 }
+/* .ivu-table-cell{
+  white-space: nowrap;
+} */
 </style>

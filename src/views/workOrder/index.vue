@@ -21,7 +21,11 @@
         <div id="search-body">
           <Form  :model="formItem" :label-width="80" :rules="ruleAdd">
             <Row type="flex" justify="start">
-
+              <Col span="8">
+              <FormItem label="检索条件">
+                <Input v-model="formItem.keyword" :maxlength=20 placeholder="工单号 / 姓名 / 状态 / 手机号 / 执行人 / 问题类别"></Input>
+              </FormItem>
+              </Col> 
               <Col span="6">
               <FormItem label="工单号">
                 <Input v-model="formItem.workOrderNo" :maxlength=20 placeholder="请输入工单号"></Input>
@@ -42,6 +46,12 @@
               <Col span="6">
               <FormItem label="姓名">
                 <Input v-model="formItem.name" :maxlength=30 placeholder="请输入姓名" />
+              </FormItem>
+              </Col>
+              <Col span="8">
+              <FormItem label="创建时间">
+                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 285px" @on-change="getcreatedTime"></DatePicker>
+                <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
               <Col span="6">
@@ -74,12 +84,7 @@
               </FormItem>
               </Col> -->
 
-              <Col span="6">
-              <FormItem label="创建时间">
-                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 280px" @on-change="getcreatedTime"></DatePicker>
-                <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
-              </FormItem>
-              </Col>
+              
             </Row>
           </Form>
           <div class="search-row">
@@ -256,6 +261,7 @@ export default {
       //表单
       formItem: {
         workOrderNo: "",
+        keyword:"",
         state: "",
         name: "",
         phone: "",
@@ -410,10 +416,25 @@ export default {
             key: "workOrderNo",
             width: 130
           },
+           {
+            title: "公司",
+            key: "companyName",
+            width: 110
+          },
           {
-            title: "姓名",
+            title: "报修人",
             key: "name",
             width: 90
+          },
+           {
+            title: "问题类型",
+            key: "problemClass",
+            width: 90
+          },
+          {
+            title: "问题描述",
+            key: "problem",
+            width: 110
           },
           {
             title: "优先级",
@@ -426,7 +447,20 @@ export default {
                 case "undefined":
                   return h("div", "");
                 default:
-                  return h("div", params.row.priority);
+                    
+                  return h("div", [h(
+                  "span",
+                  {
+                    
+                    style: {
+                      
+                       color:params.row.priority=="高"?'#57a3f3':'unset',
+                      //  fontWeight:params.row.priority=='高'?'bold':'none'
+                    },
+                    
+                  },
+                  params.row.priority
+                ),]);
               }
             }
           },
@@ -448,8 +482,9 @@ export default {
           //               }
           //             }
           //         },
+          
           {
-            title: "办公位",
+            title: "位置",
             key: "officeLocation",
             width: 90,
             render: (h, params) => {
@@ -504,7 +539,11 @@ export default {
             message: "请输入正确的手机号",
             trigger: "blur",
             transform(value) {
-              var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+              
+              if(value==null)
+              return ' '
+              // var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+               var reg = /[0-9]/;
               if (!reg.test(value)) {
                 return false;
               } else {

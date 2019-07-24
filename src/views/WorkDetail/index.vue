@@ -134,7 +134,7 @@
               <Row v-show="formItem.repairSource">
                  <Col span="20">
               <FormItem label="报修来源" >
-                <Input v-model="formItem.repairSource" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
+                <Input v-model="formItem.repairSource" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入位置"></Input>
               </FormItem>
               </Col>
               </Row>
@@ -142,7 +142,7 @@
                 <Row v-show="formItem.gmtCreate">
                  <Col span="20">
               <FormItem label="创建时间" >
-                <Input v-model="formItem.gmtCreate" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
+                <Input v-model="formItem.gmtCreate" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入位置"></Input>
               </FormItem>
               </Col>
               </Row>
@@ -212,8 +212,8 @@
 
               <Row v-show="formItem.officeLocation&&formItem.officeLocation!='null'&&formItem.officeLocation!='undefined'">
               <Col span="20">
-              <FormItem label="办公位" >
-                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入办公位"></Input>
+              <FormItem label="位置" >
+                <Input v-model="formItem.officeLocation" :disabled="viewForm.id!=''?true:false" :maxlength=11 placeholder="请输入位置"></Input>
               </FormItem>
               </Col>
               </Row>
@@ -598,7 +598,7 @@ export default {
             width: 120
           },
           {
-            title: "办公位",
+            title: "位置",
             key: "officeLocation",
             width: 90,
              render: (h, params) => {

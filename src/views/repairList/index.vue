@@ -39,7 +39,7 @@
               </FormItem>
               </Col>
               <Col span="6" v-show="formItem.officeLocation">
-              <FormItem label="办公位">
+              <FormItem label="位置">
                   <!-- <span>男</span> -->
                     <Input v-model="formItem.officeLocation" disabled :maxlength=11 ></Input>
               </FormItem>
@@ -212,7 +212,7 @@ import qs from "qs";
             //   }
             },
             {
-              title: '办公位',
+              title: '位置',
               key: 'officeLocation',
               width:90
             },
