@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;">
     <!-- :loading="loading" -->
-    <Table border stripe  :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
+    <Table border stripe @on-row-click="rowclick" :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
     <div class="page-tool">
       <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
     </div>
@@ -99,8 +99,8 @@ export default {
           list.map((item, index) => {
             list[index].series = index + 1 + (this.currentPage - 1) * (this.limit)
           })
-        
-          this.tableData = list.sort(util.compare('gmtModified'))
+          // .sort(util.compare('gmtModified'))
+          this.tableData = list
         
           this.total = data.responseResult.total || data.responseResult.length
           this.currentPage = data.responseResult.pageNum === 0 ? 1 : data.responseResult.pageNum
@@ -118,6 +118,10 @@ export default {
         })
       })
       this.selection = selection
+    },
+    rowclick(row,index){
+        console.log(row)
+        console.log(index)
     },
     pageChange (page) {
       this.currentPage = page

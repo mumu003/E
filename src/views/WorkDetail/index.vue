@@ -55,7 +55,7 @@
               </FormItem>
               </Col>
               </Row>
-              <Row type="flex"  >
+              <Row type="flex"  v-show="formItem.problemClass&&formItem.problemClass!='null'&&formItem.problemClass!='undefined'&&formItem.problemType&&formItem.problemType!='null'&&formItem.problemType!='undefined'">
               <Col span="24">
                 <FormItem label="报修类型" :label-width="95" style="text-align:left">
                   <Tooltip style="width:100%" :content="formItem.problemClass + ' - ' + formItem.problemType" placement="top" id="workDetailtooltip">
@@ -618,7 +618,7 @@ export default {
             width: 90
           },
           {
-            title: "常见问题",
+            title: "问题项",
             key: "problem",
             width: 110
           },

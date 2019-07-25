@@ -152,13 +152,7 @@
       </div>
     </Modal>
 
-    <Modal v-model="endModal" title="终止发函"
-           :loading="modal_loading"
-           @on-ok="endSubmit"
-           @on-cancel="endCancel"
-    >
-      <p>是否确认终止该流程，终止后将无法继续该流程?</p>
-    </Modal>
+
 
 
     <Modal v-model="noteModal" width="300" title="提示信息">
@@ -805,43 +799,9 @@ export default {
         }
       );
     },
-    statuSubmit() {
-      setTimeout(() => {
-        this.statusModal = false;
-        this.loading = false;
-        this.$refs.table.init();
-      }, 2000);
-    },
 
-    //终止提交
-    endSubmit() {
-      let id = this.selection.map(item => item.id).toString();
-      let params = {
-        id
-      };
-      this.$request.post(
-        "/api/sendFileBill/cutOut",
-        params,
-        res => {
-          this.$Message.success("终止成功");
-          this.modal_loading = false;
-          this.endModal = false;
-          this.$refs.table.init();
-        },
-        res => {
-          this.$Modal.error({ title: "提示信息", content: res.message });
-          this.modal_loading = false;
-          this.endModal = false;
-          this.$refs.table.init();
-        }
-      );
-    },
-    //终止取消
-    endCancel() {
-      this.$Message.info("你取消了操作");
-      this.endModal = false;
-      this.$refs.table.init();
-    },
+
+  
     //删除
     deleteProject(id) {
       this.$Modal.confirm({

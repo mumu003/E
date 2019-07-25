@@ -50,7 +50,7 @@
               </Col>
               <Col span="8">
               <FormItem label="创建时间">
-                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 285px" @on-change="getcreatedTime"></DatePicker>
+                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 285px !important" @on-change="getcreatedTime"></DatePicker>
                 <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
@@ -427,14 +427,22 @@ export default {
             width: 90
           },
            {
-            title: "问题类型",
-            key: "problemClass",
-            width: 90
+            title: "问题类别",
+            key: "problemClass" ,
+            width: 150,
+            render: (h, params) => {
+              if(params.row.problemClass!="null" && params.row.problemClass!="undefined"&&
+              params.row.problemType!="null" && params.row.problemType!="undefined"){
+                return h('div',params.row.problemClass +" - "+ params.row.problemType)
+              }
+            }
           },
           {
-            title: "问题描述",
+            title: "问题项",
             key: "problem",
-            width: 110
+            width: 110,
+            // ellipsis:true,
+            // type: 'expand',
           },
           {
             title: "优先级",
@@ -451,9 +459,7 @@ export default {
                   return h("div", [h(
                   "span",
                   {
-                    
                     style: {
-                      
                        color:params.row.priority=="高"?'#57a3f3':'unset',
                       //  fontWeight:params.row.priority=='高'?'bold':'none'
                     },
@@ -540,7 +546,7 @@ export default {
             trigger: "blur",
             transform(value) {
               
-              if(value==null)
+              if(value==null || value=="")
               return ' '
               // var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
                var reg = /[0-9]/;

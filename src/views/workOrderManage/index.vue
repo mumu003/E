@@ -492,7 +492,7 @@ export default {
             width: 90
           },
           {
-            title: "常见问题",
+            title: "问题项",
             key: "problem",
             width: 110
           },
