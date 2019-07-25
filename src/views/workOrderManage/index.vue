@@ -489,7 +489,13 @@ export default {
           {
             title: "报修类型",
             key: "problemClass",
-            width: 90
+            width: 150,
+            render: (h, params) => {
+              if(params.row.problemClass!="null" && params.row.problemClass!="undefined"&&
+              params.row.problemType!="null" && params.row.problemType!="undefined"){
+                return h('div',params.row.problemClass +" - "+ params.row.problemType)
+              }
+            }
           },
           {
             title: "问题项",
@@ -859,13 +865,13 @@ export default {
         this.$Message.error("客户信息不存在");
         this.RepairForm.clientId = "";
         this.formItem = {
-          clientId: "",
-          phone: "",
+          clientId: " ",
+          phone:null,
           callID: this.formItem.callID,
-          undef: "",
-          tel: "",
-          officeLocation: "",
-          contactPhone: "",
+          undef: " ",
+          tel: " ",
+          officeLocation:null,
+          contactPhone: " ",
           name: "",
           companyName: "",
           priority: "",
@@ -881,6 +887,7 @@ export default {
           userName: "",
           replacementRepair: ""
         };
+        console.log(this.formItem)
       }
     },
     // 报修提交
@@ -944,6 +951,7 @@ export default {
 
           // formData添加formItem的键值对
           for (var i in this.formItem) {
+            
             data.append(i, this.formItem[i]);
           }
           for (var i = 0; i < this.files.length; i++) {

@@ -89,7 +89,7 @@
 </template>
 <style>
 .logo-img {
-  background: url("../assets/img/head.jpg") center center no-repeat;
+  background: url("../assets/img/head.png") center center no-repeat;
   background-size: auto 95%;
 }
 .set-pwd {
@@ -103,7 +103,7 @@
 import "./../assets/css/mainCus.css"; // 使用 CSS
 import axios from "axios";
 import breadcrumbNav from "./../components/breadcrumb-nav.vue";
-import headImg from "./../assets/img/head.jpg";
+import headImg from "./../assets/img/head.png";
 import Bus from "./../bus.js";
 export default {
   components: {

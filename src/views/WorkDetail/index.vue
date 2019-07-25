@@ -615,7 +615,13 @@ export default {
           {
             title: "报修类型",
             key: "problemClass",
-            width: 90
+            width: 150,
+            render: (h, params) => {
+              if(params.row.problemClass!="null" && params.row.problemClass!="undefined"&&
+              params.row.problemType!="null" && params.row.problemType!="undefined"){
+                return h('div',params.row.problemClass +" - "+ params.row.problemType)
+              }
+            }
           },
           {
             title: "问题项",

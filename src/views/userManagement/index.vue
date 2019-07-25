@@ -471,22 +471,29 @@ export default {
                           this.editMaterialForm.name = params.row.loginName;
                           this.editMaterialForm.phone = params.row.phone;
                           this.editMaterialForm.id = params.row.id;
-                          this.$request.post(
-                            "/api/user/view",
-                            qs.stringify({ id: params.row.id }),
-                            res => {},
-                            res => {
-                              if (res.statusCode == 200) {
-                                var ary = res.responseResult.roleId.split(",");
-                                var newAry=[]
-                                ary.map(function(v, i) {
-                                  var a = parseInt(v)
-                                  newAry.push(a)
-                                });
-                                this.editMaterialForm.roleId = newAry;
-                              }
-                            }
-                          );
+                          var ary = params.row.roleId.split(",");
+                          var newAry = [];
+                          ary.map(function(v, i) {
+                            var a = parseInt(v);
+                            newAry.push(a);
+                          });
+                          this.editMaterialForm.roleId = newAry;
+                          // this.$request.post(
+                          //   "/api/user/view",
+                          //   qs.stringify({ id: params.row.id }),
+                          //   res => {},
+                          //   res => {
+                          //     if (res.statusCode == 200) {
+                          //       var ary = res.responseResult.roleId.split(",");
+                          //       var newAry=[]
+                          //       ary.map(function(v, i) {
+                          //         var a = parseInt(v)
+                          //         newAry.push(a)
+                          //       });
+                          //       this.editMaterialForm.roleId = newAry;
+                          //     }
+                          //   }
+                          // );
                         }
                       }
                     },

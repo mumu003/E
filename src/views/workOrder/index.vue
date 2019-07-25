@@ -50,7 +50,8 @@
               </Col>
               <Col span="8">
               <FormItem label="创建时间">
-                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width: 285px !important" @on-change="getcreatedTime"></DatePicker>
+                
+                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width:100%!important"  @on-change="getcreatedTime"></DatePicker>
                 <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
               </FormItem>
               </Col>
@@ -440,7 +441,7 @@ export default {
           {
             title: "问题项",
             key: "problem",
-            width: 110,
+            width: 120,
             // ellipsis:true,
             // type: 'expand',
           },
@@ -521,7 +522,7 @@ export default {
           },
           {
             title: "创建时间",
-            key: "gmtModified",
+            key: "gmtCreate",
             width: 170
           }
         ]
