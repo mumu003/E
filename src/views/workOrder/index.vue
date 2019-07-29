@@ -1,37 +1,51 @@
 <template>
-<!-- 工单管理 -->
+  <!-- 工单管理 -->
   <div>
     <!-- 检索框 -->
     <Row :gutter="10">
       <Col span="24">
-      <Card class="search-card">
-        <p slot="title" id="labels">
+        <Card class="search-card">
+          <p slot="title" id="labels">
             <!-- {{$route.meta.title}} -->
-           <template >
-          <label  @click="setstate('')" :style="{color:!formItem.state?'#57a3f3':''}">全部工单</label>
-          <label  @click="setstate('待派单')" :style="{color:formItem.state=='待派单'?'#57a3f3':''}">待派单</label>
-          <label  @click="setstate('待维修')" :style="{color:formItem.state=='待维修'?'#57a3f3':''}">待维修</label>
-          <label  @click="setstate('待评价')" :style="{color:formItem.state=='待评价'?'#57a3f3':''}">待评价</label>
-          <label  @click="setstate('已评价')" :style="{color:formItem.state=='已评价'?'#57a3f3':''}">已评价</label>
-           </template>
-          <collapse-icon foldPart="search-body"></collapse-icon>
-         
-         
-        </p>
-        <div id="search-body">
-          <Form  :model="formItem" :label-width="80" :rules="ruleAdd">
-            <Row type="flex" justify="start">
-              <Col span="8">
-              <FormItem label="检索条件">
-                <Input v-model="formItem.keyword" :maxlength=20 placeholder="工单号 / 姓名 / 状态 / 手机号 / 执行人 / 问题类别"></Input>
-              </FormItem>
-              </Col> 
-              <Col span="6">
-              <FormItem label="工单号">
-                <Input v-model="formItem.workOrderNo" :maxlength=20 placeholder="请输入工单号"></Input>
-              </FormItem>
-              </Col>              
-              <!-- <Col span="6">
+            <template>
+              <label @click="setstate('')" :style="{color:!formItem.state?'#57a3f3':''}">全部工单</label>
+              <label
+                @click="setstate('待派单')"
+                :style="{color:formItem.state=='待派单'?'#57a3f3':''}"
+              >待派单</label>
+              <label
+                @click="setstate('待维修')"
+                :style="{color:formItem.state=='待维修'?'#57a3f3':''}"
+              >待维修</label>
+              <label
+                @click="setstate('待评价')"
+                :style="{color:formItem.state=='待评价'?'#57a3f3':''}"
+              >待评价</label>
+              <label
+                @click="setstate('已评价')"
+                :style="{color:formItem.state=='已评价'?'#57a3f3':''}"
+              >已评价</label>
+            </template>
+            <collapse-icon foldPart="search-body"></collapse-icon>
+          </p>
+          <div id="search-body">
+            <Form :model="formItem" :label-width="80" :rules="ruleAdd">
+              <Row type="flex" justify="start">
+                <Col span="8">
+                  <FormItem label="检索条件">
+                    <Input
+                      v-model="formItem.keyword"
+                      :maxlength="20"
+                      placeholder="工单号 / 姓名 / 状态 / 手机号 / 执行人 / 问题类别"
+                    ></Input>
+                  </FormItem>
+                </Col>
+                <Col span="6">
+                  <FormItem label="工单号">
+                    <Input v-model="formItem.workOrderNo" :maxlength="20" placeholder="请输入工单号"></Input>
+                  </FormItem>
+                </Col>
+                <!-- <Col span="6">
               <FormItem label="状态">
                  <Select v-model="formItem.state" placeholder="全部">
                    <Option value="">全部</Option>
@@ -41,26 +55,32 @@
                       <Option value="已评价">已评价</Option>
                     </Select>
               </FormItem>
-              </Col> -->
-              
-              <Col span="6">
-              <FormItem label="姓名">
-                <Input v-model="formItem.name" :maxlength=30 placeholder="请输入姓名" />
-              </FormItem>
-              </Col>
-              <Col span="8">
-              <FormItem label="创建时间">
-                
-                <DatePicker type="datetimerange" v-model="createdTime" split-panels placeholder="请选择起始时间" style="width:100%!important"  @on-change="getcreatedTime"></DatePicker>
-                <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
-              </FormItem>
-              </Col>
-              <Col span="6">
-              <FormItem label="手机号" prop="phone">
-                <Input v-model="formItem.phone" :maxlength=20 placeholder="请输入手机号"/>
-              </FormItem>
-              </Col>
-              <!-- <Col span="6">
+                </Col>-->
+
+                <Col span="6">
+                  <FormItem label="姓名">
+                    <Input v-model="formItem.name" :maxlength="30" placeholder="请输入姓名" />
+                  </FormItem>
+                </Col>
+                <Col span="8">
+                  <FormItem label="创建时间">
+                    <DatePicker
+                      type="datetimerange"
+                      v-model="createdTime"
+                      split-panels
+                      placeholder="请选择起始时间"
+                      style="width:100%!important"
+                      @on-change="getcreatedTime"
+                    ></DatePicker>
+                    <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker> -->
+                  </FormItem>
+                </Col>
+                <Col span="6">
+                  <FormItem label="手机号" prop="phone">
+                    <Input v-model="formItem.phone" :maxlength="20" placeholder="请输入手机号" />
+                  </FormItem>
+                </Col>
+                <!-- <Col span="6">
               <FormItem label="是否变更">
                  <Select v-model="formItem.isChange" placeholder="全部">
                       <Option value="">全部</Option>
@@ -68,13 +88,13 @@
                       <Option value="否">未变更</Option>
                     </Select>
               </FormItem>
-              </Col> -->
-              <Col span="6">
-              <FormItem label="执行人">
-                <Input v-model="formItem.userName" :maxlength=20 placeholder="请输入执行人"/>
-              </FormItem>
-              </Col>
-              <!-- <Col span="6">
+                </Col>-->
+                <Col span="6">
+                  <FormItem label="执行人">
+                    <Input v-model="formItem.userName" :maxlength="20" placeholder="请输入执行人" />
+                  </FormItem>
+                </Col>
+                <!-- <Col span="6">
               <FormItem label="创建时间">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择开始时间" @on-change="getStartDate"  v-model="formItem.beginTime" class="widthp100"></DatePicker>
               </FormItem>
@@ -83,76 +103,105 @@
               <FormItem>
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" :options="end" placeholder="请选择结束时间" @on-change="getEndDate"  v-model="formItem.endTime" class="widthp100"></DatePicker>
               </FormItem>
-              </Col> -->
-
-              
-            </Row>
-          </Form>
-          <div class="search-row">
-            <Col>
-            </Col>
-            <Col>
-            <Button type="primary" icon="search" @click="searchSubmit">搜索</Button>
-            <Button type="ghost" icon="refresh" @click="searchCancel">重置</Button>
-            </Col>
+                </Col>-->
+              </Row>
+            </Form>
+            <div class="search-row">
+              <Col></Col>
+              <Col>
+                <Button type="primary" icon="search" @click="searchSubmit">搜索</Button>
+                <Button type="ghost" icon="refresh" @click="searchCancel">重置</Button>
+              </Col>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
       </Col>
     </Row>
 
     <!-- 操作按钮 -->
     <Row :gutter="10" class="mt10">
       <Col span="24">
-      <Card>
-        <div class="search-row">
-          <Row>
-            <Col>
-            <Button type="primary" icon="plus-round" @click="addProject" v-if="auth.tf_repair_problem_edit">新增</Button>
-            <Button type="primary" icon="ios-redo" @click="exportProject"  v-if="auth.tf_repair_problem_data_export">导出工单明细excel</Button>
-            <Button type="primary" icon="ios-redo" @click="exportProject_1"  v-if="auth.tf_repair_problem_data_export">导出客户回访excel</Button>
-            </Col>
-            <Col>
-            </Col>
+        <Card>
+          <div class="search-row">
+            <Row>
+              <Col>
+                <Button
+                  type="primary"
+                  icon="plus-round"
+                  @click="addProject"
+                  v-if="auth.tf_repair_problem_edit"
+                >新增</Button>
+                <Button
+                  type="primary"
+                  icon="ios-redo"
+                  @click="exportProject"
+                  v-if="auth.tf_repair_problem_data_export"
+                >导出工单明细excel</Button>
+                <Button
+                  type="primary"
+                  icon="ios-redo"
+                  @click="exportProject_1"
+                  v-if="auth.tf_repair_problem_data_export"
+                >导出客户回访excel</Button>
+              </Col>
+              <Col></Col>
+            </Row>
+          </div>
+          <Row class="searchable-table-con">
+            <m-table
+              :config="tableConfig"
+              :searchParams="formItem"
+              ref="table"
+              :searchTime="searchTime"
+              :isFirst="isFirst"
+            ></m-table>
           </Row>
-        </div>
-        <Row class="searchable-table-con">
-          <m-table :config="tableConfig" :searchParams="formItem" ref="table" :searchTime="searchTime" :isFirst="isFirst"></m-table>
-        </Row>
-      </Card>
+        </Card>
       </Col>
     </Row>
 
-  
     <!-- 备注 -->
-    <Modal v-model="msgModal" width="800"
+    <Modal
+      v-model="msgModal"
+      width="800"
       title="备注"
       @on-ok="msgOk"
-      @on-cancel="viewCancel('remark')">
-          <Form  :model="viewForm" :label-width="80">
-            <Row>
-              <Col span="24">
-                <FormItem label="图片描述"  style="margin-top: 12px;">
-                        <div class="addimg" :style="{'left':(index)*63+'px'}" v-for="(item,index) in imglist" :key="index">
-                            <img :src="item" alt="" v-if="item!=''"   @click="showtheimg(index)">
-                            <i class="ivu-icon ivu-icon-ios-plus-empty"  v-else @click="uploadfile(index)"></i>
-                        </div>
-                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
-                        <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
-                    </FormItem>
-                     <input type="file" name="" id="upfile" style="display:none;" @change="changefile">
-                </Col>
-              <Col span="24">
-                <FormItem label="备注">
-                    <Input v-model="viewForm.remark" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="请输入备注信息"></Input>
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
+      @on-cancel="viewCancel('remark')"
+    >
+      <Form :model="viewForm" :label-width="80">
+        <Row>
+          <Col span="24">
+            <FormItem label="图片描述" style="margin-top: 12px;">
+              <div
+                class="addimg"
+                :style="{'left':(index)*63+'px'}"
+                v-for="(item,index) in imglist"
+                :key="index"
+              >
+                <img :src="item" alt v-if="item!=''" @click="showtheimg(index)" />
+                <i class="ivu-icon ivu-icon-ios-plus-empty" v-else @click="uploadfile(index)"></i>
+              </div>
+              <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+              <!-- <div class="addimg" style="width: 58px; height: 58px; line-height: 58px;border:1px solid #eee;border-radius:5px;"><i data-v-2a8df7f4="" class="ivu-icon ivu-icon-plus" style="font-size: 40px;line-height:1.5;"></i></div> -->
+            </FormItem>
+            <input type="file" name id="upfile" style="display:none;" @change="changefile" />
+          </Col>
+          <Col span="24">
+            <FormItem label="备注">
+              <Input
+                v-model="viewForm.remark"
+                type="textarea"
+                :autosize="{minRows: 4,maxRows: 5}"
+                placeholder="请输入备注信息"
+              ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
       <div slot="footer" style="text-align:right;">
         <Row>
           <Col span="24" v-if="this.viewTabs === 'remark'">
-            <Button size="default" @click="viewCancel('remark')" >取消</Button>
+            <Button size="default" @click="viewCancel('remark')">取消</Button>
             <Button type="primary" size="default" @click="msgOk" :loading="modal_loading">确定</Button>
           </Col>
         </Row>
@@ -160,58 +209,96 @@
     </Modal>
 
     <!-- 图片幻灯 -->
-    <Modal 
-        class="showtheimg"
-        title="View Image" 
-        v-model="visible"
-        @on-cancel="imgcancel" :closable="false"
-        :mask-closable="false"
-      >
-        <img :src="imglist[showimg]" v-if="visible" style="width: 100%;">
+    <Modal
+      class="showtheimg"
+      title="View Image"
+      v-model="visible"
+      @on-cancel="imgcancel"
+      :closable="false"
+      :mask-closable="false"
+    >
+      <img :src="imglist[showimg]" v-if="visible" style="width: 100%;" />
     </Modal>
 
     <!-- 变更执行人 -->
-    <Modal v-model="choosemodel" title="执行人选择" width="500" style="z-index:1001 !important;position:relative !important"
-      @on-cancel="choosemodel=false">
-        <RadioGroup v-model="userindex"  style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll" >
-          <Radio   style="clear:both;width:100%;font-size:13px;padding:10px 5px" :label="index"  v-for="(item,index) in userlist" :key="index">
-              <span style="margin-left:15px;">{{item.name}}</span>
-              <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
-          </Radio>
-        </RadioGroup>
+    <Modal
+      v-model="choosemodel"
+      title="执行人选择"
+      width="500"
+      style="z-index:1001 !important;position:relative !important"
+      @on-cancel="choosemodel=false"
+    >
+      <RadioGroup
+        v-model="userindex"
+        style="width:100%;height:300px;overflow:auto;overflow-x:hidden;overflow-y:scroll"
+      >
+        <Radio
+          style="clear:both;width:100%;font-size:13px;padding:10px 5px"
+          :label="index"
+          v-for="(item,index) in userlist"
+          :key="index"
+        >
+          <span style="margin-left:15px;">{{item.name}}</span>
+          <span style="float:right;">{{item.problemNum==null?0:item.problemNum}}单</span>
+        </Radio>
+      </RadioGroup>
       <div slot="footer" style="text-align: right;">
         <!-- @click="bgzxr" -->
-        <Button type="primary" size="default" @click="dispatchItem.userName=userlist[userindex].name;dispatchItem.userId=userlist[userindex].id;choosemodel=false;" :loading="modal_loading">确定</Button>
+        <Button
+          type="primary"
+          size="default"
+          @click="dispatchItem.userName=userlist[userindex].name;dispatchItem.userId=userlist[userindex].id;choosemodel=false;"
+          :loading="modal_loading"
+        >确定</Button>
       </div>
     </Modal>
 
     <!-- 派单 -->
-    <Modal v-model="dispatchModel" title="派单信息" width="500"
-      @on-ok="repairSubmit" @on-cancel="dispatchModel=false">
-      <Form  :model="dispatchItem" :label-width="80" :rules="ruleValidate">
-             <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
-              <Col span="13" >
-                <FormItem label="执行人" prop="executor">
-                    <Input  class="buttoninput" @on-click="choosemodel=true" readonly  v-model="dispatchItem.userName" icon="search" :maxlength=20 placeholder="点击搜索图标选择"></Input>
-                </FormItem>
-              </Col>
-             </Row>
-             <Row>
-              <Col span="20">
-                <FormItem label="参与者">
-                    <!-- <Input v-model="formItem.participators" ></Input>  -->
-                    <Select v-model="dispatchItem.participatorids"  multiple  style="width:100%;" >
-                      <Option :value="item.id" :label="item.name" v-for="(item,index) in userlist" :key="index">
-                          <span style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;">{{item.name}}</span>
-                          <span>{{item.problemNum==null?0:item.problemNum}}单</span>
-                      </Option>
-                  </Select>
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
+    <Modal
+      v-model="dispatchModel"
+      title="派单信息"
+      width="500"
+      @on-ok="repairSubmit"
+      @on-cancel="dispatchModel=false"
+    >
+      <Form :model="dispatchItem" :label-width="80" :rules="ruleValidate">
+        <Row type="flex" style="margin-top:20px;margin-bottom:20px" justify="start">
+          <Col span="13">
+            <FormItem label="执行人" prop="executor">
+              <Input
+                class="buttoninput"
+                @on-click="choosemodel=true"
+                readonly
+                v-model="dispatchItem.userName"
+                icon="search"
+                :maxlength="20"
+                placeholder="点击搜索图标选择"
+              ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="20">
+            <FormItem label="参与者">
+              <!-- <Input v-model="formItem.participators" ></Input>  -->
+              <Select v-model="dispatchItem.participatorids" multiple style="width:100%;">
+                <Option
+                  :value="item.id"
+                  :label="item.name"
+                  v-for="(item,index) in userlist"
+                  :key="index"
+                >
+                  <span
+                    style="float: left;max-width: 120px;min-width: 120px;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;"
+                  >{{item.name}}</span>
+                  <span>{{item.problemNum==null?0:item.problemNum}}单</span>
+                </Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+      </Form>
     </Modal>
-
   </div>
 </template>
 <script>
@@ -262,7 +349,7 @@ export default {
       //表单
       formItem: {
         workOrderNo: "",
-        keyword:"",
+        keyword: "",
         state: "",
         name: "",
         phone: "",
@@ -292,132 +379,31 @@ export default {
       tableConfig: {
         url: "/api/emaint/repairProblem/repairProblemList",
         columns: [
-          // {
-          //   type: "selection",
-          //   key: "_checked",
-          //   width: 60
-          // },
-          {
-            title: "操作",
-            key: "currentNodeName",
-            width: 100,
-            align: "center",
-            render: (h, params) => {
-              return h("div", [
-                // h(
-                //   "Button",
-                //   {
-                //     props: {
-                //       type: "primary",
-                //       size: "small",
-
-                //       disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_user?true:false
-                //     },
-                //     style: {
-                //       marginRight: "5px",
-                //       //  display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':!this.auth.tf_repair_problem_add_user?'none':'inline'
-                //     },
-                //     on: {
-                //       click: () => {
-                //         // sessionStorage.setItem("paramid", params.row.id);
-                //         // this.$router.push({
-                //         //   name: "dispatch"
-                //         // });
-
-                //         this.dispatchModel = true;
-                //         this.chooseindex = params.row.id;
-
-                //         // this.userlist.forEach((v,i)=>{
-                //         //   if(v.id==params.row.userId){
-                //         //     this.userindex=i;
-                //         //   }
-                //         // })
-                //       }
-                //     }
-                //   },
-                //   "派单"
-                // ),
-                // h( "Button",
-                //   {
-                //     props: {
-                //       type: "primary",
-                //       size: "small",
-                //       disabled:params.row.state=="待评价"?true:params.row.state=="已评价"?true:!this.auth.tf_repair_problem_add_remark?true:false
-                //     },
-                //     style: {
-                //       marginRight: "5px",
-                //       // display:params.row.state=="待评价"?'none':params.row.state=="已评价"?'none':!this.auth.tf_repair_problem_add_remark?'none':'inline'
-                //     },
-                //     on: {
-                //       click: () => {
-                //         this.msgModal = true;
-                //         this.viewForm = {
-                //           id: "",
-                //           remark: ""
-                //         };
-                //         this.files = [];
-                //         this.imglist = [""];
-                //         this.viewForm.id = params.row.id;
-                //       }
-                //     }
-                //   },
-                //   "备注"
-                // ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "primary",
-                      size: "small"
-                      // disabled: !this.auth.tf_repair_problem_add_user
-                      // disabled: params.row.state == "待派单" ? false : true
-                    },
-                    style: {
-                      marginRight: "5px"
-                    },
-                    on: {
-                      click: () => {
-                        sessionStorage.setItem("paramid", params.row.id);
-                        this.$router.push({
-                          name: "WorkDetail"
-                        });
-                      }
-                    }
-                  },
-                  "工单详情"
-                )
-                // h(
-                //   "Button",
-                //   {
-                //     props: {
-                //       type: "primary",
-                //       size: "small",
-                //       disabled: params.row.state == "待维修" ? false : true
-                //     },
-                //     on: {
-                //       click: () => {
-                //         this.choosemodel = true;
-                //         this.chooseindex = params.row.id;
-
-                //         // this.userlist.forEach((v,i)=>{
-                //         //   if(v.id==params.row.userId){
-                //         //     this.userindex=i;
-                //         //   }
-                //         // })
-                //       }
-                //     }
-                //   },
-                //   "变更执行人"
-                // )
-              ]);
-            }
-          },
           {
             title: "工单号码 ",
             key: "workOrderNo",
-            width: 130
+            width: 130,
+            render: (h, params) => {
+              return h("a",
+                {
+                  style: {
+                    marginRight: "5px",
+                    color:"#57a3f3"
+                  },
+                  on: {
+                    click: () => {
+                      sessionStorage.setItem("paramid", params.row.id);
+                      this.$router.push({
+                        name: "WorkDetail"
+                      });
+                    }
+                  }
+                },
+                params.row.workOrderNo
+              );
+            }
           },
-           {
+          {
             title: "公司",
             key: "companyName",
             width: 110
@@ -427,21 +413,28 @@ export default {
             key: "name",
             width: 90
           },
-           {
+          {
             title: "问题类别",
-            key: "problemClass" ,
+            key: "problemClass",
             width: 150,
             render: (h, params) => {
-              if(params.row.problemClass!="null" && params.row.problemClass!="undefined"&&
-              params.row.problemType!="null" && params.row.problemType!="undefined"){
-                return h('div',params.row.problemClass +" - "+ params.row.problemType)
+              if (
+                params.row.problemClass != "null" &&
+                params.row.problemClass != "undefined" &&
+                params.row.problemType != "null" &&
+                params.row.problemType != "undefined"
+              ) {
+                return h(
+                  "div",
+                  params.row.problemClass + " - " + params.row.problemType
+                );
               }
             }
           },
           {
             title: "问题项",
             key: "problem",
-            width: 120,
+            width: 120
             // ellipsis:true,
             // type: 'expand',
           },
@@ -456,18 +449,19 @@ export default {
                 case "undefined":
                   return h("div", "");
                 default:
-                    
-                  return h("div", [h(
-                  "span",
-                  {
-                    style: {
-                       color:params.row.priority=="高"?'#57a3f3':'unset',
-                      //  fontWeight:params.row.priority=='高'?'bold':'none'
-                    },
-                    
-                  },
-                  params.row.priority
-                ),]);
+                  return h("div", [
+                    h(
+                      "span",
+                      {
+                        style: {
+                          color:
+                            params.row.priority == "高" ? "#57a3f3" : "unset"
+                          //  fontWeight:params.row.priority=='高'?'bold':'none'
+                        }
+                      },
+                      params.row.priority
+                    )
+                  ]);
               }
             }
           },
@@ -489,7 +483,7 @@ export default {
           //               }
           //             }
           //         },
-          
+
           {
             title: "位置",
             key: "officeLocation",
@@ -546,11 +540,9 @@ export default {
             message: "请输入正确的手机号",
             trigger: "blur",
             transform(value) {
-              
-              if(value==null || value=="")
-              return ' '
+              if (value == null || value == "") return " ";
               // var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
-               var reg = /[0-9]/;
+              var reg = /[0-9]/;
               if (!reg.test(value)) {
                 return false;
               } else {
@@ -734,9 +726,7 @@ export default {
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
 
-      var url2 = `${
-        axios.defaults.baseURL
-      }/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+      var url2 = `${axios.defaults.baseURL}/api/emaint/repairProblem/exportRepairProblemData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
         &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`;
       // console.log(url2)
       location.href = url2;
@@ -754,9 +744,7 @@ export default {
       var userName = this.formItem.userName || "";
       var token = sessionStorage.getItem("token");
 
-      var url2 = `${
-        axios.defaults.baseURL
-      }/api/emaint/repairProblem/exportCustomersPayAReturnVisitData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
+      var url2 = `${axios.defaults.baseURL}/api/emaint/repairProblem/exportCustomersPayAReturnVisitData?beginTime=${beginTime}&endTime=${endTime}&isChange=${isChange}
         &workOrderNo=${workOrderNo}&name=${name}&state=${state}&phone=${phone}&userName=${userName}&accessToken=${token}`;
       // console.log(url2)
       location.href = url2;

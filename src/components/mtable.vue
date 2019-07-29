@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;">
     <!-- :loading="loading" -->
-    <Table border stripe @on-row-click="rowclick" :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
+    <Table border stripe  :columns="config.columns" :data="tableData" @on-selection-change="select"></Table>
     <div class="page-tool">
       <Page :total="total" :current="currentPage" :page-size="limit" show-total @on-change="pageChange"></Page>
     </div>
@@ -119,10 +119,10 @@ export default {
       })
       this.selection = selection
     },
-    rowclick(row,index){
-        console.log(row)
-        console.log(index)
-    },
+    // rowclick(row,index){
+    //     console.log(row)
+    //     console.log(index)
+    // },
     pageChange (page) {
       this.currentPage = page
       // console.log(this.currentPage)

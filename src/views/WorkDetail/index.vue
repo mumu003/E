@@ -568,10 +568,37 @@ export default {
         url: "",
         columns: [
           {
-            title: "工单号码 ",
+            title: "工单号码",
             key: "workOrderNo",
-            width: 130
+            width: 130,
+            align: "center",
+            render: (h, params) => {
+              return h("div", [
+                h(
+                  "span",
+                  {
+                    style:{
+                      color:'#57a3f3',
+                      cursor:"pointer"
+                    },
+                    on: {
+                      click: () => {
+                        sessionStorage.setItem("paramid", params.row.id);
+                        Bus.$emit('changeparamid',params.row.id)
+                      }
+                    }
+                  },
+                  params.row.workOrderNo
+                )
+               
+              ]);
+            }
           },
+        // {
+          //   title: "工单号码 ",
+          //   key: "workOrderNo",
+          //   width: 130
+          // },
           {
             title: "优先级",
             key: "priority",

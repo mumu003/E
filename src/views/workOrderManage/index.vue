@@ -461,11 +461,39 @@ export default {
       tableConfig: {
         url: "",
         columns: [
-          {
-            title: "工单号码 ",
+            {
+            title: "工单号码",
             key: "workOrderNo",
-            width: 130
+            width: 130,
+            align: "center",
+            render: (h, params) => {
+              return h("div", [
+  
+                h(
+                  "span",
+                  {
+                    
+                   
+                    on: {
+                      click: () => {
+                        sessionStorage.setItem("paramid", params.row.id);
+                        this.$router.push({
+                          name: "WorkDetail"
+                        });
+                      }
+                    }
+                  },
+                  ""+params.row.workOrderNo
+                )
+               
+              ]);
+            }
           },
+          // {
+          //   title: "工单号码 ",
+          //   key: "workOrderNo",
+          //   width: 130
+          // },
           {
             title: "优先级",
             key: "priority",
