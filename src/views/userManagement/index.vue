@@ -267,6 +267,37 @@
         <Button type="primary" size="default" @click="delAll()">确定</Button>
       </div>
     </Modal>
+
+
+
+    <!-- 启用禁用 -->
+    <Modal v-model="disableModal" title="提示信息"
+           width="600"
+           @on-cancel="confirmCancel">
+      <Row>
+        <Col span="16">
+          <p>禁用该用户后，无法登录维修小程序</p>
+        </Col>
+      </Row>
+      <div slot="footer" style="text-align: center;;margin:0 auto;">
+        <Button @click="confirmCancel">取消</Button>
+        <Button type="primary"  @click="disable_sure" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
+
+    <Modal v-model="enableModal" title="提示信息"
+           width="600"
+           @on-cancel="confirmCancel">
+      <Row>
+        <Col span="16">
+          <p>启用该用户后，允许用户登录维修小程序</p>
+        </Col>
+      </Row>
+      <div slot="footer" style="text-align: center;;margin:0 auto;">
+        <Button @click="confirmCancel">取消</Button>
+        <Button type="primary"  @click="enble_sure" :loading="modal_loading">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <style type="text/css">
@@ -297,6 +328,8 @@ export default {
       delId: "", //删除用户id
       updatePwdId: "", //修改密码id
       loading: true, //加载
+      disableModal:false,//禁用确认
+      enableModal:false,//启用确认
       modal_loading: false, //模态框加载
       addMaterialModal: false, //新增用户模态框
       editMaterialModal: false, //用户修改模态框
@@ -444,7 +477,7 @@ export default {
           {
             title: "操作",
             key: "name",
-            width: 200,
+            width: 240,
             align: "center",
             render: (h, params) => {
               return h(
@@ -533,7 +566,31 @@ export default {
                       }
                     },
                     "删除"
-                  )
+                  ),
+                  h('Button', {
+                    props: {
+                      type: 'primary',
+                      size: 'small',
+                    },
+                    style:{
+                      marginRight: '5px',
+                      backgroundColor:"#ed3f14",
+                      borderColor:"#ed3f14"
+                    },
+                    on: {
+                      click: () => {
+                        this.userId=params.row.id
+                        console.log(params.row.enable)
+                        if(params.row.enable==1){
+                          // 启用状态，需要禁用
+                          this.disableModal=true
+                        }else{
+                          this.enableModal=true
+                        }
+                      }
+                    }
+                    // 1 是启用状态
+                  }, params.row.enable==1?'禁用':'启用')
                 ]
               );
             }
@@ -883,7 +940,45 @@ export default {
     updatePwdCancel() {
       this.updatePwdModal = false;
       this.$refs.updatePwdForm.resetFields();
-    }
+    },
+
+    // 启用
+    enble_sure(){
+      this.$request.post("/api/user/enable",qs.stringify({id:this.userId}), res => {
+        this.$Message.error("网络出错，请重试！")
+      }, res => {
+        if (res.statusCode === 200) {
+          this.$Message.success({title: '提示信息', content: res.responseResult})
+          this.enable = false
+          this.$refs.table.init()
+        } else {
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
+      })
+    },
+
+    // 禁用
+    disable_sure(){
+      this.$request.post("/api/user/disable",qs.stringify({id:this.userId}), res => {
+        this.$Message.error("网络出错，请重试！")
+      }, res => {
+        if (res.statusCode === 200) {
+          this.$Message.success({title: '提示信息', content: res.responseResult})
+          this.disable = false
+          this.$refs.table.init()
+        } else {
+          this.$Modal.error({title: '提示信息', content: res.responseResult})
+        }
+      })
+    },
+
+
+    //取消
+    confirmCancel() {
+      this.enableModal = false
+      this.disableModal = false
+      this.$Message.info('你取消了操作')
+    },
   }
 };
 </script>
