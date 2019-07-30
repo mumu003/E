@@ -1049,6 +1049,8 @@ export default {
               } else {
                 this.imglist.push(data.problemImgs);
               }
+            }else{
+              this.imglist=[]
             }
 
             // 处理性别
